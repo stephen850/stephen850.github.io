@@ -1,0 +1,968 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>DJ Agent Europe | Deepbloe — Electronic Music Booking</title>
+<meta name="description" content="Deepbloe is a European DJ agent and booking agency operating across the full electronic music market. Representing artists and buying talent for European clubs, festivals and events."/>
+<meta name="keywords" content="dj agent europe, european dj agent, dj booking agent netherlands, dj booking agent germany, dj agent ibiza, electronic music agent europe"/>
+<meta name="author" content="Deepbloe Agency B.V."/>
+<meta name="robots" content="index, follow"/>
+<link rel="canonical" href="https://www.deepbloe.com/dj-agent-europe"/>
+<meta property="og:type" content="website"/>
+<meta property="og:url" content="https://www.deepbloe.com/dj-agent-europe"/>
+<meta property="og:title" content="DJ Agent Europe | Deepbloe — Electronic Music Booking"/>
+<meta property="og:description" content="Deepbloe is a European DJ agent and booking agency operating across the full electronic music market. Representing artists and buying talent for European clubs, festivals and events."/>
+<meta property="og:image" content="https://www.deepbloe.com/assets/images/og-image.jpg"/>
+<meta property="og:site_name" content="Deepbloe"/>
+<meta name="twitter:card" content="summary_large_image"/>
+<meta name="twitter:title" content="DJ Agent Europe | Deepbloe — Electronic Music Booking"/>
+<meta name="twitter:description" content="Deepbloe is a European DJ agent and booking agency operating across the full electronic music market. Representing artists and buying talent for European clubs, festivals and events."/>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "ProfessionalService",
+  "name": "Deepbloe Agency B.V.",
+  "url": "https://www.deepbloe.com",
+  "logo": "https://www.deepbloe.com/assets/images/image_01.png",
+  "description": "Deepbloe is a European DJ agent and booking agency operating across the full electronic music market. Representing artists and buying talent for European clubs, festivals and events.",
+  "areaServed": "Worldwide",
+  "address": {"@type":"PostalAddress","streetAddress":"Ambachtshof 88","addressLocality":"Nootdorp","postalCode":"2632 BB","addressCountry":"NL"},
+  "sameAs": ["https://www.instagram.com/deepbloe/","https://www.linkedin.com/company/76724101/"]
+}
+</script>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300&family=DM+Mono:wght@300;400&display=swap" rel="stylesheet"/>
+<style>
+/* ── RESET & BASE ─────────────────────────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --void:      #080808;
+  --obsidian:  #0D0D10;
+  --midnight:  #0A0E1A;
+  --ink:       #111318;
+  --graphite:  #1C1E24;
+  --steel:     #2A2D36;
+  --iron:      #5A5F70;
+  --silver:    #C4C8D4;
+  --chrome:    #E2E4EA;
+  --ivory:     #FFFFFF;
+  --electric:  #29ABE2;
+  --electric2: #1A6E95;
+  --font-display: 'Bebas Neue', sans-serif;
+  --font-body:    'DM Sans', sans-serif;
+  --font-mono:    'DM Mono', monospace;
+}
+
+html { scroll-behavior: smooth; }
+
+body {
+  background: #080808;
+  color: var(--ivory);
+  font-family: var(--font-body);
+  font-size: 16px;
+  line-height: 1.7;
+  overflow-x: hidden;
+  
+}
+
+/* ── CUSTOM CURSOR ────────────────────────────────────────────────────────── */
+
+
+.cursor-ring {
+  width: 36px; height: 36px; border: 1px solid rgba(238,240,244,0.4);
+  border-radius: 50%; transform: translate(-50%,-50%);
+  transition: width 0.3s ease, height 0.3s ease, transform 0.15s ease;
+  margin-top: -22px; margin-left: -4px;
+}
+body:has(a:hover) .cursor-ring,
+body:has(button:hover) .cursor-ring { width: 56px; height: 56px; }
+
+/* ── GRAIN OVERLAY ────────────────────────────────────────────────────────── */
+body::before {
+  content: ''; position: fixed; inset: 0; z-index: 1000; pointer-events: none;
+  opacity: 0.035;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+  background-size: 200px 200px;
+}
+
+/* ── SCROLLBAR ────────────────────────────────────────────────────────────── */
+::-webkit-scrollbar { width: 3px; }
+::-webkit-scrollbar-track { background: #080808; }
+::-webkit-scrollbar-thumb { background: var(--steel); border-radius: 2px; }
+
+/* ── TYPOGRAPHY ───────────────────────────────────────────────────────────── */
+h1, h2, h3, h4 { font-family: var(--font-display); letter-spacing: 0.02em; line-height: 0.92; }
+.mono { font-family: var(--font-mono); }
+
+/* ── LAYOUT ───────────────────────────────────────────────────────────────── */
+.container { max-width: 1440px; margin: 0 auto; padding: 0 80px; }
+@media (max-width: 1024px) { .container { padding: 0 40px; } }
+@media (max-width: 640px)  { .container { padding: 0 24px; } }
+
+/* ── NAVIGATION ───────────────────────────────────────────────────────────── */
+nav {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+  padding: 0 80px;
+  display: flex; align-items: center; justify-content: space-between;
+  height: 72px;
+  background: linear-gradient(180deg, rgba(8,8,8,0.95) 0%, rgba(8,8,8,0.7) 100%);
+  border-bottom: 1px solid var(--steel);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  transition: border-color 0.4s, background 0.4s;
+}
+nav.scrolled {
+  background: rgba(8,8,8,0.97);
+  border-bottom-color: var(--steel);
+}
+nav::before {
+  content: ''; position: absolute; top: 0; left: 0; right: 0;
+  height: 1px; background: linear-gradient(90deg, transparent, var(--electric), transparent);
+  opacity: 0.6;
+}
+.nav-logo {
+  display: flex; align-items: center; gap: 12px;
+  text-decoration: none; color: var(--ivory);
+}
+.nav-logo img { width: 36px; height: 36px; object-fit: contain; }
+.nav-logo-text {
+  font-family: var(--font-display); font-size: 18px; letter-spacing: 0.1em;
+  color: var(--ivory);
+}
+.nav-links {
+  display: flex; gap: 40px; list-style: none;
+}
+.nav-links a {
+  font-size: 11px; font-weight: 500; letter-spacing: 0.12em;
+  text-transform: uppercase; text-decoration: none;
+  color: var(--ivory); transition: color 0.2s;
+  position: relative;
+}
+.nav-links a::after {
+  content: ''; position: absolute; bottom: -4px; left: 0;
+  width: 0; height: 1px; background: var(--electric);
+  transition: width 0.3s ease;
+}
+.nav-links a:hover { color: var(--ivory); }
+.nav-links a:hover::after { width: 100%; }
+.nav-cta {
+  font-size: 11px; font-weight: 500; letter-spacing: 0.12em; text-transform: uppercase;
+  text-decoration: none; color: var(--ivory); padding: 10px 24px;
+  border: 1px solid rgba(238,240,244,0.25); transition: border-color 0.2s, color 0.2s, background 0.2s;
+}
+.nav-cta:hover { border-color: var(--electric); color: var(--electric); }
+
+/* ── HERO ─────────────────────────────────────────────────────────────────── */
+.hero {
+  position: relative; min-height: 100vh;
+  display: flex; flex-direction: column; justify-content: flex-end;
+  padding-bottom: 80px; overflow: hidden;
+}
+.hero-bg {
+  position: absolute; inset: 0; overflow: hidden;
+}
+.hero-bg img {
+  position: absolute; inset: 0; width: 100%; height: 100%;
+  object-fit: cover; object-position: center 25%;
+  filter: brightness(0.55) saturate(0.9);
+}
+.hero-bg::after {
+  content: '';
+  position: absolute; inset: 0;
+  background:
+    radial-gradient(ellipse 60% 50% at 75% 15%, rgba(8,8,8,0.4) 0%, transparent 60%),
+    linear-gradient(180deg, rgba(8,8,8,0.2) 0%, rgba(8,8,8,0.5) 60%, #080808 100%);
+}
+/* Simulated light beams */
+.hero-beams {
+  position: absolute; inset: 0; pointer-events: none; overflow: hidden;
+}
+.beam {
+  position: absolute; bottom: 0;
+  width: 1px; height: 65%;
+  background: linear-gradient(0deg, transparent, rgba(41,171,226,0.08), transparent);
+  transform-origin: bottom center;
+  animation: beam-sway 8s ease-in-out infinite;
+}
+.beam:nth-child(1) { left: 25%; transform: rotate(-12deg); animation-delay: 0s; }
+.beam:nth-child(2) { left: 40%; transform: rotate(-6deg); animation-delay: 1.5s; width: 2px; background: linear-gradient(0deg, transparent, rgba(41,171,226,0.05), transparent); }
+.beam:nth-child(3) { left: 55%; transform: rotate(4deg); animation-delay: 0.8s; }
+.beam:nth-child(4) { left: 68%; transform: rotate(10deg); animation-delay: 2.2s; }
+.beam:nth-child(5) { left: 78%; transform: rotate(16deg); animation-delay: 0.4s; width: 2px; background: linear-gradient(0deg, transparent, rgba(41,171,226,0.04), transparent); }
+@keyframes beam-sway {
+  0%, 100% { opacity: 0.6; }
+  50% { opacity: 1; }
+}
+
+.hero-counter {
+  font-family: var(--font-mono); font-size: 11px; color: var(--electric);
+  letter-spacing: 0.15em; margin-bottom: 32px;
+  opacity: 0; animation: fade-up 0.8s 0.3s ease forwards;
+}
+.hero-headline {
+  font-size: clamp(72px, 10vw, 160px); line-height: 0.88;
+  margin-bottom: 48px; position: relative;
+  opacity: 0; animation: fade-up 1s 0.5s ease forwards;
+}
+.hero-headline .line-2 { color: var(--chrome); opacity: 0.45; display: block; }
+.hero-headline .accent { color: var(--electric); }
+
+.hero-bottom {
+  display: flex; align-items: flex-end; justify-content: space-between;
+  opacity: 0; animation: fade-up 0.8s 0.9s ease forwards;
+}
+.hero-tagline {
+  font-size: 15px; color: var(--chrome); max-width: 360px; line-height: 1.7;
+  border-left: 1px solid var(--electric); padding-left: 20px;
+}
+.hero-scroll {
+  display: flex; flex-direction: column; align-items: center; gap: 12px;
+  font-family: var(--font-mono); font-size: 9px; letter-spacing: 0.2em;
+  color: var(--silver); text-transform: uppercase;
+}
+.hero-scroll-line {
+  width: 1px; height: 48px;
+  background: linear-gradient(180deg, var(--electric) 0%, transparent 100%);
+  animation: scroll-pulse 2s ease-in-out infinite;
+}
+@keyframes scroll-pulse { 0%,100%{opacity:0.4} 50%{opacity:1} }
+
+@keyframes fade-up {
+  from { opacity: 0; transform: translateY(24px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ── MARQUEE ──────────────────────────────────────────────────────────────── */
+.marquee-section {
+  border-top: 1px solid var(--steel); border-bottom: 1px solid var(--steel);
+  padding: 20px 0; overflow: hidden; background: var(--obsidian);
+}
+.marquee-track {
+  display: flex; gap: 64px; white-space: nowrap;
+  animation: marquee 30s linear infinite;
+}
+.marquee-track:hover { animation-play-state: paused; }
+.marquee-item {
+  display: flex; align-items: center; gap: 20px;
+  font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.15em;
+  color: var(--silver); text-transform: uppercase;
+  flex-shrink: 0;
+}
+.marquee-item span { color: var(--electric); }
+@keyframes marquee { 0%{transform:translateX(0)} 100%{transform:translateX(-50%)} }
+
+/* ── SECTION BASE ─────────────────────────────────────────────────────────── */
+section { position: relative; }
+.section-label {
+  font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.18em;
+  color: var(--electric); text-transform: uppercase; display: flex;
+  align-items: center; gap: 12px; margin-bottom: 48px;
+}
+.section-label::before {
+  content: ''; width: 24px; height: 1px; background: var(--electric);
+}
+
+/* ── ABOUT ────────────────────────────────────────────────────────────────── */
+.about { padding: 80px 0; background: #080808; }
+.about-grid {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 80px; align-items: start;
+}
+.about-headline {
+  font-size: clamp(48px, 5.5vw, 80px);
+  margin-bottom: 0;
+}
+.about-headline em { font-style: normal; color: var(--chrome); opacity: 0.45; }
+.about-subtitle {
+  font-size: 16px; color: var(--silver); line-height: 1.7;
+  margin-top: 28px; padding-top: 28px;
+  border-top: 1px solid var(--steel);
+  max-width: 340px;
+}
+.about-body { padding-top: 20px; }
+.about-body p { font-size: 16px; color: var(--chrome); line-height: 1.9; margin-bottom: 24px; }
+.about-body p strong { color: var(--ivory); font-weight: 500; }
+.about-stats {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 1px;
+  background: var(--steel); margin-top: 48px; border: 1px solid var(--steel);
+}
+.stat {
+  background: #080808; padding: 28px 24px;
+}
+.stat-number {
+  font-family: var(--font-display); font-size: 52px; color: var(--ivory);
+  line-height: 1; margin-bottom: 6px;
+}
+.stat-number span { color: var(--electric); }
+.stat-label { font-size: 11px; color: var(--chrome); letter-spacing: 0.1em; text-transform: uppercase; }
+
+/* ── SERVICES ─────────────────────────────────────────────────────────────── */
+.services { padding: 0 0 140px; background: #080808; }
+.services-header {
+  display: flex; justify-content: space-between; align-items: flex-end;
+  margin-bottom: 2px;
+}
+.services-headline { font-size: clamp(40px, 5vw, 72px); color: var(--ivory); }
+.services-list { display: flex; flex-direction: column; }
+.service-item {
+  border-top: 1px solid var(--steel);
+  display: grid; grid-template-columns: 80px 1fr 1fr auto;
+  gap: 40px; align-items: center; padding: 32px 0;
+  cursor: pointer; transition: padding-left 0.3s ease;
+  position: relative; overflow: hidden;
+}
+.service-item::before {
+  content: ''; position: absolute; left: 0; top: 0; bottom: 0;
+  width: 0; background: #080808;
+  transition: width 0.4s cubic-bezier(0.16,1,0.3,1);
+  z-index: -1;
+}
+.service-item:hover::before { width: 100%; }
+.service-item:hover { padding-left: 24px; }
+.service-item:last-child { border-bottom: 1px solid var(--steel); }
+.service-num { font-family: var(--font-mono); font-size: 11px; color: var(--silver); letter-spacing: 0.1em; }
+.service-name { font-family: var(--font-display); font-size: 32px; letter-spacing: 0.05em; }
+.service-desc { font-size: 14px; color: var(--chrome); line-height: 1.7; max-width: 400px; }
+.service-arrow {
+  width: 40px; height: 40px; border: 1px solid var(--steel);
+  display: flex; align-items: center; justify-content: center;
+  color: var(--silver); font-size: 18px; transition: all 0.3s;
+  flex-shrink: 0;
+}
+.service-item:hover .service-arrow { border-color: var(--electric); color: var(--electric); transform: rotate(45deg); }
+
+/* ── ARTISTS ──────────────────────────────────────────────────────────────── */
+.artists { padding: 80px 0 0; background: #080808; width: 100%; overflow: hidden; }
+.artists-header { margin-bottom: 64px; }
+.artists-headline { font-size: clamp(40px, 5vw, 72px); margin-bottom: 16px; }
+.artists-sub { font-size: 15px; color: var(--chrome); }
+.artists-grid {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  gap: 2px;
+  width: 100%;
+}
+.artists-grid > * {
+  flex: 0 0 calc(20% - 2px);
+  width: calc(20% - 2px);
+  height: 420px;
+  min-width: 0;
+}
+
+.artist-card {
+  position: relative; overflow: hidden;
+  background: #080808; cursor: pointer; display: block;
+  height: 420px;
+}
+.artist-card-bg {
+  position: absolute; inset: 0; overflow: hidden;
+  transition: transform 0.6s cubic-bezier(0.16,1,0.3,1);
+}
+.artist-card:hover .artist-card-bg { transform: scale(1.06); }
+
+.artist-card-overlay {
+  position: absolute; inset: 0;
+  background: linear-gradient(0deg, rgba(8,8,8,0.9) 0%, rgba(8,8,8,0.2) 50%, transparent 100%);
+  transition: background 0.4s;
+}
+.artist-card:hover .artist-card-overlay {
+  background: linear-gradient(0deg, rgba(8,8,8,0.95) 0%, rgba(8,8,8,0.4) 60%, rgba(41,171,226,0.05) 100%);
+}
+.artist-card-content {
+  position: absolute; bottom: 0; left: 0; right: 0; padding: 24px 20px;
+}
+.artist-card-num {
+  font-family: var(--font-mono); font-size: 10px; color: var(--iron);
+  letter-spacing: 0.15em; margin-bottom: 8px;
+}
+.artist-card-name {
+  font-family: var(--font-display); font-size: 20px; letter-spacing: 0.05em;
+  color: var(--ivory); margin-bottom: 4px;
+}
+.artist-card-insta {
+  display: inline-block; margin-top: 8px;
+  font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.1em;
+  color: var(--electric); text-decoration: none;
+  border: 1px solid rgba(41,171,226,0.3); padding: 4px 10px;
+  transition: background 0.2s, border-color 0.2s;
+}
+.artist-card-insta:hover { background: rgba(41,171,226,0.15); border-color: var(--electric); }
+.artist-card-role { font-size: 12px; color: var(--chrome); letter-spacing: 0.08em; }
+.artist-card-tag {
+  position: absolute; top: 16px; right: 16px;
+  font-family: var(--font-mono); font-size: 9px; letter-spacing: 0.1em;
+  color: var(--electric); background: rgba(8,8,8,0.8); padding: 4px 8px;
+  border: 1px solid var(--steel); opacity: 0;
+  transform: translateY(-8px); transition: opacity 0.3s, transform 0.3s;
+}
+.artist-card:hover .artist-card-tag { opacity: 1; transform: translateY(0); }
+.artist-card-tag.management { color: var(--chrome); border-color: var(--iron); }
+.artists-cta { text-align: center; margin-top: 48px; }
+
+/* ── PLATFORM SECTION ─────────────────────────────────────────────────────── */
+.platform { position: relative; padding: 0; background: #080808; overflow: hidden; }
+.platform-photo-wrap {
+  position: absolute; inset: 0; z-index: 0;
+}
+.platform-photo-overlay {
+  position: absolute; inset: 0;
+  background:
+    linear-gradient(90deg, rgba(8,8,8,0.92) 0%, rgba(8,8,8,0.75) 50%, rgba(8,8,8,0.5) 100%),
+    linear-gradient(180deg, rgba(8,8,8,0.3) 0%, rgba(8,8,8,0.3) 100%);
+}
+.platform-photo-content { position: relative; z-index: 1; padding: 80px 0; }
+.platform-inner {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 120px; align-items: center;
+}
+.platform-headline { font-size: clamp(48px, 5.5vw, 80px); margin-bottom: 32px; }
+.platform-headline em { font-style: normal; display: block; color: var(--chrome); opacity: 0.45; }
+.platform-body { font-size: 16px; color: var(--chrome); line-height: 1.9; margin-bottom: 40px; }
+.platform-features { display: flex; flex-direction: column; gap: 0; }
+.platform-feature {
+  padding: 20px 0; border-bottom: 1px solid var(--steel);
+  display: flex; gap: 20px; align-items: flex-start;
+}
+.platform-feature:first-child { border-top: 1px solid var(--steel); }
+.platform-feature-num {
+  font-family: var(--font-mono); font-size: 10px; color: var(--electric);
+  width: 32px; flex-shrink: 0; padding-top: 2px;
+}
+.platform-feature-text h4 {
+  font-family: var(--font-body); font-size: 15px; font-weight: 600;
+  color: var(--ivory); margin-bottom: 6px; letter-spacing: 0;
+}
+.platform-feature-text p { font-size: 14px; color: var(--chrome); line-height: 1.7; }
+.platform-quote {
+  text-align: center; padding: 48px;
+  border: 1px solid var(--steel); background: rgba(8,8,8,0.6);
+  backdrop-filter: blur(8px);
+}
+.platform-quote-mark {
+  font-family: var(--font-display); font-size: 80px; color: var(--electric);
+  line-height: 0.8; margin-bottom: 16px;
+}
+.platform-quote p {
+  font-family: var(--font-display); font-size: 32px; color: var(--ivory);
+  line-height: 1.1; margin-bottom: 20px;
+}
+.platform-quote span {
+  font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.15em;
+  color: var(--silver); text-transform: uppercase;
+}
+
+/* ── SHOWCASES ────────────────────────────────────────────────────────────── */
+.showcases { padding: 80px 0; background: #080808; }
+.showcases-header {
+  display: grid; grid-template-columns: 1fr 1fr;
+  gap: 80px; margin-bottom: 64px; align-items: end;
+}
+.showcases-headline { font-size: clamp(40px, 5vw, 72px); }
+.showcases-body { font-size: 15px; color: var(--chrome); line-height: 1.9; }
+.showcases-grid {
+  display: grid; grid-template-columns: 2fr 1fr 1fr; grid-template-rows: auto auto;
+  gap: 2px;
+}
+.showcase-card {
+  position: relative; overflow: hidden; cursor: pointer;
+  background: #080808;
+}
+.showcase-card:nth-child(1) { grid-row: span 2; min-height: 480px; }
+.showcase-card:nth-child(n+2) { min-height: 240px; }
+.showcase-card-bg {
+  position: absolute; inset: 0; overflow: hidden;
+  transition: transform 0.7s cubic-bezier(0.16,1,0.3,1);
+}
+.showcase-card:hover .showcase-card-bg { transform: scale(1.04); }
+.showcase-overlay {
+  position: absolute; inset: 0;
+  background: linear-gradient(0deg, rgba(8,8,8,0.9) 0%, rgba(8,8,8,0.1) 60%);
+}
+.showcase-content { position: absolute; bottom: 0; left: 0; right: 0; padding: 28px 24px; }
+.showcase-location {
+  font-family: var(--font-mono); font-size: 9px; color: var(--electric);
+  letter-spacing: 0.15em; text-transform: uppercase; margin-bottom: 8px;
+}
+.showcase-name {
+  font-family: var(--font-display); font-size: 28px; letter-spacing: 0.05em; margin-bottom: 6px;
+}
+.showcase-card:nth-child(1) .showcase-name { font-size: 48px; }
+.showcase-meta { font-size: 12px; color: var(--chrome); }
+.showcase-num {
+  position: absolute; top: 16px; right: 20px;
+  font-family: var(--font-display); font-size: 56px; color: rgba(238,240,244,0.06);
+  line-height: 1;
+}
+.showcase-card:nth-child(1) .showcase-num { font-size: 120px; top: 24px; }
+
+/* ── BRANDS SECTION ───────────────────────────────────────────────────────── */
+.brands { padding: 100px 0; background: #080808; }
+.brands-headline { font-size: clamp(32px, 4vw, 56px); margin-bottom: 16px; color: var(--ivory); }
+.brands-sub { font-size: 15px; color: var(--chrome); margin-bottom: 56px; }
+.brands-logos {
+  display: grid; grid-template-columns: repeat(6, 1fr); gap: 1px;
+  background: var(--steel);
+  border: 1px solid var(--steel);
+}
+.brand-logo-cell {
+  background: #080808; padding: 32px 24px;
+  display: flex; align-items: center; justify-content: center;
+  font-family: var(--font-display); font-size: 18px; letter-spacing: 0.1em;
+  color: var(--silver); transition: color 0.3s, background 0.3s;
+  cursor: pointer;
+}
+.brand-logo-cell:hover { background: var(--ink); color: var(--ivory); }
+
+/* ── CTA BANNER ───────────────────────────────────────────────────────────── */
+.cta-banner {
+  padding: 80px 0; background: #080808;
+  text-align: center; position: relative; overflow: hidden;
+}
+.cta-banner::before {
+  content: ''; position: absolute; inset: 0;
+  background: radial-gradient(ellipse 60% 80% at 50% 50%, rgba(41,171,226,0.08) 0%, transparent 70%);
+}
+.cta-headline { font-size: clamp(48px, 7vw, 110px); margin-bottom: 24px; position: relative; }
+.cta-headline em { font-style: normal; color: var(--electric); }
+.cta-sub { font-size: 16px; color: var(--chrome); margin-bottom: 48px; max-width: 500px; margin-left: auto; margin-right: auto; }
+.btn-primary {
+  display: inline-flex; align-items: center; gap: 12px;
+  font-size: 12px; font-weight: 500; letter-spacing: 0.14em; text-transform: uppercase;
+  text-decoration: none; color: var(--void); background: var(--ivory);
+  padding: 16px 40px; transition: background 0.2s, color 0.2s;
+}
+.btn-primary:hover { background: var(--electric); }
+.btn-secondary {
+  display: inline-flex; align-items: center; gap: 12px; margin-left: 16px;
+  font-size: 12px; font-weight: 500; letter-spacing: 0.14em; text-transform: uppercase;
+  text-decoration: none; color: var(--ivory); padding: 16px 40px;
+  border: 1px solid var(--steel); transition: border-color 0.2s;
+}
+.btn-secondary:hover { border-color: var(--electric); color: var(--electric); }
+
+/* ── FOOTER ───────────────────────────────────────────────────────────────── */
+footer {
+  background: #080808; border-top: 1px solid var(--steel);
+  padding: 64px 0 40px;
+}
+.footer-top {
+  display: grid; grid-template-columns: 1.5fr 1fr 1fr 1fr;
+  gap: 60px; padding-bottom: 48px; border-bottom: 1px solid var(--steel);
+  margin-bottom: 32px;
+}
+.footer-brand { }
+.footer-logo { display: flex; align-items: center; gap: 12px; margin-bottom: 20px; }
+.footer-logo img { width: 40px; height: 40px; }
+.footer-logo-name { font-family: var(--font-display); font-size: 20px; letter-spacing: 0.1em; }
+.footer-tagline { font-size: 14px; color: var(--chrome); line-height: 1.7; max-width: 280px; }
+.footer-col h5 {
+  font-family: var(--font-mono); font-size: 9px; letter-spacing: 0.18em;
+  color: var(--electric); text-transform: uppercase; margin-bottom: 20px;
+}
+.footer-col ul { list-style: none; display: flex; flex-direction: column; gap: 12px; }
+.footer-col li a {
+  font-size: 14px; color: var(--chrome); text-decoration: none;
+  transition: color 0.2s;
+}
+.footer-col li a:hover { color: var(--ivory); }
+.footer-bottom {
+  display: flex; justify-content: space-between; align-items: center;
+}
+.footer-copy { font-size: 11px; color: var(--silver); }
+.footer-legal {
+  border-top: 1px solid var(--steel);
+  padding: 32px 0; margin-bottom: 24px;
+}
+.footer-legal-grid {
+  display: grid; grid-template-columns: repeat(4, 1fr); gap: 32px;
+}
+.footer-legal-block {
+  display: flex; flex-direction: column; gap: 8px;
+}
+.footer-legal-label {
+  font-family: var(--font-mono); font-size: 9px; letter-spacing: 0.18em;
+  color: var(--electric); text-transform: uppercase;
+}
+.footer-legal-block span {
+  font-size: 13px; color: var(--silver); line-height: 1.7;
+}
+@media (max-width: 1024px) { .footer-legal-grid { grid-template-columns: repeat(2,1fr); } }
+@media (max-width: 640px)  { .footer-legal-grid { grid-template-columns: 1fr; } }
+.footer-socials { display: flex; gap: 24px; }
+.footer-socials a {
+  font-family: var(--font-mono); font-size: 9px; letter-spacing: 0.12em;
+  color: var(--silver); text-decoration: none; text-transform: uppercase;
+  transition: color 0.2s;
+}
+.footer-socials a:hover { color: var(--electric); }
+
+/* ── ARTIST MORE LIST ─────────────────────────────────────────────────────── */
+.artists-more { border-top: 1px solid var(--steel); padding-top: 40px; }
+.artists-more-header { margin-bottom: 32px; }
+.artists-more-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 2px;
+  background: var(--steel);
+  border: 1px solid var(--steel);
+}
+.artist-row {
+  background: #080808;
+  display: flex; align-items: center; gap: 12px;
+  padding: 18px 20px;
+  text-decoration: none;
+  transition: background 0.2s;
+  position: relative;
+  overflow: hidden;
+}
+.artist-row::before {
+  content: ''; position: absolute; left: 0; top: 0; bottom: 0;
+  width: 0; background: #080808;
+  transition: width 0.3s cubic-bezier(0.16,1,0.3,1);
+}
+.artist-row:hover::before { width: 100%; }
+.artist-row:hover { background: #080808; }
+.artist-row-name {
+  font-family: var(--font-display); font-size: 17px; letter-spacing: 0.05em;
+  color: var(--ivory); flex: 1; position: relative; z-index: 1;
+  transition: color 0.2s;
+}
+.artist-row-handle {
+  font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.08em;
+  color: var(--iron); position: relative; z-index: 1;
+  transition: color 0.2s;
+}
+.artist-row:hover .artist-row-handle { color: var(--electric); }
+.artist-row-arrow {
+  font-size: 14px; color: var(--steel); position: relative; z-index: 1;
+  transition: color 0.2s, transform 0.2s;
+}
+.artist-row:hover .artist-row-arrow { color: var(--electric); transform: translate(2px, -2px); }
+
+@media (max-width: 1024px) { .artists-more-grid { grid-template-columns: repeat(2, 1fr); } }
+@media (max-width: 640px)  { .artists-more-grid { grid-template-columns: 1fr; } }
+
+/* ── TEAM ──────────────────────────────────────────────────────────────────── */
+.team-grid { display: flex; flex-direction: column; }
+.team-row {
+  display: grid; grid-template-columns: 1.4fr 1.4fr 1.6fr 120px;
+  align-items: center; gap: 24px; padding: 20px;
+  border-bottom: 1px solid var(--steel); background: #080808;
+  transition: background 0.2s;
+}
+.team-row:hover { background: #080808; }
+.team-name { font-family: var(--font-display); font-size: 20px; letter-spacing: 0.04em; color: var(--ivory); }
+.team-role { font-size: 14px; color: var(--chrome); }
+.team-email { font-size: 13px; color: var(--silver); text-decoration: none; font-family: var(--font-mono); transition: color 0.2s; }
+.team-email:hover { color: var(--electric); }
+.team-li { font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.1em; color: var(--electric); text-decoration: none; text-align: right; transition: color 0.2s; }
+.team-li:hover { color: var(--ivory); }
+@media (max-width: 768px) { .team-row { grid-template-columns: 1fr 1fr; } .team-email,.team-li { display:none; } }
+
+/* ── FADE-IN ON SCROLL ────────────────────────────────────────────────────── */
+.reveal {
+  opacity: 1; transform: none;
+  transition: opacity 0.8s cubic-bezier(0.16,1,0.3,1), transform 0.8s cubic-bezier(0.16,1,0.3,1);
+}
+.reveal.animate-hidden { opacity: 0; transform: translateY(32px); }
+.reveal.visible { opacity: 1; transform: none; }
+.reveal-delay-1 { transition-delay: 0.1s; }
+.reveal-delay-2 { transition-delay: 0.2s; }
+.reveal-delay-3 { transition-delay: 0.3s; }
+
+/* ── MOBILE ───────────────────────────────────────────────────────────────── */
+@media (max-width: 1024px) {
+  nav { padding: 0 40px; }
+  .nav-links { gap: 24px; }
+  .about-grid, .platform-inner, .showcases-header { grid-template-columns: 1fr; gap: 48px; }
+    .showcases-grid { grid-template-columns: 1fr 1fr; }
+  .showcase-card:nth-child(1) { grid-column: span 2; }
+  .brands-logos { grid-template-columns: repeat(3, 1fr); }
+  .footer-top { grid-template-columns: 1fr 1fr; }
+  .service-item { grid-template-columns: 48px 1fr auto; }
+  .service-desc { display: none; }
+}
+@media (max-width: 640px) {
+  nav { padding: 0 24px; }
+  .nav-links { display: none; }
+  .hero { padding-bottom: 60px; }
+    .showcases-grid { grid-template-columns: 1fr; }
+  .showcase-card:nth-child(1) { grid-column: span 1; }
+  .brands-logos { grid-template-columns: repeat(2, 1fr); }
+  .footer-top { grid-template-columns: 1fr; }
+  .cta-banner { padding: 80px 0; }
+  .btn-secondary { display: none; }
+}
+
+
+
+@media (max-width: 768px) {
+  nav { padding: 0 20px !important; }
+  .nav-links, .nav-cta { display: none !important; }
+  .container { padding: 0 24px !important; }
+  #contact > div > div { grid-template-columns: 1fr !important; gap: 48px !important; }
+  #contact > div { padding: 0 24px !important; }
+  #team .team-row { grid-template-columns: 1fr 1fr !important; }
+  .team-email, .team-li { display: none !important; }
+  .showcases-header { grid-template-columns: 1fr !important; }
+  .showcases-grid { grid-template-columns: 1fr !important; }
+  .about-grid { grid-template-columns: 1fr !important; }
+  .footer-grid { grid-template-columns: 1fr 1fr !important; }
+  .footer-legal-grid { grid-template-columns: 1fr 1fr !important; }
+  .artists-grid > * { flex: 0 0 calc(50% - 2px) !important; width: calc(50% - 2px) !important; }
+  #platform > div > div { grid-template-columns: 1fr !important; }
+  nav::after { content: ''; }
+}
+@media (max-width: 480px) {
+  .artists-grid > * { flex: 0 0 calc(100% - 2px) !important; width: calc(100% - 2px) !important; }
+  .footer-grid { grid-template-columns: 1fr !important; }
+  #contact > div { padding: 0 16px !important; }
+  #contact form > div:first-child { grid-template-columns: 1fr !important; }
+}
+
+
+
+@keyframes mapPulse {
+  0%   { r: 8; opacity: 0.3; }
+  50%  { r: 14; opacity: 0.08; }
+  100% { r: 8; opacity: 0.3; }
+}
+.map-dot circle.pulse {
+  animation: mapPulse 2.5s ease-in-out infinite;
+}
+.map-dot:nth-child(2n) circle.pulse { animation-delay: 0.4s; }
+.map-dot:nth-child(3n) circle.pulse { animation-delay: 0.8s; }
+.map-dot:nth-child(4n) circle.pulse { animation-delay: 1.2s; }
+.map-dot:nth-child(5n) circle.pulse { animation-delay: 1.6s; }
+
+
+
+#offer-overlay{display:none;position:fixed;inset:0;z-index:9999;background:#080808;overflow-y:auto;}
+#offer-overlay.active{display:block;}
+.offer-close-bar{position:sticky;top:0;z-index:10;background:rgba(8,8,8,0.97);border-bottom:1px solid #1C1E24;padding:0 60px;height:72px;display:flex;align-items:center;justify-content:space-between;backdrop-filter:blur(12px);}
+.offer-close-bar::before{content:"";position:absolute;top:0;left:0;right:0;height:2px;background:#29ABE2;}
+.offer-close-logo{font-family:"Bebas Neue",sans-serif;font-size:22px;letter-spacing:0.1em;color:#fff;}
+.offer-close-btn{font-family:"DM Mono",monospace;font-size:11px;letter-spacing:0.12em;text-transform:uppercase;color:#8A8F9E;background:none;border:none;cursor:pointer;transition:color 0.2s;}
+.offer-close-btn:hover{color:#fff;}
+
+/* SEO PAGE EXTRAS */
+.seo-hero {
+  padding: 160px 0 100px;
+  background: #080808;
+  border-bottom: 1px solid #2A2D36;
+  position: relative;
+  overflow: hidden;
+}
+.seo-hero::before {
+  content: '';
+  position: absolute; inset: 0;
+  background: radial-gradient(ellipse 70% 60% at 20% 50%, rgba(41,171,226,0.05) 0%, transparent 60%);
+}
+.seo-section { padding: 80px 0; background: #080808; border-top: 1px solid #1C1E24; }
+.seo-section:nth-child(even) { background: #0D0D10; }
+.seo-body { font-size: 16px; color: #E0E2E8; line-height: 1.9; max-width: 760px; }
+.seo-body p { margin-bottom: 20px; }
+.seo-body h2 { font-family: 'Bebas Neue', sans-serif; font-size: clamp(32px,3.5vw,52px); color: #fff; margin-bottom: 20px; margin-top: 40px; }
+.seo-body h3 { font-family: 'Bebas Neue', sans-serif; font-size: clamp(24px,2.5vw,36px); color: #fff; margin-bottom: 12px; margin-top: 32px; }
+.seo-body ul { padding-left: 0; list-style: none; display: flex; flex-direction: column; gap: 10px; margin-bottom: 20px; }
+.seo-body ul li { display: flex; gap: 12px; align-items: flex-start; font-size: 15px; color: #C4C8D4; }
+.seo-body ul li::before { content: '→'; color: #29ABE2; flex-shrink: 0; font-family: monospace; }
+.seo-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 80px; align-items: start; }
+.seo-aside { padding: 40px; border: 1px solid #2A2D36; background: #0D0D10; }
+.seo-cta-block { background: #0D0D10; border: 1px solid #2A2D36; border-left: 3px solid #29ABE2; padding: 40px 48px; margin-top: 48px; }
+.artist-chip {
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: 10px 20px; border: 1px solid #2A2D36;
+  font-family: 'Bebas Neue', sans-serif; font-size: 18px; letter-spacing: 0.05em;
+  color: #fff; text-decoration: none; transition: border-color 0.2s, color 0.2s;
+  margin: 4px;
+}
+.artist-chip:hover { border-color: #29ABE2; color: #29ABE2; }
+.seo-explore { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 24px; }
+.seo-explore a {
+  font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: 0.12em;
+  text-transform: uppercase; color: #8A8F9E; text-decoration: none;
+  padding: 8px 16px; border: 1px solid #2A2D36; transition: all 0.2s;
+}
+.seo-explore a:hover { color: #29ABE2; border-color: #29ABE2; }
+@media (max-width: 768px) { .seo-grid { grid-template-columns: 1fr; gap: 40px; } }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav id="mainNav">
+  <a class="nav-logo" href="index.html">
+    <img src="assets/images/image_01.png" alt="Deepbloe" style="height:40px;width:auto;"/>
+  </a>
+  <ul class="nav-links">
+    <li><a href="index.html#about">About</a></li>
+    <li><a href="index.html#services">Services</a></li>
+    <li><a href="index.html#artists">Artists</a></li>
+    <li><a href="index.html#showcases">Showcases</a></li>
+    <li><a href="index.html#contact">Contact</a></li>
+  </ul>
+  <a class="nav-cta" href="index.html#contact">Get in Touch</a>
+</nav>
+
+<!-- HERO -->
+<section class="seo-hero">
+  <div class="container" style="position:relative;z-index:1;">
+    <div style="font-family:'DM Mono',monospace;font-size:10px;letter-spacing:0.18em;color:#29ABE2;text-transform:uppercase;margin-bottom:24px;display:flex;align-items:center;gap:12px;">
+      <span style="display:block;width:24px;height:1px;background:#29ABE2;"></span>Deepbloe — Global Electronic Music Platform
+    </div>
+    <h1 style="font-family:'Bebas Neue',sans-serif;font-size:clamp(56px,8vw,120px);line-height:0.88;color:#fff;margin-bottom:24px;">
+      DJ AGENT<br/><span style="color:#E2E4EA;opacity:0.35;">EUROPE.</span>
+    </h1>
+  </div>
+</section>
+
+<!-- BODY -->
+
+<section class="seo-section">
+  <div class="container">
+    <div class="seo-body" style="max-width:860px;">
+      <p>Deepbloe is headquartered in The Netherlands and operates as a fully active DJ agent across the European electronic music market. Our team has established relationships with promoters, festival directors and club bookers from Amsterdam to Ibiza, from Berlin to London — built over years of doing real business in the rooms that matter.</p>
+
+      <h2>What a European DJ Agent Actually Does</h2>
+      <p>A DJ agent is the link between the artist and the market. On the artist side: we negotiate fees, build routing strategies, manage contracts and protect the artist's interests. On the promoter side: we advise on talent fit, handle the offer process and support the show from advance to performance. In both directions, the agent's job is to make things happen efficiently and intelligently.</p>
+
+      <h2>The European Markets We Cover</h2>
+      <ul>
+        <li><strong style="color:#fff;">Netherlands</strong> — ADE, Amsterdam clubs, Dutch festival circuit</li>
+        <li><strong style="color:#fff;">Germany</strong> — Bootshaus, Berlin underground, Parookaville, Solar Festival</li>
+        <li><strong style="color:#fff;">Ibiza / Spain</strong> — Summer season, Ushuaïa, Hï, Pacha, superclub circuit</li>
+        <li><strong style="color:#fff;">United Kingdom</strong> — Fabric LDN, Ministry of Sound, Creamfields, E1</li>
+        <li><strong style="color:#fff;">Belgium</strong> — Tomorrowland, Lakedance, Emporium</li>
+        <li><strong style="color:#fff;">Eastern Europe</strong> — Balaton Sound, emerging market development</li>
+      </ul>
+
+      <h2>For Artists Seeking European Representation</h2>
+      <p>If you're an electronic music artist looking for a European agent, Deepbloe works with a selective roster. We don't sign artists to fill a database — we build genuine partnerships with artists who have the vision, identity and ambition to grow internationally. <a href="how-to-get-bookings-as-dj.html" style="color:#29ABE2;">Read more about how we work with artists →</a></p>
+
+      <h2>For Promoters Seeking European Talent</h2>
+      <p>We work with clubs and festivals across Europe looking for the right acts for their programme. Get in touch with your date, venue and brief — we'll advise on the best artists for your audience and handle the booking process end to end.</p>
+
+      <h2>Our European Artist Roster</h2>
+      
+<div style="display:flex;flex-wrap:wrap;gap:4px;margin-top:32px;">
+  <a class="artist-chip" href="christian-liu-booking.html">Liu</a>
+  <a class="artist-chip" href="index.html#artists">Goldfish</a>
+  <a class="artist-chip" href="index.html#artists">Jax Jones</a>
+  <a class="artist-chip" href="index.html#artists">Cat Dealers</a>
+  <a class="artist-chip" href="index.html#artists">Don't Blink</a>
+  <a class="artist-chip" href="index.html#artists">RSCL</a>
+  <a class="artist-chip" href="index.html#artists">Angemi</a>
+  <a class="artist-chip" href="index.html#artists">Watermät</a>
+</div>
+    </div>
+  </div>
+</section>
+
+<section class="seo-section">
+  <div class="container">
+    <div class="seo-cta-block">
+      <div style="font-family:'DM Mono',monospace;font-size:10px;letter-spacing:0.18em;color:#29ABE2;text-transform:uppercase;margin-bottom:16px;">Ready to move?</div>
+      <h2 style="font-family:'Bebas Neue',sans-serif;font-size:clamp(36px,4vw,64px);color:#fff;line-height:0.92;margin-bottom:20px;">LET'S TALK<br/><span style="color:#5A5F70;">BUSINESS.</span></h2>
+      <p style="font-size:16px;color:#C4C8D4;line-height:1.8;margin-bottom:32px;max-width:560px;">Artist, promoter, festival, club or brand — if you're serious about electronic music, this is where the conversation starts.</p>
+      <a href="index.html#contact" style="display:inline-flex;align-items:center;gap:12px;background:#fff;color:#080808;font-family:'Bebas Neue',sans-serif;font-size:15px;letter-spacing:0.12em;padding:16px 40px;text-decoration:none;transition:background 0.2s;" onmouseover="this.style.background='#29ABE2'" onmouseout="this.style.background='#fff'">
+        Get in Touch ↗
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- EXPLORE -->
+<section class="seo-section">
+  <div class="container">
+    <div style="font-family:'DM Mono',monospace;font-size:10px;letter-spacing:0.18em;color:#29ABE2;text-transform:uppercase;margin-bottom:20px;">Explore</div>
+    <h2 style="font-family:'Bebas Neue',sans-serif;font-size:clamp(28px,3vw,44px);color:#fff;margin-bottom:24px;">More from Deepbloe</h2>
+    <div class="seo-explore">
+      <a href="book-dj.html">Book a DJ</a>
+      <a href="book-dj-europe.html">Book a DJ in Europe</a>
+      <a href="hire-dj-for-festival.html">Hire a DJ for Festival</a>
+      <a href="house-dj-booking.html">House DJ Booking</a>
+      <a href="techno-dj-booking.html">Techno DJ Booking</a>
+      <a href="dj-booking-agency.html">DJ Booking Agency</a>
+      <a href="dj-agent-europe.html">DJ Agent Europe</a>
+      <a href="how-to-get-bookings-as-dj.html">How to Get Bookings as a DJ</a>
+      <a href="christian-liu-booking.html">Book Liu</a>
+      <a href="index.html">← Back to Deepbloe</a>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="container">
+    <div class="footer-top">
+      <div class="footer-brand">
+        <div class="footer-logo">
+          <img src="assets/images/image_01.png" alt="Deepbloe" onerror="this.style.display='none'"/>
+          <span class="footer-logo-name">DEEPBLOE</span>
+        </div>
+        <p class="footer-tagline">Global electronic music platform. Talent representation, programming and industry connections — built for the long game. Est. 2018.</p>
+      </div>
+      <div class="footer-col">
+        <h5>Services</h5>
+        <ul>
+          <li><a href="book-dj.html">Book a DJ</a></li>
+          <li><a href="hire-dj-for-festival.html">Festival Booking</a></li>
+          <li><a href="house-dj-booking.html">House DJ Booking</a></li>
+          <li><a href="techno-dj-booking.html">Techno DJ Booking</a></li>
+          <li><a href="index.html#services">All Services</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h5>Artists</h5>
+        <ul>
+          <li><a href="christian-liu-booking.html">Liu</a></li>
+          <li><a href="index.html#artists">All Artists</a></li>
+          <li><a href="dj-booking-agency.html">Join the Roster</a></li>
+          <li><a href="how-to-get-bookings-as-dj.html">Get Bookings as a DJ</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h5>Contact</h5>
+        <ul>
+          <li><a href="mailto:info@deepbloe.com">info@deepbloe.com</a></li>
+          <li><a href="index.html#contact">Get in Touch</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-legal">
+      <div class="footer-legal-grid">
+        <div class="footer-legal-block">
+          <span class="footer-legal-label">Address</span>
+          <span>Deepbloe Agency B.V.<br/>Ambachtshof 88<br/>2632 BB Nootdorp<br/>The Netherlands</span>
+        </div>
+        <div class="footer-legal-block">
+          <span class="footer-legal-label">Registration</span>
+          <span>KvK: 86099477<br/>VAT: NL863860734B01</span>
+        </div>
+        <div class="footer-legal-block">
+          <span class="footer-legal-label">Contact</span>
+          <span>info@deepbloe.com<br/>deepbloe.com</span>
+        </div>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span class="footer-copy">© 2026 Deepbloe Agency B.V. All rights reserved.</span>
+      <div class="footer-socials">
+        <a href="https://www.instagram.com/deepbloe/" target="_blank">Instagram</a>
+        <a href="https://www.linkedin.com/company/76724101/" target="_blank">LinkedIn</a>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<script>
+window.addEventListener("scroll",function(){
+  var nav=document.querySelector("nav");
+  if(nav) nav.classList.toggle("scrolled",window.scrollY>50);
+});
+</script>
+</body>
+</html>

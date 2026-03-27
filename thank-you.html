@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Thank You | Deepbloe</title>
+<meta name="robots" content="noindex, nofollow"/>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300&family=DM+Mono:wght@300;400&display=swap" rel="stylesheet"/>
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --void: #080808;
+  --steel: #2A2D36;
+  --iron: #5A5F70;
+  --silver: #C4C8D4;
+  --chrome: #E2E4EA;
+  --ivory: #FFFFFF;
+  --electric: #29ABE2;
+  --font-display: 'Bebas Neue', sans-serif;
+  --font-body: 'DM Sans', sans-serif;
+  --font-mono: 'DM Mono', monospace;
+}
+html { scroll-behavior: smooth; }
+body {
+  background: #080808;
+  color: var(--ivory);
+  font-family: var(--font-body);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  overflow-x: hidden;
+}
+body::before {
+  content: ''; position: fixed; inset: 0; z-index: 1000; pointer-events: none;
+  opacity: 0.035;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+  background-size: 200px 200px;
+}
+nav {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+  padding: 0 80px;
+  display: flex; align-items: center; justify-content: space-between;
+  height: 72px;
+  background: rgba(8,8,8,0.97);
+  border-bottom: 1px solid var(--steel);
+  backdrop-filter: blur(16px);
+}
+nav::before {
+  content: ''; position: absolute; top: 0; left: 0; right: 0;
+  height: 1px; background: linear-gradient(90deg, transparent, var(--electric), transparent);
+  opacity: 0.6;
+}
+.nav-logo {
+  font-family: var(--font-display); font-size: 22px; letter-spacing: 0.1em;
+  color: var(--ivory); text-decoration: none;
+}
+.nav-back {
+  font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.12em;
+  text-transform: uppercase; color: var(--silver); text-decoration: none;
+  transition: color 0.2s;
+}
+.nav-back:hover { color: var(--electric); }
+
+main {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 120px 40px 80px;
+  position: relative;
+}
+/* Background glow */
+main::before {
+  content: '';
+  position: absolute; inset: 0;
+  background: radial-gradient(ellipse 60% 60% at 50% 50%, rgba(41,171,226,0.06) 0%, transparent 70%);
+  pointer-events: none;
+}
+
+.thank-you-wrap {
+  text-align: center;
+  max-width: 640px;
+  position: relative;
+  z-index: 1;
+  animation: fade-up 0.9s 0.1s ease both;
+}
+
+@keyframes fade-up {
+  from { opacity: 0; transform: translateY(24px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.thank-you-label {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.2em;
+  color: var(--electric);
+  text-transform: uppercase;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  margin-bottom: 32px;
+}
+.thank-you-label::before,
+.thank-you-label::after {
+  content: ''; width: 32px; height: 1px; background: var(--electric);
+}
+
+.thank-you-headline {
+  font-family: var(--font-display);
+  font-size: clamp(64px, 10vw, 120px);
+  line-height: 0.88;
+  color: var(--ivory);
+  margin-bottom: 32px;
+}
+.thank-you-headline span {
+  color: var(--chrome);
+  opacity: 0.4;
+  display: block;
+}
+
+.thank-you-body {
+  font-size: 16px;
+  color: var(--chrome);
+  line-height: 1.9;
+  margin-bottom: 48px;
+  max-width: 480px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.thank-you-divider {
+  width: 1px;
+  height: 48px;
+  background: linear-gradient(180deg, var(--electric), transparent);
+  margin: 0 auto 48px;
+}
+
+.btn-back {
+  display: inline-flex; align-items: center; gap: 12px;
+  font-family: var(--font-mono); font-size: 11px; font-weight: 500;
+  letter-spacing: 0.14em; text-transform: uppercase;
+  text-decoration: none; color: var(--void); background: var(--ivory);
+  padding: 16px 40px; transition: background 0.2s;
+}
+.btn-back:hover { background: var(--electric); }
+
+footer {
+  text-align: center;
+  padding: 32px 40px;
+  border-top: 1px solid var(--steel);
+}
+.footer-copy {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.12em;
+  color: var(--iron);
+  text-transform: uppercase;
+}
+
+@media (max-width: 640px) {
+  nav { padding: 0 24px; }
+  main { padding: 100px 24px 60px; }
+}
+</style>
+</head>
+<body>
+
+<nav>
+  <a class="nav-logo" href="index.html">DEEPBLOE</a>
+  <a class="nav-back" href="index.html">← Back to site</a>
+</nav>
+
+<main>
+  <div class="thank-you-wrap">
+
+    <div class="thank-you-label">Message received</div>
+
+    <h1 class="thank-you-headline">
+      WE'LL BE<br/>
+      <span>IN TOUCH.</span>
+    </h1>
+
+    <p class="thank-you-body">
+      Your message has been sent to the Deepbloe team.<br/>
+      We typically respond within 48 hours.
+    </p>
+
+    <div class="thank-you-divider"></div>
+
+    <a class="btn-back" href="index.html">← Back to Deepbloe</a>
+
+  </div>
+</main>
+
+<footer>
+  <span class="footer-copy">© 2026 Deepbloe Agency B.V. — Global Electronic Music Platform</span>
+</footer>
+
+</body>
+</html>
