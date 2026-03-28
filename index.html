@@ -962,36 +962,45 @@ footer {
   ╚══════════════════════════════════════════════════════╝
 -->
 <!-- NAVIGATION -->
-<nav id="mainNav">
-<a class="nav-logo" href="/">
-<img alt="Deepbloe Agency" src="assets/images/image_01.png" style="height:48px;width:auto;"/>
-</a>
-<ul class="nav-links">
-<li><a href="#about">About</a></li>
-<li><a href="#services">Services</a></li>
-<li><a href="#artists">Artists</a></li>
-<li><a href="#platform">Platform</a></li>
-<li><a href="#showcases">Showcases</a></li>
-<li><a href="#team">Team</a></li>
-<li><a href="https://www.deepbloe.com/private-access" style="color:var(--electric) !important;" target="_blank">Private Access</a></li>
-</ul>
-<a class="nav-cta" href="#contact">Get in Touch</a>
-<button class="hamburger" id="hamburgerBtn" aria-label="Menu" style="display:none;">
-  <span></span><span></span><span></span>
-</button>
+<!-- NAV -->
+<nav style="position:fixed;top:0;left:0;right:0;z-index:1000;height:72px;display:flex;align-items:center;justify-content:space-between;padding:0 32px;background:rgba(8,8,8,0.97);border-bottom:1px solid #2A2D36;backdrop-filter:blur(16px);">
+  <!-- Logo -->
+  <a href="/" style="display:flex;align-items:center;text-decoration:none;z-index:1001;">
+    <img src="assets/images/image_01.png" alt="Deepbloe" style="height:40px;width:auto;"/>
+  </a>
+
+  <!-- Desktop links -->
+  <ul id="desktopNav" style="display:flex;gap:36px;list-style:none;margin:0;padding:0;">
+    <li><a href="#about" style="font-family:'DM Sans',sans-serif;font-size:11px;font-weight:500;letter-spacing:0.12em;text-transform:uppercase;color:#fff;text-decoration:none;">About</a></li>
+    <li><a href="#services" style="font-family:'DM Sans',sans-serif;font-size:11px;font-weight:500;letter-spacing:0.12em;text-transform:uppercase;color:#fff;text-decoration:none;">Services</a></li>
+    <li><a href="#artists" style="font-family:'DM Sans',sans-serif;font-size:11px;font-weight:500;letter-spacing:0.12em;text-transform:uppercase;color:#fff;text-decoration:none;">Artists</a></li>
+    <li><a href="#showcases" style="font-family:'DM Sans',sans-serif;font-size:11px;font-weight:500;letter-spacing:0.12em;text-transform:uppercase;color:#fff;text-decoration:none;">Showcases</a></li>
+    <li><a href="#team" style="font-family:'DM Sans',sans-serif;font-size:11px;font-weight:500;letter-spacing:0.12em;text-transform:uppercase;color:#fff;text-decoration:none;">Team</a></li>
+    <li><a href="https://www.deepbloe.com/private-access" target="_blank" style="font-family:'DM Sans',sans-serif;font-size:11px;font-weight:500;letter-spacing:0.12em;text-transform:uppercase;color:#29ABE2;text-decoration:none;">Private Access</a></li>
+  </ul>
+
+  <!-- Desktop CTA -->
+  <a id="desktopCta" href="#contact" style="font-family:'DM Sans',sans-serif;font-size:11px;font-weight:500;letter-spacing:0.12em;text-transform:uppercase;color:#fff;text-decoration:none;padding:10px 24px;border:1px solid rgba(255,255,255,0.25);">Get in Touch</a>
+
+  <!-- Hamburger button -->
+  <button id="hamburgerBtn" onclick="toggleMobileMenu()" aria-label="Menu" style="display:none;flex-direction:column;gap:5px;background:none;border:none;cursor:pointer;padding:8px;z-index:1001;">
+    <span id="hLine1" style="display:block;width:24px;height:2px;background:#fff;transition:all 0.3s;"></span>
+    <span id="hLine2" style="display:block;width:24px;height:2px;background:#fff;transition:all 0.3s;"></span>
+    <span id="hLine3" style="display:block;width:24px;height:2px;background:#fff;transition:all 0.3s;"></span>
+  </button>
 </nav>
 
-<!-- MOBILE MENU -->
-<div class="mobile-menu" id="mobileMenu">
-  <a href="#about" onclick="closeMobileMenu()">About</a>
-  <a href="#services" onclick="closeMobileMenu()">Services</a>
-  <a href="#artists" onclick="closeMobileMenu()">Artists</a>
-  <a href="#platform" onclick="closeMobileMenu()">Platform</a>
-  <a href="#showcases" onclick="closeMobileMenu()">Showcases</a>
-  <a href="#team" onclick="closeMobileMenu()">Team</a>
-  <a href="https://www.deepbloe.com/private-access" class="electric" target="_blank" onclick="closeMobileMenu()">Private Access</a>
-  <a href="#contact" class="mobile-cta" onclick="closeMobileMenu()">Get in Touch</a>
+<!-- MOBILE MENU OVERLAY -->
+<div id="mobileMenuOverlay" style="display:none;position:fixed;top:72px;left:0;right:0;bottom:0;background:rgba(8,8,8,0.99);z-index:999;flex-direction:column;padding:32px 24px;overflow-y:auto;">
+  <a href="#about" onclick="closeMobileMenu()" style="font-family:'Bebas Neue',sans-serif;font-size:40px;letter-spacing:0.05em;color:#fff;text-decoration:none;padding:16px 0;border-bottom:1px solid #1C1E24;display:block;">About</a>
+  <a href="#services" onclick="closeMobileMenu()" style="font-family:'Bebas Neue',sans-serif;font-size:40px;letter-spacing:0.05em;color:#fff;text-decoration:none;padding:16px 0;border-bottom:1px solid #1C1E24;display:block;">Services</a>
+  <a href="#artists" onclick="closeMobileMenu()" style="font-family:'Bebas Neue',sans-serif;font-size:40px;letter-spacing:0.05em;color:#fff;text-decoration:none;padding:16px 0;border-bottom:1px solid #1C1E24;display:block;">Artists</a>
+  <a href="#showcases" onclick="closeMobileMenu()" style="font-family:'Bebas Neue',sans-serif;font-size:40px;letter-spacing:0.05em;color:#fff;text-decoration:none;padding:16px 0;border-bottom:1px solid #1C1E24;display:block;">Showcases</a>
+  <a href="#team" onclick="closeMobileMenu()" style="font-family:'Bebas Neue',sans-serif;font-size:40px;letter-spacing:0.05em;color:#fff;text-decoration:none;padding:16px 0;border-bottom:1px solid #1C1E24;display:block;">Team</a>
+  <a href="https://www.deepbloe.com/private-access" target="_blank" onclick="closeMobileMenu()" style="font-family:'Bebas Neue',sans-serif;font-size:40px;letter-spacing:0.05em;color:#29ABE2;text-decoration:none;padding:16px 0;border-bottom:1px solid #1C1E24;display:block;">Private Access</a>
+  <a href="#contact" onclick="closeMobileMenu()" style="display:block;text-align:center;margin-top:28px;background:#fff;color:#080808;font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:0.1em;padding:18px 32px;text-decoration:none;">Get in Touch</a>
 </div>
+
 <!-- HERO -->
 <section class="hero">
 <div class="hero-bg">
@@ -1913,26 +1922,58 @@ document.querySelectorAll(".service-row").forEach(function(row){
   });
 });
 
-// Hamburger menu
+// Mobile menu
+var mobileMenuOpen = false;
+function toggleMobileMenu() {
+  mobileMenuOpen = !mobileMenuOpen;
+  var overlay = document.getElementById('mobileMenuOverlay');
+  var btn = document.getElementById('hamburgerBtn');
+  var l1 = document.getElementById('hLine1');
+  var l2 = document.getElementById('hLine2');
+  var l3 = document.getElementById('hLine3');
+  if (mobileMenuOpen) {
+    overlay.style.display = 'flex';
+    document.body.style.overflow = 'hidden';
+    l1.style.transform = 'rotate(45deg) translate(5px,5px)';
+    l2.style.opacity = '0';
+    l3.style.transform = 'rotate(-45deg) translate(5px,-5px)';
+  } else {
+    closeMobileMenu();
+  }
+}
 function closeMobileMenu() {
-  document.getElementById('mobileMenu').classList.remove('open');
-  document.getElementById('hamburgerBtn').classList.remove('open');
+  mobileMenuOpen = false;
+  var overlay = document.getElementById('mobileMenuOverlay');
+  if (overlay) overlay.style.display = 'none';
   document.body.style.overflow = '';
+  var l1 = document.getElementById('hLine1');
+  var l2 = document.getElementById('hLine2');
+  var l3 = document.getElementById('hLine3');
+  if (l1) { l1.style.transform='none'; l2.style.opacity='1'; l3.style.transform='none'; }
 }
-var hamburgerBtn = document.getElementById('hamburgerBtn');
-if (hamburgerBtn) {
-  hamburgerBtn.addEventListener('click', function() {
-    var menu = document.getElementById('mobileMenu');
-    var isOpen = menu.classList.contains('open');
-    if (isOpen) {
-      closeMobileMenu();
-    } else {
-      menu.classList.add('open');
-      hamburgerBtn.classList.add('open');
-      document.body.style.overflow = 'hidden';
-    }
-  });
+
+
+// Responsive nav show/hide
+function handleNavResize() {
+  var w = window.innerWidth;
+  var desktop = document.getElementById('desktopNav');
+  var cta = document.getElementById('desktopCta');
+  var ham = document.getElementById('hamburgerBtn');
+  if (!desktop || !ham) return;
+  if (w <= 768) {
+    desktop.style.display = 'none';
+    cta.style.display = 'none';
+    ham.style.display = 'flex';
+  } else {
+    desktop.style.display = 'flex';
+    cta.style.display = 'block';
+    ham.style.display = 'none';
+    closeMobileMenu();
+  }
 }
+window.addEventListener('resize', handleNavResize);
+handleNavResize();
+
 </script>
 </body>
 </html>
