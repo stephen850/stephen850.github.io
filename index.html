@@ -870,7 +870,22 @@ footer {
 <li><a href="https://www.deepbloe.com/private-access" style="color:var(--electric) !important;" target="_blank">Private Access</a></li>
 </ul>
 <a class="nav-cta" href="#contact">Get in Touch</a>
+<button class="hamburger" id="hamburgerBtn" aria-label="Menu" style="display:none;">
+  <span></span><span></span><span></span>
+</button>
 </nav>
+
+<!-- MOBILE MENU -->
+<div class="mobile-menu" id="mobileMenu">
+  <a href="#about" onclick="closeMobileMenu()">About</a>
+  <a href="#services" onclick="closeMobileMenu()">Services</a>
+  <a href="#artists" onclick="closeMobileMenu()">Artists</a>
+  <a href="#platform" onclick="closeMobileMenu()">Platform</a>
+  <a href="#showcases" onclick="closeMobileMenu()">Showcases</a>
+  <a href="#team" onclick="closeMobileMenu()">Team</a>
+  <a href="https://www.deepbloe.com/private-access" class="electric" target="_blank" onclick="closeMobileMenu()">Private Access</a>
+  <a href="#contact" class="mobile-cta" onclick="closeMobileMenu()">Get in Touch</a>
+</div>
 <!-- HERO -->
 <section class="hero">
 <div class="hero-bg">
@@ -1791,6 +1806,27 @@ document.querySelectorAll(".service-row").forEach(function(row){
     if(!isOpen)row.classList.add("open");
   });
 });
+
+// Hamburger menu
+function closeMobileMenu() {
+  document.getElementById('mobileMenu').classList.remove('open');
+  document.getElementById('hamburgerBtn').classList.remove('open');
+  document.body.style.overflow = '';
+}
+var hamburgerBtn = document.getElementById('hamburgerBtn');
+if (hamburgerBtn) {
+  hamburgerBtn.addEventListener('click', function() {
+    var menu = document.getElementById('mobileMenu');
+    var isOpen = menu.classList.contains('open');
+    if (isOpen) {
+      closeMobileMenu();
+    } else {
+      menu.classList.add('open');
+      hamburgerBtn.classList.add('open');
+      document.body.style.overflow = 'hidden';
+    }
+  });
+}
 </script>
 </body>
 </html>
