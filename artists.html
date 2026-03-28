@@ -725,11 +725,24 @@ footer {
 
 *{box-sizing:border-box;}
 html,body{overflow-x:hidden;max-width:100vw;background:#080808;color:#fff;margin:0;padding:0;}
-.artists-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:3px;}
-@media(max-width:1024px){.artists-grid{grid-template-columns:repeat(2,1fr);}}
+.roster-grid{
+  display:grid !important;
+  grid-template-columns:repeat(3,1fr) !important;
+  gap:3px !important;
+  flex-direction:unset !important;
+  flex-wrap:unset !important;
+  width:100% !important;
+}
+.roster-grid > * {
+  flex:unset !important;
+  width:100% !important;
+  min-width:0 !important;
+  height:auto !important;
+}
+@media(max-width:1024px){.roster-grid{grid-template-columns:repeat(2,1fr) !important;}}
 @media(max-width:640px){
-  .artists-grid{grid-template-columns:1fr 1fr;}
-  .artists-grid a img{height:200px!important;}
+  .roster-grid{grid-template-columns:1fr 1fr !important;}
+  .roster-grid a img{height:200px!important;}
   #desktopNav{display:none!important;}
   #desktopCta{display:none!important;}
   #hamburgerBtn{display:flex!important;}
@@ -781,7 +794,7 @@ html,body{overflow-x:hidden;max-width:100vw;background:#080808;color:#fff;margin
 
   <!-- ALL 15 ARTISTS — full photo grid -->
   <div style="max-width:1440px;margin:0 auto;padding:3px 0 0;">
-    <div class="artists-grid">
+    <div class="roster-grid">
       <a href="christian-liu-booking.html" style="position:relative;overflow:hidden;display:block;text-decoration:none;background:#111318;border:1px solid #1C1E24;transition:border-color 0.3s;" onmouseover="this.style.borderColor='#29ABE2'" onmouseout="this.style.borderColor='#1C1E24'">
   <div style="overflow:hidden;">
     <img src="assets/images/image_03.jpg" alt="LIU" style="width:100%;height:320px;object-fit:cover;object-position:center top;filter:brightness(0.75) saturate(0.85);display:block;transition:transform 0.5s,filter 0.3s;" onmouseover="this.style.transform='scale(1.04)';this.style.filter='brightness(0.9) saturate(1)'" onmouseout="this.style.transform='scale(1)';this.style.filter='brightness(0.75) saturate(0.85)'"/>
