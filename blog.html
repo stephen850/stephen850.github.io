@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Blog | Electronic Music Industry Insights — Deepbloe Agency</title>
+<meta name="description" content="Industry insights, artist news and electronic music booking tips from Deepbloe Agency — the global electronic music platform based in the Netherlands."/>
+<meta name="robots" content="index, follow"/>
+<link rel="canonical" href="https://www.deepbloe.com/blog"/>
+<meta property="og:title" content="Blog | Deepbloe Agency"/>
+<meta property="og:description" content="Industry insights, artist news and electronic music booking tips from Deepbloe Agency."/>
+<meta property="og:url" content="https://www.deepbloe.com/blog"/>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "Blog",
+      "name": "Deepbloe Agency Blog",
+      "url": "https://www.deepbloe.com/blog",
+      "description": "Industry insights, artist news and electronic music booking tips from Deepbloe Agency.",
+      "publisher": {
+        "@type": "Organization",
+        "name": "Deepbloe Agency",
+        "url": "https://www.deepbloe.com",
+        "logo": "https://www.deepbloe.com/assets/images/image_01.png"
+      }
+    },
+    {
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        {"@type": "ListItem", "position": 1, "name": "Home", "item": "https://www.deepbloe.com"},
+        {"@type": "ListItem", "position": 2, "name": "Blog", "item": "https://www.deepbloe.com/blog"}
+      ]
+    }
+  ]
+}
+</script>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500&family=DM+Mono:wght@300;400&display=swap" rel="stylesheet"/>
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --void: #080808; --steel: #2A2D36; --iron: #5A5F70; --silver: #C4C8D4;
+  --chrome: #E2E4EA; --ivory: #FFFFFF; --electric: #29ABE2;
+  --font-display: 'Bebas Neue', sans-serif;
+  --font-body: 'DM Sans', sans-serif;
+  --font-mono: 'DM Mono', monospace;
+}
+html { scroll-behavior: smooth; }
+body { background: #080808; color: #fff; font-family: var(--font-body); font-size: 16px; line-height: 1.7; overflow-x: hidden; }
+body::before { content: ''; position: fixed; inset: 0; z-index: 1000; pointer-events: none; opacity: 0.035; background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E"); background-size: 200px 200px; }
+::-webkit-scrollbar { width: 3px; } ::-webkit-scrollbar-track { background: #080808; } ::-webkit-scrollbar-thumb { background: var(--steel); border-radius: 2px; }
+.container { max-width: 1200px; margin: 0 auto; padding: 0 40px; }
+@media (max-width: 768px) { .container { padding: 0 24px; } }
+nav { position: fixed; top: 0; left: 0; right: 0; z-index: 100; height: 72px; display: flex; align-items: center; justify-content: space-between; padding: 0 40px; background: rgba(8,8,8,0.97); border-bottom: 1px solid var(--steel); backdrop-filter: blur(16px); }
+nav::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 1px; background: linear-gradient(90deg, transparent, var(--electric), transparent); opacity: 0.6; }
+.nav-logo { display: flex; align-items: center; text-decoration: none; }
+.nav-logo img { height: 40px; width: auto; }
+.nav-links { display: flex; gap: 32px; list-style: none; }
+.nav-links a { font-size: 11px; font-weight: 500; letter-spacing: 0.12em; text-transform: uppercase; color: #fff; text-decoration: none; transition: color 0.2s; }
+.nav-links a:hover { color: var(--electric); }
+.nav-cta { font-size: 11px; font-weight: 500; letter-spacing: 0.12em; text-transform: uppercase; color: #fff; text-decoration: none; padding: 10px 24px; border: 1px solid rgba(255,255,255,0.25); transition: border-color 0.2s; }
+.nav-cta:hover { border-color: var(--electric); color: var(--electric); }
+@media (max-width: 768px) { .nav-links { display: none; } .nav-cta { display: none; } nav { padding: 0 20px; } }
+
+/* PAGE HEADER */
+.page-header { padding: 120px 0 64px; background: #0C0C13; border-bottom: 1px solid #1C1E24; }
+.label { font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.18em; color: var(--electric); text-transform: uppercase; display: flex; align-items: center; gap: 12px; margin-bottom: 20px; }
+.label::before { content: ''; width: 24px; height: 1px; background: var(--electric); }
+
+/* BLOG GRID */
+.blog-section { padding: 80px 0; }
+.blog-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 2px; }
+@media (max-width: 1024px) { .blog-grid { grid-template-columns: 1fr 1fr; } }
+@media (max-width: 640px) { .blog-grid { grid-template-columns: 1fr; } }
+
+.blog-card { background: #0C0C13; border: 1px solid #1C1E24; display: flex; flex-direction: column; text-decoration: none; transition: border-color 0.3s; }
+.blog-card:hover { border-color: var(--electric); }
+.blog-card-tag { font-family: var(--font-mono); font-size: 9px; letter-spacing: 0.15em; color: var(--electric); text-transform: uppercase; padding: 20px 24px 0; }
+.blog-card-title { font-family: var(--font-display); font-size: 28px; letter-spacing: 0.03em; color: #fff; line-height: 1; padding: 12px 24px 16px; }
+.blog-card-excerpt { font-size: 14px; color: var(--silver); line-height: 1.7; padding: 0 24px 24px; flex: 1; }
+.blog-card-meta { display: flex; justify-content: space-between; align-items: center; padding: 16px 24px; border-top: 1px solid #1C1E24; font-family: var(--font-mono); font-size: 9px; letter-spacing: 0.12em; color: var(--iron); text-transform: uppercase; }
+.blog-card-meta span { color: var(--electric); }
+
+/* FEATURED */
+.blog-card.featured { grid-column: span 2; flex-direction: row; }
+@media (max-width: 768px) { .blog-card.featured { grid-column: span 1; flex-direction: column; } }
+.blog-card.featured .blog-card-title { font-size: 40px; }
+
+/* FOOTER */
+footer { background: #080808; border-top: 1px solid var(--steel); padding: 40px 0 32px; margin-top: 80px; }
+.footer-inner { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 20px; }
+.footer-name { font-family: var(--font-display); font-size: 18px; letter-spacing: 0.1em; color: #fff; }
+.footer-links { display: flex; gap: 24px; }
+.footer-links a { font-family: var(--font-mono); font-size: 9px; color: var(--electric); text-decoration: none; text-transform: uppercase; }
+.footer-copy { font-size: 11px; color: var(--iron); text-align: center; margin-top: 24px; }
+</style>
+</head>
+<body>
+
+<nav>
+  <a class="nav-logo" href="/index.html">
+    <img src="/assets/images/image_01.png" alt="Deepbloe"/>
+  </a>
+  <ul class="nav-links">
+    <li><a href="/index.html#about">About</a></li>
+    <li><a href="/index.html#services">Services</a></li>
+    <li><a href="/artists.html">Artists</a></li>
+    <li><a href="/index.html#showcases">Showcases</a></li>
+    <li><a href="/team.html">Team</a></li>
+    <li><a href="/blog.html" style="color:#29ABE2;">Blog</a></li>
+    <li><a href="/jobs.html">Jobs</a></li>
+  </ul>
+  <a class="nav-cta" href="/#contact">Get in Touch</a>
+</nav>
+
+<div style="padding-top:72px;">
+
+  <div class="page-header">
+    <div class="container">
+      <div class="label">Deepbloe / Insights</div>
+      <h1 style="font-family:'Bebas Neue',sans-serif;font-size:clamp(56px,8vw,120px);line-height:0.88;margin-bottom:20px;">THE PLATFORM<br/><span style="color:#5A5F70;">SPEAKS.</span></h1>
+      <p style="font-size:17px;color:var(--silver);max-width:560px;line-height:1.8;">Industry news, artist updates and booking insights from the team behind one of the most active electronic music platforms in Europe.</p>
+    </div>
+  </div>
+
+  <section class="blog-section">
+    <div class="container">
+      <div class="blog-grid">
+
+        <!-- Article 1 — Featured -->
+        <a class="blog-card featured" href="/blog/how-dj-booking-works.html">
+          <div style="flex:1;padding:32px;">
+            <div class="blog-card-tag">Booking</div>
+            <div class="blog-card-title" style="font-size:clamp(28px,3.5vw,48px);padding:12px 0 16px;">How DJ Booking Actually Works — A Guide for Promoters</div>
+            <div class="blog-card-excerpt">Everything you need to know before sending your first booking request. From offers and riders to contracts and settlement — explained by people who do this every day.</div>
+            <div class="blog-card-meta" style="border-top:1px solid #1C1E24;margin-top:24px;padding:16px 0 0;">
+              <span style="color:#5A5F70;">March 2026</span><span>Read →</span>
+            </div>
+          </div>
+        </a>
+
+        <!-- Article 2 -->
+        <a class="blog-card" href="/blog/liu-dj-mag-top-100.html">
+          <div class="blog-card-tag">Artist News</div>
+          <div class="blog-card-title">Liu Enters DJ Mag Top 100 at #79</div>
+          <div class="blog-card-excerpt">Brazil's finest future house export lands in the global top 100 — here's what this means for his 2026 touring schedule and why you should book now.</div>
+          <div class="blog-card-meta">
+            <span style="color:#5A5F70;">February 2026</span><span>Read →</span>
+          </div>
+        </a>
+
+        <!-- Article 3 -->
+        <a class="blog-card" href="/blog/book-dj-festival-netherlands.html">
+          <div class="blog-card-tag">Industry</div>
+          <div class="blog-card-title">How to Book a DJ for Your Festival in the Netherlands</div>
+          <div class="blog-card-excerpt">A practical breakdown of the Dutch festival booking process — timelines, budgets, contracts and what agencies like Deepbloe actually look for in a promoter.</div>
+          <div class="blog-card-meta">
+            <span style="color:#5A5F70;">January 2026</span><span>Read →</span>
+          </div>
+        </a>
+
+      </div>
+    </div>
+  </section>
+
+</div>
+
+<footer>
+  <div class="container">
+    <div class="footer-inner">
+      <div>
+        <div class="footer-name">DEEPBLOE</div>
+        <p style="font-family:'DM Mono',monospace;font-size:9px;color:var(--iron);text-transform:uppercase;letter-spacing:0.12em;margin-top:4px;">Global Electronic Music Platform · Est. 2018</p>
+      </div>
+      <div class="footer-links">
+        <a href="https://www.instagram.com/deepbloe/" target="_blank">Instagram</a>
+        <a href="https://www.linkedin.com/company/76724101/" target="_blank">LinkedIn</a>
+        <a href="/blog.html">Blog</a>
+        <a href="/#contact">Contact</a>
+      </div>
+    </div>
+    <p class="footer-copy">© 2026 Deepbloe Agency B.V. All rights reserved.</p>
+  </div>
+</footer>
+
+</body>
+</html>
