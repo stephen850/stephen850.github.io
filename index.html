@@ -256,14 +256,14 @@ nav::before {
 .hero-bg img {
   position: absolute; inset: 0; width: 100%; height: 100%;
   object-fit: cover; object-position: center 25%;
-  filter: brightness(0.55) saturate(0.9);
+  filter: brightness(0.8) saturate(0.95);
 }
 .hero-bg::after {
   content: '';
   position: absolute; inset: 0;
   background:
-    radial-gradient(ellipse 60% 50% at 75% 15%, rgba(8,8,8,0.4) 0%, transparent 60%),
-    linear-gradient(180deg, rgba(8,8,8,0.2) 0%, rgba(8,8,8,0.5) 60%, #080808 100%);
+    radial-gradient(ellipse 60% 50% at 75% 15%, rgba(8,8,8,0.2) 0%, transparent 60%),
+    linear-gradient(180deg, rgba(8,8,8,0.05) 0%, rgba(8,8,8,0.3) 60%, #080808 100%);
 }
 /* Simulated light beams */
 .hero-beams {
@@ -355,7 +355,7 @@ section { position: relative; }
 }
 
 /* ── ABOUT ────────────────────────────────────────────────────────────────── */
-.about { padding: 80px 0; background: #080808; }
+.about { padding: 80px 0; background: #0C0C13; }
 .about-grid {
   display: grid; grid-template-columns: 1fr 1fr; gap: 80px; align-items: start;
 }
@@ -492,7 +492,7 @@ section { position: relative; }
 .artists-cta { text-align: center; margin-top: 48px; }
 
 /* ── PLATFORM SECTION ─────────────────────────────────────────────────────── */
-.platform { position: relative; padding: 0; background: #080808; overflow: hidden; }
+.platform { position: relative; padding: 0; background: #111318; overflow: hidden; }
 .platform-photo-wrap {
   position: absolute; inset: 0; z-index: 0;
 }
@@ -526,7 +526,7 @@ section { position: relative; }
 .platform-feature-text p { font-size: 14px; color: var(--chrome); line-height: 1.7; }
 .platform-quote {
   text-align: center; padding: 48px;
-  border: 1px solid var(--steel); background: rgba(8,8,8,0.6);
+  border: 1px solid var(--steel); background: rgba(8,8,8,0.25);
   backdrop-filter: blur(8px);
 }
 .platform-quote-mark {
@@ -543,7 +543,7 @@ section { position: relative; }
 }
 
 /* ── SHOWCASES ────────────────────────────────────────────────────────────── */
-.showcases { padding: 80px 0; background: #080808; }
+.showcases { padding: 80px 0; background: #0A0A10; }
 .showcases-header {
   display: grid; grid-template-columns: 1fr 1fr;
   gap: 80px; margin-bottom: 64px; align-items: end;
@@ -587,7 +587,7 @@ section { position: relative; }
 .showcase-card:nth-child(1) .showcase-num { font-size: 120px; top: 24px; }
 
 /* ── BRANDS SECTION ───────────────────────────────────────────────────────── */
-.brands { padding: 100px 0; background: #080808; }
+.brands { padding: 100px 0; background: #0D0D14; }
 .brands-headline { font-size: clamp(32px, 4vw, 56px); margin-bottom: 16px; color: var(--ivory); }
 .brands-sub { font-size: 15px; color: var(--chrome); margin-bottom: 56px; }
 .brands-logos {
@@ -606,7 +606,7 @@ section { position: relative; }
 
 /* ── CTA BANNER ───────────────────────────────────────────────────────────── */
 .cta-banner {
-  padding: 80px 0; background: #080808;
+  padding: 80px 0; background: #111318;
   text-align: center; position: relative; overflow: hidden;
 }
 .cta-banner::before {
@@ -1063,7 +1063,7 @@ footer {
 </div>
 </div>
 <!-- ABOUT -->
-<section class="about" id="about">
+<section class="about" id="about" style="background:#0D0D12;">
 <div class="container">
 <div class="about-grid">
 <div>
@@ -1199,7 +1199,7 @@ footer {
 </div>
 <!-- Right: quote -->
 <div class="reveal" style="display:flex;align-items:center;justify-content:center;">
-<div style="text-align:center;padding:48px;border:1px solid var(--steel);background:rgba(8,8,8,0.55);backdrop-filter:blur(12px);">
+<div style="text-align:center;padding:48px;border:1px solid var(--steel);background:rgba(8,8,8,0.25);backdrop-filter:blur(12px);">
 <div style="font-family:var(--font-display);font-size:72px;color:var(--electric);line-height:0.8;margin-bottom:20px;">"</div>
 <p style="font-family:var(--font-display);font-size:30px;color:var(--ivory);line-height:1.1;margin-bottom:20px;">We don't just<br/>book shows.<br/>We build careers.</p>
 <span style="font-family:var(--font-mono);font-size:10px;letter-spacing:0.15em;color:var(--silver);text-transform:uppercase;">Deepbloe — Est. 2018</span>
@@ -1210,7 +1210,7 @@ footer {
 </section>
 
 <!-- SHOWCASES -->
-<section class="showcases" id="showcases">
+<section class="showcases" id="showcases" style="background:#0A0A0F;">
 <div class="container">
 <div class="showcases-header">
 <div>
@@ -1345,7 +1345,7 @@ footer {
 </section>
 
 <!-- CONTACT -->
-<section id="contact" style="padding:120px 0;background:#080808;border-top:1px solid #1C1E24;">
+<section id="contact" style="background:#0A0A0F;" style="padding:120px 0;background:#080808;border-top:1px solid #1C1E24;">
 <div style="max-width:1400px;margin:0 auto;padding:0 80px;">
 <div style="display:grid;grid-template-columns:1fr 1fr;gap:100px;align-items:start;">
 <!-- Left: text -->
