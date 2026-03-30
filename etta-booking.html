@@ -15,12 +15,72 @@
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
-  "@type": "MusicGroup",
-  "name": "Etta",
-  "genre": "Electronic",
-  "url": "https://www.deepbloe.com/etta-booking",
-  "description": "Etta is an electronic music artist with a distinctive voice — both literally and musically. Her work sits at the intersection of vocal-led electronic music and ",
-  "sameAs": ["https://instagram.com/etta.music"]
+  "@graph": [
+    {
+      "@type": "MusicGroup",
+      "name": "Etta",
+      "genre": [
+        "Electronic",
+        "House"
+      ],
+      "url": "https://www.deepbloe.com/etta-booking",
+      "image": "https://www.deepbloe.com/assets/images/etta.jpg",
+      "description": "Etta is an electronic music artist represented by Deepbloe Agency.",
+      "sameAs": [
+        "https://www.instagram.com/ettamusic/"
+      ],
+      "foundingLocation": {
+        "@type": "Place",
+        "name": "Netherlands"
+      },
+      "member": {
+        "@type": "OrganizationRole",
+        "roleName": "Artist"
+      }
+    },
+    {
+      "@type": "Service",
+      "name": "Book Etta",
+      "description": "Artist booking services for Etta — available for festivals, clubs and brand events worldwide.",
+      "provider": {
+        "@type": "Organization",
+        "name": "Deepbloe Agency",
+        "url": "https://www.deepbloe.com",
+        "address": {
+          "@type": "PostalAddress",
+          "streetAddress": "Ambachtshof 88",
+          "addressLocality": "Nootdorp",
+          "postalCode": "2632 BB",
+          "addressCountry": "NL"
+        }
+      },
+      "areaServed": "Worldwide",
+      "serviceType": "Artist Booking"
+    },
+    {
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        {
+          "@type": "ListItem",
+          "position": 1,
+          "name": "Home",
+          "item": "https://www.deepbloe.com"
+        },
+        {
+          "@type": "ListItem",
+          "position": 2,
+          "name": "Artists",
+          "item": "https://www.deepbloe.com/artists.html"
+        },
+        {
+          "@type": "ListItem",
+          "position": 3,
+          "name": "Book Etta",
+          "item": "https://www.deepbloe.com/etta-booking"
+        }
+      ]
+    }
+  ]
 }
 </script>
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
@@ -795,21 +855,20 @@ footer {
         <div style="display:flex;flex-wrap:wrap;gap:8px;">
           <a href="https://instagram.com/etta.music" target="_blank" style="display:inline-flex;align-items:center;gap:8px;border:1px solid #2A2D36;padding:10px 20px;font-family:'DM Mono',monospace;font-size:10px;letter-spacing:0.1em;color:#C4C8D4;text-decoration:none;text-transform:uppercase;transition:border-color 0.2s;" onmouseover="this.style.borderColor='#29ABE2'" onmouseout="this.style.borderColor='#2A2D36'">Instagram @etta.music ↗</a>
         </div>
+        
         <!-- LISTEN SECTION -->
         <div style="margin-top:32px;">
           <div style="font-family:'DM Mono',monospace;font-size:10px;letter-spacing:0.18em;color:#29ABE2;text-transform:uppercase;margin-bottom:16px;display:flex;align-items:center;gap:12px;">
             <span style="display:block;width:24px;height:1px;background:#29ABE2;"></span>Listen
           </div>
-          <div style="position:relative;width:100%;padding-bottom:56.25%;background:#111318;border:1px solid #1C1E24;overflow:hidden;">
-            <iframe
-              style="position:absolute;top:0;left:0;width:100%;height:100%;border:0;"
-              src="https://www.youtube.com/embed/P_FGpTnFHHU?rel=0&modestbranding=1&color=white"
-              title="DJ set"
-              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-              allowfullscreen>
-            </iframe>
-          </div>
+          <iframe
+            width="100%" height="300"
+            scrolling="no" frameborder="no" allow="autoplay"
+            style="border:1px solid #1C1E24;"
+            src="https://w.soundcloud.com/player/?url=https://soundcloud.com/ettamusic&color=%2329ABE2&auto_play=false&hide_related=true&show_comments=false&show_user=true&show_reposts=false&show_teaser=false&visual=true">
+          </iframe>
         </div>
+
 
       </div>
 
