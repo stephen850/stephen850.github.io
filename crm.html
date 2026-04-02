@@ -1216,20 +1216,19 @@ async function handleFile(file) {
 
   importRows = rows.map(r => {
     const email = (r.email || '').trim().toLowerCase();
-    const orgKey = `${r.name}|${r.city}|${r.country}`.toLowerCase();
     let status = 'new';
-    if (!email) status = 'skip';
+    if (!email) status = 'new'; // org only — still imported
     else if (existingEmails.has(email)) status = 'update';
-    return { ...r, _email: email, _orgKey: orgKey, _status: status };
+    return { ...r, _email: email, _status: status };
   });
 
   const newCount    = importRows.filter(r => r._status === 'new').length;
   const updateCount = importRows.filter(r => r._status === 'update').length;
-  const skipCount   = importRows.filter(r => r._status === 'skip').length;
+  const noEmail     = importRows.filter(r => !r._email).length;
 
   document.getElementById('prev-new').textContent    = `${newCount} new`;
   document.getElementById('prev-update').textContent = `${updateCount} update`;
-  document.getElementById('prev-skip').textContent   = `${skipCount} skip`;
+  document.getElementById('prev-skip').textContent   = `${noEmail} org only`;
 
   const tbody = document.getElementById('preview-tbody');
   tbody.innerHTML = importRows.slice(0, 50).map(r => {
@@ -1253,37 +1252,48 @@ async function handleFile(file) {
 async function runImport() {
   const btn = document.getElementById('import-btn');
   btn.disabled = true; btn.textContent = 'Importing...';
-  let done = 0, errors = 0;
+  let orgsCreated = 0, contactsDone = 0, errors = 0;
 
   for (const r of importRows) {
-    if (r._status === 'skip') continue;
     try {
-      // upsert organisation
+      // Always upsert organisation if name exists (even without email)
       let orgId = null;
       if (r.name) {
         const genres = r.genre ? r.genre.split(',').map(g => g.trim()).filter(Boolean) : null;
-        const { data: orgData } = await db.from('organisations').upsert({
-          type: r.type || null, name: r.name, country: r.country || null,
-          city: r.city || null, genre: genres,
+        const { data: orgData, error: orgErr } = await db.from('organisations').upsert({
+          type:    r.type    || null,
+          name:    r.name,
+          country: r.country || null,
+          city:    r.city    || null,
+          genre:   genres,
         }, { onConflict: 'name,city,country' }).select('id');
-        orgId = orgData?.[0]?.id || null;
+        if (!orgErr) {
+          orgId = orgData?.[0]?.id || null;
+          orgsCreated++;
+        }
       }
-      // upsert contact
+
+      // Only create contact if email exists
       if (r._email) {
-        await db.from('contacts').upsert({
-          email: r._email,
-          first_name: r.first_name || null,
-          phone: r.phone || null,
+        const { error: conErr } = await db.from('contacts').upsert({
+          email:           r._email,
+          first_name:      r.first_name || null,
+          last_name:       r.last_name  || null,
+          phone:           r.phone      || null,
           organisation_id: orgId,
-          source: 'Import',
+          source:          'Import',
         }, { onConflict: 'email' });
-        done++;
+        if (!conErr) contactsDone++;
+        else errors++;
       }
     } catch(e) { errors++; }
   }
 
   btn.disabled = false; btn.textContent = 'Import All';
-  showToast(`Imported ${done} contacts${errors ? `, ${errors} errors` : ''}`, errors ? 'error' : 'success');
+  showToast(
+    `Imported ${contactsDone} contacts, ${orgsCreated} organisations${errors ? `, ${errors} errors` : ''}`,
+    errors ? 'error' : 'success'
+  );
   loadOrgs(); loadContacts();
 }
 
