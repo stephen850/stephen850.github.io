@@ -571,6 +571,27 @@ tbody td { padding: 10px 14px; vertical-align: middle; }
         </div>
       </div>
     </div>
+
+    <div class="form-section" id="om-con-section">Contact Person <span style="font-weight:300;text-transform:none;letter-spacing:0;color:var(--muted);font-family:var(--sans)">(optional)</span></div>
+    <div class="form-grid" id="om-con-fields">
+      <div class="fg">
+        <label>First Name</label>
+        <input id="om-fname" placeholder="John">
+      </div>
+      <div class="fg">
+        <label>Email</label>
+        <input id="om-email" type="email" placeholder="booking@venue.com">
+      </div>
+      <div class="fg">
+        <label>Phone</label>
+        <input id="om-phone" placeholder="+66 ...">
+      </div>
+      <div class="fg">
+        <label>Tags (comma separated)</label>
+        <input id="om-ctags" placeholder="booking, main contact">
+      </div>
+    </div>
+
     <div class="modal-ftr">
       <button class="btn" onclick="closeModal('org-modal')">Cancel</button>
       <button class="btn primary" id="org-save-btn" onclick="saveOrg()">Save Organisation</button>
@@ -727,6 +748,7 @@ function renderOrgs() {
       <td>${genres || '<span style="color:var(--muted)">—</span>'}</td>
       <td class="td-mono">${conCount}</td>
       <td><div class="row-actions">
+        <button class="ra" onclick="addContactToOrg('${o.id}','${esc(o.name)}')">+ Contact</button>
         <button class="ra" onclick="editOrg('${o.id}')">Edit</button>
         <button class="ra del" onclick="deleteOrg('${o.id}','${esc(o.name)}')">Del</button>
       </div></td>
@@ -743,16 +765,25 @@ function renderOrgs() {
 function orgPage(d) { orgPageN += d; renderOrgs(); }
 
 // ── ORG MODAL ─────────────────────────────────────────────────
-function openOrgModal(id=null) {
+function openOrgModal(id=null, preOrgId=null) {
   editOrgId = id;
   document.getElementById('org-modal-title').textContent = id ? 'Edit Organisation' : 'Add Organisation';
+  // show/hide contact section — hide when editing existing org (use + Contact button instead)
+  const conSection = document.getElementById('om-con-section');
+  const conFields  = document.getElementById('om-con-fields');
+  conSection.style.display = id ? 'none' : '';
+  conFields.style.display  = id ? 'none' : '';
   if (!id) {
-    document.getElementById('om-type').value = '';
-    document.getElementById('om-name').value = '';
-    document.getElementById('om-country').value = '';
-    document.getElementById('om-city').value = '';
-    document.getElementById('om-website').value = '';
-    document.getElementById('om-instagram').value = '';
+    document.getElementById('om-type').value     = '';
+    document.getElementById('om-name').value     = '';
+    document.getElementById('om-country').value  = '';
+    document.getElementById('om-city').value     = '';
+    document.getElementById('om-website').value  = '';
+    document.getElementById('om-instagram').value= '';
+    document.getElementById('om-fname').value    = '';
+    document.getElementById('om-email').value    = '';
+    document.getElementById('om-phone').value    = '';
+    document.getElementById('om-ctags').value    = '';
     document.querySelectorAll('#om-genres input').forEach(cb => cb.checked = false);
   }
   document.getElementById('org-modal').classList.add('open');
@@ -788,20 +819,48 @@ async function saveOrg() {
   };
   const btn = document.getElementById('org-save-btn');
   btn.disabled = true; btn.textContent = 'Saving...';
-  let error;
+  let error, orgId;
   if (editOrgId) {
     ({ error } = await db.from('organisations').update(data).eq('id', editOrgId));
+    orgId = editOrgId;
   } else {
-    ({ error } = await db.from('organisations').insert(data));
+    const { data: inserted, error: err } = await db.from('organisations').insert(data).select('id');
+    error = err;
+    orgId = inserted?.[0]?.id;
   }
   btn.disabled = false; btn.textContent = 'Save Organisation';
   if (error) {
     showToast(error.code === '23505' ? 'Organisation already exists' : 'Error saving', 'error');
-  } else {
-    showToast(editOrgId ? 'Organisation updated' : 'Organisation added', 'success');
-    closeModal('org-modal');
-    loadOrgs();
+    return;
   }
+  // save contact if email provided (only on new org)
+  if (!editOrgId && orgId) {
+    const email = document.getElementById('om-email').value.trim();
+    if (email) {
+      const tagsRaw = document.getElementById('om-ctags').value;
+      const tags = tagsRaw.split(',').map(t => t.trim()).filter(Boolean);
+      const { error: cerr } = await db.from('contacts').insert({
+        first_name:      document.getElementById('om-fname').value.trim() || null,
+        email,
+        phone:           document.getElementById('om-phone').value.trim() || null,
+        organisation_id: orgId,
+        tags:            tags.length ? tags : null,
+        source:          'Manual',
+      });
+      if (cerr && cerr.code !== '23505') {
+        showToast('Organisation saved, but contact email already exists', 'error');
+      } else {
+        showToast('Organisation + contact saved', 'success');
+      }
+    } else {
+      showToast('Organisation added', 'success');
+    }
+  } else {
+    showToast('Organisation updated', 'success');
+  }
+  closeModal('org-modal');
+  loadOrgs();
+  loadContacts();
 }
 
 async function deleteOrg(id, name) {
@@ -884,6 +943,19 @@ function renderContacts() {
 function conPage(d) { conPageN += d; renderContacts(); }
 
 // ── CONTACT MODAL ─────────────────────────────────────────────
+function addContactToOrg(orgId, orgName) {
+  // open contact modal with org pre-selected
+  editConId = null;
+  document.getElementById('con-modal-title').textContent = `Add Contact — ${orgName}`;
+  document.getElementById('cm-fname').value = '';
+  document.getElementById('cm-email').value = '';
+  document.getElementById('cm-phone').value = '';
+  document.getElementById('cm-tags').value  = '';
+  populateOrgDropdown();
+  // set org after dropdown is populated
+  setTimeout(() => { document.getElementById('cm-org').value = orgId; }, 50);
+  document.getElementById('con-modal').classList.add('open');
+}
 function populateOrgDropdown() {
   const sel = document.getElementById('cm-org');
   sel.innerHTML = '<option value="">None</option>';
