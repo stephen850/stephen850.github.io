@@ -628,18 +628,16 @@ tbody td { padding: 10px 14px; vertical-align: middle; }
         <input id="cm-fname" placeholder="John">
       </div>
       <div class="fg">
+        <label>Last Name</label>
+        <input id="cm-lname" placeholder="Smith">
+      </div>
+      <div class="fg">
         <label>Email *</label>
         <input id="cm-email" type="email" placeholder="booking@venue.com">
       </div>
       <div class="fg">
-        <label>Phone</label>
-        <input id="cm-phone" placeholder="+66 ...">
-      </div>
-      <div class="fg">
-        <label>Organisation</label>
-        <select id="cm-org">
-          <option value="">None</option>
-        </select>
+        <label>Phone / Mobile</label>
+        <input id="cm-phone" placeholder="+31 6 ...">
       </div>
       <div class="fg full">
         <label>Tags (comma separated)</label>
@@ -666,7 +664,7 @@ const db = createClient(SUPABASE_URL, SUPABASE_KEY);
 // ── STATE ─────────────────────────────────────────────────────
 let allOrgs = [], filtOrgs = [], orgPageN = 0;
 let allCons = [], filtCons = [], conPageN = 0;
-let editOrgId = null, editConId = null;
+let editOrgId = null, editConId = null, _pendingOrgId = null;
 let importRows = [];
 const PG = 30;
 
@@ -726,7 +724,7 @@ function goToContact(email) {
 // ── ORGANISATIONS ─────────────────────────────────────────────
 async function loadOrgs() {
   const { data, error } = await db.from('organisations')
-    .select('*, contacts(id, first_name, email)')
+    .select('*, contacts(id, first_name, last_name, email)')
     .order('name');
   if (error) { showToast('Error loading organisations', 'error'); return; }
   allOrgs = data;
@@ -773,8 +771,8 @@ function renderOrgs() {
     const genres = (o.genre || []).map(g => `<span class="genre-pill">${esc(g)}</span>`).join('');
     // first contact
     const firstCon = (o.contacts || [])[0];
-    const conName  = firstCon?.first_name
-      ? `<span style="font-weight:500">${esc(firstCon.first_name)}</span>`
+    const conName  = firstCon
+      ? `<span style="font-weight:500">${esc([firstCon.first_name, firstCon.last_name].filter(Boolean).join(' ') || '—')}</span>`
       : '<span style="color:var(--muted)">—</span>';
     const conEmail = firstCon?.email
       ? `<a onclick="goToContact('${esc(firstCon.email)}')" style="color:var(--blue);cursor:pointer;font-family:var(--mono);font-size:11px;text-decoration:none;border-bottom:1px solid var(--border)">${esc(firstCon.email)}</a>`
@@ -1009,11 +1007,12 @@ function renderContacts() {
   tbody.innerHTML = slice.map(c => {
     const org = c.organisations;
     const tags = (c.tags || []).map(t => `<span class="genre-pill">${esc(t)}</span>`).join('');
+    const fullName = [c.first_name, c.last_name].filter(Boolean).join(' ') || '—';
     return `<tr>
-      <td class="td-name">${esc(c.first_name||'—')}</td>
+      <td class="td-name">${esc(fullName)}</td>
       <td class="td-mono td-trunc">${esc(c.email)}</td>
       <td class="td-mono">${esc(c.phone||'—')}</td>
-      <td class="td-trunc">${org ? `<span class="td-mono" style="font-size:11px">${esc(org.name)}</span>` : '—'}</td>
+      <td class="td-trunc">${org ? `<span style="font-size:11px">${esc(org.name)}</span>` : '—'}</td>
       <td>${tags || '—'}</td>
       <td>${sourceBadge(c.source)}</td>
       <td><span class="sync-dot ${c.mailchimp_synced ? 'sync-yes' : 'sync-no'}"></span></td>
@@ -1035,35 +1034,27 @@ function conPage(d) { conPageN += d; renderContacts(); }
 
 // ── CONTACT MODAL ─────────────────────────────────────────────
 function addContactToOrg(orgId, orgName) {
-  // open contact modal with org pre-selected
   editConId = null;
+  _pendingOrgId = orgId;
   document.getElementById('con-modal-title').textContent = `Add Contact — ${orgName}`;
   document.getElementById('cm-fname').value = '';
+  document.getElementById('cm-lname').value = '';
   document.getElementById('cm-email').value = '';
   document.getElementById('cm-phone').value = '';
   document.getElementById('cm-tags').value  = '';
-  populateOrgDropdown();
-  // set org after dropdown is populated
-  setTimeout(() => { document.getElementById('cm-org').value = orgId; }, 50);
   document.getElementById('con-modal').classList.add('open');
 }
-function populateOrgDropdown() {
-  const sel = document.getElementById('cm-org');
-  sel.innerHTML = '<option value="">None</option>';
-  [...allOrgs].sort((a,b) => a.name.localeCompare(b.name)).forEach(o => {
-    sel.innerHTML += `<option value="${o.id}">${esc(o.name)} (${esc(o.country||'')})</option>`;
-  });
-}
+function populateOrgDropdown() { /* kept for import compatibility */ }
 
 function openConModal(id=null) {
   editConId = id;
+  _pendingOrgId = null;
   document.getElementById('con-modal-title').textContent = id ? 'Edit Contact' : 'Add Contact';
-  populateOrgDropdown();
   if (!id) {
     document.getElementById('cm-fname').value = '';
+    document.getElementById('cm-lname').value = '';
     document.getElementById('cm-email').value = '';
     document.getElementById('cm-phone').value = '';
-    document.getElementById('cm-org').value   = '';
     document.getElementById('cm-tags').value  = '';
   }
   document.getElementById('con-modal').classList.add('open');
@@ -1073,16 +1064,13 @@ function editContact(id) {
   const c = allCons.find(x => x.id === id);
   if (!c) return;
   editConId = id;
+  _pendingOrgId = null;
   document.getElementById('con-modal-title').textContent = 'Edit Contact';
-  populateOrgDropdown();
   document.getElementById('cm-fname').value = c.first_name || '';
-  document.getElementById('cm-email').value = c.email || '';
-  document.getElementById('cm-phone').value = c.phone || '';
+  document.getElementById('cm-lname').value = c.last_name  || '';
+  document.getElementById('cm-email').value = c.email      || '';
+  document.getElementById('cm-phone').value = c.phone      || '';
   document.getElementById('cm-tags').value  = (c.tags || []).join(', ');
-  // set org after dropdown populated
-  setTimeout(() => {
-    document.getElementById('cm-org').value = c.organisation_id || '';
-  }, 30);
   document.getElementById('con-modal').classList.add('open');
 }
 
@@ -1092,14 +1080,18 @@ async function saveContact() {
   const tagsRaw = document.getElementById('cm-tags').value;
   const tags = tagsRaw.split(',').map(t => t.trim()).filter(Boolean);
   const data = {
-    first_name:       document.getElementById('cm-fname').value.trim() || null,
+    first_name: document.getElementById('cm-fname').value.trim() || null,
+    last_name:  document.getElementById('cm-lname').value.trim() || null,
     email,
-    phone:            document.getElementById('cm-phone').value.trim() || null,
-    organisation_id:  document.getElementById('cm-org').value || null,
-    tags:             tags.length ? tags : null,
-    source:           editConId ? undefined : 'Manual',
+    phone:      document.getElementById('cm-phone').value.trim() || null,
+    tags:       tags.length ? tags : null,
   };
-  if (editConId) delete data.source;
+  // attach org if coming from + Contact button
+  if (!editConId && _pendingOrgId) {
+    data.organisation_id = _pendingOrgId;
+  }
+  if (!editConId) data.source = 'Manual';
+
   const btn = document.getElementById('con-save-btn');
   btn.disabled = true; btn.textContent = 'Saving...';
   let error;
@@ -1110,10 +1102,12 @@ async function saveContact() {
   }
   btn.disabled = false; btn.textContent = 'Save Contact';
   if (error) {
-    showToast(error.code === '23505' ? 'Email already exists' : 'Error saving', 'error');
+    showToast(error.code === '23505' ? 'Email already exists' : 'Error: ' + error.message, 'error');
   } else {
     showToast(editConId ? 'Contact updated' : 'Contact added', 'success');
     closeModal('con-modal');
+    _pendingOrgId = null;
+    loadOrgs();
     loadContacts();
   }
 }
