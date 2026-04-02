@@ -452,6 +452,7 @@ tbody td { padding: 10px 14px; vertical-align: middle; }
         </select>
         <div class="tb-right">
           <button class="btn" onclick="exportContacts()">↓ Export</button>
+          <button class="btn" id="sync-btn" onclick="syncAllToMailchimp()" style="border-color:#1a6b3c;color:#1a6b3c">⟳ Sync to Mailchimp</button>
           <button class="btn primary" onclick="openConModal()">+ Add Contact</button>
         </div>
       </div>
@@ -1106,9 +1107,73 @@ async function saveContact() {
   } else {
     showToast(editConId ? 'Contact updated' : 'Contact added', 'success');
     closeModal('con-modal');
-    _pendingOrgId = null;
+    // auto-sync to Mailchimp
+    const savedEmail = email;
     loadOrgs();
+    loadContacts().then(async () => {
+      const c = allCons.find(x => x.email === savedEmail);
+      if (c) {
+        await syncContactToMailchimp(c.id);
+        showToast('Synced to Mailchimp ✓', 'success');
+        loadContacts();
+      }
+    });
+    _pendingOrgId = null;
+  }
+}
+
+// ── MAILCHIMP SYNC ────────────────────────────────────────────
+const FUNCTION_URL = 'https://ksnxgidklhonpsneerbu.supabase.co/functions/v1/mailchimp-sync';
+const FUNCTION_KEY = 'sb_publishable_JsOkmXlOxBWKXcraBE7gGg_qErTkqX9';
+
+async function syncContactToMailchimp(contactId) {
+  try {
+    const res = await fetch(FUNCTION_URL, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${FUNCTION_KEY}`,
+        'apikey': FUNCTION_KEY,
+      },
+      body: JSON.stringify({ contact_id: contactId })
+    });
+    const data = await res.json();
+    return data.success;
+  } catch(e) {
+    console.error('Sync error:', e);
+    return false;
+  }
+}
+
+async function syncAllToMailchimp() {
+  const btn = document.getElementById('sync-btn');
+  const unsynced = allCons.filter(c => !c.mailchimp_synced && c.email);
+  if (unsynced.length === 0) {
+    showToast('All contacts already synced', 'info');
+    return;
+  }
+  btn.disabled = true;
+  btn.textContent = `Syncing 0 / ${unsynced.length}...`;
+
+  try {
+    const res = await fetch(FUNCTION_URL, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${FUNCTION_KEY}`,
+        'apikey': FUNCTION_KEY,
+      },
+      body: JSON.stringify({ sync_all: true })
+    });
+    const data = await res.json();
+    btn.disabled = false;
+    btn.textContent = '⟳ Sync to Mailchimp';
+    showToast(`Synced ${data.synced} contacts to Mailchimp${data.failed ? `, ${data.failed} failed` : ''}`, 'success');
     loadContacts();
+  } catch(e) {
+    btn.disabled = false;
+    btn.textContent = '⟳ Sync to Mailchimp';
+    showToast('Sync error: ' + e.message, 'error');
   }
 }
 
