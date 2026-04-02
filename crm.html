@@ -382,6 +382,12 @@ tbody td { padding: 10px 14px; vertical-align: middle; }
           <option>Italy</option><option>France</option><option>United Kingdom</option>
           <option>Other</option>
         </select>
+        <select class="tb-select" id="org-genre" onchange="filterOrgs()">
+          <option value="">All genres</option>
+          <option>Afro House</option><option>Melodic House</option><option>Tech House</option>
+          <option>Deep House</option><option>House</option><option>Techno</option>
+          <option>EDM</option><option>Melodic Techno</option><option>Progressive</option><option>Disco</option>
+        </select>
         <div class="tb-right">
           <button class="btn" onclick="exportOrgs()">↓ Export</button>
           <button class="btn primary" onclick="openOrgModal()">+ Add Organisation</button>
@@ -535,13 +541,16 @@ tbody td { padding: 10px 14px; vertical-align: middle; }
       </div>
       <div class="fg">
         <label>Country *</label>
-        <select id="om-country">
-          <option value="">Select country</option>
+        <input id="om-country" list="country-list" placeholder="Type or select..." autocomplete="off">
+        <datalist id="country-list">
           <option>Indonesia</option><option>Thailand</option><option>UAE</option>
           <option>Singapore</option><option>Cambodia</option><option>Netherlands</option>
           <option>Belgium</option><option>Germany</option><option>Spain</option>
-          <option>Italy</option><option>France</option><option>United Kingdom</option><option>Other</option>
-        </select>
+          <option>Italy</option><option>France</option><option>United Kingdom</option>
+          <option>United States</option><option>Australia</option><option>Japan</option>
+          <option>South Korea</option><option>Brazil</option><option>Mexico</option>
+          <option>South Africa</option><option>India</option><option>China</option>
+        </datalist>
       </div>
       <div class="fg">
         <label>City</label>
@@ -568,6 +577,12 @@ tbody td { padding: 10px 14px; vertical-align: middle; }
           <label class="genre-cb"><input type="checkbox" value="Melodic Techno"> Melodic Techno</label>
           <label class="genre-cb"><input type="checkbox" value="Progressive"> Progressive</label>
           <label class="genre-cb"><input type="checkbox" value="Disco"> Disco</label>
+          <label class="genre-cb"><input type="checkbox" value="Amapiano"> Amapiano</label>
+          <label class="genre-cb"><input type="checkbox" value="Organic"> Organic</label>
+        </div>
+        <div style="display:flex;gap:6px;margin-top:8px;align-items:center">
+          <input id="om-genre-custom" class="form-input" placeholder="Add custom genre..." style="flex:1;padding:6px 10px;font-size:12px">
+          <button type="button" class="btn" onclick="addCustomGenre()" style="padding:6px 12px;white-space:nowrap">+ Add</button>
         </div>
       </div>
     </div>
@@ -732,10 +747,12 @@ function filterOrgs() {
   const q  = document.getElementById('org-search').value.toLowerCase();
   const ty = document.getElementById('org-type').value;
   const co = document.getElementById('org-country').value;
+  const ge = document.getElementById('org-genre').value;
   filtOrgs = allOrgs.filter(o => {
     if (q  && !`${o.name}${o.city}`.toLowerCase().includes(q)) return false;
     if (ty && o.type    !== ty) return false;
     if (co && o.country !== co) return false;
+    if (ge && !(o.genre || []).includes(ge)) return false;
     return true;
   });
   orgPageN = 0;
@@ -792,43 +809,90 @@ function renderOrgs() {
 function orgPage(d) { orgPageN += d; renderOrgs(); }
 
 // ── ORG MODAL ─────────────────────────────────────────────────
-function openOrgModal(id=null, preOrgId=null) {
+function openOrgModal(id=null) {
   editOrgId = id;
   document.getElementById('org-modal-title').textContent = id ? 'Edit Organisation' : 'Add Organisation';
-  // show/hide contact section — hide when editing existing org (use + Contact button instead)
   const conSection = document.getElementById('om-con-section');
   const conFields  = document.getElementById('om-con-fields');
   conSection.style.display = id ? 'none' : '';
   conFields.style.display  = id ? 'none' : '';
   if (!id) {
-    document.getElementById('om-type').value     = '';
-    document.getElementById('om-name').value     = '';
-    document.getElementById('om-country').value  = '';
-    document.getElementById('om-city').value     = '';
-    document.getElementById('om-website').value  = '';
-    document.getElementById('om-instagram').value= '';
-    document.getElementById('om-fname').value    = '';
-    document.getElementById('om-email').value    = '';
-    document.getElementById('om-phone').value    = '';
-    document.getElementById('om-ctags').value    = '';
+    document.getElementById('om-type').value      = '';
+    document.getElementById('om-name').value      = '';
+    document.getElementById('om-country').value   = '';
+    document.getElementById('om-city').value      = '';
+    document.getElementById('om-website').value   = '';
+    document.getElementById('om-instagram').value = '';
+    document.getElementById('om-fname').value     = '';
+    document.getElementById('om-email').value     = '';
+    document.getElementById('om-phone').value     = '';
+    document.getElementById('om-ctags').value     = '';
+    document.getElementById('om-genre-custom').value = '';
     document.querySelectorAll('#om-genres input').forEach(cb => cb.checked = false);
+    // remove any previously added custom genres
+    document.querySelectorAll('#om-genres .custom-genre-cb').forEach(el => el.remove());
   }
   document.getElementById('org-modal').classList.add('open');
+}
+
+function addCustomGenre() {
+  const input = document.getElementById('om-genre-custom');
+  const val = input.value.trim();
+  if (!val) return;
+  // check not already there
+  const existing = [...document.querySelectorAll('#om-genres input')].map(cb => cb.value.toLowerCase());
+  if (existing.includes(val.toLowerCase())) {
+    // just check it
+    document.querySelectorAll('#om-genres input').forEach(cb => {
+      if (cb.value.toLowerCase() === val.toLowerCase()) cb.checked = true;
+    });
+    input.value = '';
+    return;
+  }
+  // add new checkbox
+  const label = document.createElement('label');
+  label.className = 'genre-cb custom-genre-cb';
+  label.innerHTML = `<input type="checkbox" value="${esc(val)}" checked> ${esc(val)}`;
+  document.getElementById('om-genres').appendChild(label);
+  input.value = '';
 }
 
 function editOrg(id) {
   const o = allOrgs.find(x => x.id === id);
   if (!o) return;
+  // show/hide contact section
+  document.getElementById('om-con-section').style.display = 'none';
+  document.getElementById('om-con-fields').style.display  = 'none';
+  document.getElementById('org-modal-title').textContent  = 'Edit Organisation';
+  editOrgId = id;
+
   document.getElementById('om-type').value      = o.type || '';
   document.getElementById('om-name').value      = o.name || '';
   document.getElementById('om-country').value   = o.country || '';
   document.getElementById('om-city').value      = o.city || '';
   document.getElementById('om-website').value   = o.website || '';
   document.getElementById('om-instagram').value = o.instagram || '';
+  document.getElementById('om-genre-custom').value = '';
+
+  // remove previous custom genres
+  document.querySelectorAll('#om-genres .custom-genre-cb').forEach(el => el.remove());
+
+  // restore genre checkboxes — add custom ones if needed
+  const savedGenres = o.genre || [];
+  const builtInValues = [...document.querySelectorAll('#om-genres input')].map(cb => cb.value);
   document.querySelectorAll('#om-genres input').forEach(cb => {
-    cb.checked = (o.genre || []).includes(cb.value);
+    cb.checked = savedGenres.includes(cb.value);
   });
-  openOrgModal(id);
+  savedGenres.forEach(g => {
+    if (!builtInValues.includes(g)) {
+      const label = document.createElement('label');
+      label.className = 'genre-cb custom-genre-cb';
+      label.innerHTML = `<input type="checkbox" value="${esc(g)}" checked> ${esc(g)}`;
+      document.getElementById('om-genres').appendChild(label);
+    }
+  });
+
+  document.getElementById('org-modal').classList.add('open');
 }
 
 async function saveOrg() {
@@ -838,7 +902,7 @@ async function saveOrg() {
   const data = {
     type:      document.getElementById('om-type').value || null,
     name,
-    country:   document.getElementById('om-country').value || null,
+    country:   document.getElementById('om-country').value.trim() || null,
     city:      document.getElementById('om-city').value.trim() || null,
     website:   document.getElementById('om-website').value.trim() || null,
     instagram: document.getElementById('om-instagram').value.trim() || null,
@@ -994,6 +1058,7 @@ function populateOrgDropdown() {
 function openConModal(id=null) {
   editConId = id;
   document.getElementById('con-modal-title').textContent = id ? 'Edit Contact' : 'Add Contact';
+  populateOrgDropdown();
   if (!id) {
     document.getElementById('cm-fname').value = '';
     document.getElementById('cm-email').value = '';
@@ -1007,12 +1072,18 @@ function openConModal(id=null) {
 function editContact(id) {
   const c = allCons.find(x => x.id === id);
   if (!c) return;
+  editConId = id;
+  document.getElementById('con-modal-title').textContent = 'Edit Contact';
+  populateOrgDropdown();
   document.getElementById('cm-fname').value = c.first_name || '';
   document.getElementById('cm-email').value = c.email || '';
   document.getElementById('cm-phone').value = c.phone || '';
-  document.getElementById('cm-org').value   = c.organisation_id || '';
   document.getElementById('cm-tags').value  = (c.tags || []).join(', ');
-  openConModal(id);
+  // set org after dropdown populated
+  setTimeout(() => {
+    document.getElementById('cm-org').value = c.organisation_id || '';
+  }, 30);
+  document.getElementById('con-modal').classList.add('open');
 }
 
 async function saveContact() {
