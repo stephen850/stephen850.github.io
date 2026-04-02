@@ -725,7 +725,7 @@ function goToContact(email) {
 // ── ORGANISATIONS ─────────────────────────────────────────────
 async function loadOrgs() {
   const { data, error } = await db.from('organisations')
-    .select('*, contacts(id, first_name, last_name, email)')
+    .select('*, contacts(id, first_name, last_name, email, phone)')
     .order('name');
   if (error) { showToast('Error loading organisations', 'error'); return; }
   allOrgs = data;
@@ -1299,10 +1299,24 @@ function downloadTemplate() {
 
 // ── EXPORT ────────────────────────────────────────────────────
 function exportOrgs() {
-  const data = filtOrgs.map(o => ({
-    Type: o.type, Name: o.name, Country: o.country, City: o.city,
-    Genre: (o.genre||[]).join(', '), Website: o.website, Instagram: o.instagram,
-  }));
+  const data = filtOrgs.map(o => {
+    const firstCon = (o.contacts || [])[0];
+    const fullName = firstCon
+      ? [firstCon.first_name, firstCon.last_name].filter(Boolean).join(' ')
+      : '';
+    return {
+      Type:         o.type        || '',
+      Name:         o.name        || '',
+      Country:      o.country     || '',
+      City:         o.city        || '',
+      Genre:        (o.genre||[]).join(', '),
+      Website:      o.website     || '',
+      Instagram:    o.instagram   || '',
+      ContactName:  fullName,
+      ContactEmail: firstCon?.email || '',
+      ContactPhone: firstCon?.phone || '',
+    };
+  });
   const ws = XLSX.utils.json_to_sheet(data);
   const wb = XLSX.utils.book_new();
   XLSX.utils.book_append_sheet(wb, ws, 'Organisations');
