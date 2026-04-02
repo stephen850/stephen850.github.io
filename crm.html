@@ -1,0 +1,1112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Deepbloe CRM</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@300;400;500&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+<style>
+:root {
+  --bg: #f7f5f0;
+  --surface: #ffffff;
+  --border: #e2ddd6;
+  --border-dark: #c8c2b8;
+  --accent: #1a1a1a;
+  --red: #c0392b;
+  --green: #1a6b3c;
+  --blue: #1a3a6b;
+  --amber: #8b5e00;
+  --text: #1a1a1a;
+  --muted: #8a8278;
+  --mono: 'DM Mono', monospace;
+  --sans: 'DM Sans', sans-serif;
+  --radius: 4px;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { background: var(--bg); color: var(--text); font-family: var(--sans);
+       font-size: 13px; min-height: 100vh; }
+
+/* ── LOGIN ─────────────────────────────────────────── */
+#login-screen {
+  min-height: 100vh; display: flex; align-items: center;
+  justify-content: center; flex-direction: column; gap: 0;
+  background: var(--accent);
+}
+.login-logo {
+  font-family: var(--mono); font-size: 10px; letter-spacing: 0.4em;
+  color: rgba(255,255,255,0.3); text-transform: uppercase; margin-bottom: 40px;
+}
+.login-logo strong { color: #fff; }
+.login-box {
+  background: #fff; padding: 40px; width: 360px;
+  border-top: 3px solid var(--red);
+}
+.login-box h1 { font-size: 20px; font-weight: 400; margin-bottom: 8px; color: var(--accent); }
+.login-box p { font-size: 12px; color: var(--muted); margin-bottom: 28px; }
+.login-field { display: flex; flex-direction: column; gap: 5px; margin-bottom: 14px; }
+.login-field label { font-family: var(--mono); font-size: 10px; letter-spacing: 0.1em;
+                     text-transform: uppercase; color: var(--muted); }
+.login-field input {
+  border: 1px solid var(--border-dark); padding: 10px 12px;
+  font-family: var(--sans); font-size: 13px; outline: none; background: var(--bg);
+}
+.login-field input:focus { border-color: var(--accent); background: #fff; }
+.login-btn {
+  width: 100%; background: var(--accent); color: #fff; border: none;
+  padding: 12px; font-family: var(--mono); font-size: 11px;
+  letter-spacing: 0.15em; text-transform: uppercase; cursor: pointer;
+  margin-top: 8px; transition: background 0.15s;
+}
+.login-btn:hover { background: #333; }
+.login-err { color: var(--red); font-size: 11px; margin-top: 10px; display: none; font-family: var(--mono); }
+
+/* ── APP ───────────────────────────────────────────── */
+#app { display: none; min-height: 100vh; }
+
+/* header */
+header {
+  background: var(--accent); color: #fff; padding: 0 28px;
+  display: flex; align-items: center; height: 48px; gap: 32px;
+  position: sticky; top: 0; z-index: 50;
+}
+.h-brand { font-family: var(--mono); font-size: 11px; letter-spacing: 0.3em;
+           text-transform: uppercase; color: rgba(255,255,255,0.5); }
+.h-brand strong { color: #fff; }
+.h-nav { display: flex; gap: 0; flex: 1; }
+.h-tab {
+  padding: 0 16px; height: 48px; display: flex; align-items: center;
+  font-family: var(--mono); font-size: 10px; letter-spacing: 0.1em;
+  text-transform: uppercase; color: rgba(255,255,255,0.4); cursor: pointer;
+  border-bottom: 2px solid transparent; transition: all 0.15s;
+}
+.h-tab:hover { color: rgba(255,255,255,0.8); }
+.h-tab.active { color: #fff; border-bottom-color: var(--red); }
+.h-right { display: flex; align-items: center; gap: 12px; margin-left: auto; }
+.h-user { font-family: var(--mono); font-size: 10px; color: rgba(255,255,255,0.4); }
+.h-logout {
+  background: none; border: 1px solid rgba(255,255,255,0.2); color: rgba(255,255,255,0.5);
+  padding: 5px 10px; font-family: var(--mono); font-size: 10px; letter-spacing: 0.08em;
+  text-transform: uppercase; cursor: pointer; transition: all 0.15s;
+}
+.h-logout:hover { border-color: rgba(255,255,255,0.5); color: #fff; }
+
+/* main */
+main { padding: 28px; max-width: 1400px; }
+
+/* panels */
+.panel { display: none; }
+.panel.active { display: block; }
+
+/* stats */
+.stats { display: grid; grid-template-columns: repeat(5, 1fr); gap: 12px; margin-bottom: 24px; }
+.stat {
+  background: var(--surface); border: 1px solid var(--border);
+  padding: 16px 18px; position: relative; overflow: hidden;
+}
+.stat::before {
+  content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px;
+  background: var(--border);
+}
+.stat.red::before { background: var(--red); }
+.stat.green::before { background: var(--green); }
+.stat.blue::before { background: var(--blue); }
+.stat-lbl { font-family: var(--mono); font-size: 9px; letter-spacing: 0.15em;
+            text-transform: uppercase; color: var(--muted); margin-bottom: 8px; }
+.stat-val { font-size: 32px; font-weight: 300; line-height: 1; color: var(--accent); }
+
+/* toolbar */
+.toolbar {
+  display: flex; gap: 8px; align-items: center; margin-bottom: 14px; flex-wrap: wrap;
+  background: var(--surface); border: 1px solid var(--border); padding: 12px;
+}
+.tb-search {
+  background: var(--bg); border: 1px solid var(--border); padding: 7px 12px;
+  font-family: var(--sans); font-size: 12px; outline: none; width: 220px;
+  color: var(--text);
+}
+.tb-search:focus { border-color: var(--accent); }
+.tb-select {
+  background: var(--bg); border: 1px solid var(--border); padding: 7px 28px 7px 10px;
+  font-family: var(--mono); font-size: 11px; outline: none; cursor: pointer;
+  appearance: none; color: var(--text);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='5'%3E%3Cpath d='M0 0l5 5 5-5z' fill='%238a8278'/%3E%3C/svg%3E");
+  background-repeat: no-repeat; background-position: right 9px center;
+}
+.tb-select:focus { border-color: var(--accent); }
+.tb-right { margin-left: auto; display: flex; gap: 8px; }
+.btn {
+  padding: 7px 16px; font-family: var(--mono); font-size: 10px;
+  letter-spacing: 0.1em; text-transform: uppercase; cursor: pointer;
+  border: 1px solid var(--border-dark); background: var(--surface);
+  color: var(--accent); transition: all 0.15s;
+}
+.btn:hover { background: var(--accent); color: #fff; border-color: var(--accent); }
+.btn.primary { background: var(--accent); color: #fff; border-color: var(--accent); }
+.btn.primary:hover { background: #333; }
+.btn.danger { border-color: var(--red); color: var(--red); }
+.btn.danger:hover { background: var(--red); color: #fff; }
+
+/* table */
+.tbl-wrap { background: var(--surface); border: 1px solid var(--border); overflow-x: auto; }
+table { width: 100%; border-collapse: collapse; }
+thead th {
+  background: var(--accent); color: rgba(255,255,255,0.7); padding: 10px 14px;
+  text-align: left; font-family: var(--mono); font-size: 9px; letter-spacing: 0.15em;
+  text-transform: uppercase; white-space: nowrap; font-weight: 400;
+}
+tbody tr { border-bottom: 1px solid var(--border); transition: background 0.1s; }
+tbody tr:last-child { border-bottom: none; }
+tbody tr:hover { background: var(--bg); }
+tbody td { padding: 10px 14px; vertical-align: middle; }
+.td-name { font-weight: 500; }
+.td-mono { font-family: var(--mono); font-size: 11px; color: var(--muted); }
+.td-trunc { max-width: 160px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+/* badges */
+.badge {
+  display: inline-block; padding: 2px 7px; font-family: var(--mono);
+  font-size: 9px; letter-spacing: 0.08em; text-transform: uppercase;
+  border: 1px solid; border-radius: 2px; white-space: nowrap;
+}
+.b-club      { color: #1a3a6b; border-color: #b5c8e8; background: #eef3fb; }
+.b-festival  { color: #1a6b3c; border-color: #a8d5b8; background: #edf7f2; }
+.b-promoter  { color: #5a1a6b; border-color: #d0a8e8; background: #f5eefb; }
+.b-agency    { color: #6b3a1a; border-color: #e8c4a8; background: #fbf3ee; }
+.b-brand     { color: #6b1a3a; border-color: #e8a8c4; background: #fbeeef; }
+.b-other     { color: var(--muted); border-color: var(--border); background: var(--bg); }
+
+.b-manual    { color: #1a3a6b; border-color: #b5c8e8; background: #eef3fb; }
+.b-import    { color: #1a6b3c; border-color: #a8d5b8; background: #edf7f2; }
+.b-claude    { color: #5a1a6b; border-color: #d0a8e8; background: #f5eefb; }
+
+.sync-dot { width: 7px; height: 7px; border-radius: 50%; display: inline-block; }
+.sync-yes { background: var(--green); }
+.sync-no  { background: var(--border-dark); }
+
+/* genre pills */
+.genre-pill {
+  display: inline-block; padding: 1px 6px; font-size: 9px; font-family: var(--mono);
+  background: var(--bg); border: 1px solid var(--border); border-radius: 2px;
+  margin: 1px; color: var(--muted);
+}
+
+/* row actions */
+.row-actions { display: flex; gap: 4px; }
+.ra {
+  background: none; border: 1px solid var(--border); color: var(--muted);
+  padding: 3px 8px; font-family: var(--mono); font-size: 9px;
+  letter-spacing: 0.06em; cursor: pointer; transition: all 0.1s;
+}
+.ra:hover { border-color: var(--accent); color: var(--accent); background: var(--bg); }
+.ra.del:hover { border-color: var(--red); color: var(--red); }
+
+/* empty / loading */
+.tbl-msg td { text-align: center; padding: 48px; color: var(--muted);
+              font-family: var(--mono); font-size: 11px; }
+
+/* pagination */
+.pagination {
+  display: flex; align-items: center; gap: 8px; margin-top: 12px;
+  justify-content: flex-end;
+}
+.pg-btn {
+  background: var(--surface); border: 1px solid var(--border); color: var(--muted);
+  padding: 5px 12px; font-family: var(--mono); font-size: 10px; cursor: pointer;
+  transition: all 0.1s;
+}
+.pg-btn:hover:not(:disabled) { border-color: var(--accent); color: var(--accent); }
+.pg-btn:disabled { opacity: 0.3; cursor: not-allowed; }
+.pg-info { font-family: var(--mono); font-size: 10px; color: var(--muted); }
+
+/* ── MODAL ──────────────────────────────────────────── */
+.overlay {
+  position: fixed; inset: 0; background: rgba(26,26,26,0.6);
+  display: none; align-items: center; justify-content: center; z-index: 200;
+}
+.overlay.open { display: flex; }
+.modal {
+  background: var(--surface); border-top: 3px solid var(--accent);
+  width: 640px; max-height: 90vh; overflow-y: auto; padding: 32px;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.2);
+}
+.modal-hdr { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; }
+.modal-title { font-size: 16px; font-weight: 400; }
+.modal-close { background: none; border: none; font-size: 22px; cursor: pointer;
+               color: var(--muted); line-height: 1; padding: 0 4px; }
+.modal-close:hover { color: var(--accent); }
+
+.form-section { font-family: var(--mono); font-size: 9px; letter-spacing: 0.15em;
+                text-transform: uppercase; color: var(--muted); margin: 20px 0 12px;
+                padding-bottom: 6px; border-bottom: 1px solid var(--border); }
+.form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+.fg { display: flex; flex-direction: column; gap: 5px; }
+.fg.full { grid-column: 1/-1; }
+.fg label { font-family: var(--mono); font-size: 9px; letter-spacing: 0.1em;
+            text-transform: uppercase; color: var(--muted); }
+.fg input, .fg select, .fg textarea {
+  border: 1px solid var(--border-dark); padding: 8px 10px; font-family: var(--sans);
+  font-size: 13px; outline: none; background: var(--bg); color: var(--text);
+  transition: border-color 0.15s;
+}
+.fg input:focus, .fg select:focus, .fg textarea:focus {
+  border-color: var(--accent); background: #fff;
+}
+.fg textarea { resize: vertical; min-height: 64px; }
+.fg select { appearance: none; cursor: pointer;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='5'%3E%3Cpath d='M0 0l5 5 5-5z' fill='%238a8278'/%3E%3C/svg%3E");
+  background-repeat: no-repeat; background-position: right 10px center;
+  padding-right: 28px;
+}
+.genre-checkboxes { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 4px; }
+.genre-cb { display: flex; align-items: center; gap: 4px; cursor: pointer;
+            font-size: 12px; color: var(--text); }
+.genre-cb input { cursor: pointer; accent-color: var(--accent); }
+
+.modal-ftr {
+  display: flex; justify-content: flex-end; gap: 8px;
+  margin-top: 24px; padding-top: 20px; border-top: 1px solid var(--border);
+}
+
+/* ── IMPORT PANEL ───────────────────────────────────── */
+.import-area {
+  border: 2px dashed var(--border-dark); padding: 48px; text-align: center;
+  cursor: pointer; transition: all 0.2s; background: var(--surface); margin-bottom: 20px;
+}
+.import-area:hover { border-color: var(--accent); background: var(--bg); }
+.import-area.drag { border-color: var(--accent); background: #f0f0f0; }
+.import-icon { font-size: 32px; margin-bottom: 12px; }
+.import-lbl { font-size: 14px; font-weight: 400; margin-bottom: 6px; }
+.import-sub { font-size: 12px; color: var(--muted); font-family: var(--mono); }
+.import-actions { display: flex; gap: 10px; margin-bottom: 20px; align-items: center; }
+
+/* preview table */
+.preview-wrap { margin-top: 16px; }
+.preview-hdr { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+.preview-title { font-size: 13px; font-weight: 500; }
+.preview-stats { font-family: var(--mono); font-size: 11px; color: var(--muted); }
+.preview-tag { display: inline-block; padding: 1px 6px; border-radius: 2px;
+               font-family: var(--mono); font-size: 9px; margin-left: 4px; }
+.tag-new    { background: #edf7f2; color: var(--green); border: 1px solid #a8d5b8; }
+.tag-update { background: #fff8ed; color: var(--amber); border: 1px solid #e8c87a; }
+.tag-skip   { background: var(--bg); color: var(--muted); border: 1px solid var(--border); }
+
+/* toast */
+#toast {
+  position: fixed; bottom: 24px; right: 24px; padding: 12px 20px;
+  font-family: var(--mono); font-size: 11px; letter-spacing: 0.05em;
+  display: none; z-index: 999; border-top: 2px solid;
+  background: var(--surface); box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+}
+#toast.success { border-color: var(--green); color: var(--green); }
+#toast.error   { border-color: var(--red);   color: var(--red); }
+#toast.info    { border-color: var(--blue);  color: var(--blue); }
+</style>
+</head>
+<body>
+
+<!-- LOGIN -->
+<div id="login-screen">
+  <div class="login-logo"><strong>DEEPBLOE</strong> AGENCY · CRM</div>
+  <div class="login-box">
+    <h1>Agent Login</h1>
+    <p>Access restricted to Deepbloe team members.</p>
+    <div class="login-field">
+      <label>Email</label>
+      <input type="email" id="l-email" placeholder="you@deepbloe.com" autocomplete="email">
+    </div>
+    <div class="login-field">
+      <label>Password</label>
+      <input type="password" id="l-pass" placeholder="••••••••">
+    </div>
+    <button class="login-btn" onclick="doLogin()">Sign In</button>
+    <div class="login-err" id="login-err">Invalid email or password.</div>
+  </div>
+</div>
+
+<!-- APP -->
+<div id="app">
+  <header>
+    <div class="h-brand"><strong>DEEPBLOE</strong> · CRM</div>
+    <nav class="h-nav">
+      <div class="h-tab active" onclick="showPanel('orgs')">Organisations</div>
+      <div class="h-tab" onclick="showPanel('contacts')">Contacts</div>
+      <div class="h-tab" onclick="showPanel('import')">Import</div>
+    </nav>
+    <div class="h-right">
+      <span class="h-user" id="h-user"></span>
+      <button class="h-logout" onclick="doLogout()">Logout</button>
+    </div>
+  </header>
+
+  <main>
+
+    <!-- ── ORGANISATIONS PANEL ── -->
+    <div class="panel active" id="panel-orgs">
+      <div class="stats" id="org-stats">
+        <div class="stat red">
+          <div class="stat-lbl">Total Orgs</div>
+          <div class="stat-val" id="s-total">—</div>
+        </div>
+        <div class="stat blue">
+          <div class="stat-lbl">Clubs</div>
+          <div class="stat-val" id="s-clubs">—</div>
+        </div>
+        <div class="stat green">
+          <div class="stat-lbl">Festivals</div>
+          <div class="stat-val" id="s-fests">—</div>
+        </div>
+        <div class="stat">
+          <div class="stat-lbl">Promoters</div>
+          <div class="stat-val" id="s-proms">—</div>
+        </div>
+        <div class="stat">
+          <div class="stat-lbl">Countries</div>
+          <div class="stat-val" id="s-countries">—</div>
+        </div>
+      </div>
+
+      <div class="toolbar">
+        <input class="tb-search" type="text" id="org-search" placeholder="Search name, city..." oninput="filterOrgs()">
+        <select class="tb-select" id="org-type" onchange="filterOrgs()">
+          <option value="">All types</option>
+          <option>Club</option><option>Festival</option><option>Promoter</option>
+          <option>Agency</option><option>Brand</option><option>Other</option>
+        </select>
+        <select class="tb-select" id="org-country" onchange="filterOrgs()">
+          <option value="">All countries</option>
+          <option>Indonesia</option><option>Thailand</option><option>UAE</option>
+          <option>Singapore</option><option>Cambodia</option><option>Netherlands</option>
+          <option>Belgium</option><option>Germany</option><option>Spain</option>
+          <option>Italy</option><option>France</option><option>United Kingdom</option>
+          <option>Other</option>
+        </select>
+        <div class="tb-right">
+          <button class="btn" onclick="exportOrgs()">↓ Export</button>
+          <button class="btn primary" onclick="openOrgModal()">+ Add Organisation</button>
+        </div>
+      </div>
+
+      <div class="tbl-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Name</th><th>Type</th><th>Country</th><th>City</th>
+              <th>Genre</th><th>Contacts</th><th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="org-tbody">
+            <tr class="tbl-msg"><td colspan="7">Loading...</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="pagination">
+        <button class="pg-btn" id="org-prev" onclick="orgPage(-1)" disabled>← Prev</button>
+        <span class="pg-info" id="org-pinfo"></span>
+        <button class="pg-btn" id="org-next" onclick="orgPage(1)">Next →</button>
+      </div>
+    </div>
+
+    <!-- ── CONTACTS PANEL ── -->
+    <div class="panel" id="panel-contacts">
+      <div class="stats">
+        <div class="stat red">
+          <div class="stat-lbl">Total Contacts</div>
+          <div class="stat-val" id="sc-total">—</div>
+        </div>
+        <div class="stat green">
+          <div class="stat-lbl">Mailchimp Synced</div>
+          <div class="stat-val" id="sc-synced">—</div>
+        </div>
+        <div class="stat blue">
+          <div class="stat-lbl">Manual</div>
+          <div class="stat-val" id="sc-manual">—</div>
+        </div>
+        <div class="stat">
+          <div class="stat-lbl">Imported</div>
+          <div class="stat-val" id="sc-import">—</div>
+        </div>
+        <div class="stat">
+          <div class="stat-lbl">Claude</div>
+          <div class="stat-val" id="sc-claude">—</div>
+        </div>
+      </div>
+
+      <div class="toolbar">
+        <input class="tb-search" type="text" id="con-search" placeholder="Search name, email..." oninput="filterContacts()">
+        <select class="tb-select" id="con-source" onchange="filterContacts()">
+          <option value="">All sources</option>
+          <option>Manual</option><option>Import</option><option>Claude</option>
+        </select>
+        <select class="tb-select" id="con-synced" onchange="filterContacts()">
+          <option value="">All sync status</option>
+          <option value="true">Synced</option>
+          <option value="false">Not synced</option>
+        </select>
+        <div class="tb-right">
+          <button class="btn" onclick="exportContacts()">↓ Export</button>
+          <button class="btn primary" onclick="openConModal()">+ Add Contact</button>
+        </div>
+      </div>
+
+      <div class="tbl-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Name</th><th>Email</th><th>Phone</th>
+              <th>Organisation</th><th>Tags</th><th>Source</th><th>MC Sync</th><th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="con-tbody">
+            <tr class="tbl-msg"><td colspan="8">Loading...</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="pagination">
+        <button class="pg-btn" id="con-prev" onclick="conPage(-1)" disabled>← Prev</button>
+        <span class="pg-info" id="con-pinfo"></span>
+        <button class="pg-btn" id="con-next" onclick="conPage(1)">Next →</button>
+      </div>
+    </div>
+
+    <!-- ── IMPORT PANEL ── -->
+    <div class="panel" id="panel-import">
+      <div class="import-actions">
+        <button class="btn primary" onclick="downloadTemplate()">↓ Download Template</button>
+        <span style="font-family:var(--mono);font-size:11px;color:var(--muted)">
+          Download the Excel template, fill it in, then upload below.
+        </span>
+      </div>
+
+      <div class="import-area" id="drop-area" onclick="document.getElementById('file-input').click()"
+           ondragover="e=>e.preventDefault()" ondrop="handleDrop(event)">
+        <div class="import-icon">📂</div>
+        <div class="import-lbl">Drop Excel file here or click to browse</div>
+        <div class="import-sub">Accepts .xlsx — columns: type, name, country, city, genre, first_name, email, phone</div>
+      </div>
+      <input type="file" id="file-input" accept=".xlsx,.xls" style="display:none" onchange="handleFile(this.files[0])">
+
+      <div class="preview-wrap" id="import-preview" style="display:none">
+        <div class="preview-hdr">
+          <div>
+            <span class="preview-title">Preview</span>
+            <span class="preview-tag tag-new" id="prev-new">0 new</span>
+            <span class="preview-tag tag-update" id="prev-update">0 update</span>
+            <span class="preview-tag tag-skip" id="prev-skip">0 skip</span>
+          </div>
+          <button class="btn primary" id="import-btn" onclick="runImport()">Import All</button>
+        </div>
+        <div class="tbl-wrap">
+          <table>
+            <thead>
+              <tr><th>Status</th><th>Name</th><th>Type</th><th>Country</th><th>City</th>
+                  <th>Email</th><th>Genre</th><th>First Name</th></tr>
+            </thead>
+            <tbody id="preview-tbody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<!-- ORG MODAL -->
+<div class="overlay" id="org-modal">
+  <div class="modal">
+    <div class="modal-hdr">
+      <div class="modal-title" id="org-modal-title">Add Organisation</div>
+      <button class="modal-close" onclick="closeModal('org-modal')">×</button>
+    </div>
+    <div class="form-section">Organisation Details</div>
+    <div class="form-grid">
+      <div class="fg">
+        <label>Type *</label>
+        <select id="om-type">
+          <option value="">Select type</option>
+          <option>Club</option><option>Festival</option><option>Promoter</option>
+          <option>Agency</option><option>Brand</option><option>Other</option>
+        </select>
+      </div>
+      <div class="fg">
+        <label>Name *</label>
+        <input id="om-name" placeholder="Illuzion Phuket">
+      </div>
+      <div class="fg">
+        <label>Country *</label>
+        <select id="om-country">
+          <option value="">Select country</option>
+          <option>Indonesia</option><option>Thailand</option><option>UAE</option>
+          <option>Singapore</option><option>Cambodia</option><option>Netherlands</option>
+          <option>Belgium</option><option>Germany</option><option>Spain</option>
+          <option>Italy</option><option>France</option><option>United Kingdom</option><option>Other</option>
+        </select>
+      </div>
+      <div class="fg">
+        <label>City</label>
+        <input id="om-city" placeholder="Phuket">
+      </div>
+      <div class="fg">
+        <label>Website</label>
+        <input id="om-website" placeholder="https://...">
+      </div>
+      <div class="fg">
+        <label>Instagram</label>
+        <input id="om-instagram" placeholder="@handle">
+      </div>
+      <div class="fg full">
+        <label>Genre</label>
+        <div class="genre-checkboxes" id="om-genres">
+          <label class="genre-cb"><input type="checkbox" value="Afro House"> Afro House</label>
+          <label class="genre-cb"><input type="checkbox" value="Melodic House"> Melodic House</label>
+          <label class="genre-cb"><input type="checkbox" value="Tech House"> Tech House</label>
+          <label class="genre-cb"><input type="checkbox" value="Deep House"> Deep House</label>
+          <label class="genre-cb"><input type="checkbox" value="House"> House</label>
+          <label class="genre-cb"><input type="checkbox" value="Techno"> Techno</label>
+          <label class="genre-cb"><input type="checkbox" value="EDM"> EDM</label>
+          <label class="genre-cb"><input type="checkbox" value="Melodic Techno"> Melodic Techno</label>
+          <label class="genre-cb"><input type="checkbox" value="Progressive"> Progressive</label>
+          <label class="genre-cb"><input type="checkbox" value="Disco"> Disco</label>
+        </div>
+      </div>
+    </div>
+    <div class="modal-ftr">
+      <button class="btn" onclick="closeModal('org-modal')">Cancel</button>
+      <button class="btn primary" id="org-save-btn" onclick="saveOrg()">Save Organisation</button>
+    </div>
+  </div>
+</div>
+
+<!-- CONTACT MODAL -->
+<div class="overlay" id="con-modal">
+  <div class="modal">
+    <div class="modal-hdr">
+      <div class="modal-title" id="con-modal-title">Add Contact</div>
+      <button class="modal-close" onclick="closeModal('con-modal')">×</button>
+    </div>
+    <div class="form-section">Contact Details</div>
+    <div class="form-grid">
+      <div class="fg">
+        <label>First Name</label>
+        <input id="cm-fname" placeholder="John">
+      </div>
+      <div class="fg">
+        <label>Email *</label>
+        <input id="cm-email" type="email" placeholder="booking@venue.com">
+      </div>
+      <div class="fg">
+        <label>Phone</label>
+        <input id="cm-phone" placeholder="+66 ...">
+      </div>
+      <div class="fg">
+        <label>Organisation</label>
+        <select id="cm-org">
+          <option value="">None</option>
+        </select>
+      </div>
+      <div class="fg full">
+        <label>Tags (comma separated)</label>
+        <input id="cm-tags" placeholder="booking, main contact, vip">
+      </div>
+    </div>
+    <div class="modal-ftr">
+      <button class="btn" onclick="closeModal('con-modal')">Cancel</button>
+      <button class="btn primary" id="con-save-btn" onclick="saveContact()">Save Contact</button>
+    </div>
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<script>
+// ── CONFIG ────────────────────────────────────────────────────
+const SUPABASE_URL = 'https://ksnxgidklhonpsneerbu.supabase.co';
+const SUPABASE_KEY = 'sb_publishable_JsOkmXlOxBWKXcraBE7gGg_qErTkqX9';
+
+const { createClient } = supabase;
+const db = createClient(SUPABASE_URL, SUPABASE_KEY);
+
+// ── STATE ─────────────────────────────────────────────────────
+let allOrgs = [], filtOrgs = [], orgPageN = 0;
+let allCons = [], filtCons = [], conPageN = 0;
+let editOrgId = null, editConId = null;
+let importRows = [];
+const PG = 30;
+
+// ── AUTH ──────────────────────────────────────────────────────
+async function doLogin() {
+  const email = document.getElementById('l-email').value.trim();
+  const pass  = document.getElementById('l-pass').value;
+  const { error } = await db.auth.signInWithPassword({ email, password: pass });
+  if (error) {
+    document.getElementById('login-err').style.display = 'block';
+  } else {
+    startApp();
+  }
+}
+document.getElementById('l-pass').addEventListener('keydown', e => {
+  if (e.key === 'Enter') doLogin();
+});
+async function doLogout() {
+  await db.auth.signOut();
+  location.reload();
+}
+async function startApp() {
+  const { data: { user } } = await db.auth.getUser();
+  if (!user) return;
+  document.getElementById('login-screen').style.display = 'none';
+  document.getElementById('app').style.display = 'block';
+  document.getElementById('h-user').textContent = user.email;
+  loadOrgs();
+  loadContacts();
+}
+// check session on load
+db.auth.getSession().then(({ data: { session } }) => {
+  if (session) startApp();
+});
+
+// ── NAVIGATION ────────────────────────────────────────────────
+function showPanel(name) {
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.h-tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('panel-' + name).classList.add('active');
+  event.target.classList.add('active');
+}
+
+// ── ORGANISATIONS ─────────────────────────────────────────────
+async function loadOrgs() {
+  const { data, error } = await db.from('organisations').select('*, contacts(count)').order('name');
+  if (error) { showToast('Error loading organisations', 'error'); return; }
+  allOrgs = data;
+  updateOrgStats();
+  filterOrgs();
+}
+
+function updateOrgStats() {
+  document.getElementById('s-total').textContent    = allOrgs.length;
+  document.getElementById('s-clubs').textContent    = allOrgs.filter(o => o.type === 'Club').length;
+  document.getElementById('s-fests').textContent    = allOrgs.filter(o => o.type === 'Festival').length;
+  document.getElementById('s-proms').textContent    = allOrgs.filter(o => o.type === 'Promoter').length;
+  const countries = new Set(allOrgs.map(o => o.country).filter(Boolean));
+  document.getElementById('s-countries').textContent = countries.size;
+}
+
+function filterOrgs() {
+  const q  = document.getElementById('org-search').value.toLowerCase();
+  const ty = document.getElementById('org-type').value;
+  const co = document.getElementById('org-country').value;
+  filtOrgs = allOrgs.filter(o => {
+    if (q  && !`${o.name}${o.city}`.toLowerCase().includes(q)) return false;
+    if (ty && o.type    !== ty) return false;
+    if (co && o.country !== co) return false;
+    return true;
+  });
+  orgPageN = 0;
+  renderOrgs();
+}
+
+function renderOrgs() {
+  const tbody = document.getElementById('org-tbody');
+  const slice = filtOrgs.slice(orgPageN * PG, (orgPageN + 1) * PG);
+  if (!slice.length) {
+    tbody.innerHTML = '<tr class="tbl-msg"><td colspan="7">No organisations found</td></tr>';
+    document.getElementById('org-pinfo').textContent = '';
+    document.getElementById('org-prev').disabled = true;
+    document.getElementById('org-next').disabled = true;
+    return;
+  }
+  tbody.innerHTML = slice.map(o => {
+    const genres = (o.genre || []).map(g => `<span class="genre-pill">${esc(g)}</span>`).join('');
+    const conCount = o.contacts?.[0]?.count ?? 0;
+    return `<tr>
+      <td class="td-name td-trunc">${esc(o.name)}</td>
+      <td>${typeBadge(o.type)}</td>
+      <td>${esc(o.country||'—')}</td>
+      <td class="td-trunc">${esc(o.city||'—')}</td>
+      <td>${genres || '<span style="color:var(--muted)">—</span>'}</td>
+      <td class="td-mono">${conCount}</td>
+      <td><div class="row-actions">
+        <button class="ra" onclick="editOrg('${o.id}')">Edit</button>
+        <button class="ra del" onclick="deleteOrg('${o.id}','${esc(o.name)}')">Del</button>
+      </div></td>
+    </tr>`;
+  }).join('');
+  const total = filtOrgs.length;
+  const pages = Math.ceil(total / PG);
+  document.getElementById('org-pinfo').textContent =
+    `${orgPageN*PG+1}–${Math.min((orgPageN+1)*PG, total)} of ${total}`;
+  document.getElementById('org-prev').disabled = orgPageN === 0;
+  document.getElementById('org-next').disabled = orgPageN >= pages - 1;
+}
+
+function orgPage(d) { orgPageN += d; renderOrgs(); }
+
+// ── ORG MODAL ─────────────────────────────────────────────────
+function openOrgModal(id=null) {
+  editOrgId = id;
+  document.getElementById('org-modal-title').textContent = id ? 'Edit Organisation' : 'Add Organisation';
+  if (!id) {
+    document.getElementById('om-type').value = '';
+    document.getElementById('om-name').value = '';
+    document.getElementById('om-country').value = '';
+    document.getElementById('om-city').value = '';
+    document.getElementById('om-website').value = '';
+    document.getElementById('om-instagram').value = '';
+    document.querySelectorAll('#om-genres input').forEach(cb => cb.checked = false);
+  }
+  document.getElementById('org-modal').classList.add('open');
+}
+
+function editOrg(id) {
+  const o = allOrgs.find(x => x.id === id);
+  if (!o) return;
+  document.getElementById('om-type').value      = o.type || '';
+  document.getElementById('om-name').value      = o.name || '';
+  document.getElementById('om-country').value   = o.country || '';
+  document.getElementById('om-city').value      = o.city || '';
+  document.getElementById('om-website').value   = o.website || '';
+  document.getElementById('om-instagram').value = o.instagram || '';
+  document.querySelectorAll('#om-genres input').forEach(cb => {
+    cb.checked = (o.genre || []).includes(cb.value);
+  });
+  openOrgModal(id);
+}
+
+async function saveOrg() {
+  const name = document.getElementById('om-name').value.trim();
+  if (!name) { showToast('Name is required', 'error'); return; }
+  const genre = [...document.querySelectorAll('#om-genres input:checked')].map(cb => cb.value);
+  const data = {
+    type:      document.getElementById('om-type').value || null,
+    name,
+    country:   document.getElementById('om-country').value || null,
+    city:      document.getElementById('om-city').value.trim() || null,
+    website:   document.getElementById('om-website').value.trim() || null,
+    instagram: document.getElementById('om-instagram').value.trim() || null,
+    genre:     genre.length ? genre : null,
+  };
+  const btn = document.getElementById('org-save-btn');
+  btn.disabled = true; btn.textContent = 'Saving...';
+  let error;
+  if (editOrgId) {
+    ({ error } = await db.from('organisations').update(data).eq('id', editOrgId));
+  } else {
+    ({ error } = await db.from('organisations').insert(data));
+  }
+  btn.disabled = false; btn.textContent = 'Save Organisation';
+  if (error) {
+    showToast(error.code === '23505' ? 'Organisation already exists' : 'Error saving', 'error');
+  } else {
+    showToast(editOrgId ? 'Organisation updated' : 'Organisation added', 'success');
+    closeModal('org-modal');
+    loadOrgs();
+  }
+}
+
+async function deleteOrg(id, name) {
+  if (!confirm(`Delete "${name}"?`)) return;
+  const { error } = await db.from('organisations').delete().eq('id', id);
+  if (error) { showToast('Error deleting', 'error'); return; }
+  showToast('Deleted', 'success');
+  loadOrgs();
+}
+
+// ── CONTACTS ──────────────────────────────────────────────────
+async function loadContacts() {
+  const { data, error } = await db.from('contacts')
+    .select('*, organisations(name, type, country)').order('created_at', { ascending: false });
+  if (error) { showToast('Error loading contacts', 'error'); return; }
+  allCons = data;
+  updateConStats();
+  filterContacts();
+  populateOrgDropdown();
+}
+
+function updateConStats() {
+  document.getElementById('sc-total').textContent  = allCons.length;
+  document.getElementById('sc-synced').textContent = allCons.filter(c => c.mailchimp_synced).length;
+  document.getElementById('sc-manual').textContent = allCons.filter(c => c.source === 'Manual').length;
+  document.getElementById('sc-import').textContent = allCons.filter(c => c.source === 'Import').length;
+  document.getElementById('sc-claude').textContent = allCons.filter(c => c.source === 'Claude').length;
+}
+
+function filterContacts() {
+  const q  = document.getElementById('con-search').value.toLowerCase();
+  const src = document.getElementById('con-source').value;
+  const syn = document.getElementById('con-synced').value;
+  filtCons = allCons.filter(c => {
+    if (q   && !`${c.first_name}${c.email}`.toLowerCase().includes(q)) return false;
+    if (src && c.source !== src) return false;
+    if (syn === 'true'  && !c.mailchimp_synced) return false;
+    if (syn === 'false' &&  c.mailchimp_synced) return false;
+    return true;
+  });
+  conPageN = 0;
+  renderContacts();
+}
+
+function renderContacts() {
+  const tbody = document.getElementById('con-tbody');
+  const slice = filtCons.slice(conPageN * PG, (conPageN + 1) * PG);
+  if (!slice.length) {
+    tbody.innerHTML = '<tr class="tbl-msg"><td colspan="8">No contacts found</td></tr>';
+    document.getElementById('con-pinfo').textContent = '';
+    document.getElementById('con-prev').disabled = true;
+    document.getElementById('con-next').disabled = true;
+    return;
+  }
+  tbody.innerHTML = slice.map(c => {
+    const org = c.organisations;
+    const tags = (c.tags || []).map(t => `<span class="genre-pill">${esc(t)}</span>`).join('');
+    return `<tr>
+      <td class="td-name">${esc(c.first_name||'—')}</td>
+      <td class="td-mono td-trunc">${esc(c.email)}</td>
+      <td class="td-mono">${esc(c.phone||'—')}</td>
+      <td class="td-trunc">${org ? `<span class="td-mono" style="font-size:11px">${esc(org.name)}</span>` : '—'}</td>
+      <td>${tags || '—'}</td>
+      <td>${sourceBadge(c.source)}</td>
+      <td><span class="sync-dot ${c.mailchimp_synced ? 'sync-yes' : 'sync-no'}"></span></td>
+      <td><div class="row-actions">
+        <button class="ra" onclick="editContact('${c.id}')">Edit</button>
+        <button class="ra del" onclick="deleteContact('${c.id}','${esc(c.email)}')">Del</button>
+      </div></td>
+    </tr>`;
+  }).join('');
+  const total = filtCons.length;
+  const pages = Math.ceil(total / PG);
+  document.getElementById('con-pinfo').textContent =
+    `${conPageN*PG+1}–${Math.min((conPageN+1)*PG, total)} of ${total}`;
+  document.getElementById('con-prev').disabled = conPageN === 0;
+  document.getElementById('con-next').disabled = conPageN >= pages - 1;
+}
+
+function conPage(d) { conPageN += d; renderContacts(); }
+
+// ── CONTACT MODAL ─────────────────────────────────────────────
+function populateOrgDropdown() {
+  const sel = document.getElementById('cm-org');
+  sel.innerHTML = '<option value="">None</option>';
+  [...allOrgs].sort((a,b) => a.name.localeCompare(b.name)).forEach(o => {
+    sel.innerHTML += `<option value="${o.id}">${esc(o.name)} (${esc(o.country||'')})</option>`;
+  });
+}
+
+function openConModal(id=null) {
+  editConId = id;
+  document.getElementById('con-modal-title').textContent = id ? 'Edit Contact' : 'Add Contact';
+  if (!id) {
+    document.getElementById('cm-fname').value = '';
+    document.getElementById('cm-email').value = '';
+    document.getElementById('cm-phone').value = '';
+    document.getElementById('cm-org').value   = '';
+    document.getElementById('cm-tags').value  = '';
+  }
+  document.getElementById('con-modal').classList.add('open');
+}
+
+function editContact(id) {
+  const c = allCons.find(x => x.id === id);
+  if (!c) return;
+  document.getElementById('cm-fname').value = c.first_name || '';
+  document.getElementById('cm-email').value = c.email || '';
+  document.getElementById('cm-phone').value = c.phone || '';
+  document.getElementById('cm-org').value   = c.organisation_id || '';
+  document.getElementById('cm-tags').value  = (c.tags || []).join(', ');
+  openConModal(id);
+}
+
+async function saveContact() {
+  const email = document.getElementById('cm-email').value.trim();
+  if (!email) { showToast('Email is required', 'error'); return; }
+  const tagsRaw = document.getElementById('cm-tags').value;
+  const tags = tagsRaw.split(',').map(t => t.trim()).filter(Boolean);
+  const data = {
+    first_name:       document.getElementById('cm-fname').value.trim() || null,
+    email,
+    phone:            document.getElementById('cm-phone').value.trim() || null,
+    organisation_id:  document.getElementById('cm-org').value || null,
+    tags:             tags.length ? tags : null,
+    source:           editConId ? undefined : 'Manual',
+  };
+  if (editConId) delete data.source;
+  const btn = document.getElementById('con-save-btn');
+  btn.disabled = true; btn.textContent = 'Saving...';
+  let error;
+  if (editConId) {
+    ({ error } = await db.from('contacts').update(data).eq('id', editConId));
+  } else {
+    ({ error } = await db.from('contacts').insert(data));
+  }
+  btn.disabled = false; btn.textContent = 'Save Contact';
+  if (error) {
+    showToast(error.code === '23505' ? 'Email already exists' : 'Error saving', 'error');
+  } else {
+    showToast(editConId ? 'Contact updated' : 'Contact added', 'success');
+    closeModal('con-modal');
+    loadContacts();
+  }
+}
+
+async function deleteContact(id, email) {
+  if (!confirm(`Delete contact "${email}"?`)) return;
+  const { error } = await db.from('contacts').delete().eq('id', id);
+  if (error) { showToast('Error deleting', 'error'); return; }
+  showToast('Deleted', 'success');
+  loadContacts();
+}
+
+// ── EXCEL IMPORT ──────────────────────────────────────────────
+function handleDrop(e) {
+  e.preventDefault();
+  const file = e.dataTransfer.files[0];
+  if (file) handleFile(file);
+}
+
+async function handleFile(file) {
+  if (!file) return;
+  showToast('Reading file...', 'info');
+  const buf = await file.arrayBuffer();
+  const wb  = XLSX.read(buf, { type: 'array' });
+  const ws  = wb.Sheets[wb.SheetNames[0]];
+  const rows = XLSX.utils.sheet_to_json(ws, { defval: '' });
+
+  // fetch existing emails for dedup check
+  const { data: existing } = await db.from('contacts').select('email');
+  const existingEmails = new Set((existing || []).map(c => c.email.toLowerCase()));
+  const { data: existingOrgs } = await db.from('organisations').select('name,city,country');
+  const existingOrgKeys = new Set((existingOrgs||[]).map(o =>
+    `${o.name}|${o.city}|${o.country}`.toLowerCase()));
+
+  importRows = rows.map(r => {
+    const email = (r.email || '').trim().toLowerCase();
+    const orgKey = `${r.name}|${r.city}|${r.country}`.toLowerCase();
+    let status = 'new';
+    if (!email) status = 'skip';
+    else if (existingEmails.has(email)) status = 'update';
+    return { ...r, _email: email, _orgKey: orgKey, _status: status };
+  });
+
+  const newCount    = importRows.filter(r => r._status === 'new').length;
+  const updateCount = importRows.filter(r => r._status === 'update').length;
+  const skipCount   = importRows.filter(r => r._status === 'skip').length;
+
+  document.getElementById('prev-new').textContent    = `${newCount} new`;
+  document.getElementById('prev-update').textContent = `${updateCount} update`;
+  document.getElementById('prev-skip').textContent   = `${skipCount} skip`;
+
+  const tbody = document.getElementById('preview-tbody');
+  tbody.innerHTML = importRows.slice(0, 50).map(r => {
+    const cls = { new: 'tag-new', update: 'tag-update', skip: 'tag-skip' }[r._status];
+    return `<tr>
+      <td><span class="preview-tag ${cls}">${r._status}</span></td>
+      <td>${esc(r.name||'')}</td>
+      <td>${esc(r.type||'')}</td>
+      <td>${esc(r.country||'')}</td>
+      <td>${esc(r.city||'')}</td>
+      <td class="td-mono" style="font-size:11px">${esc(r._email)}</td>
+      <td>${esc(r.genre||'')}</td>
+      <td>${esc(r.first_name||'')}</td>
+    </tr>`;
+  }).join('');
+
+  document.getElementById('import-preview').style.display = 'block';
+  showToast(`${rows.length} rows loaded`, 'info');
+}
+
+async function runImport() {
+  const btn = document.getElementById('import-btn');
+  btn.disabled = true; btn.textContent = 'Importing...';
+  let done = 0, errors = 0;
+
+  for (const r of importRows) {
+    if (r._status === 'skip') continue;
+    try {
+      // upsert organisation
+      let orgId = null;
+      if (r.name) {
+        const genres = r.genre ? r.genre.split(',').map(g => g.trim()).filter(Boolean) : null;
+        const { data: orgData } = await db.from('organisations').upsert({
+          type: r.type || null, name: r.name, country: r.country || null,
+          city: r.city || null, genre: genres,
+        }, { onConflict: 'name,city,country' }).select('id');
+        orgId = orgData?.[0]?.id || null;
+      }
+      // upsert contact
+      if (r._email) {
+        await db.from('contacts').upsert({
+          email: r._email,
+          first_name: r.first_name || null,
+          phone: r.phone || null,
+          organisation_id: orgId,
+          source: 'Import',
+        }, { onConflict: 'email' });
+        done++;
+      }
+    } catch(e) { errors++; }
+  }
+
+  btn.disabled = false; btn.textContent = 'Import All';
+  showToast(`Imported ${done} contacts${errors ? `, ${errors} errors` : ''}`, errors ? 'error' : 'success');
+  loadOrgs(); loadContacts();
+}
+
+function downloadTemplate() {
+  const ws = XLSX.utils.aoa_to_sheet([
+    ['type','name','country','city','genre','first_name','email','phone'],
+    ['Club','Example Club','Thailand','Bangkok','Afro House, Tech House','John','john@example.com','+66 1234567'],
+  ]);
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, 'Import');
+  XLSX.writeFile(wb, 'deepbloe_import_template.xlsx');
+}
+
+// ── EXPORT ────────────────────────────────────────────────────
+function exportOrgs() {
+  const data = filtOrgs.map(o => ({
+    Type: o.type, Name: o.name, Country: o.country, City: o.city,
+    Genre: (o.genre||[]).join(', '), Website: o.website, Instagram: o.instagram,
+  }));
+  const ws = XLSX.utils.json_to_sheet(data);
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, 'Organisations');
+  XLSX.writeFile(wb, `deepbloe_orgs_${new Date().toISOString().slice(0,10)}.xlsx`);
+  showToast(`Exported ${data.length} organisations`, 'success');
+}
+
+function exportContacts() {
+  const data = filtCons.map(c => ({
+    FirstName: c.first_name, Email: c.email, Phone: c.phone,
+    Organisation: c.organisations?.name, Country: c.organisations?.country,
+    Tags: (c.tags||[]).join(', '), Source: c.source,
+    MailchimpSynced: c.mailchimp_synced ? 'Yes' : 'No',
+  }));
+  const ws = XLSX.utils.json_to_sheet(data);
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, 'Contacts');
+  XLSX.writeFile(wb, `deepbloe_contacts_${new Date().toISOString().slice(0,10)}.xlsx`);
+  showToast(`Exported ${data.length} contacts`, 'success');
+}
+
+// ── HELPERS ───────────────────────────────────────────────────
+function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+
+function typeBadge(t) {
+  const map = { Club:'club', Festival:'festival', Promoter:'promoter', Agency:'agency', Brand:'brand' };
+  return `<span class="badge b-${map[t]||'other'}">${esc(t||'Other')}</span>`;
+}
+function sourceBadge(s) {
+  return `<span class="badge b-${(s||'manual').toLowerCase()}">${esc(s||'Manual')}</span>`;
+}
+function esc(s) {
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+function showToast(msg, type='info') {
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.className = type; t.style.display = 'block';
+  setTimeout(() => t.style.display = 'none', 3500);
+}
+</script>
+</body>
+</html>
