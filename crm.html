@@ -393,11 +393,11 @@ tbody td { padding: 10px 14px; vertical-align: middle; }
           <thead>
             <tr>
               <th>Name</th><th>Type</th><th>Country</th><th>City</th>
-              <th>Genre</th><th>Contacts</th><th>Actions</th>
+              <th>Genre</th><th>Contact Name</th><th>Contact Email</th><th>Actions</th>
             </tr>
           </thead>
           <tbody id="org-tbody">
-            <tr class="tbl-msg"><td colspan="7">Loading...</td></tr>
+            <tr class="tbl-msg"><td colspan="8">Loading...</td></tr>
           </tbody>
         </table>
       </div>
@@ -695,9 +695,24 @@ function showPanel(name) {
   event.target.classList.add('active');
 }
 
+function goToContact(email) {
+  // switch to contacts tab
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.h-tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('panel-contacts').classList.add('active');
+  document.querySelectorAll('.h-tab')[1].classList.add('active');
+  // filter on email
+  document.getElementById('con-search').value = email;
+  document.getElementById('con-source').value = '';
+  document.getElementById('con-synced').value = '';
+  filterContacts();
+}
+
 // ── ORGANISATIONS ─────────────────────────────────────────────
 async function loadOrgs() {
-  const { data, error } = await db.from('organisations').select('*, contacts(count)').order('name');
+  const { data, error } = await db.from('organisations')
+    .select('*, contacts(id, first_name, email)')
+    .order('name');
   if (error) { showToast('Error loading organisations', 'error'); return; }
   allOrgs = data;
   updateOrgStats();
@@ -731,7 +746,7 @@ function renderOrgs() {
   const tbody = document.getElementById('org-tbody');
   const slice = filtOrgs.slice(orgPageN * PG, (orgPageN + 1) * PG);
   if (!slice.length) {
-    tbody.innerHTML = '<tr class="tbl-msg"><td colspan="7">No organisations found</td></tr>';
+    tbody.innerHTML = '<tr class="tbl-msg"><td colspan="8">No organisations found</td></tr>';
     document.getElementById('org-pinfo').textContent = '';
     document.getElementById('org-prev').disabled = true;
     document.getElementById('org-next').disabled = true;
@@ -739,14 +754,26 @@ function renderOrgs() {
   }
   tbody.innerHTML = slice.map(o => {
     const genres = (o.genre || []).map(g => `<span class="genre-pill">${esc(g)}</span>`).join('');
-    const conCount = o.contacts?.[0]?.count ?? 0;
+    // first contact
+    const firstCon = (o.contacts || [])[0];
+    const conName  = firstCon?.first_name
+      ? `<span style="font-weight:500">${esc(firstCon.first_name)}</span>`
+      : '<span style="color:var(--muted)">—</span>';
+    const conEmail = firstCon?.email
+      ? `<a onclick="goToContact('${esc(firstCon.email)}')" style="color:var(--blue);cursor:pointer;font-family:var(--mono);font-size:11px;text-decoration:none;border-bottom:1px solid var(--border)">${esc(firstCon.email)}</a>`
+      : `<button class="ra" onclick="addContactToOrg('${o.id}','${esc(o.name)}')">+ add</button>`;
+    const extraCount = (o.contacts || []).length - 1;
+    const extraLabel = extraCount > 0
+      ? `<span style="font-family:var(--mono);font-size:9px;color:var(--muted);margin-left:4px">+${extraCount} more</span>`
+      : '';
     return `<tr>
       <td class="td-name td-trunc">${esc(o.name)}</td>
       <td>${typeBadge(o.type)}</td>
       <td>${esc(o.country||'—')}</td>
       <td class="td-trunc">${esc(o.city||'—')}</td>
       <td>${genres || '<span style="color:var(--muted)">—</span>'}</td>
-      <td class="td-mono">${conCount}</td>
+      <td>${conName}${extraLabel}</td>
+      <td class="td-trunc">${conEmail}</td>
       <td><div class="row-actions">
         <button class="ra" onclick="addContactToOrg('${o.id}','${esc(o.name)}')">+ Contact</button>
         <button class="ra" onclick="editOrg('${o.id}')">Edit</button>
