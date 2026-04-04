@@ -340,12 +340,13 @@ async function startApp() {
   if (!user) return;
 
   // Get artist via portal_access — two queries to avoid RLS join issues
-  const { data: access } = await db.from('portal_access')
+  const { data: access, error: accessError } = await db.from('portal_access')
     .select('artist_id')
     .eq('user_id', user.id)
     .eq('role', 'artist')
-    .eq('active', true)
-    .single();
+    .maybeSingle();
+
+  console.log('portal_access result:', access, accessError);
 
   if (!access?.artist_id) {
     document.getElementById('login-screen').style.display = 'none';
