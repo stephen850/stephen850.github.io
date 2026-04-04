@@ -2265,7 +2265,7 @@ let currentContractBookingId = null, editContractId = null;
 
 async function loadContracts() {
   const { data, error } = await db.from('contracts')
-    .select('*, bookings(reference, show_date, artists(name), organisations(name))')
+    .select('*, bookings(reference, show_date, company_id, artists(name))')
     .order('created_at', { ascending: false });
   if (error) { showToast('Error loading contracts', 'error'); return; }
   allContracts = data || [];
@@ -2317,7 +2317,7 @@ function renderContracts() {
       <td class="td-mono" style="font-size:10px">${esc(c.id.slice(0,8).toUpperCase())}</td>
       <td class="td-mono" style="font-size:10px">${esc(bk?.reference||'—')}</td>
       <td class="td-name">${esc(bk?.artists?.name||'—')}</td>
-      <td class="td-trunc">${esc(bk?.organisations?.name||'—')}</td>
+      <td class="td-trunc">${esc(allOrgs.find(o => o.id === bk?.company_id)?.name || '—')}</td>
       <td class="td-mono">${bk?.show_date ? fmtDate(bk.show_date) : '—'}</td>
       <td><span class="genre-pill">${esc((c.notes||'en').toUpperCase())}</span></td>
       <td><span class="badge ${statusCls}">${statusLabel}</span></td>
