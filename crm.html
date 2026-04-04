@@ -1416,7 +1416,7 @@ function populateArtistDropdowns() {
 // ── BOOKINGS ──────────────────────────────────────────────────
 async function loadBookings() {
   const { data, error } = await db.from('bookings')
-    .select('*, artists(name), company:organisations(name, type), contact:contacts(first_name, last_name)')
+    .select('*, artists(name), company:organisations!bookings_company_id_fkey(name, type)')
     .order('show_date', { ascending: true });
   if (error) { showToast('Error loading bookings: ' + error.message, 'error'); return; }
   allBookings = data || [];
