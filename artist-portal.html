@@ -339,22 +339,34 @@ async function startApp() {
   const { data: { user } } = await db.auth.getUser();
   if (!user) return;
 
-  // Get artist via portal_access
+  // Get artist via portal_access — two queries to avoid RLS join issues
   const { data: access } = await db.from('portal_access')
-    .select('artist_id, artists(id, name, slug, genre, home_country)')
+    .select('artist_id')
     .eq('user_id', user.id)
     .eq('role', 'artist')
     .eq('active', true)
     .single();
 
-  if (!access?.artists) {
+  if (!access?.artist_id) {
     document.getElementById('login-screen').style.display = 'none';
     document.getElementById('app').style.display = 'block';
     document.getElementById('h-artist-name').textContent = 'No artist linked';
     return;
   }
 
-  artistData = access.artists;
+  const { data: artist } = await db.from('artists')
+    .select('id, name, slug, genre, home_country')
+    .eq('id', access.artist_id)
+    .single();
+
+  if (!artist) {
+    document.getElementById('login-screen').style.display = 'none';
+    document.getElementById('app').style.display = 'block';
+    document.getElementById('h-artist-name').textContent = 'Artist not found';
+    return;
+  }
+
+  artistData = artist;
   document.getElementById('login-screen').style.display = 'none';
   document.getElementById('app').style.display = 'block';
   document.getElementById('h-artist-name').textContent = artistData.name;
