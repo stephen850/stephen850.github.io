@@ -1,0 +1,539 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Deepbloe · Show Advancing Form</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@300;400;500&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+:root {
+  --bg: #f7f5f0; --surface: #fff; --border: #e2ddd6; --border-dark: #c8c2b8;
+  --accent: #1a1a1a; --red: #c0392b; --green: #1a6b3c; --blue: #1a3a6b;
+  --muted: #8a8278; --text: #1a1a1a;
+  --mono: 'DM Mono', monospace; --sans: 'DM Sans', sans-serif;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { background: var(--bg); color: var(--text); font-family: var(--sans); font-size: 13px; min-height: 100vh; }
+
+.top-bar {
+  background: var(--accent); padding: 0 28px; height: 52px;
+  display: flex; align-items: center; justify-content: space-between;
+}
+.top-bar .brand { font-family: var(--mono); font-size: 11px; letter-spacing: 0.3em;
+                  text-transform: uppercase; color: rgba(255,255,255,0.5); }
+.top-bar .brand strong { color: #fff; }
+.top-bar .tag { font-family: var(--mono); font-size: 10px; letter-spacing: 0.1em;
+                text-transform: uppercase; color: rgba(255,255,255,0.4); }
+
+.page { max-width: 760px; margin: 0 auto; padding: 40px 28px 80px; }
+
+.show-hero {
+  background: var(--accent); color: #fff; padding: 28px 32px;
+  margin-bottom: 28px;
+}
+.show-hero .artist { font-size: 28px; font-weight: 300; margin-bottom: 4px; }
+.show-hero .details { font-family: var(--mono); font-size: 11px;
+                       color: rgba(255,255,255,0.5); letter-spacing: 0.08em; }
+.show-hero .details span { color: rgba(255,255,255,0.8); margin: 0 4px; }
+
+.intro {
+  background: #eef3fb; border-left: 3px solid #1a3a6b;
+  padding: 14px 18px; margin-bottom: 28px; font-size: 12px; line-height: 1.6;
+}
+.intro strong { color: var(--blue); }
+
+/* Progress bar */
+.progress-bar {
+  display: flex; gap: 0; margin-bottom: 28px; background: var(--surface);
+  border: 1px solid var(--border); overflow: hidden;
+}
+.progress-step {
+  flex: 1; padding: 10px 12px; text-align: center; cursor: pointer;
+  font-family: var(--mono); font-size: 9px; letter-spacing: 0.1em;
+  text-transform: uppercase; color: var(--muted); border-right: 1px solid var(--border);
+  transition: all 0.15s;
+}
+.progress-step:last-child { border-right: none; }
+.progress-step.active { background: var(--accent); color: #fff; }
+.progress-step.done { background: #edf7f2; color: var(--green); }
+
+/* Sections */
+.section { background: var(--surface); border: 1px solid var(--border); margin-bottom: 20px; display: none; }
+.section.active { display: block; }
+.section-hdr {
+  padding: 12px 18px; background: var(--accent); color: #fff;
+  font-family: var(--mono); font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase;
+}
+.section-grid { display: grid; grid-template-columns: 1fr 1fr; }
+.field { padding: 12px 16px; border-bottom: 1px solid var(--border); border-right: 1px solid var(--border); }
+.field:nth-child(even) { border-right: none; }
+.field.full { grid-column: 1/-1; border-right: none; }
+.field:last-child, .field:nth-last-child(2):nth-child(odd) { border-bottom: none; }
+.field label { font-family: var(--mono); font-size: 9px; letter-spacing: 0.08em;
+               text-transform: uppercase; color: var(--muted); display: block; margin-bottom: 5px; }
+.field input, .field select, .field textarea {
+  width: 100%; border: 1px solid var(--border-dark); padding: 8px 10px;
+  font-family: var(--sans); font-size: 13px; outline: none; background: var(--bg); color: var(--text);
+}
+.field input:focus, .field select:focus, .field textarea:focus { border-color: var(--accent); background: #fff; }
+.field textarea { resize: vertical; min-height: 72px; }
+.field .hint { font-size: 10px; color: var(--muted); margin-top: 4px; font-family: var(--mono); }
+
+/* Nav buttons */
+.nav-btns { display: flex; gap: 10px; justify-content: space-between; margin-top: 24px; }
+.btn {
+  padding: 10px 24px; font-family: var(--mono); font-size: 10px; letter-spacing: 0.12em;
+  text-transform: uppercase; cursor: pointer; border: 1px solid var(--border-dark);
+  background: var(--surface); color: var(--accent); transition: all 0.15s;
+}
+.btn:hover { background: var(--accent); color: #fff; border-color: var(--accent); }
+.btn.primary { background: var(--accent); color: #fff; border-color: var(--accent); }
+.btn.primary:hover { background: #333; }
+.btn.success { background: var(--green); color: #fff; border-color: var(--green); }
+.btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+/* Success screen */
+#success-screen { display: none; text-align: center; padding: 60px 20px; }
+#success-screen .checkmark { font-size: 48px; margin-bottom: 20px; }
+#success-screen h2 { font-size: 22px; font-weight: 400; margin-bottom: 10px; }
+#success-screen p { color: var(--muted); font-size: 13px; max-width: 380px; margin: 0 auto; }
+
+/* Loading / error */
+#loading { text-align: center; padding: 80px; font-family: var(--mono); font-size: 12px; color: var(--muted); }
+#error-screen { display: none; text-align: center; padding: 80px 20px; }
+#error-screen h2 { font-size: 18px; font-weight: 400; margin-bottom: 10px; color: var(--red); }
+
+/* Toast */
+#toast {
+  position: fixed; bottom: 24px; right: 24px; padding: 12px 20px;
+  font-family: var(--mono); font-size: 11px; display: none; z-index: 999;
+  border-top: 2px solid; background: var(--surface); box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+}
+#toast.success { border-color: var(--green); color: var(--green); }
+#toast.error   { border-color: var(--red); color: var(--red); }
+#toast.info    { border-color: var(--blue); color: var(--blue); }
+
+@media (max-width: 600px) {
+  .section-grid { grid-template-columns: 1fr; }
+  .field { border-right: none; }
+  .show-hero { padding: 20px; }
+  .show-hero .artist { font-size: 22px; }
+}
+</style>
+</head>
+<body>
+
+<div class="top-bar">
+  <div class="brand"><strong>DEEPBLOE</strong> AGENCY</div>
+  <div class="tag">Show Advancing Form</div>
+</div>
+
+<div class="page">
+
+  <div id="loading">Loading show details...</div>
+  <div id="error-screen">
+    <h2>Link not found</h2>
+    <p>This advancing form link is invalid or has expired. Please contact your Deepbloe agent.</p>
+  </div>
+
+  <div id="main-content" style="display:none">
+
+    <div class="show-hero" id="show-hero">
+      <div class="artist" id="hero-artist">—</div>
+      <div class="details">
+        <span id="hero-date">—</span> ·
+        <span id="hero-venue">—</span> ·
+        <span id="hero-ref">—</span>
+      </div>
+    </div>
+
+    <div class="intro">
+      <strong>Hello!</strong> Please fill in the details below for this show. Your agent at Deepbloe Agency will be notified once you submit. Fields marked with * are required. You can save and return to this link at any time.
+    </div>
+
+    <!-- Progress steps -->
+    <div class="progress-bar">
+      <div class="progress-step active" onclick="goToStep(0)">1. Venue</div>
+      <div class="progress-step" onclick="goToStep(1)">2. Technical</div>
+      <div class="progress-step" onclick="goToStep(2)">3. Schedule</div>
+      <div class="progress-step" onclick="goToStep(3)">4. Hospitality</div>
+      <div class="progress-step" onclick="goToStep(4)">5. Submit</div>
+    </div>
+
+    <!-- Step 0: Venue & Contact -->
+    <div class="section active" id="step-0">
+      <div class="section-hdr">Venue & Contact Information</div>
+      <div class="section-grid">
+        <div class="field">
+          <label>Your Name *</label>
+          <input id="p-contact-name" placeholder="Production manager name">
+        </div>
+        <div class="field">
+          <label>Your Phone *</label>
+          <input id="p-contact-phone" placeholder="+63 9...">
+        </div>
+        <div class="field">
+          <label>Your Email *</label>
+          <input type="email" id="p-contact-email" placeholder="production@venue.com">
+        </div>
+        <div class="field">
+          <label>Venue / Company Name</label>
+          <input id="p-venue-name" placeholder="Venue or company name">
+        </div>
+        <div class="field full">
+          <label>Load-in Address *</label>
+          <input id="p-load-in-address" placeholder="Full address of stage/loading entrance">
+        </div>
+        <div class="field">
+          <label>Load-in Time</label>
+          <input type="time" id="p-load-in-time">
+        </div>
+        <div class="field">
+          <label>Parking</label>
+          <input id="p-parking-info" placeholder="Artist parking details">
+        </div>
+      </div>
+    </div>
+
+    <!-- Step 1: Technical -->
+    <div class="section" id="step-1">
+      <div class="section-hdr">Technical & Stage</div>
+      <div class="section-grid">
+        <div class="field">
+          <label>PA System</label>
+          <input id="p-pa-system" placeholder="e.g. d&b V-Series, L-Acoustics K2">
+        </div>
+        <div class="field">
+          <label>Power Supply</label>
+          <input id="p-power-supply" placeholder="e.g. 16A CEE 1-phase">
+        </div>
+        <div class="field">
+          <label>Stage Width (m)</label>
+          <input type="number" id="p-stage-width" placeholder="12">
+        </div>
+        <div class="field">
+          <label>Stage Depth (m)</label>
+          <input type="number" id="p-stage-depth" placeholder="8">
+        </div>
+        <div class="field full">
+          <label>Backline Provided *</label>
+          <textarea id="p-backline" placeholder="List all equipment: CDJ-3000 x2, DJM-900NXS2, monitor speakers..."></textarea>
+          <div class="hint">Please list exact equipment models</div>
+        </div>
+        <div class="field full">
+          <label>Technical Notes</label>
+          <textarea id="p-tech-notes" placeholder="Any other technical information..."></textarea>
+        </div>
+      </div>
+    </div>
+
+    <!-- Step 2: Schedule -->
+    <div class="section" id="step-2">
+      <div class="section-hdr">Show Schedule</div>
+      <div class="section-grid">
+        <div class="field">
+          <label>Doors Open</label>
+          <input type="time" id="p-doors">
+        </div>
+        <div class="field">
+          <label>Curfew *</label>
+          <input type="time" id="p-curfew">
+        </div>
+        <div class="field">
+          <label>Support Act(s)</label>
+          <input id="p-support" placeholder="Support artist name(s)">
+        </div>
+        <div class="field">
+          <label>Other Acts / Headliner</label>
+          <input id="p-other-acts" placeholder="Other performers on the bill">
+        </div>
+        <div class="field full">
+          <label>Full Schedule / Run of Show</label>
+          <textarea id="p-run-of-show" placeholder="23:00 Support Act&#10;00:30 Artist Name&#10;02:00 Close"></textarea>
+        </div>
+        <div class="field full">
+          <label>Settlement Contact</label>
+          <input id="p-settlement-contact" placeholder="Name + contact for show settlement">
+        </div>
+      </div>
+    </div>
+
+    <!-- Step 3: Hospitality -->
+    <div class="section" id="step-3">
+      <div class="section-hdr">Hospitality & Hotel</div>
+      <div class="section-grid">
+        <div class="field">
+          <label>Hotel Name</label>
+          <input id="p-hotel-name" placeholder="Hotel name">
+        </div>
+        <div class="field">
+          <label>Hotel Confirmation #</label>
+          <input id="p-hotel-confirmation" placeholder="Booking reference">
+        </div>
+        <div class="field">
+          <label>Check-in Date</label>
+          <input type="date" id="p-hotel-checkin">
+        </div>
+        <div class="field">
+          <label>Check-out Date</label>
+          <input type="date" id="p-hotel-checkout">
+        </div>
+        <div class="field full">
+          <label>Hotel Address</label>
+          <input id="p-hotel-address" placeholder="Full hotel address">
+        </div>
+        <div class="field full">
+          <label>Dressing Room</label>
+          <textarea id="p-dressing-room" placeholder="Location, facilities, access instructions..."></textarea>
+        </div>
+        <div class="field full">
+          <label>Catering / Hospitality</label>
+          <textarea id="p-catering" placeholder="What food & drinks will be provided? Any restrictions?"></textarea>
+        </div>
+        <div class="field">
+          <label>Guestlist Spots</label>
+          <input type="number" id="p-guestlist-spots" placeholder="0">
+        </div>
+        <div class="field">
+          <label>Accreditation Contact</label>
+          <input id="p-accreditation" placeholder="Name + email for guestlist">
+        </div>
+        <div class="field full">
+          <label>Additional Notes</label>
+          <textarea id="p-notes" placeholder="Anything else we should know..."></textarea>
+        </div>
+      </div>
+    </div>
+
+    <!-- Step 4: Submit -->
+    <div class="section" id="step-4">
+      <div class="section-hdr">Review & Submit</div>
+      <div style="padding:24px">
+        <div id="review-summary" style="font-size:12px;line-height:1.8;color:var(--muted);margin-bottom:20px"></div>
+        <div style="background:#edf7f2;border:1px solid #a8d5b8;padding:14px 18px;margin-bottom:20px;font-size:12px;line-height:1.6">
+          By submitting this form, you confirm that the information provided is accurate. Your Deepbloe agent will be notified immediately.
+        </div>
+        <button class="btn success" onclick="submitForm()" id="submit-btn" style="width:100%;padding:14px;font-size:11px">
+          ✓ Submit Advancing Information
+        </button>
+      </div>
+    </div>
+
+    <div class="nav-btns">
+      <button class="btn" id="btn-prev" onclick="prevStep()" style="display:none">← Previous</button>
+      <div style="flex:1"></div>
+      <button class="btn primary" id="btn-next" onclick="nextStep()">Next →</button>
+    </div>
+
+  </div>
+
+  <!-- Success screen -->
+  <div id="success-screen">
+    <div class="checkmark">✓</div>
+    <h2>Submitted successfully</h2>
+    <p>Thank you! Your Deepbloe agent has been notified and will follow up if anything is missing. You can close this page.</p>
+  </div>
+
+</div>
+
+<div id="toast"></div>
+
+<script>
+const SUPABASE_URL = 'https://ksnxgidklhonpsneerbu.supabase.co';
+const SUPABASE_KEY = 'sb_publishable_JsOkmXlOxBWKXcraBE7gGg_qErTkqX9';
+const { createClient } = supabase;
+const db = createClient(SUPABASE_URL, SUPABASE_KEY);
+
+let advancingId = null;
+let currentStep = 0;
+const totalSteps = 5;
+
+// Get ID from URL
+const params = new URLSearchParams(window.location.search);
+advancingId = params.get('id');
+
+async function init() {
+  if (!advancingId) { showError(); return; }
+
+  const { data, error } = await db.from('advancing_cases')
+    .select('*, bookings(reference, show_date, venue_name, venue_city, venue_country, artists(name))')
+    .eq('id', advancingId)
+    .single();
+
+  if (error || !data) { showError(); return; }
+
+  document.getElementById('loading').style.display = 'none';
+  document.getElementById('main-content').style.display = 'block';
+
+  const bk = data.bookings || {};
+  document.getElementById('hero-artist').textContent = bk.artists?.name || 'Artist';
+  document.getElementById('hero-date').textContent   = bk.show_date ? fmtDate(bk.show_date) : '—';
+  document.getElementById('hero-venue').textContent  = [bk.venue_name, bk.venue_city, bk.venue_country].filter(Boolean).join(', ') || '—';
+  document.getElementById('hero-ref').textContent    = bk.reference || '';
+  document.title = `Deepbloe · Advancing · ${bk.artists?.name || ''} · ${bk.show_date || ''}`;
+
+  // Pre-fill from existing data
+  const d = data.advancing_data || {};
+  prefill('p-contact-name',    d.venue_contact_name);
+  prefill('p-contact-phone',   d.venue_contact_phone);
+  prefill('p-contact-email',   d.venue_contact_email);
+  prefill('p-load-in-address', d.load_in_address);
+  prefill('p-load-in-time',    d.load_in_time);
+  prefill('p-parking-info',    d.parking_info);
+  prefill('p-pa-system',       d.pa_system);
+  prefill('p-power-supply',    d.power_supply);
+  prefill('p-stage-width',     d.stage_width);
+  prefill('p-stage-depth',     d.stage_depth);
+  prefill('p-backline',        d.backline);
+  prefill('p-tech-notes',      d.tech_notes);
+  prefill('p-doors',           d.doors);
+  prefill('p-curfew',          d.curfew);
+  prefill('p-support',         d.support);
+  prefill('p-other-acts',      d.other_acts);
+  prefill('p-run-of-show',     d.run_of_show);
+  prefill('p-settlement-contact', d.settlement_contact);
+  prefill('p-hotel-name',      d.hotel_name);
+  prefill('p-hotel-confirmation', d.hotel_confirmation);
+  prefill('p-hotel-checkin',   d.hotel_checkin);
+  prefill('p-hotel-checkout',  d.hotel_checkout);
+  prefill('p-hotel-address',   d.hotel_address);
+  prefill('p-dressing-room',   d.dressing_room);
+  prefill('p-catering',        d.catering);
+  prefill('p-guestlist-spots', d.guestlist_spots);
+  prefill('p-accreditation',   d.accreditation);
+  prefill('p-notes',           d.notes);
+
+  goToStep(0);
+}
+
+function prefill(id, val) {
+  const el = document.getElementById(id);
+  if (el && val) el.value = val;
+}
+
+function showError() {
+  document.getElementById('loading').style.display = 'none';
+  document.getElementById('error-screen').style.display = 'block';
+}
+
+function goToStep(step) {
+  currentStep = step;
+  document.querySelectorAll('.section').forEach((s, i) => {
+    s.classList.toggle('active', i === step);
+  });
+  document.querySelectorAll('.progress-step').forEach((s, i) => {
+    s.classList.remove('active', 'done');
+    if (i < step) s.classList.add('done');
+    if (i === step) s.classList.add('active');
+  });
+  document.getElementById('btn-prev').style.display = step === 0 ? 'none' : 'block';
+  document.getElementById('btn-next').style.display = step === totalSteps - 1 ? 'none' : 'block';
+  if (step === totalSteps - 1) buildReviewSummary();
+  window.scrollTo(0, 0);
+}
+
+function nextStep() {
+  if (currentStep < totalSteps - 1) goToStep(currentStep + 1);
+}
+function prevStep() {
+  if (currentStep > 0) goToStep(currentStep - 1);
+}
+
+function buildReviewSummary() {
+  const rows = [
+    ['Contact', v('p-contact-name') + (v('p-contact-phone') ? ' · ' + v('p-contact-phone') : '')],
+    ['Load-in', v('p-load-in-address') + (v('p-load-in-time') ? ' · ' + v('p-load-in-time') : '')],
+    ['PA System', v('p-pa-system')],
+    ['Backline', v('p-backline')],
+    ['Curfew', v('p-curfew')],
+    ['Hotel', v('p-hotel-name') + (v('p-hotel-confirmation') ? ' (' + v('p-hotel-confirmation') + ')' : '')],
+  ].filter(r => r[1]);
+  document.getElementById('review-summary').innerHTML = rows.map(r =>
+    `<div style="display:flex;gap:12px;padding:4px 0;border-bottom:1px solid var(--border)">
+      <span style="min-width:120px;font-family:var(--mono);font-size:10px;color:var(--muted)">${r[0]}</span>
+      <span>${esc(r[1])}</span>
+    </div>`
+  ).join('') || '<span style="color:var(--muted)">No fields filled in yet.</span>';
+}
+
+function v(id) { return (document.getElementById(id)?.value || '').trim(); }
+
+async function submitForm() {
+  const btn = document.getElementById('submit-btn');
+  btn.disabled = true; btn.textContent = 'Submitting...';
+
+  // Get existing data first
+  const { data: existing } = await db.from('advancing_cases')
+    .select('advancing_data').eq('id', advancingId).single();
+  const existingData = existing?.advancing_data || {};
+
+  // Merge promoter data into existing
+  const promoterData = {
+    venue_contact_name:   v('p-contact-name')   || existingData.venue_contact_name,
+    venue_contact_phone:  v('p-contact-phone')  || existingData.venue_contact_phone,
+    venue_contact_email:  v('p-contact-email')  || existingData.venue_contact_email,
+    load_in_address:      v('p-load-in-address')|| existingData.load_in_address,
+    load_in_time:         v('p-load-in-time')   || existingData.load_in_time,
+    parking_info:         v('p-parking-info')   || existingData.parking_info,
+    pa_system:            v('p-pa-system')       || existingData.pa_system,
+    power_supply:         v('p-power-supply')    || existingData.power_supply,
+    stage_width:          v('p-stage-width')     || existingData.stage_width,
+    stage_depth:          v('p-stage-depth')     || existingData.stage_depth,
+    backline:             v('p-backline')        || existingData.backline,
+    tech_notes:           v('p-tech-notes')      || existingData.tech_notes,
+    doors:                v('p-doors')           || existingData.doors,
+    curfew:               v('p-curfew')          || existingData.curfew,
+    support:              v('p-support')         || existingData.support,
+    other_acts:           v('p-other-acts')      || existingData.other_acts,
+    run_of_show:          v('p-run-of-show')     || existingData.run_of_show,
+    settlement_contact:   v('p-settlement-contact') || existingData.settlement_contact,
+    hotel_name:           v('p-hotel-name')      || existingData.hotel_name,
+    hotel_confirmation:   v('p-hotel-confirmation') || existingData.hotel_confirmation,
+    hotel_checkin:        v('p-hotel-checkin')   || existingData.hotel_checkin,
+    hotel_checkout:       v('p-hotel-checkout')  || existingData.hotel_checkout,
+    hotel_address:        v('p-hotel-address')   || existingData.hotel_address,
+    dressing_room:        v('p-dressing-room')   || existingData.dressing_room,
+    catering:             v('p-catering')        || existingData.catering,
+    guestlist_spots:      v('p-guestlist-spots') || existingData.guestlist_spots,
+    accreditation:        v('p-accreditation')   || existingData.accreditation,
+    notes:                v('p-notes')           || existingData.notes,
+    // preserve existing checklist & other fields
+    ...Object.fromEntries(
+      Object.entries(existingData).filter(([k]) => k.startsWith('checklist_') || ['set_time','set_length','headliner','hotel_room','accreditation_notes','driver_name','driver_phone','vehicle','pickup','transport_notes','airline_in','flight_in','dep_in','arr_in','dep_time_in','arr_time_in','seat_in','flight_ref_in','airline_out','flight_out','dep_out','arr_out','dep_time_out','arr_time_out','seat_out','flight_ref_out'].includes(k))
+    ),
+  };
+
+  const { error } = await db.from('advancing_cases').update({
+    advancing_data: promoterData,
+    status: 'in_progress',
+  }).eq('id', advancingId);
+
+  if (error) {
+    btn.disabled = false; btn.textContent = '✓ Submit Advancing Information';
+    showToast('Error submitting: ' + error.message, 'error');
+    return;
+  }
+
+  document.getElementById('main-content').style.display = 'none';
+  document.getElementById('success-screen').style.display = 'block';
+}
+
+function fmtDate(d) {
+  if (!d) return '—';
+  const dt = new Date(d + 'T00:00:00');
+  return dt.toLocaleDateString('en-GB', { day:'2-digit', month:'short', year:'numeric' });
+}
+function esc(s) {
+  return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+function showToast(msg, type='info') {
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.className = type; t.style.display = 'block';
+  setTimeout(() => t.style.display = 'none', 3500);
+}
+
+init();
+</script>
+</body>
+</html>
