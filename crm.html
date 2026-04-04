@@ -2364,7 +2364,7 @@ function openContractEditor(bookingId = null) {
   // Populate booking dropdown
   const sel = document.getElementById('ce-booking');
   sel.innerHTML = '<option value="">Select booking...</option>' +
-    allBookings.filter(b => ['confirmed','offer_sent','negotiating','hold'].includes(b.status))
+    allBookings
       .map(b => `<option value="${b.id}" ${b.id === bookingId ? 'selected' : ''}>
         ${esc(b.reference||'')} — ${esc(b.artists?.name||'')} — ${b.show_date||''}
       </option>`).join('');
