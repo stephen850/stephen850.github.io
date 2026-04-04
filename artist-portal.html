@@ -1,0 +1,658 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Deepbloe · Artist Portal</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@300;400;500&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+:root {
+  --bg: #0d0d0d;
+  --surface: #161616;
+  --surface2: #1e1e1e;
+  --border: #2a2a2a;
+  --border-light: #333;
+  --accent: #ffffff;
+  --red: #e05252;
+  --green: #4caf82;
+  --blue: #5b8dee;
+  --amber: #e0a84a;
+  --muted: #666;
+  --muted2: #888;
+  --text: #e8e8e8;
+  --mono: 'DM Mono', monospace;
+  --sans: 'DM Sans', sans-serif;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { background: var(--bg); color: var(--text); font-family: var(--sans); font-size: 13px; min-height: 100vh; }
+
+/* ── LOGIN ── */
+#login-screen {
+  min-height: 100vh; display: flex; align-items: center;
+  justify-content: center; flex-direction: column; gap: 0;
+  background: #080808;
+}
+.login-logo {
+  font-family: var(--mono); font-size: 10px; letter-spacing: 0.5em;
+  color: #333; text-transform: uppercase; margin-bottom: 48px;
+}
+.login-logo strong { color: #888; }
+.login-box {
+  background: #111; border: 1px solid #222; padding: 40px; width: 360px;
+  border-top: 2px solid #fff;
+}
+.login-box h1 { font-size: 18px; font-weight: 300; margin-bottom: 6px; color: #fff; letter-spacing: 0.02em; }
+.login-box p  { font-size: 11px; color: #444; margin-bottom: 28px; font-family: var(--mono); }
+.lf { display: flex; flex-direction: column; gap: 5px; margin-bottom: 14px; }
+.lf label { font-family: var(--mono); font-size: 9px; letter-spacing: 0.12em; text-transform: uppercase; color: #444; }
+.lf input {
+  border: 1px solid #222; padding: 10px 12px; background: #0a0a0a;
+  font-family: var(--sans); font-size: 13px; outline: none; color: #fff;
+}
+.lf input:focus { border-color: #555; background: #111; }
+.login-btn {
+  width: 100%; background: #fff; color: #000; border: none;
+  padding: 12px; font-family: var(--mono); font-size: 11px;
+  letter-spacing: 0.15em; text-transform: uppercase; cursor: pointer;
+  margin-top: 8px; transition: background 0.15s;
+}
+.login-btn:hover { background: #ddd; }
+.login-err { color: var(--red); font-size: 11px; margin-top: 10px; display: none; font-family: var(--mono); }
+
+/* ── APP ── */
+#app { display: none; min-height: 100vh; }
+
+header {
+  background: #111; border-bottom: 1px solid var(--border);
+  padding: 0 28px; display: flex; align-items: center; height: 52px; gap: 24px;
+  position: sticky; top: 0; z-index: 50;
+}
+.h-brand { font-family: var(--mono); font-size: 10px; letter-spacing: 0.3em;
+           text-transform: uppercase; color: #333; }
+.h-brand strong { color: #888; }
+.h-artist-name { font-size: 14px; font-weight: 400; color: #fff; letter-spacing: 0.02em; }
+.h-nav { display: flex; gap: 0; flex: 1; margin-left: 24px; }
+.h-tab {
+  padding: 0 16px; height: 52px; display: flex; align-items: center;
+  font-family: var(--mono); font-size: 10px; letter-spacing: 0.1em;
+  text-transform: uppercase; color: #444; cursor: pointer;
+  border-bottom: 2px solid transparent; transition: all 0.15s;
+}
+.h-tab:hover { color: #888; }
+.h-tab.active { color: #fff; border-bottom-color: #fff; }
+.h-right { margin-left: auto; display: flex; align-items: center; gap: 12px; }
+.h-logout {
+  background: none; border: 1px solid #222; color: #444;
+  padding: 5px 10px; font-family: var(--mono); font-size: 9px; letter-spacing: 0.08em;
+  text-transform: uppercase; cursor: pointer; transition: all 0.15s;
+}
+.h-logout:hover { border-color: #555; color: #888; }
+
+main { padding: 28px; max-width: 1200px; }
+
+.panel { display: none; }
+.panel.active { display: block; }
+
+/* Stats */
+.stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 28px; }
+.stat {
+  background: var(--surface); border: 1px solid var(--border);
+  padding: 20px; position: relative;
+}
+.stat::before { content:''; position:absolute; top:0; left:0; right:0; height:1px; background:var(--border-light); }
+.stat.accent::before { background: #fff; }
+.stat.green::before  { background: var(--green); }
+.stat.blue::before   { background: var(--blue); }
+.stat.amber::before  { background: var(--amber); }
+.stat-lbl { font-family:var(--mono); font-size:9px; letter-spacing:0.15em; text-transform:uppercase; color:var(--muted); margin-bottom:10px; }
+.stat-val { font-size:36px; font-weight:300; line-height:1; color:#fff; }
+.stat-sub { font-family:var(--mono); font-size:10px; color:var(--muted); margin-top:5px; }
+
+/* Show cards */
+.shows-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 16px; }
+
+.show-card {
+  background: var(--surface); border: 1px solid var(--border);
+  cursor: pointer; transition: all 0.15s; overflow: hidden;
+}
+.show-card:hover { border-color: var(--border-light); background: var(--surface2); }
+.show-card-top { padding: 20px; border-bottom: 1px solid var(--border); }
+.show-card-date { font-family:var(--mono); font-size:10px; color:var(--muted); margin-bottom:8px; letter-spacing:0.05em; }
+.show-card-venue { font-size:16px; font-weight:400; color:#fff; margin-bottom:4px; }
+.show-card-location { font-family:var(--mono); font-size:11px; color:var(--muted2); }
+.show-card-bottom { padding: 12px 20px; display:flex; justify-content:space-between; align-items:center; }
+.show-card-status { font-family:var(--mono); font-size:9px; letter-spacing:0.1em; text-transform:uppercase; }
+.show-card-status.confirmed { color: var(--green); }
+.show-card-status.advancing { color: var(--blue); }
+.show-card-status.inquiry   { color: var(--muted); }
+.show-card-status.hold      { color: var(--amber); }
+.show-card-status.completed { color: var(--muted); }
+.show-card-adv { font-family:var(--mono); font-size:10px; color:var(--muted); }
+.show-card-adv.has-adv { color: var(--green); }
+
+/* Show detail view */
+.back-btn {
+  background: none; border: 1px solid var(--border); color: var(--muted);
+  padding: 6px 14px; font-family: var(--mono); font-size: 10px; letter-spacing: 0.08em;
+  text-transform: uppercase; cursor: pointer; margin-bottom: 20px; transition: all 0.15s;
+}
+.back-btn:hover { border-color: #555; color: #888; }
+
+.detail-hero {
+  background: var(--surface); border: 1px solid var(--border);
+  padding: 28px 32px; margin-bottom: 20px;
+  display: flex; justify-content: space-between; align-items: flex-start;
+}
+.detail-hero-left .show-date { font-family:var(--mono); font-size:11px; color:var(--muted); margin-bottom:6px; }
+.detail-hero-left .show-venue { font-size:24px; font-weight:300; color:#fff; margin-bottom:4px; }
+.detail-hero-left .show-location { font-family:var(--mono); font-size:12px; color:var(--muted2); }
+.detail-status { font-family:var(--mono); font-size:10px; letter-spacing:0.12em; text-transform:uppercase; padding:6px 14px; border:1px solid; }
+.detail-status.confirmed { color:var(--green); border-color:var(--green); }
+.detail-status.advancing { color:var(--blue); border-color:var(--blue); }
+.detail-status.completed { color:var(--muted); border-color:var(--border); }
+
+.detail-grid { display:grid; grid-template-columns: 1fr 1fr; gap:16px; margin-bottom:16px; }
+.detail-card { background:var(--surface); border:1px solid var(--border); padding:20px; }
+.detail-card h3 { font-family:var(--mono); font-size:9px; letter-spacing:0.15em; text-transform:uppercase; color:var(--muted); margin-bottom:14px; padding-bottom:8px; border-bottom:1px solid var(--border); }
+.detail-row { display:flex; gap:12px; margin-bottom:8px; font-size:12px; }
+.detail-label { font-family:var(--mono); font-size:10px; color:var(--muted); min-width:120px; }
+.detail-val { color:#fff; }
+
+/* Advancing section */
+.adv-section { background:var(--surface); border:1px solid var(--border); margin-bottom:16px; }
+.adv-section-hdr { padding:12px 20px; border-bottom:1px solid var(--border); display:flex; justify-content:space-between; align-items:center; }
+.adv-section-hdr h3 { font-family:var(--mono); font-size:9px; letter-spacing:0.15em; text-transform:uppercase; color:var(--muted); }
+.adv-section-body { padding:20px; }
+.adv-row { display:flex; gap:12px; margin-bottom:10px; font-size:12px; padding-bottom:10px; border-bottom:1px solid var(--border); }
+.adv-row:last-child { border-bottom:none; margin-bottom:0; padding-bottom:0; }
+.adv-lbl { font-family:var(--mono); font-size:10px; color:var(--muted); min-width:140px; }
+.adv-val { color:#fff; }
+
+/* Empty state */
+.empty { text-align:center; padding:60px 20px; }
+.empty-icon { font-size:32px; margin-bottom:16px; opacity:0.3; }
+.empty-title { font-size:16px; font-weight:300; color:#fff; margin-bottom:8px; }
+.empty-sub { font-size:12px; color:var(--muted); font-family:var(--mono); }
+
+/* Progress ring */
+.adv-progress { display:flex; align-items:center; gap:8px; }
+.prog-bar { flex:1; height:4px; background:var(--border); border-radius:2px; }
+.prog-fill { height:100%; border-radius:2px; background:var(--green); transition:width 0.3s; }
+.prog-pct { font-family:var(--mono); font-size:10px; color:var(--muted2); min-width:32px; text-align:right; }
+
+/* Section tabs */
+.section-tabs { display:flex; gap:0; margin-bottom:16px; border:1px solid var(--border); overflow:hidden; }
+.section-tab {
+  flex:1; padding:9px; text-align:center; font-family:var(--mono); font-size:9px;
+  letter-spacing:0.1em; text-transform:uppercase; cursor:pointer; color:var(--muted);
+  border-right:1px solid var(--border); transition:all 0.15s;
+}
+.section-tab:last-child { border-right:none; }
+.section-tab:hover { color:#888; background:var(--surface2); }
+.section-tab.active { background:var(--surface2); color:#fff; }
+
+/* Toast */
+#toast {
+  position:fixed; bottom:24px; right:24px; padding:12px 20px;
+  font-family:var(--mono); font-size:11px; display:none; z-index:999;
+  border-top:2px solid; background:#111; box-shadow:0 4px 20px rgba(0,0,0,0.5);
+}
+#toast.success { border-color:var(--green); color:var(--green); }
+#toast.error   { border-color:var(--red);   color:var(--red); }
+#toast.info    { border-color:var(--blue);  color:var(--blue); }
+
+@media (max-width: 700px) {
+  .stats { grid-template-columns: 1fr 1fr; }
+  .shows-grid { grid-template-columns: 1fr; }
+  .detail-grid { grid-template-columns: 1fr; }
+  main { padding: 16px; }
+  header { padding: 0 16px; }
+  .detail-hero { flex-direction: column; gap: 12px; }
+}
+</style>
+</head>
+<body>
+
+<!-- LOGIN -->
+<div id="login-screen">
+  <div class="login-logo"><strong>DEEPBLOE</strong> AGENCY</div>
+  <div class="login-box">
+    <h1>Artist Portal</h1>
+    <p>Sign in with your Deepbloe artist account</p>
+    <div class="lf">
+      <label>Email</label>
+      <input type="email" id="l-email" placeholder="your@email.com" autocomplete="email">
+    </div>
+    <div class="lf">
+      <label>Password</label>
+      <input type="password" id="l-pass" placeholder="••••••••">
+    </div>
+    <button class="login-btn" onclick="doLogin()">Sign In</button>
+    <div class="login-err" id="login-err">Invalid email or password.</div>
+  </div>
+</div>
+
+<!-- APP -->
+<div id="app">
+  <header>
+    <div class="h-brand"><strong>DEEPBLOE</strong></div>
+    <div class="h-artist-name" id="h-artist-name">—</div>
+    <nav class="h-nav">
+      <div class="h-tab active" onclick="showTab('shows', this)">My Shows</div>
+      <div class="h-tab" onclick="showTab('upcoming', this)">Upcoming</div>
+    </nav>
+    <div class="h-right">
+      <button class="h-logout" onclick="doLogout()">Logout</button>
+    </div>
+  </header>
+
+  <main>
+
+    <!-- SHOWS OVERVIEW -->
+    <div class="panel active" id="panel-shows">
+      <div class="stats">
+        <div class="stat accent">
+          <div class="stat-lbl">Total Shows</div>
+          <div class="stat-val" id="s-total">—</div>
+        </div>
+        <div class="stat green">
+          <div class="stat-lbl">Confirmed</div>
+          <div class="stat-val" id="s-confirmed">—</div>
+        </div>
+        <div class="stat blue">
+          <div class="stat-lbl">Advancing</div>
+          <div class="stat-val" id="s-advancing">—</div>
+        </div>
+        <div class="stat amber">
+          <div class="stat-lbl">Next Show</div>
+          <div class="stat-val" id="s-next">—</div>
+          <div class="stat-sub" id="s-next-sub"></div>
+        </div>
+      </div>
+
+      <div id="shows-grid-container">
+        <div class="shows-grid" id="shows-grid"></div>
+      </div>
+    </div>
+
+    <!-- UPCOMING (next 3 months) -->
+    <div class="panel" id="panel-upcoming">
+      <div class="shows-grid" id="upcoming-grid"></div>
+    </div>
+
+    <!-- SHOW DETAIL -->
+    <div class="panel" id="panel-detail">
+      <button class="back-btn" onclick="showTab('shows', null)">← Back to shows</button>
+
+      <div class="detail-hero" id="detail-hero"></div>
+
+      <div class="section-tabs">
+        <div class="section-tab active" onclick="showDetailTab('info')">Show Info</div>
+        <div class="section-tab" onclick="showDetailTab('advancing')">Advancing</div>
+        <div class="section-tab" onclick="showDetailTab('travel')">Travel</div>
+      </div>
+
+      <div id="detail-info"></div>
+      <div id="detail-advancing" style="display:none"></div>
+      <div id="detail-travel" style="display:none"></div>
+    </div>
+
+  </main>
+</div>
+
+<div id="toast"></div>
+
+<script>
+const SUPABASE_URL = 'https://ksnxgidklhonpsneerbu.supabase.co';
+const SUPABASE_KEY = 'sb_publishable_JsOkmXlOxBWKXcraBE7gGg_qErTkqX9';
+const { createClient } = supabase;
+const db = createClient(SUPABASE_URL, SUPABASE_KEY);
+
+let artistData = null;
+let allBookings = [];
+let allAdvancing = [];
+
+// ── AUTH ──────────────────────────────────────────────────────
+async function doLogin() {
+  const email = document.getElementById('l-email').value.trim();
+  const pass  = document.getElementById('l-pass').value;
+  const { error } = await db.auth.signInWithPassword({ email, password: pass });
+  if (error) {
+    document.getElementById('login-err').style.display = 'block';
+  } else {
+    startApp();
+  }
+}
+document.getElementById('l-pass').addEventListener('keydown', e => {
+  if (e.key === 'Enter') doLogin();
+});
+async function doLogout() {
+  await db.auth.signOut();
+  location.reload();
+}
+db.auth.getSession().then(({ data: { session } }) => {
+  if (session) startApp();
+});
+
+async function startApp() {
+  const { data: { user } } = await db.auth.getUser();
+  if (!user) return;
+
+  // Get artist via portal_access
+  const { data: access } = await db.from('portal_access')
+    .select('artist_id, artists(id, name, slug, genre, home_country)')
+    .eq('user_id', user.id)
+    .eq('role', 'artist')
+    .eq('active', true)
+    .single();
+
+  if (!access?.artists) {
+    document.getElementById('login-screen').style.display = 'none';
+    document.getElementById('app').style.display = 'block';
+    document.getElementById('h-artist-name').textContent = 'No artist linked';
+    return;
+  }
+
+  artistData = access.artists;
+  document.getElementById('login-screen').style.display = 'none';
+  document.getElementById('app').style.display = 'block';
+  document.getElementById('h-artist-name').textContent = artistData.name;
+  document.title = `Deepbloe · ${artistData.name}`;
+
+  await loadData();
+}
+
+async function loadData() {
+  // Load bookings
+  const { data: bookings } = await db.from('bookings')
+    .select('*')
+    .eq('artist_id', artistData.id)
+    .order('show_date', { ascending: true });
+  allBookings = bookings || [];
+
+  // Load advancing cases
+  const bookingIds = allBookings.map(b => b.id);
+  if (bookingIds.length > 0) {
+    const { data: advancing } = await db.from('advancing_cases')
+      .select('*')
+      .in('booking_id', bookingIds)
+      .not('shared_with_artist_at', 'is', null);
+    allAdvancing = advancing || [];
+  }
+
+  renderStats();
+  renderShows();
+  renderUpcoming();
+}
+
+function renderStats() {
+  const now = new Date();
+  const confirmed = allBookings.filter(b => ['confirmed','advancing'].includes(b.status));
+  const upcoming  = allBookings.filter(b => new Date(b.show_date) >= now && b.status !== 'cancelled');
+  const nextShow  = upcoming[0];
+
+  document.getElementById('s-total').textContent     = allBookings.length;
+  document.getElementById('s-confirmed').textContent = confirmed.filter(b => b.status === 'confirmed').length;
+  document.getElementById('s-advancing').textContent = confirmed.filter(b => b.status === 'advancing').length;
+
+  if (nextShow) {
+    const days = Math.ceil((new Date(nextShow.show_date) - now) / (1000*60*60*24));
+    document.getElementById('s-next').textContent    = days === 0 ? 'Today' : days + 'd';
+    document.getElementById('s-next-sub').textContent = nextShow.venue_city || nextShow.venue_name || '';
+  } else {
+    document.getElementById('s-next').textContent = '—';
+  }
+}
+
+function renderShows() {
+  const grid = document.getElementById('shows-grid');
+  if (!allBookings.length) {
+    grid.innerHTML = `<div class="empty" style="grid-column:1/-1">
+      <div class="empty-icon">📅</div>
+      <div class="empty-title">No shows yet</div>
+      <div class="empty-sub">Your confirmed shows will appear here</div>
+    </div>`;
+    return;
+  }
+  grid.innerHTML = allBookings.map(b => showCard(b)).join('');
+}
+
+function renderUpcoming() {
+  const now = new Date();
+  const upcoming = allBookings.filter(b => new Date(b.show_date) >= now && b.status !== 'cancelled');
+  const grid = document.getElementById('upcoming-grid');
+  if (!upcoming.length) {
+    grid.innerHTML = `<div class="empty" style="grid-column:1/-1">
+      <div class="empty-icon">🗓</div>
+      <div class="empty-title">No upcoming shows</div>
+      <div class="empty-sub">Check back soon</div>
+    </div>`;
+    return;
+  }
+  grid.innerHTML = upcoming.map(b => showCard(b)).join('');
+}
+
+function showCard(b) {
+  const adv = allAdvancing.find(a => a.booking_id === b.id);
+  const hasAdv = !!adv;
+  const venue = b.venue_name || '—';
+  const location = [b.venue_city, b.venue_country].filter(Boolean).join(', ') || '—';
+  const statusCls = b.status;
+  const advText = hasAdv ? '✓ Advancing available' : 'Advancing pending';
+  const advCls  = hasAdv ? 'has-adv' : '';
+  return `<div class="show-card" onclick="openShowDetail('${b.id}')">
+    <div class="show-card-top">
+      <div class="show-card-date">${b.show_date ? fmtDate(b.show_date) : '—'}</div>
+      <div class="show-card-venue">${esc(venue)}</div>
+      <div class="show-card-location">${esc(location)}</div>
+    </div>
+    <div class="show-card-bottom">
+      <div class="show-card-status ${statusCls}">${b.status?.replace('_',' ') || '—'}</div>
+      <div class="show-card-adv ${advCls}">${advText}</div>
+    </div>
+  </div>`;
+}
+
+function openShowDetail(bookingId) {
+  const b   = allBookings.find(x => x.id === bookingId);
+  const adv = allAdvancing.find(a => a.booking_id === bookingId);
+  if (!b) return;
+
+  // Hero
+  document.getElementById('detail-hero').innerHTML = `
+    <div class="detail-hero-left">
+      <div class="show-date">${b.show_date ? fmtDate(b.show_date) : '—'}</div>
+      <div class="show-venue">${esc(b.venue_name || '—')}</div>
+      <div class="show-location">${esc([b.venue_city, b.venue_country].filter(Boolean).join(', ') || '—')}</div>
+    </div>
+    <div class="detail-status ${b.status||''}">${(b.status||'').replace('_',' ')}</div>
+  `;
+
+  // Show info tab
+  const times = [];
+  if (b.set_time) times.push({ label:'Set Time', val: b.set_time.slice(0,5) });
+  if (b.set_length_minutes) times.push({ label:'Duration', val: b.set_length_minutes + ' min' });
+
+  document.getElementById('detail-info').innerHTML = `
+    <div class="detail-grid">
+      <div class="detail-card">
+        <h3>Show Details</h3>
+        ${dr('Date', b.show_date ? fmtDate(b.show_date) : null)}
+        ${dr('Venue', b.venue_name)}
+        ${dr('City', b.venue_city)}
+        ${dr('Country', b.venue_country)}
+        ${dr('Set Time', b.set_time ? b.set_time.slice(0,5) : null)}
+        ${dr('Duration', b.set_length_minutes ? b.set_length_minutes + ' min' : null)}
+      </div>
+      <div class="detail-card">
+        <h3>Status</h3>
+        ${dr('Booking Ref', b.reference)}
+        ${dr('Status', b.status?.replace('_',' '))}
+        ${dr('Territory', b.territory)}
+        ${adv ? dr('Advancing', 'Available') : dr('Advancing', 'Not yet shared')}
+      </div>
+    </div>
+  `;
+
+  // Advancing tab
+  if (adv) {
+    const d = adv.advancing_data || {};
+    const total = 27; // rough field count
+    const filled = Object.values(d).filter(v => v && !Array.isArray(v) && String(v).trim()).length;
+    const pct = Math.round(filled / total * 100);
+
+    document.getElementById('detail-advancing').innerHTML = `
+      <div class="adv-section" style="margin-bottom:16px">
+        <div class="adv-section-hdr">
+          <h3>Overall Progress</h3>
+          <div class="adv-progress" style="width:200px">
+            <div class="prog-bar"><div class="prog-fill" style="width:${pct}%"></div></div>
+            <span class="prog-pct">${pct}%</span>
+          </div>
+        </div>
+      </div>
+      ${advSection('Venue & Contact', [
+        ['Contact', d.venue_contact_name],
+        ['Phone', d.venue_contact_phone],
+        ['Email', d.venue_contact_email],
+        ['Load-in Address', d.load_in_address],
+        ['Load-in Time', d.load_in_time],
+        ['Parking', d.parking_info],
+      ])}
+      ${advSection('Stage & Technical', [
+        ['PA System', d.pa_system],
+        ['Stage', d.stage_width && d.stage_depth ? `${d.stage_width}m × ${d.stage_depth}m` : null],
+        ['Power', d.power_supply],
+        ['Backline', d.backline],
+      ])}
+      ${advSection('Schedule', [
+        ['Doors', d.doors],
+        ['Set Time', d.set_time],
+        ['Set Length', d.set_length ? d.set_length + ' min' : null],
+        ['Curfew', d.curfew],
+        ['Support Act', d.support],
+        ['Run of Show', d.run_of_show],
+      ])}
+      ${advSection('Hospitality', [
+        ['Hotel', d.hotel_name],
+        ['Hotel Address', d.hotel_address],
+        ['Check-in', d.hotel_checkin ? fmtDate(d.hotel_checkin) : null],
+        ['Check-out', d.hotel_checkout ? fmtDate(d.hotel_checkout) : null],
+        ['Confirmation', d.hotel_confirmation],
+        ['Dressing Room', d.dressing_room],
+        ['Catering', d.catering],
+        ['Guestlist Spots', d.guestlist_spots],
+      ])}
+    `;
+  } else {
+    document.getElementById('detail-advancing').innerHTML = `
+      <div class="empty">
+        <div class="empty-icon">📋</div>
+        <div class="empty-title">Advancing not yet shared</div>
+        <div class="empty-sub">Your agent will share show details when available</div>
+      </div>`;
+  }
+
+  // Travel tab
+  if (adv) {
+    const d = adv.advancing_data || {};
+    document.getElementById('detail-travel').innerHTML = `
+      ${advSection('Inbound Flight', [
+        ['Airline / Flight', d.airline_in && d.flight_in ? `${d.airline_in} ${d.flight_in}` : null],
+        ['Route', d.dep_in && d.arr_in ? `${d.dep_in} → ${d.arr_in}` : null],
+        ['Departure', d.dep_time_in],
+        ['Arrival', d.arr_time_in],
+        ['Seat', d.seat_in],
+        ['Booking Ref', d.flight_ref_in],
+      ])}
+      ${advSection('Return Flight', [
+        ['Airline / Flight', d.airline_out && d.flight_out ? `${d.airline_out} ${d.flight_out}` : null],
+        ['Route', d.dep_out && d.arr_out ? `${d.dep_out} → ${d.arr_out}` : null],
+        ['Departure', d.dep_time_out],
+        ['Arrival', d.arr_time_out],
+        ['Seat', d.seat_out],
+        ['Booking Ref', d.flight_ref_out],
+      ])}
+      ${advSection('Ground Transport', [
+        ['Driver', d.driver_name],
+        ['Phone', d.driver_phone],
+        ['Vehicle', d.vehicle],
+        ['Pickup', d.pickup],
+        ['Notes', d.transport_notes],
+      ])}
+    `;
+  } else {
+    document.getElementById('detail-travel').innerHTML = `
+      <div class="empty">
+        <div class="empty-icon">✈️</div>
+        <div class="empty-title">Travel details not yet available</div>
+        <div class="empty-sub">Your agent will add travel information when confirmed</div>
+      </div>`;
+  }
+
+  showDetailTab('info');
+  showPanelDirect('detail');
+}
+
+function advSection(title, rows) {
+  const filled = rows.filter(r => r[1]);
+  if (!filled.length) return '';
+  return `<div class="adv-section" style="margin-bottom:16px">
+    <div class="adv-section-hdr"><h3>${esc(title)}</h3></div>
+    <div class="adv-section-body">
+      ${filled.map(r => `<div class="adv-row">
+        <span class="adv-lbl">${esc(r[0])}</span>
+        <span class="adv-val">${esc(String(r[1]))}</span>
+      </div>`).join('')}
+    </div>
+  </div>`;
+}
+
+function dr(label, val) {
+  if (!val) return '';
+  return `<div class="detail-row">
+    <span class="detail-label">${esc(label)}</span>
+    <span class="detail-val">${esc(String(val))}</span>
+  </div>`;
+}
+
+// ── NAVIGATION ────────────────────────────────────────────────
+function showTab(name, el) {
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.h-tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('panel-' + name).classList.add('active');
+  if (el) el.classList.add('active');
+}
+
+function showPanelDirect(name) {
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  document.getElementById('panel-' + name).classList.add('active');
+}
+
+function showDetailTab(tab) {
+  ['info','advancing','travel'].forEach(t => {
+    document.getElementById('detail-' + t).style.display = t === tab ? 'block' : 'none';
+  });
+  document.querySelectorAll('.section-tab').forEach((t, i) => {
+    t.classList.toggle('active', ['info','advancing','travel'][i] === tab);
+  });
+}
+
+// ── HELPERS ───────────────────────────────────────────────────
+function fmtDate(d) {
+  if (!d) return '—';
+  const dt = new Date(d + 'T00:00:00');
+  return dt.toLocaleDateString('en-GB', { day:'2-digit', month:'short', year:'numeric' });
+}
+function esc(s) {
+  return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+function showToast(msg, type='info') {
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.className = type; t.style.display = 'block';
+  setTimeout(() => t.style.display = 'none', 3000);
+}
+</script>
+</body>
+</html>
