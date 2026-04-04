@@ -2446,14 +2446,17 @@ function loadBookingIntoContract() {
     ? b.withholding_rate + '% (' + (b.withholding_country||'') + ')'
     : 'Not applicable';
 
-  // Format fee
   if (b.fee_amount) {
     const sym = { EUR:'€', USD:'$', GBP:'£', SGD:'S$', AED:'AED ', IDR:'Rp ', THB:'฿' }[b.fee_currency||'EUR'] || '';
     document.getElementById('ce-fee').value = sym + b.fee_amount.toLocaleString();
+  } else {
+    document.getElementById('ce-fee').value = '';
   }
 
   currentContractBookingId = bookingId;
-  renderContractPreview();
+
+  // Force re-render with a small delay to ensure all DOM values are set
+  setTimeout(() => renderContractPreview(), 50);
 }
 
 function closeContractEditor() {
