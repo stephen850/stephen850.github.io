@@ -625,6 +625,128 @@ tbody td { padding: 10px 14px; vertical-align: middle; }
 }
 /* ── INVOICE ENGINE END ──────────────────────────────── */
 
+/* ── ADVANCING MODULE ────────────────────────────────── */
+.adv-status-not_started { color: var(--muted); border-color: var(--border); background: var(--bg); }
+.adv-status-in_progress { color: #6b3a1a; border-color: #e8c4a8; background: #fbf3ee; }
+.adv-status-pending_review { color: #1a3a6b; border-color: #b5c8e8; background: #eef3fb; }
+.adv-status-completed   { color: #1a6b3c; border-color: #a8d5b8; background: #edf7f2; }
+
+#advancing-editor-overlay {
+  position: fixed; inset: 0; background: var(--bg);
+  z-index: 300; display: none; flex-direction: column;
+}
+#advancing-editor-overlay.open { display: flex; }
+
+.adv-header {
+  background: var(--accent); color: #fff; padding: 0 28px;
+  display: flex; align-items: center; height: 52px; gap: 16px; flex-shrink: 0;
+}
+.adv-title { font-family: var(--mono); font-size: 11px; letter-spacing: 0.2em;
+             text-transform: uppercase; color: rgba(255,255,255,0.6); flex: 1; }
+.adv-title strong { color: #fff; }
+.adv-actions { display: flex; gap: 8px; }
+.adv-btn {
+  padding: 6px 14px; font-family: var(--mono); font-size: 10px;
+  letter-spacing: 0.1em; text-transform: uppercase; cursor: pointer;
+  border: 1px solid rgba(255,255,255,0.25); background: transparent;
+  color: rgba(255,255,255,0.7); transition: all 0.15s;
+}
+.adv-btn:hover { border-color: #fff; color: #fff; }
+.adv-btn.success { background: var(--green); border-color: var(--green); color: #fff; }
+.adv-btn.primary { background: var(--blue); border-color: var(--blue); color: #fff; }
+
+.adv-body { display: flex; flex: 1; overflow: hidden; }
+
+/* Tabs inside advancing editor */
+.adv-tabs { display: flex; border-bottom: 1px solid var(--border); background: var(--surface); flex-shrink: 0; }
+.adv-tab {
+  padding: 10px 20px; font-family: var(--mono); font-size: 10px; letter-spacing: 0.1em;
+  text-transform: uppercase; cursor: pointer; color: var(--muted);
+  border-bottom: 2px solid transparent; transition: all 0.15s;
+}
+.adv-tab:hover { color: var(--accent); }
+.adv-tab.active { color: var(--accent); border-bottom-color: var(--red); }
+
+.adv-content { flex: 1; overflow-y: auto; }
+.adv-panel { display: none; padding: 28px; max-width: 900px; }
+.adv-panel.active { display: block; }
+
+.adv-section {
+  background: var(--surface); border: 1px solid var(--border);
+  margin-bottom: 20px;
+}
+.adv-section-hdr {
+  padding: 12px 16px; background: var(--accent); color: #fff;
+  font-family: var(--mono); font-size: 10px; letter-spacing: 0.12em;
+  text-transform: uppercase; display: flex; justify-content: space-between; align-items: center;
+}
+.adv-section-hdr .adv-lock {
+  font-size: 9px; padding: 2px 8px; border: 1px solid rgba(255,255,255,0.3);
+  cursor: pointer; color: rgba(255,255,255,0.6); transition: all 0.1s;
+}
+.adv-section-hdr .adv-lock:hover { border-color: #fff; color: #fff; }
+.adv-section-hdr .adv-lock.locked { background: var(--green); border-color: var(--green); color: #fff; }
+
+.adv-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0; }
+.adv-field {
+  padding: 10px 16px; border-bottom: 1px solid var(--border);
+  border-right: 1px solid var(--border);
+}
+.adv-field:nth-child(even) { border-right: none; }
+.adv-field.full { grid-column: 1/-1; border-right: none; }
+.adv-field label {
+  font-family: var(--mono); font-size: 9px; letter-spacing: 0.08em;
+  text-transform: uppercase; color: var(--muted); display: block; margin-bottom: 4px;
+}
+.adv-field input, .adv-field select, .adv-field textarea {
+  width: 100%; border: 1px solid var(--border-dark); padding: 6px 8px;
+  font-family: var(--sans); font-size: 12px; outline: none;
+  background: var(--bg); color: var(--text);
+}
+.adv-field input:focus, .adv-field select:focus, .adv-field textarea:focus {
+  border-color: var(--accent); background: #fff;
+}
+.adv-field textarea { resize: vertical; min-height: 56px; }
+.adv-field input:disabled, .adv-field textarea:disabled, .adv-field select:disabled {
+  background: #f0f0ed; color: var(--muted); cursor: not-allowed;
+}
+
+/* Checklist items */
+.adv-checklist { padding: 12px 16px; }
+.adv-check-item {
+  display: flex; align-items: center; gap: 10px; padding: 7px 0;
+  border-bottom: 1px solid var(--border); font-size: 12px;
+}
+.adv-check-item:last-child { border-bottom: none; }
+.adv-check-item input[type="checkbox"] { accent-color: var(--green); width: 14px; height: 14px; cursor: pointer; }
+.adv-check-item.done span { text-decoration: line-through; color: var(--muted); }
+.adv-check-label { flex: 1; }
+.adv-check-who { font-family: var(--mono); font-size: 9px; color: var(--muted); }
+
+/* Show pack / output */
+.adv-showpack {
+  background: #fff; border: 1px solid var(--border);
+  padding: 32px 40px; max-width: 800px; margin: 0 auto;
+}
+.adv-showpack h1 { font-size: 20px; font-weight: 400; margin-bottom: 4px; }
+.adv-showpack .sp-sub { font-family: var(--mono); font-size: 10px; color: var(--muted); margin-bottom: 28px; }
+.adv-showpack h2 { font-family: var(--mono); font-size: 9px; letter-spacing: 0.15em; text-transform: uppercase;
+                   color: var(--muted); margin: 20px 0 10px; padding-bottom: 6px; border-bottom: 1px solid var(--border); }
+.adv-showpack .sp-row { display: flex; gap: 12px; margin-bottom: 6px; font-size: 12px; }
+.adv-showpack .sp-label { font-family: var(--mono); font-size: 10px; color: var(--muted); min-width: 140px; }
+.adv-showpack .sp-val { font-weight: 500; }
+
+/* Promoter link box */
+.adv-link-box {
+  background: #eef3fb; border: 1px solid #b5c8e8; padding: 16px;
+  margin-bottom: 20px; display: flex; align-items: center; gap: 12px;
+}
+.adv-link-url {
+  flex: 1; font-family: var(--mono); font-size: 11px; color: var(--blue);
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+/* ── ADVANCING MODULE END ────────────────────────────── */
+
 /* toast */
 #toast {
   position: fixed; bottom: 24px; right: 24px; padding: 12px 20px;
@@ -668,6 +790,7 @@ tbody td { padding: 10px 14px; vertical-align: middle; }
       <div class="h-tab" onclick="showPanel('bookings', this)">Bookings</div>
       <div class="h-tab" onclick="showPanel('contracts', this)">Contracts</div>
       <div class="h-tab" onclick="showPanel('invoices', this)">Invoices</div>
+      <div class="h-tab" onclick="showPanel('advancing', this)">Advancing</div>
       <div class="h-tab" onclick="showPanel('import', this)">Import</div>
     </nav>
     <div class="h-right">
@@ -1055,6 +1178,69 @@ tbody td { padding: 10px 14px; vertical-align: middle; }
         <button class="pg-btn" id="inv-prev" onclick="invPage(-1)" disabled>← Prev</button>
         <span class="pg-info" id="inv-pinfo"></span>
         <button class="pg-btn" id="inv-next" onclick="invPage(1)">Next →</button>
+      </div>
+    </div>
+
+    <!-- ── ADVANCING PANEL ── -->
+    <div class="panel" id="panel-advancing">
+      <div class="stats">
+        <div class="stat red">
+          <div class="stat-lbl">Total</div>
+          <div class="stat-val" id="sadv-total">—</div>
+        </div>
+        <div class="stat amber">
+          <div class="stat-lbl">In Progress</div>
+          <div class="stat-val" id="sadv-progress">—</div>
+        </div>
+        <div class="stat green">
+          <div class="stat-lbl">Completed</div>
+          <div class="stat-val" id="sadv-done">—</div>
+        </div>
+        <div class="stat blue">
+          <div class="stat-lbl">Not Started</div>
+          <div class="stat-val" id="sadv-new">—</div>
+        </div>
+        <div class="stat">
+          <div class="stat-lbl">Shared w/ Artist</div>
+          <div class="stat-val" id="sadv-shared">—</div>
+        </div>
+      </div>
+
+      <div class="toolbar">
+        <input class="tb-search" type="text" id="adv-search" placeholder="Search artist, venue..." oninput="filterAdvancing()">
+        <select class="tb-select" id="adv-status" onchange="filterAdvancing()">
+          <option value="">All statuses</option>
+          <option value="not_started">Not started</option>
+          <option value="in_progress">In progress</option>
+          <option value="pending_review">Pending review</option>
+          <option value="completed">Completed</option>
+        </select>
+        <select class="tb-select" id="adv-artist" onchange="filterAdvancing()">
+          <option value="">All artists</option>
+        </select>
+        <div class="tb-right">
+          <button class="btn primary" onclick="openAdvancingEditor()">+ New Advancing</button>
+        </div>
+      </div>
+
+      <div class="tbl-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Booking</th><th>Artist</th><th>Show Date</th><th>Venue</th>
+              <th>Status</th><th>Production</th><th>Hospitality</th><th>Travel</th>
+              <th>Shared</th><th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="adv-tbody">
+            <tr class="tbl-msg"><td colspan="10">No advancing cases yet.</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="pagination">
+        <button class="pg-btn" id="adv-prev" onclick="advPage(-1)" disabled>← Prev</button>
+        <span class="pg-info" id="adv-pinfo"></span>
+        <button class="pg-btn" id="adv-next" onclick="advPage(1)">Next →</button>
       </div>
     </div>
 
@@ -1702,6 +1888,202 @@ The Netherlands</textarea>
   </div>
 </div>
 
+<!-- ADVANCING EDITOR (fullscreen overlay) -->
+<div id="advancing-editor-overlay">
+  <div class="adv-header">
+    <div class="adv-title"><strong>DEEPBLOE</strong> · ADVANCING <span id="adv-booking-ref" style="margin-left:16px;font-size:10px;opacity:0.5"></span></div>
+    <div class="adv-actions">
+      <select id="adv-booking-sel" onchange="loadBookingIntoAdvancing()" style="background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.2);color:#fff;padding:5px 24px 5px 8px;font-family:var(--mono);font-size:10px;appearance:none;cursor:pointer;min-width:280px;background-image:url('data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%2210%22 height=%225%22%3E%3Cpath d=%22M0 0l5 5 5-5z%22 fill=%22white%22/%3E%3C/svg%3E');background-repeat:no-repeat;background-position:right 6px center">
+        <option value="">Select booking...</option>
+      </select>
+      <button class="adv-btn primary" onclick="copyPromoterLink()">⎘ Promoter Link</button>
+      <button class="adv-btn" onclick="showAdvancingTab('showpack')" style="border-color:rgba(255,255,255,0.4)">Show Pack</button>
+      <button class="adv-btn success" onclick="saveAdvancing()">✓ Save</button>
+      <button class="adv-btn" onclick="closeAdvancingEditor()">✕ Close</button>
+    </div>
+  </div>
+
+  <!-- Category tabs -->
+  <div class="adv-tabs">
+    <div class="adv-tab active" onclick="showAdvancingTab('production')">Production</div>
+    <div class="adv-tab" onclick="showAdvancingTab('hospitality')">Hospitality</div>
+    <div class="adv-tab" onclick="showAdvancingTab('travel')">Travel</div>
+    <div class="adv-tab" onclick="showAdvancingTab('checklist')">Checklist</div>
+    <div class="adv-tab" onclick="showAdvancingTab('showpack')">Show Pack</div>
+  </div>
+
+  <div class="adv-content">
+
+    <!-- PRODUCTION -->
+    <div class="adv-panel active" id="adv-panel-production">
+      <!-- Promoter link -->
+      <div class="adv-link-box" id="adv-promoter-link-box" style="display:none">
+        <span style="font-family:var(--mono);font-size:9px;text-transform:uppercase;letter-spacing:0.1em;color:var(--blue)">Promoter form link</span>
+        <span class="adv-link-url" id="adv-link-url">—</span>
+        <button class="btn" onclick="copyPromoterLink()" style="padding:4px 10px;font-size:9px">Copy</button>
+      </div>
+
+      <div class="adv-section">
+        <div class="adv-section-hdr">Venue & Contact
+          <span class="adv-lock" id="lock-venue" onclick="toggleLock('venue')">✓ Lock</span>
+        </div>
+        <div class="adv-grid">
+          <div class="adv-field"><label>Venue Contact Name</label><input id="adv-venue-contact-name" placeholder="Stage manager name"></div>
+          <div class="adv-field"><label>Venue Contact Phone</label><input id="adv-venue-contact-phone" placeholder="+63 9..."></div>
+          <div class="adv-field"><label>Venue Contact Email</label><input id="adv-venue-contact-email" placeholder="production@venue.com"></div>
+          <div class="adv-field"><label>Load-in Address</label><input id="adv-load-in-address" placeholder="Stage entrance address"></div>
+          <div class="adv-field"><label>Parking Info</label><input id="adv-parking-info" placeholder="Artist parking details"></div>
+          <div class="adv-field"><label>Load-in Time</label><input type="time" id="adv-load-in-time"></div>
+        </div>
+      </div>
+
+      <div class="adv-section">
+        <div class="adv-section-hdr">Stage & Technical
+          <span class="adv-lock" id="lock-stage" onclick="toggleLock('stage')">✓ Lock</span>
+        </div>
+        <div class="adv-grid">
+          <div class="adv-field"><label>Stage Width (m)</label><input type="number" id="adv-stage-width" placeholder="12"></div>
+          <div class="adv-field"><label>Stage Depth (m)</label><input type="number" id="adv-stage-depth" placeholder="8"></div>
+          <div class="adv-field"><label>PA System</label><input id="adv-pa-system" placeholder="e.g. d&b V-Series"></div>
+          <div class="adv-field"><label>Power Supply</label><input id="adv-power-supply" placeholder="e.g. 16A CEE"></div>
+          <div class="adv-field full"><label>Backline Provided</label><textarea id="adv-backline" placeholder="CDJ-3000 x2, DJM-900NXS2, monitor..."></textarea></div>
+        </div>
+      </div>
+
+      <div class="adv-section">
+        <div class="adv-section-hdr">Show Schedule
+          <span class="adv-lock" id="lock-schedule" onclick="toggleLock('schedule')">✓ Lock</span>
+        </div>
+        <div class="adv-grid">
+          <div class="adv-field"><label>Doors Open</label><input type="time" id="adv-doors"></div>
+          <div class="adv-field"><label>Curfew</label><input type="time" id="adv-curfew"></div>
+          <div class="adv-field"><label>Support Act</label><input id="adv-support" placeholder="Support artist name"></div>
+          <div class="adv-field"><label>Headliner</label><input id="adv-headliner" placeholder="Headliner name"></div>
+          <div class="adv-field"><label>Set Time (confirmed)</label><input type="time" id="adv-set-time"></div>
+          <div class="adv-field"><label>Set Length (min)</label><input type="number" id="adv-set-length" placeholder="60"></div>
+          <div class="adv-field full"><label>Run of Show / Notes</label><textarea id="adv-run-of-show" placeholder="Full schedule, changeovers..."></textarea></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- HOSPITALITY -->
+    <div class="adv-panel" id="adv-panel-hospitality">
+      <div class="adv-section">
+        <div class="adv-section-hdr">Hotel
+          <span class="adv-lock" id="lock-hotel" onclick="toggleLock('hotel')">✓ Lock</span>
+        </div>
+        <div class="adv-grid">
+          <div class="adv-field"><label>Hotel Name</label><input id="adv-hotel-name" placeholder="Hotel name"></div>
+          <div class="adv-field"><label>Hotel Address</label><input id="adv-hotel-address" placeholder="Full address"></div>
+          <div class="adv-field"><label>Check-in Date</label><input type="date" id="adv-hotel-checkin"></div>
+          <div class="adv-field"><label>Check-out Date</label><input type="date" id="adv-hotel-checkout"></div>
+          <div class="adv-field"><label>Booking Confirmation #</label><input id="adv-hotel-confirmation" placeholder="Reservation number"></div>
+          <div class="adv-field"><label>Room Type</label><input id="adv-hotel-room" placeholder="e.g. Deluxe Double"></div>
+        </div>
+      </div>
+
+      <div class="adv-section">
+        <div class="adv-section-hdr">Dressing Room & Catering
+          <span class="adv-lock" id="lock-catering" onclick="toggleLock('catering')">✓ Lock</span>
+        </div>
+        <div class="adv-grid">
+          <div class="adv-field full"><label>Dressing Room Notes</label><textarea id="adv-dressing-room" placeholder="Location, facilities, access..."></textarea></div>
+          <div class="adv-field full"><label>Catering / Rider Requirements</label><textarea id="adv-catering" placeholder="Food, drinks, specific requests..."></textarea></div>
+        </div>
+      </div>
+
+      <div class="adv-section">
+        <div class="adv-section-hdr">Guestlist & Accreditation
+          <span class="adv-lock" id="lock-guestlist" onclick="toggleLock('guestlist')">✓ Lock</span>
+        </div>
+        <div class="adv-grid">
+          <div class="adv-field"><label>Guestlist Spots</label><input type="number" id="adv-guestlist-spots" placeholder="0"></div>
+          <div class="adv-field"><label>Accreditation Contact</label><input id="adv-accreditation" placeholder="Name + email"></div>
+          <div class="adv-field full"><label>Accreditation Notes</label><textarea id="adv-accreditation-notes" placeholder="Photo pass, backstage access..."></textarea></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TRAVEL -->
+    <div class="adv-panel" id="adv-panel-travel">
+      <div class="adv-section">
+        <div class="adv-section-hdr">Inbound Flight
+          <span class="adv-lock" id="lock-flight-in" onclick="toggleLock('flight-in')">✓ Lock</span>
+        </div>
+        <div class="adv-grid">
+          <div class="adv-field"><label>Airline</label><input id="adv-airline-in" placeholder="e.g. KLM"></div>
+          <div class="adv-field"><label>Flight Number</label><input id="adv-flight-in" placeholder="KL811"></div>
+          <div class="adv-field"><label>Departure</label><input id="adv-dep-in" placeholder="Amsterdam (AMS)"></div>
+          <div class="adv-field"><label>Arrival</label><input id="adv-arr-in" placeholder="Manila (MNL)"></div>
+          <div class="adv-field"><label>Departure Time</label><input type="datetime-local" id="adv-dep-time-in"></div>
+          <div class="adv-field"><label>Arrival Time</label><input type="datetime-local" id="adv-arr-time-in"></div>
+          <div class="adv-field"><label>Seat</label><input id="adv-seat-in" placeholder="14A"></div>
+          <div class="adv-field"><label>Booking Ref</label><input id="adv-flight-ref-in" placeholder="ABC123"></div>
+        </div>
+      </div>
+
+      <div class="adv-section">
+        <div class="adv-section-hdr">Return Flight
+          <span class="adv-lock" id="lock-flight-out" onclick="toggleLock('flight-out')">✓ Lock</span>
+        </div>
+        <div class="adv-grid">
+          <div class="adv-field"><label>Airline</label><input id="adv-airline-out" placeholder="e.g. KLM"></div>
+          <div class="adv-field"><label>Flight Number</label><input id="adv-flight-out" placeholder="KL812"></div>
+          <div class="adv-field"><label>Departure</label><input id="adv-dep-out" placeholder="Manila (MNL)"></div>
+          <div class="adv-field"><label>Arrival</label><input id="adv-arr-out" placeholder="Amsterdam (AMS)"></div>
+          <div class="adv-field"><label>Departure Time</label><input type="datetime-local" id="adv-dep-time-out"></div>
+          <div class="adv-field"><label>Arrival Time</label><input type="datetime-local" id="adv-arr-time-out"></div>
+          <div class="adv-field"><label>Seat</label><input id="adv-seat-out" placeholder="14A"></div>
+          <div class="adv-field"><label>Booking Ref</label><input id="adv-flight-ref-out" placeholder="ABC123"></div>
+        </div>
+      </div>
+
+      <div class="adv-section">
+        <div class="adv-section-hdr">Ground Transport
+          <span class="adv-lock" id="lock-ground" onclick="toggleLock('ground')">✓ Lock</span>
+        </div>
+        <div class="adv-grid">
+          <div class="adv-field"><label>Driver Name</label><input id="adv-driver-name" placeholder="Driver name"></div>
+          <div class="adv-field"><label>Driver Phone</label><input id="adv-driver-phone" placeholder="+63 9..."></div>
+          <div class="adv-field"><label>Vehicle Type</label><input id="adv-vehicle" placeholder="e.g. Toyota Alphard"></div>
+          <div class="adv-field"><label>Pickup Location</label><input id="adv-pickup" placeholder="Airport / Hotel"></div>
+          <div class="adv-field full"><label>Transport Notes</label><textarea id="adv-transport-notes" placeholder="Pickup times, drop-off details..."></textarea></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- CHECKLIST -->
+    <div class="adv-panel" id="adv-panel-checklist">
+      <div style="margin-bottom:16px;display:flex;gap:8px;align-items:center">
+        <span style="font-family:var(--mono);font-size:11px;color:var(--muted)">Track advancing progress</span>
+        <button class="btn" onclick="checkAllItems()" style="padding:4px 12px;font-size:9px">Check All</button>
+      </div>
+      <div class="adv-section">
+        <div class="adv-section-hdr">Production Checklist</div>
+        <div class="adv-checklist" id="checklist-production"></div>
+      </div>
+      <div class="adv-section">
+        <div class="adv-section-hdr">Hospitality Checklist</div>
+        <div class="adv-checklist" id="checklist-hospitality"></div>
+      </div>
+      <div class="adv-section">
+        <div class="adv-section-hdr">Travel Checklist</div>
+        <div class="adv-checklist" id="checklist-travel"></div>
+      </div>
+    </div>
+
+    <!-- SHOW PACK -->
+    <div class="adv-panel" id="adv-panel-showpack">
+      <div style="margin-bottom:16px;display:flex;gap:8px">
+        <button class="btn primary" onclick="printShowPack()">⎙ Print Show Pack</button>
+        <button class="btn success" onclick="markSharedWithArtist()" style="border-color:var(--green);color:var(--green)">✓ Mark Shared with Artist</button>
+      </div>
+      <div id="adv-showpack-content"></div>
+    </div>
+
+  </div>
+</div>
+
 <div id="toast"></div>
 
 <script>
@@ -1751,6 +2133,7 @@ async function startApp() {
   loadBookings();
   loadContracts();
   loadInvoices();
+  loadAdvancing();
 }
 db.auth.getSession().then(({ data: { session } }) => {
   if (session) startApp();
@@ -1875,6 +2258,7 @@ function renderBookingList() {
       <td><div class="row-actions">
         <button class="ra confirm" onclick="openContractEditor('${b.id}')">Contract</button>
         <button class="ra" style="border-color:var(--amber);color:var(--amber)" onclick="openInvoiceEditor('${b.id}')">Invoice</button>
+        <button class="ra" style="border-color:var(--blue);color:var(--blue)" onclick="openAdvancingEditor('${b.id}')">Advance</button>
         <button class="ra" onclick="editBooking('${b.id}')">Edit</button>
         <button class="ra del" onclick="confirmDeleteBooking('${b.id}','${esc(b.reference||'')}')">Del</button>
       </div></td>
@@ -3520,6 +3904,506 @@ function closeInvoiceEditor() {
   editInvoiceId=null; currentInvoiceBookingId=null;
 }
 // ── END INVOICES ──────────────────────────────────────────────
+
+// ── ADVANCING ─────────────────────────────────────────────────
+let allAdvancing = [], filtAdvancing = [], advPageN = 0;
+let editAdvancingId = null, currentAdvancingBookingId = null;
+let lockedSections = {};
+
+const ADV_CHECKLIST = {
+  production: [
+    'Venue contact confirmed', 'Load-in time confirmed', 'Stage plot sent',
+    'PA system confirmed', 'Backline confirmed', 'Power supply confirmed',
+    'Set time confirmed', 'Curfew confirmed', 'Run of show shared',
+  ],
+  hospitality: [
+    'Hotel booked & confirmed', 'Dressing room confirmed', 'Catering rider sent',
+    'Guestlist spots confirmed', 'Accreditation arranged', 'Hospitality rider sent',
+  ],
+  travel: [
+    'Inbound flight booked', 'Return flight booked', 'Ground transport arranged',
+    'Hotel confirmation received', 'Travel documents checked', 'Airport pickup confirmed',
+  ],
+};
+
+async function loadAdvancing() {
+  const { data, error } = await db.from('advancing_cases')
+    .select('*, bookings(reference, show_date, artists(name), venue_name, venue_city, venue_country)')
+    .order('created_at', { ascending: false });
+  if (error) { showToast('Error loading advancing: ' + error.message, 'error'); return; }
+  allAdvancing = data || [];
+  updateAdvancingStats();
+  filterAdvancing();
+  const sel = document.getElementById('adv-artist');
+  sel.innerHTML = '<option value="">All artists</option>' +
+    allArtists.map(a => `<option value="${a.id}">${esc(a.name)}</option>`).join('');
+}
+
+function updateAdvancingStats() {
+  document.getElementById('sadv-total').textContent    = allAdvancing.length;
+  document.getElementById('sadv-progress').textContent = allAdvancing.filter(a => a.status === 'in_progress').length;
+  document.getElementById('sadv-done').textContent     = allAdvancing.filter(a => a.status === 'completed').length;
+  document.getElementById('sadv-new').textContent      = allAdvancing.filter(a => a.status === 'not_started').length;
+  document.getElementById('sadv-shared').textContent   = allAdvancing.filter(a => a.shared_with_artist_at).length;
+}
+
+function filterAdvancing() {
+  const q    = document.getElementById('adv-search').value.toLowerCase();
+  const stat = document.getElementById('adv-status').value;
+  filtAdvancing = allAdvancing.filter(a => {
+    const bk = a.bookings;
+    const search = `${bk?.reference||''}${bk?.artists?.name||''}${bk?.venue_name||''}${bk?.venue_city||''}`.toLowerCase();
+    if (q    && !search.includes(q)) return false;
+    if (stat && a.status !== stat)   return false;
+    return true;
+  });
+  advPageN = 0;
+  renderAdvancing();
+}
+
+function renderAdvancing() {
+  const tbody = document.getElementById('adv-tbody');
+  const slice = filtAdvancing.slice(advPageN * PG, (advPageN + 1) * PG);
+  if (!slice.length) {
+    tbody.innerHTML = '<tr class="tbl-msg"><td colspan="10">No advancing cases found</td></tr>';
+    document.getElementById('adv-pinfo').textContent = '';
+    document.getElementById('adv-prev').disabled = true;
+    document.getElementById('adv-next').disabled = true;
+    return;
+  }
+  tbody.innerHTML = slice.map(a => {
+    const bk = a.bookings;
+    const data = a.advancing_data || {};
+    const prodPct  = calcSectionPct(data, 'production');
+    const hospPct  = calcSectionPct(data, 'hospitality');
+    const travPct  = calcSectionPct(data, 'travel');
+    const shared   = a.shared_with_artist_at ? '<span style="color:var(--green)">✓</span>' : '—';
+    return `<tr>
+      <td class="td-mono" style="font-size:10px">${esc(bk?.reference||'—')}</td>
+      <td class="td-name">${esc(bk?.artists?.name||'—')}</td>
+      <td class="td-mono">${bk?.show_date ? fmtDate(bk.show_date) : '—'}</td>
+      <td class="td-trunc">${esc([bk?.venue_name,bk?.venue_city].filter(Boolean).join(', ')||'—')}</td>
+      <td><span class="badge adv-status-${a.status||'not_started'}">${(a.status||'not started').replace('_',' ')}</span></td>
+      <td>${progressBar(prodPct)}</td>
+      <td>${progressBar(hospPct)}</td>
+      <td>${progressBar(travPct)}</td>
+      <td style="text-align:center">${shared}</td>
+      <td><div class="row-actions">
+        <button class="ra" onclick="openAdvancingEditorById('${a.id}')">Open</button>
+        <button class="ra del" onclick="deleteAdvancingCase('${a.id}')">Del</button>
+      </div></td>
+    </tr>`;
+  }).join('');
+  const total = filtAdvancing.length, pages = Math.ceil(total/PG);
+  document.getElementById('adv-pinfo').textContent = `${advPageN*PG+1}–${Math.min((advPageN+1)*PG,total)} of ${total}`;
+  document.getElementById('adv-prev').disabled = advPageN === 0;
+  document.getElementById('adv-next').disabled = advPageN >= pages-1;
+}
+
+function advPage(d) { advPageN += d; renderAdvancing(); }
+
+function calcSectionPct(data, section) {
+  const items = ADV_CHECKLIST[section] || [];
+  const checked = (data[`checklist_${section}`] || []).filter(Boolean).length;
+  return items.length ? Math.round(checked / items.length * 100) : 0;
+}
+
+function progressBar(pct) {
+  const color = pct === 100 ? 'var(--green)' : pct > 0 ? 'var(--amber)' : 'var(--border-dark)';
+  return `<div style="display:flex;align-items:center;gap:6px">
+    <div style="width:60px;height:5px;background:var(--border);border-radius:2px">
+      <div style="width:${pct}%;height:100%;background:${color};border-radius:2px"></div>
+    </div>
+    <span style="font-family:var(--mono);font-size:9px;color:var(--muted)">${pct}%</span>
+  </div>`;
+}
+
+async function deleteAdvancingCase(id) {
+  if (!confirm('Delete this advancing case?')) return;
+  const { error } = await db.from('advancing_cases').delete().eq('id', id);
+  if (error) { showToast('Error deleting', 'error'); return; }
+  showToast('Deleted', 'success');
+  loadAdvancing();
+}
+
+// ── ADVANCING EDITOR ──────────────────────────────────────────
+function openAdvancingEditor(bookingId = null) {
+  editAdvancingId = null;
+  currentAdvancingBookingId = bookingId;
+  lockedSections = {};
+
+  const sel = document.getElementById('adv-booking-sel');
+  sel.innerHTML = '<option value="">Select booking...</option>' +
+    allBookings.map(b => `<option value="${b.id}" ${b.id===bookingId?'selected':''}>
+      ${esc(b.reference||'')} — ${esc(b.artists?.name||'')} — ${b.show_date||''}
+    </option>`).join('');
+  if (bookingId) sel.value = bookingId;
+
+  resetAdvancingFields();
+  if (bookingId) loadBookingIntoAdvancing();
+
+  showAdvancingTab('production');
+  renderChecklist({});
+  document.getElementById('advancing-editor-overlay').classList.add('open');
+}
+
+async function openAdvancingEditorById(advancingId) {
+  const { data: a, error } = await db.from('advancing_cases').select('*').eq('id', advancingId).single();
+  if (error || !a) { showToast('Error loading', 'error'); return; }
+
+  editAdvancingId = advancingId;
+  currentAdvancingBookingId = a.booking_id;
+  lockedSections = a.locked_sections || {};
+
+  const sel = document.getElementById('adv-booking-sel');
+  sel.innerHTML = allBookings.map(b => `<option value="${b.id}" ${b.id===a.booking_id?'selected':''}>
+    ${esc(b.reference||'')} — ${esc(b.artists?.name||'')}
+  </option>`).join('');
+  if (a.booking_id) sel.value = a.booking_id;
+
+  const d = a.advancing_data || {};
+  document.getElementById('adv-booking-ref').textContent = a.bookings?.reference || '';
+
+  // Production
+  document.getElementById('adv-venue-contact-name').value  = d.venue_contact_name||'';
+  document.getElementById('adv-venue-contact-phone').value = d.venue_contact_phone||'';
+  document.getElementById('adv-venue-contact-email').value = d.venue_contact_email||'';
+  document.getElementById('adv-load-in-address').value     = d.load_in_address||'';
+  document.getElementById('adv-parking-info').value        = d.parking_info||'';
+  document.getElementById('adv-load-in-time').value        = d.load_in_time||'';
+  document.getElementById('adv-stage-width').value         = d.stage_width||'';
+  document.getElementById('adv-stage-depth').value         = d.stage_depth||'';
+  document.getElementById('adv-pa-system').value           = d.pa_system||'';
+  document.getElementById('adv-power-supply').value        = d.power_supply||'';
+  document.getElementById('adv-backline').value            = d.backline||'';
+  document.getElementById('adv-doors').value               = d.doors||'';
+  document.getElementById('adv-curfew').value              = d.curfew||'';
+  document.getElementById('adv-support').value             = d.support||'';
+  document.getElementById('adv-headliner').value           = d.headliner||'';
+  document.getElementById('adv-set-time').value            = d.set_time||'';
+  document.getElementById('adv-set-length').value          = d.set_length||'';
+  document.getElementById('adv-run-of-show').value         = d.run_of_show||'';
+  // Hospitality
+  document.getElementById('adv-hotel-name').value          = d.hotel_name||'';
+  document.getElementById('adv-hotel-address').value       = d.hotel_address||'';
+  document.getElementById('adv-hotel-checkin').value       = d.hotel_checkin||'';
+  document.getElementById('adv-hotel-checkout').value      = d.hotel_checkout||'';
+  document.getElementById('adv-hotel-confirmation').value  = d.hotel_confirmation||'';
+  document.getElementById('adv-hotel-room').value          = d.hotel_room||'';
+  document.getElementById('adv-dressing-room').value       = d.dressing_room||'';
+  document.getElementById('adv-catering').value            = d.catering||'';
+  document.getElementById('adv-guestlist-spots').value     = d.guestlist_spots||'';
+  document.getElementById('adv-accreditation').value       = d.accreditation||'';
+  document.getElementById('adv-accreditation-notes').value = d.accreditation_notes||'';
+  // Travel
+  document.getElementById('adv-airline-in').value          = d.airline_in||'';
+  document.getElementById('adv-flight-in').value           = d.flight_in||'';
+  document.getElementById('adv-dep-in').value              = d.dep_in||'';
+  document.getElementById('adv-arr-in').value              = d.arr_in||'';
+  document.getElementById('adv-dep-time-in').value         = d.dep_time_in||'';
+  document.getElementById('adv-arr-time-in').value         = d.arr_time_in||'';
+  document.getElementById('adv-seat-in').value             = d.seat_in||'';
+  document.getElementById('adv-flight-ref-in').value       = d.flight_ref_in||'';
+  document.getElementById('adv-airline-out').value         = d.airline_out||'';
+  document.getElementById('adv-flight-out').value          = d.flight_out||'';
+  document.getElementById('adv-dep-out').value             = d.dep_out||'';
+  document.getElementById('adv-arr-out').value             = d.arr_out||'';
+  document.getElementById('adv-dep-time-out').value        = d.dep_time_out||'';
+  document.getElementById('adv-arr-time-out').value        = d.arr_time_out||'';
+  document.getElementById('adv-seat-out').value            = d.seat_out||'';
+  document.getElementById('adv-flight-ref-out').value      = d.flight_ref_out||'';
+  document.getElementById('adv-driver-name').value         = d.driver_name||'';
+  document.getElementById('adv-driver-phone').value        = d.driver_phone||'';
+  document.getElementById('adv-vehicle').value             = d.vehicle||'';
+  document.getElementById('adv-pickup').value              = d.pickup||'';
+  document.getElementById('adv-transport-notes').value     = d.transport_notes||'';
+
+  updateLockUI();
+  renderChecklist(d);
+  updateShowPack();
+  showAdvancingTab('production');
+  document.getElementById('advancing-editor-overlay').classList.add('open');
+}
+
+function loadBookingIntoAdvancing() {
+  const bookingId = document.getElementById('adv-booking-sel').value;
+  if (!bookingId) return;
+  const b = allBookings.find(x => x.id === bookingId);
+  if (!b) return;
+  currentAdvancingBookingId = bookingId;
+  document.getElementById('adv-booking-ref').textContent = b.reference || '';
+  // Pre-fill from booking
+  if (b.set_time)            document.getElementById('adv-set-time').value = b.set_time.slice(0,5);
+  if (b.set_length_minutes)  document.getElementById('adv-set-length').value = b.set_length_minutes;
+  if (b.artists?.name)       document.getElementById('adv-headliner').value = b.artists.name;
+  // Show promoter link if case exists
+  if (editAdvancingId) {
+    showPromoterLink(editAdvancingId);
+  }
+  updateShowPack();
+}
+
+function resetAdvancingFields() {
+  const fields = document.querySelectorAll('#advancing-editor-overlay input, #advancing-editor-overlay textarea');
+  fields.forEach(f => { if (f.type !== 'checkbox') f.value = ''; });
+  document.getElementById('adv-booking-ref').textContent = '';
+  document.getElementById('adv-promoter-link-box').style.display = 'none';
+}
+
+function showAdvancingTab(tab) {
+  document.querySelectorAll('.adv-tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.adv-panel').forEach(p => p.classList.remove('active'));
+  const tabEl = document.querySelector(`.adv-tab[onclick*="${tab}"]`);
+  if (tabEl) tabEl.classList.add('active');
+  const panel = document.getElementById(`adv-panel-${tab}`);
+  if (panel) {
+    panel.classList.add('active');
+    if (tab === 'showpack') updateShowPack();
+    if (tab === 'checklist') renderChecklist(getAdvancingData());
+  }
+}
+
+function toggleLock(section) {
+  lockedSections[section] = !lockedSections[section];
+  updateLockUI();
+}
+
+function updateLockUI() {
+  const sectionMap = {
+    venue: ['adv-venue-contact-name','adv-venue-contact-phone','adv-venue-contact-email','adv-load-in-address','adv-parking-info','adv-load-in-time'],
+    stage: ['adv-stage-width','adv-stage-depth','adv-pa-system','adv-power-supply','adv-backline'],
+    schedule: ['adv-doors','adv-curfew','adv-support','adv-headliner','adv-set-time','adv-set-length','adv-run-of-show'],
+    hotel: ['adv-hotel-name','adv-hotel-address','adv-hotel-checkin','adv-hotel-checkout','adv-hotel-confirmation','adv-hotel-room'],
+    catering: ['adv-dressing-room','adv-catering'],
+    guestlist: ['adv-guestlist-spots','adv-accreditation','adv-accreditation-notes'],
+    'flight-in': ['adv-airline-in','adv-flight-in','adv-dep-in','adv-arr-in','adv-dep-time-in','adv-arr-time-in','adv-seat-in','adv-flight-ref-in'],
+    'flight-out': ['adv-airline-out','adv-flight-out','adv-dep-out','adv-arr-out','adv-dep-time-out','adv-arr-time-out','adv-seat-out','adv-flight-ref-out'],
+    ground: ['adv-driver-name','adv-driver-phone','adv-vehicle','adv-pickup','adv-transport-notes'],
+  };
+  for (const [sec, fields] of Object.entries(sectionMap)) {
+    const locked = lockedSections[sec];
+    const btn = document.getElementById(`lock-${sec}`);
+    if (btn) {
+      btn.textContent = locked ? '🔒 Locked' : '✓ Lock';
+      btn.classList.toggle('locked', !!locked);
+    }
+    fields.forEach(id => {
+      const el = document.getElementById(id);
+      if (el) el.disabled = !!locked;
+    });
+  }
+}
+
+function getAdvancingData() {
+  const d = {};
+  const ids = [
+    'venue-contact-name','venue-contact-phone','venue-contact-email','load-in-address',
+    'parking-info','load-in-time','stage-width','stage-depth','pa-system','power-supply',
+    'backline','doors','curfew','support','headliner','set-time','set-length','run-of-show',
+    'hotel-name','hotel-address','hotel-checkin','hotel-checkout','hotel-confirmation',
+    'hotel-room','dressing-room','catering','guestlist-spots','accreditation',
+    'accreditation-notes','airline-in','flight-in','dep-in','arr-in','dep-time-in',
+    'arr-time-in','seat-in','flight-ref-in','airline-out','flight-out','dep-out','arr-out',
+    'dep-time-out','arr-time-out','seat-out','flight-ref-out','driver-name','driver-phone',
+    'vehicle','pickup','transport-notes',
+  ];
+  ids.forEach(id => {
+    const el = document.getElementById(`adv-${id}`);
+    if (el) d[id.replace(/-/g,'_')] = el.value.trim() || null;
+  });
+  // Collect checklist states
+  ['production','hospitality','travel'].forEach(cat => {
+    const checks = document.querySelectorAll(`#checklist-${cat} input[type="checkbox"]`);
+    d[`checklist_${cat}`] = [...checks].map(c => c.checked);
+  });
+  return d;
+}
+
+function renderChecklist(data) {
+  ['production','hospitality','travel'].forEach(cat => {
+    const el = document.getElementById(`checklist-${cat}`);
+    if (!el) return;
+    const saved = data[`checklist_${cat}`] || [];
+    el.innerHTML = ADV_CHECKLIST[cat].map((item, i) => {
+      const checked = saved[i] || false;
+      return `<div class="adv-check-item ${checked?'done':''}">
+        <input type="checkbox" ${checked?'checked':''} onchange="this.closest('.adv-check-item').classList.toggle('done',this.checked)">
+        <span class="adv-check-label">${esc(item)}</span>
+      </div>`;
+    }).join('');
+  });
+}
+
+function checkAllItems() {
+  document.querySelectorAll('.adv-check-item input[type="checkbox"]').forEach(cb => {
+    cb.checked = true;
+    cb.closest('.adv-check-item').classList.add('done');
+  });
+}
+
+function calcOverallStatus() {
+  const d = getAdvancingData();
+  let total = 0, checked = 0;
+  ['production','hospitality','travel'].forEach(cat => {
+    const items = ADV_CHECKLIST[cat];
+    const states = d[`checklist_${cat}`] || [];
+    total += items.length;
+    checked += states.filter(Boolean).length;
+  });
+  if (checked === 0) return 'not_started';
+  if (checked === total) return 'completed';
+  return 'in_progress';
+}
+
+async function saveAdvancing() {
+  const bookingId = document.getElementById('adv-booking-sel').value || currentAdvancingBookingId;
+  if (!bookingId) { showToast('Select a booking first', 'error'); return; }
+
+  const data = getAdvancingData();
+  const status = calcOverallStatus();
+
+  const payload = {
+    booking_id:       bookingId,
+    status,
+    advancing_data:   data,
+    locked_sections:  lockedSections,
+  };
+
+  let error;
+  if (editAdvancingId) {
+    ({ error } = await db.from('advancing_cases').update(payload).eq('id', editAdvancingId));
+  } else {
+    const { data: inserted, error: err } = await db.from('advancing_cases').insert(payload).select('id');
+    error = err;
+    if (!err && inserted?.[0]?.id) {
+      editAdvancingId = inserted[0].id;
+      showPromoterLink(editAdvancingId);
+    }
+  }
+
+  if (error) { showToast('Error: ' + error.message, 'error'); return; }
+  showToast('Advancing saved', 'success');
+  loadAdvancing();
+}
+
+async function markSharedWithArtist() {
+  if (!editAdvancingId) { showToast('Save first', 'error'); return; }
+  const { error } = await db.from('advancing_cases')
+    .update({ shared_with_artist_at: new Date().toISOString() })
+    .eq('id', editAdvancingId);
+  if (error) { showToast('Error: ' + error.message, 'error'); return; }
+  showToast('Marked as shared with artist ✓', 'success');
+  loadAdvancing();
+}
+
+function showPromoterLink(advancingId) {
+  const base = window.location.origin;
+  const url  = `${base}/promoter-advance.html?id=${advancingId}`;
+  document.getElementById('adv-link-url').textContent = url;
+  document.getElementById('adv-promoter-link-box').style.display = 'flex';
+}
+
+function copyPromoterLink() {
+  const url = document.getElementById('adv-link-url').textContent;
+  if (!url || url === '—') { showToast('Save advancing first to get link', 'info'); return; }
+  navigator.clipboard.writeText(url);
+  showToast('Promoter link copied ✓', 'success');
+}
+
+function updateShowPack() {
+  const bookingId = document.getElementById('adv-booking-sel').value || currentAdvancingBookingId;
+  const b = allBookings.find(x => x.id === bookingId) || {};
+  const d = getAdvancingData();
+  const ref = document.getElementById('adv-booking-ref').textContent;
+
+  const row = (label, val) => val ? `<div class="sp-row"><span class="sp-label">${esc(label)}</span><span class="sp-val">${esc(val)}</span></div>` : '';
+
+  document.getElementById('adv-showpack-content').innerHTML = `
+<div class="adv-showpack">
+  <h1>${esc(b.artists?.name||'[Artist]')}</h1>
+  <div class="sp-sub">${esc(ref)} · Show Pack · Generated ${fmtDate(new Date().toISOString().slice(0,10))}</div>
+
+  <h2>Show Details</h2>
+  ${row('Date', b.show_date ? fmtDate(b.show_date) : null)}
+  ${row('Venue', b.venue_name)}
+  ${row('City', b.venue_city)}
+  ${row('Country', b.venue_country)}
+  ${row('Set Time', d.set_time)}
+  ${row('Set Length', d.set_length ? d.set_length + ' minutes' : null)}
+  ${row('Doors', d.doors)}
+  ${row('Curfew', d.curfew)}
+
+  <h2>Venue & Production Contact</h2>
+  ${row('Contact Name', d.venue_contact_name)}
+  ${row('Phone', d.venue_contact_phone)}
+  ${row('Email', d.venue_contact_email)}
+  ${row('Load-in Address', d.load_in_address)}
+  ${row('Load-in Time', d.load_in_time)}
+  ${row('Parking', d.parking_info)}
+
+  <h2>Stage & Technical</h2>
+  ${row('PA System', d.pa_system)}
+  ${row('Stage', d.stage_width && d.stage_depth ? `${d.stage_width}m × ${d.stage_depth}m` : null)}
+  ${row('Power', d.power_supply)}
+  ${row('Backline', d.backline)}
+
+  <h2>Schedule</h2>
+  ${row('Support Act', d.support)}
+  ${row('Headliner', d.headliner)}
+  ${row('Run of Show', d.run_of_show)}
+
+  <h2>Hotel</h2>
+  ${row('Hotel', d.hotel_name)}
+  ${row('Address', d.hotel_address)}
+  ${row('Check-in', d.hotel_checkin ? fmtDate(d.hotel_checkin) : null)}
+  ${row('Check-out', d.hotel_checkout ? fmtDate(d.hotel_checkout) : null)}
+  ${row('Confirmation', d.hotel_confirmation)}
+
+  <h2>Hospitality</h2>
+  ${row('Dressing Room', d.dressing_room)}
+  ${row('Guestlist Spots', d.guestlist_spots)}
+  ${row('Catering', d.catering)}
+
+  <h2>Inbound Flight</h2>
+  ${row('Airline / Flight', d.airline_in && d.flight_in ? `${d.airline_in} ${d.flight_in}` : null)}
+  ${row('Route', d.dep_in && d.arr_in ? `${d.dep_in} → ${d.arr_in}` : null)}
+  ${row('Departure', d.dep_time_in)}
+  ${row('Arrival', d.arr_time_in)}
+  ${row('Seat', d.seat_in)}
+  ${row('Booking Ref', d.flight_ref_in)}
+
+  <h2>Return Flight</h2>
+  ${row('Airline / Flight', d.airline_out && d.flight_out ? `${d.airline_out} ${d.flight_out}` : null)}
+  ${row('Route', d.dep_out && d.arr_out ? `${d.dep_out} → ${d.arr_out}` : null)}
+  ${row('Departure', d.dep_time_out)}
+  ${row('Arrival', d.arr_time_out)}
+  ${row('Seat', d.seat_out)}
+  ${row('Booking Ref', d.flight_ref_out)}
+
+  <h2>Ground Transport</h2>
+  ${row('Driver', d.driver_name)}
+  ${row('Phone', d.driver_phone)}
+  ${row('Vehicle', d.vehicle)}
+  ${row('Pickup', d.pickup)}
+  ${row('Notes', d.transport_notes)}
+
+  <div style="margin-top:32px;padding-top:16px;border-top:1px solid var(--border);font-family:var(--mono);font-size:9px;color:var(--muted);text-align:center">
+    Deepbloe Agency B.V. · deepbloe.com · Confidential
+  </div>
+</div>`;
+}
+
+function printShowPack() {
+  showAdvancingTab('showpack');
+  setTimeout(() => window.print(), 100);
+}
+
+function closeAdvancingEditor() {
+  document.getElementById('advancing-editor-overlay').classList.remove('open');
+  editAdvancingId = null; currentAdvancingBookingId = null; lockedSections = {};
+}
+// ── END ADVANCING ─────────────────────────────────────────────
+
 
 
 function closeModal(id) { document.getElementById(id).classList.remove('open'); }
