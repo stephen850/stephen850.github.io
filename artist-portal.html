@@ -347,6 +347,7 @@ async function startApp() {
     .maybeSingle();
 
   console.log('portal_access result:', access, accessError);
+  alert('access: ' + JSON.stringify(access) + '\nerror: ' + JSON.stringify(accessError));
 
   if (!access?.artist_id) {
     document.getElementById('login-screen').style.display = 'none';
