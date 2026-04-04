@@ -785,7 +785,8 @@ tbody td { padding: 10px 14px; vertical-align: middle; }
   <header>
     <div class="h-brand"><strong>DEEPBLOE</strong> · CRM</div>
     <nav class="h-nav">
-      <div class="h-tab active" onclick="showPanel('orgs', this)">Organisations</div>
+      <div class="h-tab active" onclick="showPanel('dashboard', this);renderDashboard()">Dashboard</div>
+      <div class="h-tab" onclick="showPanel('orgs', this)">Organisations</div>
       <div class="h-tab" onclick="showPanel('contacts', this)">Contacts</div>
       <div class="h-tab" onclick="showPanel('bookings', this)">Bookings</div>
       <div class="h-tab" onclick="showPanel('contracts', this)">Contracts</div>
@@ -801,8 +802,110 @@ tbody td { padding: 10px 14px; vertical-align: middle; }
 
   <main>
 
+    <!-- ── DASHBOARD PANEL ── -->
+    <div class="panel active" id="panel-dashboard">
+
+      <!-- Top stats row -->
+      <div class="stats" style="grid-template-columns:repeat(6,1fr);margin-bottom:20px">
+        <div class="stat red">
+          <div class="stat-lbl">Pipeline Value</div>
+          <div class="stat-val" id="db-pipeline">—</div>
+          <div class="stat-sub">EUR confirmed</div>
+        </div>
+        <div class="stat green">
+          <div class="stat-lbl">Confirmed Shows</div>
+          <div class="stat-val" id="db-confirmed">—</div>
+        </div>
+        <div class="stat blue">
+          <div class="stat-lbl">Next 30 Days</div>
+          <div class="stat-val" id="db-30days">—</div>
+        </div>
+        <div class="stat amber">
+          <div class="stat-lbl">Open Invoices</div>
+          <div class="stat-val" id="db-invoices-open">—</div>
+          <div class="stat-sub" id="db-invoices-val"></div>
+        </div>
+        <div class="stat">
+          <div class="stat-lbl">Unsigned Contracts</div>
+          <div class="stat-val" id="db-contracts-unsigned">—</div>
+        </div>
+        <div class="stat">
+          <div class="stat-lbl">Advancing Open</div>
+          <div class="stat-val" id="db-advancing-open">—</div>
+        </div>
+      </div>
+
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px">
+
+        <!-- Upcoming shows -->
+        <div class="tbl-wrap">
+          <div style="background:var(--accent);padding:10px 14px;font-family:var(--mono);font-size:9px;letter-spacing:0.15em;text-transform:uppercase;color:rgba(255,255,255,0.7)">
+            Upcoming Shows — Next 90 Days
+          </div>
+          <table>
+            <thead>
+              <tr><th>Date</th><th>Artist</th><th>Venue</th><th>Status</th><th>Fee</th></tr>
+            </thead>
+            <tbody id="db-upcoming-tbody">
+              <tr class="tbl-msg"><td colspan="5">Loading...</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Open actions -->
+        <div class="tbl-wrap">
+          <div style="background:var(--accent);padding:10px 14px;font-family:var(--mono);font-size:9px;letter-spacing:0.15em;text-transform:uppercase;color:rgba(255,255,255,0.7)">
+            Open Actions
+          </div>
+          <table>
+            <thead>
+              <tr><th>Type</th><th>Reference</th><th>Artist</th><th>Action</th></tr>
+            </thead>
+            <tbody id="db-actions-tbody">
+              <tr class="tbl-msg"><td colspan="4">Loading...</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+      </div>
+
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+
+        <!-- Overdue / due soon invoices -->
+        <div class="tbl-wrap">
+          <div style="background:var(--accent);padding:10px 14px;font-family:var(--mono);font-size:9px;letter-spacing:0.15em;text-transform:uppercase;color:rgba(255,255,255,0.7)">
+            Invoice Deadlines
+          </div>
+          <table>
+            <thead>
+              <tr><th>Invoice</th><th>Artist</th><th>Amount</th><th>Due</th><th>Status</th></tr>
+            </thead>
+            <tbody id="db-invoices-tbody">
+              <tr class="tbl-msg"><td colspan="5">Loading...</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Per artist pipeline -->
+        <div class="tbl-wrap">
+          <div style="background:var(--accent);padding:10px 14px;font-family:var(--mono);font-size:9px;letter-spacing:0.15em;text-transform:uppercase;color:rgba(255,255,255,0.7)">
+            Artist Pipeline
+          </div>
+          <table>
+            <thead>
+              <tr><th>Artist</th><th>Holds</th><th>Confirmed</th><th>Value EUR</th></tr>
+            </thead>
+            <tbody id="db-artists-tbody">
+              <tr class="tbl-msg"><td colspan="4">Loading...</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+      </div>
+    </div>
+
     <!-- ── ORGANISATIONS PANEL ── -->
-    <div class="panel active" id="panel-orgs">
+    <div class="panel" id="panel-orgs">
       <div class="stats" id="org-stats">
         <div class="stat red">
           <div class="stat-lbl">Total Orgs</div>
@@ -2134,6 +2237,7 @@ async function startApp() {
   loadContracts();
   loadInvoices();
   loadAdvancing();
+  setTimeout(renderDashboard, 1200);
 }
 db.auth.getSession().then(({ data: { session } }) => {
   if (session) startApp();
@@ -4403,6 +4507,148 @@ function closeAdvancingEditor() {
   editAdvancingId = null; currentAdvancingBookingId = null; lockedSections = {};
 }
 // ── END ADVANCING ─────────────────────────────────────────────
+
+// ── DASHBOARD ─────────────────────────────────────────────────
+function renderDashboard() {
+  const now = new Date();
+  const today = now.toISOString().slice(0,10);
+  const in30  = new Date(now.getTime() + 30*24*60*60*1000).toISOString().slice(0,10);
+  const in90  = new Date(now.getTime() + 90*24*60*60*1000).toISOString().slice(0,10);
+
+  // ── TOP STATS ──
+  const confirmed = allBookings.filter(b => ['confirmed','advancing'].includes(b.status));
+  const pipelineEUR = confirmed.filter(b => b.fee_currency === 'EUR').reduce((s,b) => s + (b.fee_amount||0), 0);
+  const next30 = allBookings.filter(b => b.show_date >= today && b.show_date <= in30 && b.status !== 'cancelled');
+  const openInvoices = allInvoices.filter(i => ['sent','overdue'].includes(i.status));
+  const openInvoiceVal = openInvoices.filter(i => i.currency === 'EUR').reduce((s,i) => s + (i.total_amount||0), 0);
+  const unsignedContracts = allContracts.filter(c => ['draft','sent'].includes(c.status));
+  const advancingOpen = allAdvancing.filter(a => ['not_started','in_progress'].includes(a.status));
+
+  document.getElementById('db-pipeline').textContent = pipelineEUR >= 1000 ? '€'+(pipelineEUR/1000).toFixed(0)+'k' : '€'+Math.round(pipelineEUR);
+  document.getElementById('db-confirmed').textContent = confirmed.length;
+  document.getElementById('db-30days').textContent = next30.length;
+  document.getElementById('db-invoices-open').textContent = openInvoices.length;
+  document.getElementById('db-invoices-val').textContent = openInvoiceVal >= 1000 ? '€'+(openInvoiceVal/1000).toFixed(0)+'k open' : '€'+Math.round(openInvoiceVal)+' open';
+  document.getElementById('db-contracts-unsigned').textContent = unsignedContracts.length;
+  document.getElementById('db-advancing-open').textContent = advancingOpen.length;
+
+  // ── UPCOMING SHOWS ──
+  const upcoming = allBookings
+    .filter(b => b.show_date >= today && b.show_date <= in90 && b.status !== 'cancelled')
+    .sort((a,b) => a.show_date.localeCompare(b.show_date))
+    .slice(0, 10);
+
+  document.getElementById('db-upcoming-tbody').innerHTML = upcoming.length
+    ? upcoming.map(b => {
+        const sym = {EUR:'€',USD:'$',GBP:'£',SGD:'S$',AED:'AED ',IDR:'Rp',THB:'฿'}[b.fee_currency||'EUR']||'';
+        const daysLeft = Math.ceil((new Date(b.show_date) - now) / (1000*60*60*24));
+        const urgency = daysLeft <= 14 ? 'color:var(--red)' : daysLeft <= 30 ? 'color:var(--amber)' : '';
+        return `<tr>
+          <td class="td-mono" style="font-size:10px;${urgency}">${fmtDate(b.show_date)}</td>
+          <td class="td-name">${esc(b.artists?.name||'—')}</td>
+          <td class="td-trunc">${esc([b.venue_name,b.venue_city].filter(Boolean).join(', ')||'—')}</td>
+          <td>${statusBadge(b.status)}</td>
+          <td class="fee-val">${b.fee_amount ? sym+(b.fee_amount/1000).toFixed(0)+'k' : '—'}</td>
+        </tr>`;
+      }).join('')
+    : '<tr class="tbl-msg"><td colspan="5">No shows in next 90 days</td></tr>';
+
+  // ── OPEN ACTIONS ──
+  const actions = [];
+
+  // Unsigned contracts
+  unsignedContracts.slice(0,5).forEach(c => {
+    const bk = allBookings.find(b => b.id === c.booking_id);
+    actions.push({
+      type: 'Contract',
+      typeCls: 'color:var(--amber)',
+      ref: bk?.reference || c.id.slice(0,8),
+      artist: bk?.artists?.name || '—',
+      action: 'Awaiting signature',
+      onclick: `openContractEditorById('${c.id}')`,
+    });
+  });
+
+  // Overdue invoices
+  allInvoices.filter(i => i.status === 'sent' && i.due_date && i.due_date < today).slice(0,5).forEach(i => {
+    const bk = allBookings.find(b => b.id === i.booking_id);
+    actions.push({
+      type: 'Invoice',
+      typeCls: 'color:var(--red)',
+      ref: i.invoice_number || '—',
+      artist: bk?.artists?.name || '—',
+      action: 'OVERDUE',
+      onclick: `openInvoiceEditorById('${i.id}')`,
+    });
+  });
+
+  // Advancing not started for confirmed shows
+  confirmed.forEach(b => {
+    const hasAdv = allAdvancing.find(a => a.booking_id === b.id);
+    if (!hasAdv) {
+      actions.push({
+        type: 'Advancing',
+        typeCls: 'color:var(--blue)',
+        ref: b.reference || '—',
+        artist: b.artists?.name || '—',
+        action: 'Not started',
+        onclick: `openAdvancingEditor('${b.id}')`,
+      });
+    }
+  });
+
+  document.getElementById('db-actions-tbody').innerHTML = actions.length
+    ? actions.slice(0,10).map(a => `<tr style="cursor:pointer" onclick="${a.onclick}">
+        <td><span style="font-family:var(--mono);font-size:9px;${a.typeCls}">${esc(a.type)}</span></td>
+        <td class="td-mono" style="font-size:10px">${esc(a.ref)}</td>
+        <td class="td-name">${esc(a.artist)}</td>
+        <td style="font-family:var(--mono);font-size:10px;${a.typeCls}">${esc(a.action)}</td>
+      </tr>`).join('')
+    : '<tr class="tbl-msg"><td colspan="4">No open actions — all clear!</td></tr>';
+
+  // ── INVOICE DEADLINES ──
+  const invoiceDue = allInvoices
+    .filter(i => ['sent','overdue'].includes(i.status) && i.due_date)
+    .sort((a,b) => a.due_date.localeCompare(b.due_date))
+    .slice(0, 8);
+
+  document.getElementById('db-invoices-tbody').innerHTML = invoiceDue.length
+    ? invoiceDue.map(i => {
+        const bk = allBookings.find(b => b.id === i.booking_id);
+        const sym = {EUR:'€',USD:'$',GBP:'£',SGD:'S$'}[i.currency||'EUR']||'';
+        const overdue = i.due_date < today;
+        const soon    = !overdue && i.due_date <= in30;
+        const clr = overdue ? 'color:var(--red)' : soon ? 'color:var(--amber)' : '';
+        const eff = overdue ? 'overdue' : i.status;
+        return `<tr style="cursor:pointer" onclick="openInvoiceEditorById('${i.id}')">
+          <td class="td-mono" style="font-size:10px">${esc(i.invoice_number||'—')}</td>
+          <td class="td-name">${esc(bk?.artists?.name||'—')}</td>
+          <td class="fee-val">${sym}${(i.total_amount||0).toLocaleString()}</td>
+          <td class="td-mono" style="font-size:10px;${clr}">${fmtDate(i.due_date)}</td>
+          <td><span class="badge inv-status-${eff}">${eff}</span></td>
+        </tr>`;
+      }).join('')
+    : '<tr class="tbl-msg"><td colspan="5">No open invoice deadlines</td></tr>';
+
+  // ── ARTIST PIPELINE ──
+  document.getElementById('db-artists-tbody').innerHTML = allArtists.length
+    ? allArtists.map(a => {
+        const bks = allBookings.filter(b => b.artist_id === a.id);
+        const holds = bks.filter(b => ['inquiry','hold','offer_sent','negotiating'].includes(b.status)).length;
+        const conf  = bks.filter(b => ['confirmed','advancing','completed'].includes(b.status)).length;
+        const val   = bks.filter(b => ['confirmed','advancing'].includes(b.status) && b.fee_currency === 'EUR')
+                        .reduce((s,b) => s + (b.fee_amount||0), 0);
+        return `<tr>
+          <td class="td-name">${esc(a.name)}</td>
+          <td class="td-mono" style="font-size:11px;color:var(--muted)">${holds||'—'}</td>
+          <td class="td-mono" style="font-size:11px;color:var(--green)">${conf||'—'}</td>
+          <td class="fee-val">${val >= 1000 ? '€'+(val/1000).toFixed(0)+'k' : val > 0 ? '€'+val : '—'}</td>
+        </tr>`;
+      }).join('')
+    : '<tr class="tbl-msg"><td colspan="4">No artists</td></tr>';
+}
+// ── END DASHBOARD ──────────────────────────────────────────────
+
 
 
 
