@@ -3486,13 +3486,18 @@ async function saveInvoice() {
   if (!bookingId) { showToast('Select a booking first', 'error'); return; }
   const d = getInvoiceData();
   const payload = {
-    booking_id:d.booking_id,type:d.type,issued_at:d.issued_at||new Date().toISOString().slice(0,10),
-    due_date:d.due_date||null,currency:d.currency,subtotal:d.subtotal,
-    vat_rate:d.vat_rate,vat_amount:d.vat_amount,vat_reverse_charge:d.vat_reverse_charge,
-    vat_exempt:d.vat_exempt,vat_reference:d.vat_reference,total_amount:d.total_amount,
-    withholding_amount:d.withholding_amount,withholding_rate:d.withholding_rate,
-    bill_to_name:d.bill_to_name,bill_to_address:d.bill_to_address,client_vat_id:d.client_vat_id,
-    agency_vat_id:d.agency_vat_id,description:d.description,notes:d.notes,
+    booking_id:d.booking_id, type:d.type,
+    issued_at:d.issued_at||new Date().toISOString().slice(0,10),
+    due_date:d.due_date||null, currency:d.currency, subtotal:d.subtotal,
+    vat_rate:d.vat_rate, vat_amount:d.vat_amount,
+    vat_reverse_charge:d.vat_reverse_charge,
+    vat_exempt:d.vat_exempt, vat_reference:d.vat_reference,
+    total_amount:d.total_amount,
+    withholding_amount:d.withholding_amount,
+    withholding_rate:d.withholding_rate,
+    bill_to_name:d.bill_to_name, bill_to_address:d.bill_to_address,
+    client_vat_id:d.client_vat_id, agency_vat_id:d.agency_vat_id,
+    description:d.description, notes:d.notes,
     payment_reference:d.payment_reference,
   };
   const btn = document.querySelector('#invoice-editor-overlay .ie-btn.success');
