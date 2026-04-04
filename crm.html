@@ -2369,11 +2369,13 @@ function openContractEditor(bookingId = null) {
         ${esc(b.reference||'')} — ${esc(b.artists?.name||'')} — ${b.show_date||''}
       </option>`).join('');
 
+  // Force the select value explicitly
+  if (bookingId) sel.value = bookingId;
+
   if (bookingId) loadBookingIntoContract();
-  else resetContractEditor();
+  else { resetContractEditor(); renderContractPreview(); }
 
   document.getElementById('contract-editor-overlay').classList.add('open');
-  renderContractPreview();
 }
 
 async function openContractEditorById(contractId) {
