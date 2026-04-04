@@ -485,6 +485,146 @@ tbody td { padding: 10px 14px; vertical-align: middle; }
 
 /* ── CONTRACT ENGINE END ─────────────────────────────── */
 
+/* ── INVOICE ENGINE ──────────────────────────────────── */
+.inv-status-draft    { color: #5a4a00; border-color: #e8d07a; background: #fdf8e1; }
+.inv-status-sent     { color: #1a3a6b; border-color: #b5c8e8; background: #eef3fb; }
+.inv-status-paid     { color: #1a6b3c; border-color: #a8d5b8; background: #edf7f2; }
+.inv-status-overdue  { color: var(--red); border-color: #f0a8a8; background: #fdf0f0; }
+.inv-status-cancelled{ color: var(--muted); border-color: var(--border); background: var(--bg); }
+
+#invoice-editor-overlay {
+  position: fixed; inset: 0; background: var(--bg);
+  z-index: 300; display: none; flex-direction: column;
+}
+#invoice-editor-overlay.open { display: flex; }
+
+.ie-header {
+  background: var(--accent); color: #fff; padding: 0 28px;
+  display: flex; align-items: center; height: 52px; gap: 16px; flex-shrink: 0;
+}
+.ie-title { font-family: var(--mono); font-size: 11px; letter-spacing: 0.2em;
+            text-transform: uppercase; color: rgba(255,255,255,0.6); flex: 1; }
+.ie-title strong { color: #fff; }
+.ie-actions { display: flex; gap: 8px; }
+.ie-btn {
+  padding: 6px 14px; font-family: var(--mono); font-size: 10px;
+  letter-spacing: 0.1em; text-transform: uppercase; cursor: pointer;
+  border: 1px solid rgba(255,255,255,0.25); background: transparent;
+  color: rgba(255,255,255,0.7); transition: all 0.15s;
+}
+.ie-btn:hover { border-color: #fff; color: #fff; }
+.ie-btn.success { background: var(--green); border-color: var(--green); color: #fff; }
+.ie-btn.success:hover { background: #0f5530; }
+
+.ie-body { display: flex; flex: 1; overflow: hidden; }
+
+.ie-sidebar {
+  width: 300px; flex-shrink: 0; background: var(--surface);
+  border-right: 1px solid var(--border); overflow-y: auto; padding: 20px;
+}
+.ie-sidebar-section {
+  font-family: var(--mono); font-size: 9px; letter-spacing: 0.15em;
+  text-transform: uppercase; color: var(--muted); margin: 16px 0 10px;
+  padding-bottom: 6px; border-bottom: 1px solid var(--border);
+}
+.ie-sidebar-section:first-child { margin-top: 0; }
+.ie-field { display: flex; flex-direction: column; gap: 4px; margin-bottom: 10px; }
+.ie-field label { font-family: var(--mono); font-size: 9px; letter-spacing: 0.08em;
+                  text-transform: uppercase; color: var(--muted); }
+.ie-field input, .ie-field select, .ie-field textarea {
+  border: 1px solid var(--border-dark); padding: 7px 9px; font-family: var(--sans);
+  font-size: 12px; outline: none; background: var(--bg); color: var(--text);
+}
+.ie-field input:focus, .ie-field select:focus { border-color: var(--accent); background: #fff; }
+.ie-field select { appearance: none; cursor: pointer;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='5'%3E%3Cpath d='M0 0l5 5 5-5z' fill='%238a8278'/%3E%3C/svg%3E");
+  background-repeat: no-repeat; background-position: right 8px center; padding-right: 24px;
+}
+
+.ie-preview { flex: 1; overflow-y: auto; padding: 40px; background: var(--bg); }
+
+/* Invoice document styling */
+.inv-doc {
+  max-width: 800px; margin: 0 auto; background: #fff;
+  box-shadow: 0 2px 20px rgba(0,0,0,0.08);
+  padding: 52px 64px; font-family: 'DM Sans', sans-serif;
+  font-size: 13px; line-height: 1.6; color: #1a1a1a;
+  min-height: 900px;
+}
+.inv-doc-top { display: flex; justify-content: space-between; align-items: flex-start;
+               margin-bottom: 40px; padding-bottom: 28px; border-bottom: 2px solid #1a1a1a; }
+.inv-doc-brand { font-family: 'DM Mono', monospace; font-size: 11px;
+                 letter-spacing: 0.3em; text-transform: uppercase; }
+.inv-doc-brand .brand-name { font-size: 16px; font-weight: 500; letter-spacing: 0.15em; }
+.inv-doc-brand .brand-sub  { color: #8a8278; font-size: 10px; margin-top: 3px; }
+.inv-doc-meta { text-align: right; }
+.inv-doc-meta .inv-type { font-family: 'DM Mono', monospace; font-size: 10px;
+                           letter-spacing: 0.15em; text-transform: uppercase;
+                           color: #8a8278; margin-bottom: 4px; }
+.inv-doc-meta .inv-number { font-size: 20px; font-weight: 300; }
+.inv-doc-meta .inv-date   { font-family: 'DM Mono', monospace; font-size: 10px;
+                             color: #8a8278; margin-top: 4px; }
+
+.inv-parties { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; margin-bottom: 36px; }
+.inv-party-label { font-family: 'DM Mono', monospace; font-size: 9px; letter-spacing: 0.12em;
+                   text-transform: uppercase; color: #8a8278; margin-bottom: 8px; }
+.inv-party-name  { font-weight: 500; font-size: 14px; margin-bottom: 4px; }
+.inv-party-addr  { font-size: 12px; color: #444; line-height: 1.6; }
+.inv-party-vat   { font-family: 'DM Mono', monospace; font-size: 10px;
+                   color: #8a8278; margin-top: 6px; }
+
+.inv-ref-box { background: #f7f5f0; padding: 12px 16px; margin-bottom: 28px;
+               border-left: 3px solid #1a1a1a; }
+.inv-ref-box .ref-label { font-family: 'DM Mono', monospace; font-size: 9px;
+                           letter-spacing: 0.12em; text-transform: uppercase;
+                           color: #8a8278; margin-bottom: 4px; }
+.inv-ref-box .ref-value { font-size: 13px; }
+
+.inv-lines { width: 100%; border-collapse: collapse; margin-bottom: 0; }
+.inv-lines thead th { background: #1a1a1a; color: rgba(255,255,255,0.8);
+                      padding: 9px 12px; text-align: left; font-family: 'DM Mono', monospace;
+                      font-size: 9px; letter-spacing: 0.12em; text-transform: uppercase;
+                      font-weight: 400; }
+.inv-lines thead th:last-child { text-align: right; }
+.inv-lines tbody td { padding: 11px 12px; border-bottom: 1px solid #e2ddd6;
+                      font-size: 12px; vertical-align: top; }
+.inv-lines tbody td:last-child { text-align: right; font-family: 'DM Mono', monospace; }
+.inv-lines tbody tr:last-child td { border-bottom: none; }
+
+.inv-totals { margin-left: auto; width: 280px; margin-top: 0; }
+.inv-total-row { display: flex; justify-content: space-between; padding: 6px 0;
+                 font-size: 12px; border-bottom: 1px solid #e2ddd6; }
+.inv-total-row:last-child { border-bottom: none; }
+.inv-total-row.total-final { font-size: 16px; font-weight: 500; padding: 10px 0;
+                              border-top: 2px solid #1a1a1a; margin-top: 4px; }
+.inv-total-row .t-label { color: #8a8278; }
+.inv-total-row .t-val   { font-family: 'DM Mono', monospace; }
+.inv-total-row.total-final .t-val { font-size: 18px; }
+
+.inv-bottom { margin-top: 40px; padding-top: 24px; border-top: 1px solid #e2ddd6; }
+.inv-payment-box { background: #f7f5f0; padding: 16px; margin-bottom: 16px; }
+.inv-payment-label { font-family: 'DM Mono', monospace; font-size: 9px; letter-spacing: 0.12em;
+                     text-transform: uppercase; color: #8a8278; margin-bottom: 10px; }
+.inv-payment-row   { display: flex; gap: 24px; font-size: 12px; flex-wrap: wrap; }
+.inv-payment-item  { display: flex; flex-direction: column; gap: 2px; }
+.inv-payment-item .pi-label { font-family: 'DM Mono', monospace; font-size: 9px;
+                               color: #8a8278; text-transform: uppercase; letter-spacing: 0.08em; }
+.inv-payment-item .pi-val   { font-weight: 500; }
+.inv-vat-note { font-size: 11px; color: #8a8278; font-style: italic; margin-top: 8px; }
+.inv-due-box { background: #edf7f2; border: 1px solid #a8d5b8; padding: 12px 16px;
+               display: flex; justify-content: space-between; align-items: center; }
+.inv-due-label { font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: 0.1em;
+                 text-transform: uppercase; color: #1a6b3c; }
+.inv-due-amount { font-size: 18px; font-weight: 500; color: #1a6b3c; font-family: 'DM Mono', monospace; }
+
+@media print {
+  #invoice-editor-overlay .ie-header,
+  #invoice-editor-overlay .ie-sidebar { display: none !important; }
+  #invoice-editor-overlay .ie-preview { padding: 0; background: #fff; }
+  .inv-doc { box-shadow: none; padding: 15mm 20mm; }
+}
+/* ── INVOICE ENGINE END ──────────────────────────────── */
+
 /* toast */
 #toast {
   position: fixed; bottom: 24px; right: 24px; padding: 12px 20px;
@@ -527,6 +667,7 @@ tbody td { padding: 10px 14px; vertical-align: middle; }
       <div class="h-tab" onclick="showPanel('contacts', this)">Contacts</div>
       <div class="h-tab" onclick="showPanel('bookings', this)">Bookings</div>
       <div class="h-tab" onclick="showPanel('contracts', this)">Contracts</div>
+      <div class="h-tab" onclick="showPanel('invoices', this)">Invoices</div>
       <div class="h-tab" onclick="showPanel('import', this)">Import</div>
     </nav>
     <div class="h-right">
@@ -843,6 +984,77 @@ tbody td { padding: 10px 14px; vertical-align: middle; }
         <button class="pg-btn" id="ct-prev" onclick="ctPage(-1)" disabled>← Prev</button>
         <span class="pg-info" id="ct-pinfo"></span>
         <button class="pg-btn" id="ct-next" onclick="ctPage(1)">Next →</button>
+      </div>
+    </div>
+
+    <!-- ── INVOICES PANEL ── -->
+    <div class="panel" id="panel-invoices">
+      <div class="stats">
+        <div class="stat red">
+          <div class="stat-lbl">Total Invoices</div>
+          <div class="stat-val" id="si-total">—</div>
+        </div>
+        <div class="stat blue">
+          <div class="stat-lbl">Sent</div>
+          <div class="stat-val" id="si-sent">—</div>
+        </div>
+        <div class="stat green">
+          <div class="stat-lbl">Paid</div>
+          <div class="stat-val" id="si-paid">—</div>
+        </div>
+        <div class="stat amber">
+          <div class="stat-lbl">Outstanding</div>
+          <div class="stat-val" id="si-outstanding">—</div>
+          <div class="stat-sub">EUR open</div>
+        </div>
+        <div class="stat">
+          <div class="stat-lbl">Overdue</div>
+          <div class="stat-val" id="si-overdue">—</div>
+        </div>
+      </div>
+
+      <div class="toolbar">
+        <input class="tb-search" type="text" id="inv-search" placeholder="Search invoice, artist, promoter..." oninput="filterInvoices()">
+        <select class="tb-select" id="inv-status" onchange="filterInvoices()">
+          <option value="">All statuses</option>
+          <option value="draft">Draft</option>
+          <option value="sent">Sent</option>
+          <option value="paid">Paid</option>
+          <option value="overdue">Overdue</option>
+          <option value="cancelled">Cancelled</option>
+        </select>
+        <select class="tb-select" id="inv-type" onchange="filterInvoices()">
+          <option value="">All types</option>
+          <option value="deposit">Deposit</option>
+          <option value="second_deposit">2nd Deposit</option>
+          <option value="balance">Balance</option>
+          <option value="full">Full</option>
+          <option value="credit_note">Credit Note</option>
+        </select>
+        <div class="tb-right">
+          <button class="btn" onclick="exportInvoices()">↓ Export</button>
+          <button class="btn primary" onclick="openInvoiceEditor()">+ New Invoice</button>
+        </div>
+      </div>
+
+      <div class="tbl-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Invoice #</th><th>Booking</th><th>Artist</th><th>Promoter</th>
+              <th>Type</th><th>Amount</th><th>VAT</th><th>Total</th>
+              <th>Due Date</th><th>Status</th><th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="inv-tbody">
+            <tr class="tbl-msg"><td colspan="11">No invoices yet. Generate one from a booking.</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="pagination">
+        <button class="pg-btn" id="inv-prev" onclick="invPage(-1)" disabled>← Prev</button>
+        <span class="pg-info" id="inv-pinfo"></span>
+        <button class="pg-btn" id="inv-next" onclick="invPage(1)">Next →</button>
       </div>
     </div>
 
@@ -1323,6 +1535,173 @@ VAT: NL000000000B00</textarea>
   </div>
 </div>
 
+<!-- INVOICE EDITOR (fullscreen overlay) -->
+<div id="invoice-editor-overlay">
+  <div class="ie-header">
+    <div class="ie-title"><strong>DEEPBLOE</strong> · INVOICE EDITOR <span id="ie-booking-ref" style="margin-left:16px;font-size:10px;opacity:0.5"></span></div>
+    <div class="ie-actions">
+      <button class="ie-btn" onclick="printInvoice()">⎙ Print / PDF</button>
+      <button class="ie-btn success" onclick="saveInvoice()">✓ Save Invoice</button>
+      <button class="ie-btn" onclick="closeInvoiceEditor()">✕ Close</button>
+    </div>
+  </div>
+  <div class="ie-body">
+    <div class="ie-sidebar">
+
+      <div class="ie-sidebar-section">Booking</div>
+      <div class="ie-field">
+        <label>Booking</label>
+        <select id="ie-booking" onchange="loadBookingIntoInvoice()">
+          <option value="">Select booking...</option>
+        </select>
+      </div>
+      <div class="ie-field">
+        <label>Invoice Type</label>
+        <select id="ie-type" onchange="updateInvoiceCalc()">
+          <option value="deposit">Deposit (1st payment)</option>
+          <option value="second_deposit">2nd Deposit</option>
+          <option value="balance">Balance (final)</option>
+          <option value="full">Full invoice</option>
+          <option value="credit_note">Credit note</option>
+        </select>
+      </div>
+      <div class="ie-field">
+        <label>Invoice Date</label>
+        <input type="date" id="ie-date" oninput="renderInvoicePreview()">
+      </div>
+      <div class="ie-field">
+        <label>Due Date</label>
+        <input type="date" id="ie-due-date" oninput="renderInvoicePreview()">
+      </div>
+
+      <div class="ie-sidebar-section">From (Agency)</div>
+      <div class="ie-field">
+        <label>Agency Name</label>
+        <input id="ie-agency-name" value="Deepbloe Agency B.V." oninput="renderInvoicePreview()">
+      </div>
+      <div class="ie-field">
+        <label>Agency Address</label>
+        <textarea id="ie-agency-addr" oninput="renderInvoicePreview()" style="min-height:72px;font-size:11px;resize:vertical">Laan van Clingendael 10
+2597 VH The Hague
+The Netherlands</textarea>
+      </div>
+      <div class="ie-field">
+        <label>Agency VAT / KVK</label>
+        <input id="ie-agency-vat" value="NL000000000B00" oninput="renderInvoicePreview()">
+      </div>
+      <div class="ie-field">
+        <label>IBAN</label>
+        <input id="ie-iban" placeholder="NL00 BANK 0000 0000 00" oninput="renderInvoicePreview()">
+      </div>
+      <div class="ie-field">
+        <label>BIC/SWIFT</label>
+        <input id="ie-bic" placeholder="INGBNL2A" oninput="renderInvoicePreview()">
+      </div>
+
+      <div class="ie-sidebar-section">Bill To (Promoter)</div>
+      <div class="ie-field">
+        <label>Company Name</label>
+        <input id="ie-client-name" placeholder="XYLO Manila" oninput="renderInvoicePreview()">
+      </div>
+      <div class="ie-field">
+        <label>Address</label>
+        <textarea id="ie-client-addr" placeholder="Full address..." oninput="renderInvoicePreview()" style="min-height:60px;font-size:11px;resize:vertical"></textarea>
+      </div>
+      <div class="ie-field">
+        <label>VAT / Tax ID</label>
+        <input id="ie-client-vat" placeholder="e.g. PH123456789" oninput="renderInvoicePreview()">
+      </div>
+
+      <div class="ie-sidebar-section">Description</div>
+      <div class="ie-field">
+        <label>Line Description</label>
+        <input id="ie-description" placeholder="Performance fee — DJ Liu" oninput="renderInvoicePreview()">
+      </div>
+      <div class="ie-field">
+        <label>Artist</label>
+        <input id="ie-artist" placeholder="Liu" oninput="renderInvoicePreview()">
+      </div>
+      <div class="ie-field">
+        <label>Show Date</label>
+        <input id="ie-show-date" placeholder="16 Dec 2026" oninput="renderInvoicePreview()">
+      </div>
+      <div class="ie-field">
+        <label>Venue / Location</label>
+        <input id="ie-venue" placeholder="XYLO Manila, Philippines" oninput="renderInvoicePreview()">
+      </div>
+
+      <div class="ie-sidebar-section">Financial</div>
+      <div class="ie-field">
+        <label>Subtotal (excl. VAT)</label>
+        <input type="number" id="ie-subtotal" placeholder="5000" oninput="updateInvoiceCalc()">
+      </div>
+      <div class="ie-field">
+        <label>Currency</label>
+        <select id="ie-currency" onchange="updateInvoiceCalc()">
+          <option value="EUR">EUR €</option>
+          <option value="USD">USD $</option>
+          <option value="GBP">GBP £</option>
+          <option value="SGD">SGD S$</option>
+          <option value="AED">AED</option>
+          <option value="IDR">IDR Rp</option>
+          <option value="THB">THB ฿</option>
+        </select>
+      </div>
+
+      <div class="ie-sidebar-section">BTW / VAT</div>
+      <div class="ie-field">
+        <label>VAT Regime</label>
+        <select id="ie-vat-regime" onchange="updateVatRegime()">
+          <option value="nl_21">NL — 21% BTW (Dutch client)</option>
+          <option value="eu_reverse">EU B2B — 0% Reverse Charge</option>
+          <option value="eu_exempt">Outside EU — 0% Exempt</option>
+          <option value="custom">Custom rate</option>
+        </select>
+      </div>
+      <div class="ie-field" id="ie-vat-custom-field" style="display:none">
+        <label>Custom VAT %</label>
+        <input type="number" id="ie-vat-custom" placeholder="0" oninput="updateInvoiceCalc()">
+      </div>
+      <div class="ie-field">
+        <label>VAT Amount</label>
+        <input id="ie-vat-amount" readonly style="background:#f7f5f0;color:var(--muted)">
+      </div>
+      <div class="ie-field">
+        <label>Total incl. VAT</label>
+        <input id="ie-total" readonly style="background:#f7f5f0;font-weight:500">
+      </div>
+
+      <div class="ie-sidebar-section">Withholding</div>
+      <div class="ie-field">
+        <label>Withholding Tax %</label>
+        <input type="number" id="ie-withholding-pct" placeholder="0" value="0" oninput="updateInvoiceCalc()">
+      </div>
+      <div class="ie-field">
+        <label>Withholding Amount</label>
+        <input id="ie-withholding-amount" readonly style="background:#f7f5f0;color:var(--muted)">
+      </div>
+      <div class="ie-field">
+        <label>Net Payable</label>
+        <input id="ie-net-payable" readonly style="background:#edf7f2;font-weight:500;color:var(--green)">
+      </div>
+
+      <div class="ie-sidebar-section">Notes</div>
+      <div class="ie-field">
+        <label>Payment Reference</label>
+        <input id="ie-pay-ref" placeholder="Auto-generated" oninput="renderInvoicePreview()">
+      </div>
+      <div class="ie-field">
+        <label>Notes / Footer</label>
+        <textarea id="ie-notes" placeholder="Additional notes..." oninput="renderInvoicePreview()" style="min-height:60px;font-size:11px;resize:vertical"></textarea>
+      </div>
+
+    </div>
+    <div class="ie-preview">
+      <div class="inv-doc" id="ie-doc-content"></div>
+    </div>
+  </div>
+</div>
+
 <div id="toast"></div>
 
 <script>
@@ -1371,6 +1750,7 @@ async function startApp() {
   loadArtists();
   loadBookings();
   loadContracts();
+  loadInvoices();
 }
 db.auth.getSession().then(({ data: { session } }) => {
   if (session) startApp();
@@ -1494,6 +1874,7 @@ function renderBookingList() {
       <td class="td-trunc">${esc(org)}</td>
       <td><div class="row-actions">
         <button class="ra confirm" onclick="openContractEditor('${b.id}')">Contract</button>
+        <button class="ra" style="border-color:var(--amber);color:var(--amber)" onclick="openInvoiceEditor('${b.id}')">Invoice</button>
         <button class="ra" onclick="editBooking('${b.id}')">Edit</button>
         <button class="ra del" onclick="confirmDeleteBooking('${b.id}','${esc(b.reference||'')}')">Del</button>
       </div></td>
@@ -2754,6 +3135,387 @@ function getTemplateNL() {
 }
 
 // ── END CONTRACTS ─────────────────────────────────────────────
+
+// ── INVOICES ──────────────────────────────────────────────────
+let allInvoices = [], filtInvoices = [], invPageN = 0;
+let editInvoiceId = null, currentInvoiceBookingId = null;
+
+const VAT_REGIMES = {
+  nl_21:      { rate: 21, note: '' },
+  eu_reverse: { rate: 0,  note: 'BTW verlegd / Reverse charge — Art. 196 EU VAT Directive 2006/112/EC' },
+  eu_exempt:  { rate: 0,  note: 'VAT exempt — Services outside scope of EU VAT' },
+  custom:     { rate: 0,  note: '' },
+};
+
+async function loadInvoices() {
+  const { data, error } = await db.from('invoices')
+    .select('*, bookings(reference, show_date, artists(name))')
+    .order('created_at', { ascending: false });
+  if (error) { showToast('Error loading invoices: ' + error.message, 'error'); return; }
+  allInvoices = data || [];
+  updateInvoiceStats();
+  filterInvoices();
+}
+
+function updateInvoiceStats() {
+  const now = new Date().toISOString().slice(0,10);
+  document.getElementById('si-total').textContent   = allInvoices.length;
+  document.getElementById('si-sent').textContent    = allInvoices.filter(i => i.status === 'sent').length;
+  document.getElementById('si-paid').textContent    = allInvoices.filter(i => i.status === 'paid').length;
+  document.getElementById('si-overdue').textContent = allInvoices.filter(i => i.status === 'overdue' || (i.status === 'sent' && i.due_date && i.due_date < now)).length;
+  const outstanding = allInvoices.filter(i => ['sent','overdue'].includes(i.status) && i.currency === 'EUR').reduce((s, i) => s + (i.total_amount||0), 0);
+  document.getElementById('si-outstanding').textContent = outstanding >= 1000 ? '€'+(outstanding/1000).toFixed(0)+'k' : '€'+Math.round(outstanding);
+}
+
+function filterInvoices() {
+  const q = document.getElementById('inv-search').value.toLowerCase();
+  const stat = document.getElementById('inv-status').value;
+  const type = document.getElementById('inv-type').value;
+  filtInvoices = allInvoices.filter(i => {
+    const search = `${i.invoice_number||''}${i.bookings?.artists?.name||''}${i.bill_to_name||''}`.toLowerCase();
+    if (q && !search.includes(q)) return false;
+    if (stat && i.status !== stat) return false;
+    if (type && i.type !== type) return false;
+    return true;
+  });
+  invPageN = 0;
+  renderInvoices();
+}
+
+function renderInvoices() {
+  const tbody = document.getElementById('inv-tbody');
+  const slice = filtInvoices.slice(invPageN * PG, (invPageN + 1) * PG);
+  if (!slice.length) {
+    tbody.innerHTML = '<tr class="tbl-msg"><td colspan="11">No invoices found</td></tr>';
+    document.getElementById('inv-pinfo').textContent = '';
+    document.getElementById('inv-prev').disabled = true;
+    document.getElementById('inv-next').disabled = true;
+    return;
+  }
+  const now = new Date().toISOString().slice(0,10);
+  tbody.innerHTML = slice.map(i => {
+    const es = (i.status === 'sent' && i.due_date && i.due_date < now) ? 'overdue' : i.status;
+    const sym = {EUR:'€',USD:'$',GBP:'£',SGD:'S$',AED:'AED ',IDR:'Rp',THB:'฿'}[i.currency||'EUR']||'';
+    const vatPct = i.vat_rate > 0 ? i.vat_rate+'%' : (i.vat_reverse_charge ? 'RC' : '0%');
+    return `<tr>
+      <td class="td-mono" style="font-size:10px">${esc(i.invoice_number||'—')}</td>
+      <td class="td-mono" style="font-size:10px">${esc(i.bookings?.reference||'—')}</td>
+      <td class="td-name">${esc(i.bookings?.artists?.name||'—')}</td>
+      <td class="td-trunc">${esc(i.bill_to_name||'—')}</td>
+      <td><span class="genre-pill">${esc((i.type||'').replace('_',' '))}</span></td>
+      <td class="td-mono" style="font-size:11px">${sym}${(i.subtotal||0).toLocaleString()}</td>
+      <td class="td-mono" style="font-size:11px">${vatPct}</td>
+      <td class="td-mono" style="font-size:11px;font-weight:500">${sym}${(i.total_amount||0).toLocaleString()}</td>
+      <td class="td-mono" style="font-size:10px">${i.due_date ? fmtDate(i.due_date) : '—'}</td>
+      <td><span class="badge inv-status-${es}">${es}</span></td>
+      <td><div class="row-actions">
+        <button class="ra" onclick="openInvoiceEditorById('${i.id}')">Open</button>
+        <button class="ra" onclick="updateInvoiceStatus('${i.id}','sent')">Sent</button>
+        <button class="ra confirm" onclick="updateInvoiceStatus('${i.id}','paid')">Paid</button>
+        <button class="ra del" onclick="deleteInvoice('${i.id}')">Del</button>
+      </div></td>
+    </tr>`;
+  }).join('');
+  const total = filtInvoices.length, pages = Math.ceil(total/PG);
+  document.getElementById('inv-pinfo').textContent = `${invPageN*PG+1}–${Math.min((invPageN+1)*PG,total)} of ${total}`;
+  document.getElementById('inv-prev').disabled = invPageN === 0;
+  document.getElementById('inv-next').disabled = invPageN >= pages-1;
+}
+
+function invPage(d) { invPageN += d; renderInvoices(); }
+
+async function updateInvoiceStatus(id, status) {
+  const { error } = await db.from('invoices').update({ status }).eq('id', id);
+  if (error) { showToast('Error: '+error.message, 'error'); return; }
+  showToast('Invoice marked as '+status, 'success');
+  loadInvoices();
+}
+
+async function deleteInvoice(id) {
+  if (!confirm('Delete this invoice?')) return;
+  const { error } = await db.from('invoices').delete().eq('id', id);
+  if (error) { showToast('Error deleting', 'error'); return; }
+  showToast('Invoice deleted', 'success');
+  loadInvoices();
+}
+
+function exportInvoices() {
+  const data = filtInvoices.map(i => ({
+    InvoiceNumber:i.invoice_number, Booking:i.bookings?.reference, Artist:i.bookings?.artists?.name,
+    Client:i.bill_to_name, Type:i.type, Subtotal:i.subtotal, VATRate:i.vat_rate,
+    VATAmount:i.vat_amount, Total:i.total_amount, Currency:i.currency,
+    Withholding:i.withholding_amount, DueDate:i.due_date, Status:i.status,
+  }));
+  const ws = XLSX.utils.json_to_sheet(data);
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, 'Invoices');
+  XLSX.writeFile(wb, `deepbloe_invoices_${new Date().toISOString().slice(0,10)}.xlsx`);
+  showToast(`Exported ${data.length} invoices`, 'success');
+}
+
+function openInvoiceEditor(bookingId = null) {
+  editInvoiceId = null; currentInvoiceBookingId = bookingId;
+  const sel = document.getElementById('ie-booking');
+  sel.innerHTML = '<option value="">Select booking...</option>' +
+    allBookings.map(b => `<option value="${b.id}" ${b.id===bookingId?'selected':''}>
+      ${esc(b.reference||'')} — ${esc(b.artists?.name||'')} — ${b.show_date||''}
+    </option>`).join('');
+  if (bookingId) sel.value = bookingId;
+  const today = new Date().toISOString().slice(0,10);
+  const due   = new Date(Date.now()+14*24*60*60*1000).toISOString().slice(0,10);
+  document.getElementById('ie-date').value = today;
+  document.getElementById('ie-due-date').value = due;
+  document.getElementById('ie-type').value = 'deposit';
+  document.getElementById('ie-vat-regime').value = 'eu_exempt';
+  document.getElementById('ie-withholding-pct').value = '0';
+  document.getElementById('ie-notes').value = '';
+  document.getElementById('ie-pay-ref').value = '';
+  document.getElementById('ie-client-vat').value = '';
+  document.getElementById('ie-client-addr').value = '';
+  document.getElementById('ie-vat-custom-field').style.display = 'none';
+  if (bookingId) loadBookingIntoInvoice();
+  else { document.getElementById('ie-booking-ref').textContent=''; updateInvoiceCalc(); }
+  document.getElementById('invoice-editor-overlay').classList.add('open');
+}
+
+async function openInvoiceEditorById(invoiceId) {
+  const { data: inv, error } = await db.from('invoices').select('*').eq('id', invoiceId).single();
+  if (error || !inv) { showToast('Error loading invoice', 'error'); return; }
+  editInvoiceId = invoiceId;
+  const sel = document.getElementById('ie-booking');
+  sel.innerHTML = allBookings.map(b => `<option value="${b.id}" ${b.id===inv.booking_id?'selected':''}>
+    ${esc(b.reference||'')} — ${esc(b.artists?.name||'')}
+  </option>`).join('');
+  if (inv.booking_id) sel.value = inv.booking_id;
+  document.getElementById('ie-type').value = inv.type||'full';
+  document.getElementById('ie-date').value = inv.issued_at||'';
+  document.getElementById('ie-due-date').value = inv.due_date||'';
+  document.getElementById('ie-client-name').value = inv.bill_to_name||'';
+  document.getElementById('ie-client-addr').value = inv.bill_to_address||'';
+  document.getElementById('ie-client-vat').value = inv.client_vat_id||'';
+  document.getElementById('ie-description').value = inv.description||'';
+  document.getElementById('ie-subtotal').value = inv.subtotal||'';
+  document.getElementById('ie-currency').value = inv.currency||'EUR';
+  document.getElementById('ie-withholding-pct').value = inv.withholding_rate||'0';
+  document.getElementById('ie-notes').value = inv.notes||'';
+  document.getElementById('ie-pay-ref').value = inv.payment_reference||'';
+  if (inv.vat_reverse_charge) document.getElementById('ie-vat-regime').value = 'eu_reverse';
+  else if (inv.vat_rate===21) document.getElementById('ie-vat-regime').value = 'nl_21';
+  else if (inv.vat_rate===0)  document.getElementById('ie-vat-regime').value = 'eu_exempt';
+  else { document.getElementById('ie-vat-regime').value='custom'; document.getElementById('ie-vat-custom').value=inv.vat_rate; }
+  updateVatRegime(); updateInvoiceCalc();
+  document.getElementById('invoice-editor-overlay').classList.add('open');
+}
+
+function loadBookingIntoInvoice() {
+  const bookingId = document.getElementById('ie-booking').value;
+  if (!bookingId) { updateInvoiceCalc(); return; }
+  const b = allBookings.find(x => x.id === bookingId);
+  if (!b) return;
+  document.getElementById('ie-booking-ref').textContent = b.reference||'';
+  document.getElementById('ie-artist').value    = b.artists?.name||'';
+  document.getElementById('ie-show-date').value = b.show_date ? fmtDate(b.show_date) : '';
+  document.getElementById('ie-venue').value     = [b.venue_name,b.venue_city,b.venue_country].filter(Boolean).join(', ');
+  document.getElementById('ie-currency').value  = b.fee_currency||'EUR';
+  document.getElementById('ie-client-name').value = b.company?.name||'';
+  document.getElementById('ie-withholding-pct').value = b.withholding_rate||0;
+  const type = document.getElementById('ie-type').value;
+  const labels = {deposit:'Deposit — ',second_deposit:'2nd Deposit — ',balance:'Balance — ',full:'Performance fee — ',credit_note:'Credit note — '};
+  document.getElementById('ie-description').value = (labels[type]||'')+(b.artists?.name||'')+(b.show_date?' · '+fmtDate(b.show_date):'');
+  const country = b.venue_country||'';
+  const euC = ['Netherlands','Germany','France','Belgium','Spain','Italy','Portugal','Austria','Sweden','Denmark','Finland','Poland'];
+  if (country==='Netherlands') document.getElementById('ie-vat-regime').value='nl_21';
+  else if (euC.includes(country)) document.getElementById('ie-vat-regime').value='eu_reverse';
+  else document.getElementById('ie-vat-regime').value='eu_exempt';
+  if (b.fee_amount) {
+    let amount = b.fee_amount;
+    if (type==='deposit') amount=Math.round(b.fee_amount*0.5);
+    else if (type==='second_deposit') amount=Math.round(b.fee_amount*0.25);
+    else if (type==='balance') amount=Math.round(b.fee_amount*0.5);
+    document.getElementById('ie-subtotal').value = amount;
+  }
+  updateVatRegime();
+  setTimeout(()=>updateInvoiceCalc(), 50);
+}
+
+function updateVatRegime() {
+  const regime = document.getElementById('ie-vat-regime').value;
+  document.getElementById('ie-vat-custom-field').style.display = regime==='custom'?'flex':'none';
+  updateInvoiceCalc();
+}
+
+function updateInvoiceCalc() {
+  const subtotal = parseFloat(document.getElementById('ie-subtotal').value)||0;
+  const regime   = document.getElementById('ie-vat-regime').value;
+  const currency = document.getElementById('ie-currency').value;
+  const withPct  = parseFloat(document.getElementById('ie-withholding-pct').value)||0;
+  const sym = {EUR:'€ ',USD:'$ ',GBP:'£ ',SGD:'S$ ',AED:'AED ',IDR:'Rp ',THB:'฿ '}[currency]||'';
+  let vatRate = VAT_REGIMES[regime]?.rate||0;
+  if (regime==='custom') vatRate = parseFloat(document.getElementById('ie-vat-custom').value)||0;
+  const vatAmount  = Math.round(subtotal*vatRate/100*100)/100;
+  const total      = Math.round((subtotal+vatAmount)*100)/100;
+  const withAmount = Math.round(subtotal*withPct/100*100)/100;
+  const netPayable = Math.round((total-withAmount)*100)/100;
+  const fmt = n => sym+n.toLocaleString('nl-NL',{minimumFractionDigits:2});
+  document.getElementById('ie-vat-amount').value         = fmt(vatAmount);
+  document.getElementById('ie-total').value              = fmt(total);
+  document.getElementById('ie-withholding-amount').value = withAmount>0?'− '+fmt(withAmount):fmt(0);
+  document.getElementById('ie-net-payable').value        = fmt(netPayable);
+  renderInvoicePreview();
+}
+
+function getInvoiceData() {
+  const regime   = document.getElementById('ie-vat-regime').value;
+  const subtotal = parseFloat(document.getElementById('ie-subtotal').value)||0;
+  let vatRate = VAT_REGIMES[regime]?.rate||0;
+  if (regime==='custom') vatRate=parseFloat(document.getElementById('ie-vat-custom').value)||0;
+  const vatAmount  = Math.round(subtotal*vatRate/100*100)/100;
+  const total      = subtotal+vatAmount;
+  const withPct    = parseFloat(document.getElementById('ie-withholding-pct').value)||0;
+  const withAmount = Math.round(subtotal*withPct/100*100)/100;
+  const currency   = document.getElementById('ie-currency').value;
+  const sym = {EUR:'€',USD:'$',GBP:'£',SGD:'S$',AED:'AED ',IDR:'Rp',THB:'฿'}[currency]||'';
+  return {
+    booking_id:document.getElementById('ie-booking').value||null,
+    type:document.getElementById('ie-type').value,
+    issued_at:document.getElementById('ie-date').value,
+    due_date:document.getElementById('ie-due-date').value||null,
+    currency,subtotal,vat_rate:vatRate,vat_amount:vatAmount,
+    vat_reverse_charge:regime==='eu_reverse',vat_exempt:regime==='eu_exempt',
+    vat_reference:VAT_REGIMES[regime]?.note||null,total_amount:total,
+    withholding_amount:withAmount,withholding_rate:withPct,
+    bill_to_name:document.getElementById('ie-client-name').value.trim()||null,
+    bill_to_address:document.getElementById('ie-client-addr').value.trim()||null,
+    client_vat_id:document.getElementById('ie-client-vat').value.trim()||null,
+    agency_vat_id:document.getElementById('ie-agency-vat').value.trim()||null,
+    description:document.getElementById('ie-description').value.trim()||null,
+    notes:document.getElementById('ie-notes').value.trim()||null,
+    payment_reference:document.getElementById('ie-pay-ref').value.trim()||null,
+    _sym:sym,_vatRate:vatRate,_vatAmount:vatAmount,_total:total,
+    _withAmount:withAmount,_netPayable:total-withAmount,
+    _regime:regime,_vatNote:VAT_REGIMES[regime]?.note||'',
+    _agencyName:document.getElementById('ie-agency-name').value,
+    _agencyAddr:document.getElementById('ie-agency-addr').value,
+    _agencyVat:document.getElementById('ie-agency-vat').value,
+    _iban:document.getElementById('ie-iban').value,
+    _bic:document.getElementById('ie-bic').value,
+    _artist:document.getElementById('ie-artist').value,
+    _showDate:document.getElementById('ie-show-date').value,
+    _venue:document.getElementById('ie-venue').value,
+    _typeLabel:{deposit:'DEPOSIT INVOICE',second_deposit:'2ND DEPOSIT INVOICE',balance:'BALANCE INVOICE',full:'INVOICE',credit_note:'CREDIT NOTE'}[document.getElementById('ie-type').value]||'INVOICE',
+  };
+}
+
+function renderInvoicePreview() {
+  const d = getInvoiceData();
+  const invNum = editInvoiceId ? (allInvoices.find(i=>i.id===editInvoiceId)?.invoice_number||'DRAFT') : 'DRAFT';
+  const today   = fmtDate(d.issued_at||new Date().toISOString().slice(0,10));
+  const dueDate = d.due_date ? fmtDate(d.due_date) : '—';
+  const fmt = n => d._sym+n.toLocaleString('nl-NL',{minimumFractionDigits:2});
+  document.getElementById('ie-doc-content').innerHTML = `
+<div class="inv-doc-top">
+  <div class="inv-doc-brand">
+    <div class="brand-name">DEEPBLOE</div>
+    <div class="brand-sub">AGENCY B.V. · deepbloe.com</div>
+    <div style="margin-top:12px;font-size:11px;color:#444;line-height:1.6">${esc(d._agencyAddr).replace(/\n/g,'<br>')}</div>
+    <div style="font-family:'DM Mono',monospace;font-size:10px;color:#8a8278;margin-top:6px">VAT: ${esc(d._agencyVat)}</div>
+  </div>
+  <div class="inv-doc-meta">
+    <div class="inv-type">${d._typeLabel}</div>
+    <div class="inv-number">${invNum}</div>
+    <div class="inv-date">Date: ${today}</div>
+    <div class="inv-date">Due: ${dueDate}</div>
+  </div>
+</div>
+<div class="inv-parties">
+  <div>
+    <div class="inv-party-label">From</div>
+    <div class="inv-party-name">${esc(d._agencyName)}</div>
+    <div class="inv-party-addr">${esc(d._agencyAddr).replace(/\n/g,'<br>')}</div>
+    <div class="inv-party-vat">VAT: ${esc(d._agencyVat)}</div>
+  </div>
+  <div>
+    <div class="inv-party-label">Bill To</div>
+    <div class="inv-party-name">${esc(d.bill_to_name||'[CLIENT NAME]')}</div>
+    <div class="inv-party-addr">${esc(d.bill_to_address||'').replace(/\n/g,'<br>')}</div>
+    ${d.client_vat_id?`<div class="inv-party-vat">VAT: ${esc(d.client_vat_id)}</div>`:''}
+  </div>
+</div>
+${(d._artist||d._showDate||d._venue)?`
+<div class="inv-ref-box">
+  <div class="ref-label">Performance Reference</div>
+  <div class="ref-value">${d._artist?`<strong>${esc(d._artist)}</strong>`:''} ${d._showDate?` · ${esc(d._showDate)}`:''} ${d._venue?` · ${esc(d._venue)}`:''}</div>
+</div>`:''}
+<table class="inv-lines">
+  <thead><tr><th style="width:60%">Description</th><th style="width:15%;text-align:right">VAT</th><th style="width:25%;text-align:right">Amount</th></tr></thead>
+  <tbody><tr>
+    <td>${esc(d.description||'Performance services')}</td>
+    <td style="text-align:right;font-family:'DM Mono',monospace;font-size:11px">${d._vatRate>0?d._vatRate+'%':(d._regime==='eu_reverse'?'RC':'0%')}</td>
+    <td style="text-align:right;font-family:'DM Mono',monospace">${fmt(d.subtotal)}</td>
+  </tr></tbody>
+</table>
+<div style="display:flex;justify-content:flex-end;border-top:1px solid #e2ddd6;padding-top:16px">
+  <div class="inv-totals">
+    <div class="inv-total-row"><span class="t-label">Subtotal</span><span class="t-val">${fmt(d.subtotal)}</span></div>
+    <div class="inv-total-row"><span class="t-label">VAT ${d._vatRate>0?d._vatRate+'%':'0%'}</span><span class="t-val">${fmt(d._vatAmount)}</span></div>
+    ${d._withAmount>0?`<div class="inv-total-row"><span class="t-label">Withholding (${document.getElementById('ie-withholding-pct').value}%)</span><span class="t-val" style="color:#c0392b">− ${fmt(d._withAmount)}</span></div>`:''}
+    <div class="inv-total-row total-final"><span class="t-label">${d._withAmount>0?'Net Payable':'Total Due'}</span><span class="t-val">${fmt(d._netPayable)}</span></div>
+  </div>
+</div>
+<div class="inv-bottom">
+  ${(d._iban||d._bic)?`<div class="inv-payment-box"><div class="inv-payment-label">Payment Details</div><div class="inv-payment-row">
+    ${d._iban?`<div class="inv-payment-item"><span class="pi-label">IBAN</span><span class="pi-val">${esc(d._iban)}</span></div>`:''}
+    ${d._bic?`<div class="inv-payment-item"><span class="pi-label">BIC/SWIFT</span><span class="pi-val">${esc(d._bic)}</span></div>`:''}
+    <div class="inv-payment-item"><span class="pi-label">Reference</span><span class="pi-val">${esc(d.payment_reference||invNum)}</span></div>
+    <div class="inv-payment-item"><span class="pi-label">Currency</span><span class="pi-val">${esc(d.currency)}</span></div>
+  </div></div>`:''}
+  ${d._vatNote?`<div class="inv-vat-note">${esc(d._vatNote)}</div>`:''}
+  ${d.notes?`<div style="margin-top:12px;font-size:12px;color:#444">${esc(d.notes).replace(/\n/g,'<br>')}</div>`:''}
+  <div class="inv-due-box" style="margin-top:20px">
+    <div class="inv-due-label">Amount due by ${dueDate}</div>
+    <div class="inv-due-amount">${fmt(d._netPayable)}</div>
+  </div>
+  <div style="margin-top:24px;font-family:'DM Mono',monospace;font-size:9px;color:#8a8278;text-align:center">
+    Deepbloe Agency B.V. · deepbloe.com · ${esc(d._agencyVat)}
+  </div>
+</div>`;
+}
+
+async function saveInvoice() {
+  const bookingId = document.getElementById('ie-booking').value;
+  if (!bookingId) { showToast('Select a booking first', 'error'); return; }
+  const d = getInvoiceData();
+  const payload = {
+    booking_id:d.booking_id,type:d.type,issued_at:d.issued_at||new Date().toISOString().slice(0,10),
+    due_date:d.due_date||null,currency:d.currency,subtotal:d.subtotal,
+    vat_rate:d.vat_rate,vat_amount:d.vat_amount,vat_reverse_charge:d.vat_reverse_charge,
+    vat_exempt:d.vat_exempt,vat_reference:d.vat_reference,total_amount:d.total_amount,
+    withholding_amount:d.withholding_amount,withholding_rate:d.withholding_rate,
+    bill_to_name:d.bill_to_name,bill_to_address:d.bill_to_address,client_vat_id:d.client_vat_id,
+    agency_vat_id:d.agency_vat_id,description:d.description,notes:d.notes,
+    payment_reference:d.payment_reference,
+  };
+  const btn = document.querySelector('#invoice-editor-overlay .ie-btn.success');
+  btn.disabled=true; btn.textContent='Saving...';
+  let error;
+  if (editInvoiceId) {
+    ({error}=await db.from('invoices').update(payload).eq('id',editInvoiceId));
+  } else {
+    ({error}=await db.from('invoices').insert({...payload,status:'draft'}));
+  }
+  btn.disabled=false; btn.textContent='✓ Save Invoice';
+  if (error) { showToast('Error: '+error.message,'error'); return; }
+  showToast(editInvoiceId?'Invoice updated':'Invoice saved as draft','success');
+  loadInvoices();
+}
+
+function printInvoice() { window.print(); }
+function closeInvoiceEditor() {
+  document.getElementById('invoice-editor-overlay').classList.remove('open');
+  editInvoiceId=null; currentInvoiceBookingId=null;
+}
+// ── END INVOICES ──────────────────────────────────────────────
+
 
 function closeModal(id) { document.getElementById(id).classList.remove('open'); }
 
