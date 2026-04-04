@@ -1416,9 +1416,9 @@ function populateArtistDropdowns() {
 // ── BOOKINGS ──────────────────────────────────────────────────
 async function loadBookings() {
   const { data, error } = await db.from('bookings')
-    .select('*, artists(name), organisations(name, type), contacts(first_name, last_name)')
+    .select('*, artists(name), company:organisations(name, type), contact:contacts(first_name, last_name)')
     .order('show_date', { ascending: true });
-  if (error) { showToast('Error loading bookings', 'error'); return; }
+  if (error) { showToast('Error loading bookings: ' + error.message, 'error'); return; }
   allBookings = data || [];
   updateBookingStats();
   filterBookings();
@@ -1477,7 +1477,7 @@ function renderBookingList() {
   }
   tbody.innerHTML = slice.map(b => {
     const artist = b.artists?.name || '—';
-    const org    = b.organisations?.name || '—';
+    const org    = b.company?.name || b.organisations?.name || '—';
     const fee    = b.fee_amount
       ? `<span class="fee-val">${fmtFee(b.fee_amount, b.fee_currency)}</span>`
       : '<span style="color:var(--muted)">—</span>';
@@ -1715,7 +1715,7 @@ function exportBookings() {
     Currency:    b.fee_currency,
     Commission:  b.commission_rate,
     Withholding: b.withholding_rate,
-    Promoter:    b.organisations?.name,
+    Promoter:    b.company?.name || b.organisations?.name,
     Territory:   b.territory,
     Notes:       b.internal_notes,
   }));
@@ -2439,7 +2439,7 @@ function loadBookingIntoContract() {
   document.getElementById('ce-settime').value   = b.set_time ? b.set_time.slice(0,5) : '';
   document.getElementById('ce-setlength').value = b.set_length_minutes ? b.set_length_minutes + ' minutes' : '';
   document.getElementById('ce-currency').value  = b.fee_currency || 'EUR';
-  document.getElementById('ce-promoter').value  = b.organisations?.name || '';
+  document.getElementById('ce-promoter').value  = b.company?.name || b.organisations?.name || '';
   document.getElementById('ce-withholding').value = b.withholding_rate && b.withholding_rate > 0
     ? b.withholding_rate + '% (' + (b.withholding_country||'') + ')'
     : 'Not applicable';
