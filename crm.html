@@ -965,7 +965,7 @@ tbody td { padding: 10px 14px; vertical-align: middle; }
       <label>Password</label>
       <input type="password" id="l-pass" placeholder="••••••••">
     </div>
-    <button class="login-btn" onclick="doLogin()">Sign In</button>
+    <button class="login-btn" id="login-btn">Sign In</button>
     <div class="login-err" id="login-err">Invalid email or password.</div>
   </div>
 </div>
@@ -2590,6 +2590,8 @@ const db = createClient(SUPABASE_URL, SUPABASE_KEY);
 document.addEventListener('DOMContentLoaded', () => {
   const fromEl = document.getElementById('email-from');
   if (fromEl) fromEl.value = 'finance' + '@' + 'deepbloe.com';
+  const loginBtn = document.getElementById('login-btn');
+  if (loginBtn) loginBtn.addEventListener('click', doLogin);
 });
 
 // ── STATE ─────────────────────────────────────────────────────
