@@ -1681,6 +1681,48 @@ tbody td { padding: 10px 14px; vertical-align: middle; }
         </div>
       </div>
 
+      <!-- CASHFLOW -->
+      <div style="margin-top:20px">
+        <div class="tbl-wrap">
+          <div style="background:var(--accent);padding:10px 14px;display:flex;justify-content:space-between;align-items:center">
+            <span style="font-family:var(--mono);font-size:9px;letter-spacing:0.15em;text-transform:uppercase;color:rgba(255,255,255,0.7)">
+              Cashflow — Verwacht vs Ontvangen — <span id="fin-cf-year">2026</span>
+            </span>
+            <button class="btn" onclick="exportCashflow()" style="padding:4px 12px;font-size:9px;border-color:rgba(255,255,255,0.3);color:rgba(255,255,255,0.7)">↓ Export</button>
+          </div>
+          <table>
+            <thead>
+              <tr>
+                <th>Maand</th>
+                <th>Verwacht (due)</th>
+                <th>Ontvangen (paid)</th>
+                <th>Openstaand</th>
+                <th>Cumulatief</th>
+                <th>Facturen</th>
+              </tr>
+            </thead>
+            <tbody id="fin-cf-tbody">
+              <tr class="tbl-msg"><td colspan="6">Loading...</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Upcoming payments -->
+        <div class="tbl-wrap" style="margin-top:12px">
+          <div style="background:var(--accent);padding:10px 14px;font-family:var(--mono);font-size:9px;letter-spacing:0.15em;text-transform:uppercase;color:rgba(255,255,255,0.7)">
+            Aankomende Betalingen — Openstaande Facturen
+          </div>
+          <table>
+            <thead>
+              <tr><th>Due Date</th><th>Invoice #</th><th>Artist</th><th>Klant</th><th>Type</th><th>Bedrag</th><th>Status</th><th>Dagen</th></tr>
+            </thead>
+            <tbody id="fin-cf-upcoming-tbody">
+              <tr class="tbl-msg"><td colspan="8">Loading...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
     </div>
 
     <!-- ── CALENDAR PANEL ── -->
@@ -5220,6 +5262,9 @@ async function renderFinance() {
 
   // ── VAT REPORT ──
   renderVATReport(year);
+
+  // ── CASHFLOW ──
+  renderCashflow(year);
 }
 
 function renderLedger(year, yearLines) {
@@ -5510,6 +5555,119 @@ function exportVAT() {
   XLSX.utils.book_append_sheet(wb, ws, `BTW ${year}`);
   XLSX.writeFile(wb, `deepbloe_btw_rapport_${year}.xlsx`);
   showToast(`BTW rapport ${year} geëxporteerd`, 'success');
+}
+
+function renderCashflow(year) {
+  document.getElementById('fin-cf-year').textContent = year;
+  const today = new Date().toISOString().slice(0,10);
+  const fmt = n => '€ ' + Math.round(n).toLocaleString('nl-NL');
+
+  // All EUR invoices for this year (by due_date)
+  const yearInvoices = allInvoices.filter(i => {
+    if (i.status === 'cancelled') return false;
+    if (i.currency !== 'EUR') return false;
+    const d = i.due_date || i.issued_at;
+    return d && new Date(d).getFullYear() === year;
+  });
+
+  // Monthly cashflow
+  let cumulative = 0;
+  const months = ['Jan','Feb','Mrt','Apr','Mei','Jun','Jul','Aug','Sep','Okt','Nov','Dec'];
+  const cfRows = months.map((m, i) => {
+    const month = i + 1;
+    const monthInvs = yearInvoices.filter(inv => {
+      const d = inv.due_date || inv.issued_at;
+      return d && new Date(d).getMonth() + 1 === month;
+    });
+
+    const expected = monthInvs
+      .filter(inv => ['draft','sent','overdue'].includes(inv.status))
+      .reduce((s,inv) => s + (inv.total_amount||0), 0);
+    const received = monthInvs
+      .filter(inv => inv.status === 'paid')
+      .reduce((s,inv) => s + (inv.total_amount||0), 0);
+    const outstanding = expected;
+    cumulative += received - expected;
+
+    const invCount = monthInvs.length;
+    if (expected === 0 && received === 0) return `<tr>
+      <td class="td-mono" style="color:var(--muted)">${m}</td>
+      <td class="td-mono" style="color:var(--muted)">—</td>
+      <td class="td-mono" style="color:var(--muted)">—</td>
+      <td class="td-mono" style="color:var(--muted)">—</td>
+      <td class="td-mono" style="color:var(--muted)">—</td>
+      <td class="td-mono" style="color:var(--muted)">—</td>
+    </tr>`;
+
+    const cumCls = cumulative >= 0 ? 'color:var(--green)' : 'color:var(--red)';
+    return `<tr>
+      <td class="td-mono" style="font-weight:500">${m}</td>
+      <td class="td-mono" style="color:var(--blue)">${expected > 0 ? fmt(expected) : '—'}</td>
+      <td class="td-mono" style="color:var(--green)">${received > 0 ? fmt(received) : '—'}</td>
+      <td class="td-mono" style="color:var(--amber)">${outstanding > 0 ? fmt(outstanding) : '—'}</td>
+      <td class="td-mono" style="${cumCls}">${fmt(cumulative)}</td>
+      <td class="td-mono" style="color:var(--muted)">${invCount > 0 ? invCount : '—'}</td>
+    </tr>`;
+  }).join('');
+
+  document.getElementById('fin-cf-tbody').innerHTML = cfRows;
+
+  // Upcoming open invoices sorted by due date
+  const openInvs = allInvoices
+    .filter(i => ['sent','overdue','draft'].includes(i.status) && i.currency === 'EUR' && i.due_date)
+    .sort((a,b) => a.due_date.localeCompare(b.due_date));
+
+  const upcomingRows = openInvs.map(i => {
+    const bk = allBookings.find(b => b.id === i.booking_id);
+    const sym = '€';
+    const daysLeft = Math.ceil((new Date(i.due_date) - new Date()) / (1000*60*60*24));
+    const overdue  = daysLeft < 0;
+    const urgent   = !overdue && daysLeft <= 14;
+    const daysCls  = overdue ? 'color:var(--red);font-weight:500' : urgent ? 'color:var(--amber);font-weight:500' : 'color:var(--muted)';
+    const daysText = overdue ? `${Math.abs(daysLeft)}d overdue` : `${daysLeft}d`;
+    const typeLabel = {deposit:'Deposit',second_deposit:'2nd Deposit',balance:'Balance',full:'Full',credit_note:'Credit'}[i.type]||i.type;
+    const eff = overdue ? 'overdue' : i.status;
+    return `<tr style="cursor:pointer" onclick="openInvoiceEditorById('${i.id}')">
+      <td class="td-mono" style="font-size:10px;${overdue?'color:var(--red)':''}">${fmtDate(i.due_date)}</td>
+      <td class="td-mono" style="font-size:10px">${esc(i.invoice_number||'—')}</td>
+      <td class="td-name">${esc(bk?.artists?.name||'—')}</td>
+      <td class="td-trunc">${esc(i.bill_to_name||'—')}</td>
+      <td><span class="genre-pill">${esc(typeLabel)}</span></td>
+      <td class="fee-val">${sym}${(i.total_amount||0).toLocaleString()}</td>
+      <td><span class="badge inv-status-${eff}">${eff}</span></td>
+      <td class="td-mono" style="font-size:10px;${daysCls}">${daysText}</td>
+    </tr>`;
+  }).join('');
+
+  document.getElementById('fin-cf-upcoming-tbody').innerHTML = upcomingRows ||
+    '<tr class="tbl-msg"><td colspan="8">Geen openstaande facturen</td></tr>';
+}
+
+function exportCashflow() {
+  const year = finYear;
+  const months = ['Jan','Feb','Mrt','Apr','Mei','Jun','Jul','Aug','Sep','Okt','Nov','Dec'];
+  const yearInvoices = allInvoices.filter(i => {
+    if (i.status === 'cancelled' || i.currency !== 'EUR') return false;
+    const d = i.due_date || i.issued_at;
+    return d && new Date(d).getFullYear() === year;
+  });
+
+  const rows = months.map((m, i) => {
+    const month = i + 1;
+    const monthInvs = yearInvoices.filter(inv => {
+      const d = inv.due_date || inv.issued_at;
+      return d && new Date(d).getMonth() + 1 === month;
+    });
+    const expected = monthInvs.filter(inv => ['draft','sent','overdue'].includes(inv.status)).reduce((s,inv) => s+(inv.total_amount||0), 0);
+    const received = monthInvs.filter(inv => inv.status==='paid').reduce((s,inv) => s+(inv.total_amount||0), 0);
+    return { Jaar: year, Maand: m, Verwacht_EUR: Math.round(expected), Ontvangen_EUR: Math.round(received), Openstaand_EUR: Math.round(expected) };
+  });
+
+  const ws = XLSX.utils.json_to_sheet(rows);
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, `Cashflow ${year}`);
+  XLSX.writeFile(wb, `deepbloe_cashflow_${year}.xlsx`);
+  showToast(`Cashflow ${year} geëxporteerd`, 'success');
 }
 
 // ── END FINANCE ────────────────────────────────────────────────
