@@ -804,36 +804,36 @@ tbody td { padding: 10px 14px; vertical-align: middle; }
 .fin-lines.open { display:block; }
 
 /* Line header row */
-.fin-line-col-hdr { display:grid; grid-template-columns:200px repeat(12,1fr) 80px 24px;
-                    border-bottom:1px solid var(--border); background:var(--bg); }
-.fin-line-col-hdr > div { padding:5px 6px; font-family:var(--mono); font-size:9px; letter-spacing:0.08em;
+.fin-line-col-hdr { display:grid; grid-template-columns:160px repeat(12,62px) 80px 24px;
+                    border-bottom:1px solid var(--border); background:var(--bg); overflow-x:auto; }
+.fin-line-col-hdr > div { padding:5px 4px; font-family:var(--mono); font-size:9px; letter-spacing:0.08em;
                            text-transform:uppercase; color:var(--muted); text-align:center; }
 .fin-line-col-hdr > div:first-child { text-align:left; padding-left:36px; }
 
 /* Each expense line */
-.fin-line { display:grid; grid-template-columns:200px repeat(12,1fr) 80px 24px;
+.fin-line { display:grid; grid-template-columns:160px repeat(12,62px) 80px 24px;
             border-bottom:1px solid var(--border); align-items:center; }
 .fin-line:hover { background:#faf9f7; }
-.fin-line-label { padding:6px 8px 6px 36px; }
+.fin-line-label { padding:6px 6px 6px 36px; }
 .fin-line-label input { border:none; background:transparent; font-size:12px; outline:none;
                          color:var(--accent); width:100%; font-family:var(--sans); }
 .fin-line-label input:focus { border-bottom:1px solid var(--accent); }
-.fin-line-cell { padding:4px 3px; text-align:center; }
+.fin-line-cell { padding:3px 2px; text-align:center; }
 .fin-line-cell input { width:100%; border:none; background:transparent; font-family:var(--mono);
-                        font-size:11px; outline:none; color:var(--accent); text-align:right;
-                        padding:3px 4px; }
+                        font-size:10px; outline:none; color:var(--accent); text-align:right;
+                        padding:3px 3px; }
 .fin-line-cell input:focus { background:var(--bg); border-bottom:1px solid var(--accent); }
-.fin-line-total { font-family:var(--mono); font-size:11px; font-weight:500; color:var(--red);
-                  text-align:right; padding:4px 8px; }
+.fin-line-total { font-family:var(--mono); font-size:10px; font-weight:500; color:var(--red);
+                  text-align:right; padding:4px 6px; white-space:nowrap; }
 .fin-line-del { display:flex; align-items:center; justify-content:center; cursor:pointer;
                 color:var(--muted); font-size:14px; padding:4px; transition:color 0.1s; }
 .fin-line-del:hover { color:var(--red); }
 
 /* Totals row */
-.fin-ledger-totals { display:grid; grid-template-columns:200px repeat(12,1fr) 80px 24px;
+.fin-ledger-totals { display:grid; grid-template-columns:160px repeat(12,62px) 80px 24px;
                      border-top:2px solid var(--border); background:var(--bg); }
-.fin-ledger-totals > div { padding:7px 6px; font-family:var(--mono); font-size:10px;
-                            font-weight:500; color:var(--red); text-align:right; }
+.fin-ledger-totals > div { padding:7px 4px; font-family:var(--mono); font-size:10px;
+                            font-weight:500; color:var(--red); text-align:right; white-space:nowrap; }
 .fin-ledger-totals > div:first-child { text-align:left; padding-left:14px; color:var(--muted);
                                         font-size:9px; letter-spacing:0.1em; text-transform:uppercase; }
 /* ── FINANCE MODULE END ───────────────────────────────── */
@@ -1539,8 +1539,8 @@ tbody td { padding: 10px 14px; vertical-align: middle; }
               <span>Cost Ledger — <span id="fin-exp-year">2026</span></span>
               <span style="font-size:9px;opacity:0.6">Click category to expand · Click amounts to edit</span>
             </div>
-            <div id="fin-ledger-body"></div>
-            <div class="fin-ledger-totals" id="fin-ledger-totals"></div>
+            <div id="fin-ledger-body" style="overflow-x:auto"></div>
+            <div class="fin-ledger-totals" id="fin-ledger-totals" style="min-width:1100px"></div>
           </div>
         </div>
 
@@ -5070,8 +5070,8 @@ function renderLedger(year, yearLines) {
         <div class="fin-cat-total">${catTotal>0?'€'+Math.round(catTotal).toLocaleString('nl-NL'):'—'}</div>
         <button class="fin-cat-add" onclick="event.stopPropagation();addLine('${cat.id}')">+ Add line</button>
       </div>
-      <div class="fin-lines" id="lines-${cat.id}">
-        ${catLines.length ? colHdr + linesHtml : `<div style="padding:10px 36px;font-family:var(--mono);font-size:10px;color:var(--muted)">No lines yet. Click "+ Add line" to add costs.</div>`}
+      <div class="fin-lines" id="lines-${cat.id}" style="overflow-x:auto">
+        ${catLines.length ? `<div style="min-width:1100px">${colHdr + linesHtml}</div>` : `<div style="padding:10px 36px;font-family:var(--mono);font-size:10px;color:var(--muted)">No lines yet. Click "+ Add line" to add costs.</div>`}
       </div>
     </div>`;
   }).join('');
