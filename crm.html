@@ -861,6 +861,82 @@ tbody td { padding: 10px 14px; vertical-align: middle; }
 .email-field textarea { resize: vertical; min-height: 200px; line-height: 1.6; }
 /* ── EMAIL MODAL END ─────────────────────────────────── */
 
+/* ── CALENDAR ─────────────────────────────────────────── */
+.cal-nav { display:flex; align-items:center; gap:12px; margin-bottom:20px; }
+.cal-nav-btn { background:none; border:1px solid var(--border-dark); color:var(--muted);
+               padding:5px 14px; font-family:var(--mono); font-size:11px; cursor:pointer; transition:all 0.1s; }
+.cal-nav-btn:hover { border-color:var(--accent); color:var(--accent); }
+.cal-month-label { font-family:var(--mono); font-size:16px; font-weight:300; color:var(--accent);
+                   min-width:160px; text-align:center; }
+.cal-artist-filter { margin-left:auto; display:flex; gap:6px; flex-wrap:wrap; align-items:center; }
+.cal-legend { display:flex; gap:16px; align-items:center; }
+.cal-legend-item { display:flex; align-items:center; gap:5px; font-family:var(--mono); font-size:9px;
+                   letter-spacing:0.08em; text-transform:uppercase; color:var(--muted); }
+.cal-legend-dot { width:10px; height:10px; border-radius:50%; }
+
+.cal-grid { display:grid; grid-template-columns:repeat(7,1fr); gap:1px;
+            background:var(--border); border:1px solid var(--border); }
+.cal-day-hdr { background:var(--accent); color:rgba(255,255,255,0.6); padding:8px 10px;
+               font-family:var(--mono); font-size:9px; letter-spacing:0.12em; text-transform:uppercase;
+               text-align:center; }
+.cal-day {
+  background:var(--surface); min-height:110px; padding:6px;
+  position:relative; transition:background 0.1s; cursor:pointer;
+}
+.cal-day:hover { background:#f5f3ee; }
+.cal-day.other-month { background:#faf9f6; }
+.cal-day.today { background:#fff9f0; }
+.cal-day.today .cal-day-num { color:var(--red); font-weight:500; }
+.cal-day-num { font-family:var(--mono); font-size:11px; color:var(--muted);
+               margin-bottom:4px; }
+.cal-event {
+  padding:2px 6px; margin-bottom:2px; font-size:10px; font-family:var(--mono);
+  cursor:pointer; border-radius:2px; white-space:nowrap; overflow:hidden;
+  text-overflow:ellipsis; border-left:3px solid; line-height:1.4;
+  transition:opacity 0.1s;
+}
+.cal-event:hover { opacity:0.8; }
+.cal-event.confirmed  { background:#edf7f2; border-color:var(--green); color:#1a4a2e; }
+.cal-event.advancing  { background:#e8f0fb; border-color:#3a6bbf; color:#1a3a6b; }
+.cal-event.hold       { background:#eef3fb; border-color:#5a8dee; color:#1a3a6b; }
+.cal-event.inquiry    { background:#fdf8e8; border-color:#c8a020; color:#6b4a00; }
+.cal-event.offer_sent { background:#fff3e8; border-color:#e08030; color:#6b3000; }
+.cal-event.negotiating{ background:#f8eefb; border-color:#a050c0; color:#4a0070; }
+.cal-event.completed  { background:var(--bg); border-color:var(--border-dark); color:var(--muted); }
+.cal-event.cancelled  { background:#fdf0f0; border-color:#e08080; color:var(--red); text-decoration:line-through; }
+.cal-more { font-family:var(--mono); font-size:9px; color:var(--muted); padding:2px 4px; cursor:pointer; }
+.cal-more:hover { color:var(--accent); }
+
+/* Cal popup */
+.cal-popup {
+  position:fixed; background:var(--surface); border:1px solid var(--border);
+  border-top:3px solid var(--accent); padding:16px; width:280px;
+  box-shadow:0 8px 32px rgba(0,0,0,0.15); z-index:200; display:none;
+}
+.cal-popup.open { display:block; }
+.cal-popup-hdr { display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; }
+.cal-popup-title { font-size:13px; font-weight:500; }
+.cal-popup-close { background:none; border:none; font-size:18px; cursor:pointer; color:var(--muted); }
+.cal-popup-close:hover { color:var(--accent); }
+.cal-popup-row { display:flex; gap:8px; margin-bottom:6px; font-size:12px; }
+.cal-popup-label { font-family:var(--mono); font-size:10px; color:var(--muted); min-width:70px; }
+.cal-popup-val { color:var(--accent); }
+
+/* Artist availability strip */
+.cal-avail { margin-top:20px; }
+.cal-avail-hdr { font-family:var(--mono); font-size:9px; letter-spacing:0.15em; text-transform:uppercase;
+                 color:var(--muted); margin-bottom:10px; padding-bottom:6px; border-bottom:1px solid var(--border); }
+.cal-avail-row { display:flex; align-items:center; gap:8px; margin-bottom:6px; }
+.cal-avail-name { font-family:var(--mono); font-size:10px; color:var(--accent); width:80px; flex-shrink:0; }
+.cal-avail-strip { flex:1; display:flex; height:20px; gap:1px; }
+.cal-avail-day { flex:1; border-radius:1px; }
+.cal-avail-day.free      { background:#edf7f2; }
+.cal-avail-day.confirmed { background:var(--green); }
+.cal-avail-day.hold      { background:#5b8dee; }
+.cal-avail-day.busy      { background:var(--red); }
+.cal-avail-day.other     { background:var(--border); }
+/* ── CALENDAR END ─────────────────────────────────────── */
+
 /* toast */
 #toast {
   position: fixed; bottom: 24px; right: 24px; padding: 12px 20px;
@@ -907,6 +983,7 @@ tbody td { padding: 10px 14px; vertical-align: middle; }
       <div class="h-tab" onclick="showPanel('invoices', this)">Invoices</div>
       <div class="h-tab" onclick="showPanel('advancing', this)">Advancing</div>
       <div class="h-tab" onclick="showPanel('finance', this);renderFinance()">Finance</div>
+      <div class="h-tab" onclick="showPanel('calendar', this);renderCalendar()">Calendar</div>
       <div class="h-tab" onclick="showPanel('import', this)">Import</div>
     </nav>
     <div class="h-right">
@@ -1561,6 +1638,70 @@ tbody td { padding: 10px 14px; vertical-align: middle; }
         </table>
       </div>
 
+    </div>
+
+    <!-- ── CALENDAR PANEL ── -->
+    <div class="panel" id="panel-calendar">
+
+      <!-- Nav + filters -->
+      <div class="cal-nav">
+        <button class="cal-nav-btn" onclick="calChangeMonth(-1)">← Prev</button>
+        <div class="cal-month-label" id="cal-month-label">April 2026</div>
+        <button class="cal-nav-btn" onclick="calChangeMonth(1)">Next →</button>
+        <button class="btn" onclick="calGoToday()" style="padding:5px 12px;font-size:10px">Today</button>
+        <div class="cal-artist-filter">
+          <select class="tb-select" id="cal-artist-filter" onchange="renderCalendar()" style="font-size:10px">
+            <option value="">All artists</option>
+          </select>
+          <select class="tb-select" id="cal-status-filter" onchange="renderCalendar()" style="font-size:10px">
+            <option value="">All statuses</option>
+            <option value="inquiry">Inquiry</option>
+            <option value="hold">Hold</option>
+            <option value="offer_sent">Offer sent</option>
+            <option value="confirmed">Confirmed</option>
+            <option value="advancing">Advancing</option>
+            <option value="completed">Completed</option>
+          </select>
+        </div>
+        <div class="cal-legend">
+          <div class="cal-legend-item"><div class="cal-legend-dot" style="background:var(--green)"></div>Confirmed</div>
+          <div class="cal-legend-item"><div class="cal-legend-dot" style="background:#5b8dee"></div>Hold</div>
+          <div class="cal-legend-item"><div class="cal-legend-dot" style="background:#c8a020"></div>Inquiry</div>
+          <div class="cal-legend-item"><div class="cal-legend-dot" style="background:var(--muted)"></div>Completed</div>
+        </div>
+      </div>
+
+      <!-- Calendar grid -->
+      <div class="cal-grid" id="cal-grid">
+        <div class="cal-day-hdr">Mon</div>
+        <div class="cal-day-hdr">Tue</div>
+        <div class="cal-day-hdr">Wed</div>
+        <div class="cal-day-hdr">Thu</div>
+        <div class="cal-day-hdr">Fri</div>
+        <div class="cal-day-hdr">Sat</div>
+        <div class="cal-day-hdr">Sun</div>
+      </div>
+
+      <!-- Availability strip -->
+      <div class="cal-avail" id="cal-avail-section">
+        <div class="cal-avail-hdr">Artist Availability — <span id="cal-avail-month"></span></div>
+        <div id="cal-avail-rows"></div>
+      </div>
+
+    </div>
+
+    <!-- Booking popup -->
+    <div class="cal-popup" id="cal-popup">
+      <div class="cal-popup-hdr">
+        <div class="cal-popup-title" id="cal-popup-title">Show Details</div>
+        <button class="cal-popup-close" onclick="closeCalPopup()">×</button>
+      </div>
+      <div id="cal-popup-body"></div>
+      <div style="margin-top:12px;padding-top:12px;border-top:1px solid var(--border);display:flex;gap:6px">
+        <button class="btn" id="cal-popup-edit" style="font-size:9px;padding:4px 10px">Edit</button>
+        <button class="btn" id="cal-popup-adv" style="font-size:9px;padding:4px 10px;border-color:var(--blue);color:var(--blue)">Advance</button>
+        <button class="btn primary" onclick="closeCalPopup();openBookingModal()" style="font-size:9px;padding:4px 10px;margin-left:auto">+ New Booking</button>
+      </div>
     </div>
 
     <!-- ── IMPORT PANEL ── -->
@@ -2421,7 +2562,7 @@ The Netherlands</textarea>
       <label>From</label>
       <input id="email-from" value="finance@deepbloe.com" readonly style="color:var(--muted);background:#f7f5f0">
     </div>
-    <div style="font-family:var(--mono);font-size:10px;color:var(--muted);margin-bottom:14px">CC: stephen@deepbloe.com (always)</div>
+    <div style="font-family:var(--mono);font-size:10px;color:var(--muted);margin-bottom:14px">CC: <a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="e7949382978f8289a783828297858b8882c984888a">[email&#160;protected]</a> (always)</div>
     <div class="email-field">
       <label>Subject *</label>
       <input id="email-subject" placeholder="Invoice DBL-INV-2026-0001">
@@ -2439,7 +2580,7 @@ The Netherlands</textarea>
 
 <div id="toast"></div>
 
-<script>
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
 // ── CONFIG ────────────────────────────────────────────────────
 const SUPABASE_URL = 'https://ksnxgidklhonpsneerbu.supabase.co';
 const SUPABASE_KEY = 'sb_publishable_JsOkmXlOxBWKXcraBE7gGg_qErTkqX9';
@@ -5322,6 +5463,190 @@ async function sendEmail() {
 }
 // ── END EMAIL ──────────────────────────────────────────────────
 
+// ── CALENDAR ──────────────────────────────────────────────────
+let calYear  = new Date().getFullYear();
+let calMonth = new Date().getMonth(); // 0-indexed
+
+function calGoToday() {
+  calYear  = new Date().getFullYear();
+  calMonth = new Date().getMonth();
+  renderCalendar();
+}
+
+function calChangeMonth(d) {
+  calMonth += d;
+  if (calMonth > 11) { calMonth = 0; calYear++; }
+  if (calMonth < 0)  { calMonth = 11; calYear--; }
+  renderCalendar();
+}
+
+function renderCalendar() {
+  const artistFilter = document.getElementById('cal-artist-filter')?.value || '';
+  const statusFilter = document.getElementById('cal-status-filter')?.value || '';
+
+  // Populate artist filter
+  const artSel = document.getElementById('cal-artist-filter');
+  const curVal = artSel.value;
+  artSel.innerHTML = '<option value="">All artists</option>' +
+    allArtists.map(a => `<option value="${a.id}" ${a.id===curVal?'selected':''}>${esc(a.name)}</option>`).join('');
+
+  const MONTH_NAMES = ['January','February','March','April','May','June',
+                       'July','August','September','October','November','December'];
+  document.getElementById('cal-month-label').textContent = `${MONTH_NAMES[calMonth]} ${calYear}`;
+  document.getElementById('cal-avail-month').textContent = `${MONTH_NAMES[calMonth]} ${calYear}`;
+
+  // Filter bookings
+  let bks = allBookings.filter(b => {
+    if (!b.show_date) return false;
+    const d = new Date(b.show_date);
+    if (d.getFullYear() !== calYear || d.getMonth() !== calMonth) return false;
+    if (artistFilter && b.artist_id !== artistFilter) return false;
+    if (statusFilter && b.status !== statusFilter) return false;
+    if (b.status === 'cancelled') return false;
+    return true;
+  });
+
+  // Build calendar days
+  const firstDay = new Date(calYear, calMonth, 1);
+  const lastDay  = new Date(calYear, calMonth + 1, 0);
+  const today    = new Date().toISOString().slice(0,10);
+
+  // Start from Monday
+  let startDow = firstDay.getDay(); // 0=Sun
+  startDow = startDow === 0 ? 6 : startDow - 1; // Mon=0
+
+  const grid = document.getElementById('cal-grid');
+  // Remove old day cells (keep headers)
+  const hdrs = [...grid.querySelectorAll('.cal-day-hdr')];
+  grid.innerHTML = '';
+  hdrs.forEach(h => grid.appendChild(h));
+
+  // Previous month days
+  for (let i = 0; i < startDow; i++) {
+    const d = new Date(calYear, calMonth, -startDow + i + 1);
+    const cell = makeCalDay(d, bks, true, today);
+    grid.appendChild(cell);
+  }
+  // Current month days
+  for (let d = 1; d <= lastDay.getDate(); d++) {
+    const date = new Date(calYear, calMonth, d);
+    const cell = makeCalDay(date, bks, false, today);
+    grid.appendChild(cell);
+  }
+  // Next month days to fill grid
+  const totalCells = startDow + lastDay.getDate();
+  const remaining  = totalCells % 7 === 0 ? 0 : 7 - (totalCells % 7);
+  for (let d = 1; d <= remaining; d++) {
+    const date = new Date(calYear, calMonth + 1, d);
+    const cell = makeCalDay(date, bks, true, today);
+    grid.appendChild(cell);
+  }
+
+  // Availability strip
+  renderAvailStrip(lastDay.getDate());
+}
+
+function makeCalDay(date, bks, otherMonth, today) {
+  const iso = date.toISOString().slice(0,10);
+  const dayBks = bks.filter(b => b.show_date === iso);
+  const isToday = iso === today;
+
+  const cell = document.createElement('div');
+  cell.className = 'cal-day' + (otherMonth?' other-month':'') + (isToday?' today':'');
+  cell.onclick = () => {
+    if (dayBks.length === 0) {
+      // Open new booking modal with date pre-filled
+      openBookingModal();
+      setTimeout(() => { document.getElementById('bm-date').value = iso; }, 50);
+    }
+  };
+
+  let html = `<div class="cal-day-num">${date.getDate()}</div>`;
+
+  const MAX_SHOW = 3;
+  dayBks.slice(0, MAX_SHOW).forEach(b => {
+    const artist = b.artists?.name || allArtists.find(a=>a.id===b.artist_id)?.name || '?';
+    const isExpiring = b.status === 'hold' && b.hold_expires_at &&
+      new Date(b.hold_expires_at) < new Date(Date.now() + 48*60*60*1000);
+    html += `<div class="cal-event ${b.status}" onclick="event.stopPropagation();showCalPopup(event,'${b.id}')"
+      title="${esc(artist)} — ${esc(b.venue_name||'')}${isExpiring?' ⚠ Hold expiring!':''}">
+      ${isExpiring?'⚠ ':''}${esc(artist)}${b.venue_city?' · '+esc(b.venue_city):''}
+    </div>`;
+  });
+  if (dayBks.length > MAX_SHOW) {
+    html += `<div class="cal-more" onclick="event.stopPropagation()">+${dayBks.length - MAX_SHOW} more</div>`;
+  }
+
+  cell.innerHTML = html;
+  return cell;
+}
+
+function showCalPopup(event, bookingId) {
+  const b = allBookings.find(x => x.id === bookingId);
+  if (!b) return;
+  const artist = b.artists?.name || allArtists.find(a=>a.id===b.artist_id)?.name || '—';
+  const org    = allOrgs.find(o => o.id === b.company_id);
+  const sym    = {EUR:'€',USD:'$',GBP:'£',SGD:'S$',AED:'AED ',IDR:'Rp',THB:'฿'}[b.fee_currency||'EUR']||'';
+
+  document.getElementById('cal-popup-title').textContent = artist;
+  document.getElementById('cal-popup-body').innerHTML = `
+    <div class="cal-popup-row"><span class="cal-popup-label">Date</span><span class="cal-popup-val">${fmtDate(b.show_date)}</span></div>
+    <div class="cal-popup-row"><span class="cal-popup-label">Venue</span><span class="cal-popup-val">${esc([b.venue_name,b.venue_city,b.venue_country].filter(Boolean).join(', ')||'—')}</span></div>
+    <div class="cal-popup-row"><span class="cal-popup-label">Status</span><span class="cal-popup-val">${statusBadge(b.status)}</span></div>
+    <div class="cal-popup-row"><span class="cal-popup-label">Fee</span><span class="cal-popup-val">${b.fee_amount?sym+b.fee_amount.toLocaleString():'—'}</span></div>
+    <div class="cal-popup-row"><span class="cal-popup-label">Promoter</span><span class="cal-popup-val">${esc(org?.name||'—')}</span></div>
+    <div class="cal-popup-row"><span class="cal-popup-label">Ref</span><span class="cal-popup-val" style="font-family:var(--mono);font-size:10px">${esc(b.reference||'—')}</span></div>
+    ${b.status==='hold'&&b.hold_expires_at?`<div class="cal-popup-row"><span class="cal-popup-label">Hold expires</span><span class="cal-popup-val" style="color:var(--amber)">${fmtDate(b.hold_expires_at.slice(0,10))}</span></div>`:''}
+  `;
+
+  document.getElementById('cal-popup-edit').onclick = () => { closeCalPopup(); editBooking(b.id); };
+  document.getElementById('cal-popup-adv').onclick  = () => { closeCalPopup(); openAdvancingEditor(b.id); };
+
+  const popup = document.getElementById('cal-popup');
+  popup.classList.add('open');
+  // Position near click
+  const x = Math.min(event.clientX, window.innerWidth - 300);
+  const y = Math.min(event.clientY, window.innerHeight - 280);
+  popup.style.left = x + 'px';
+  popup.style.top  = y + 'px';
+}
+
+function closeCalPopup() {
+  document.getElementById('cal-popup').classList.remove('open');
+}
+
+// Close popup on outside click
+document.addEventListener('click', e => {
+  const popup = document.getElementById('cal-popup');
+  if (popup?.classList.contains('open') && !popup.contains(e.target)) {
+    closeCalPopup();
+  }
+});
+
+function renderAvailStrip(daysInMonth) {
+  const rows = allArtists.map(a => {
+    const days = Array.from({length: daysInMonth}, (_,i) => {
+      const iso = new Date(calYear, calMonth, i+1).toISOString().slice(0,10);
+      const bk  = allBookings.find(b => b.artist_id===a.id && b.show_date===iso && b.status!=='cancelled');
+      if (!bk) return 'free';
+      if (['confirmed','advancing'].includes(bk.status)) return 'confirmed';
+      if (bk.status==='hold') return 'hold';
+      if (bk.status==='completed') return 'other';
+      return 'busy';
+    });
+    const freeCount = days.filter(d=>d==='free').length;
+    return `<div class="cal-avail-row">
+      <div class="cal-avail-name">${esc(a.name)}</div>
+      <div class="cal-avail-strip">
+        ${days.map((d,i) => `<div class="cal-avail-day ${d}" title="${new Date(calYear,calMonth,i+1).getDate()} — ${d}"></div>`).join('')}
+      </div>
+      <div style="font-family:var(--mono);font-size:9px;color:var(--muted);margin-left:8px;white-space:nowrap">${freeCount}d free</div>
+    </div>`;
+  }).join('');
+  document.getElementById('cal-avail-rows').innerHTML = rows;
+}
+// ── END CALENDAR ───────────────────────────────────────────────
+
 function closeModal(id) { document.getElementById(id).classList.remove('open'); }
 
 function typeBadge(t) {
@@ -5349,11 +5674,4 @@ function fmtDate(d) {
 function esc(s) {
   return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 }
-function showToast(msg, type='info') {
-  const t = document.getElementById('toast');
-  t.textContent = msg; t.className = type; t.style.display = 'block';
-  setTimeout(() => t.style.display = 'none', 3500);
-}
-</script>
-</body>
-</html>
+func
