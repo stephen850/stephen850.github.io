@@ -766,7 +766,7 @@ tbody td { padding: 10px 14px; vertical-align: middle; }
 .fin-card-val { font-size:28px; font-weight:300; color:var(--accent); }
 .fin-card-sub { font-family:var(--mono); font-size:10px; color:var(--muted); margin-top:4px; }
 
-.fin-monthly { display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-bottom:20px; }
+.fin-monthly { display:grid; grid-template-columns:1fr 1.6fr; gap:16px; margin-bottom:20px; }
 
 /* Monthly P&L table */
 .fin-pl-table { background:var(--surface); border:1px solid var(--border); }
@@ -776,33 +776,66 @@ tbody td { padding: 10px 14px; vertical-align: middle; }
               border-bottom:1px solid var(--border); font-size:12px; align-items:center; }
 .fin-pl-row:last-child { border-bottom:none; }
 .fin-pl-row.total { background:var(--bg); font-weight:500; border-top:2px solid var(--border); }
-.fin-pl-row.profit { color:var(--green); }
-.fin-pl-row.loss   { color:var(--red); }
 .fin-pl-month { font-family:var(--mono); font-size:10px; color:var(--muted); }
 .fin-pl-num { font-family:var(--mono); font-size:11px; text-align:right; }
 .fin-pl-num.neg { color:var(--red); }
 .fin-pl-num.pos { color:var(--green); }
 
-/* Expenses editor */
-.fin-expenses { background:var(--surface); border:1px solid var(--border); }
-.fin-exp-hdr { background:var(--accent); padding:10px 16px; font-family:var(--mono); font-size:9px;
-               letter-spacing:0.15em; text-transform:uppercase; color:rgba(255,255,255,0.7);
-               display:flex; justify-content:space-between; align-items:center; }
-.fin-exp-grid { display:grid; grid-template-columns:repeat(6,1fr) auto; gap:0; }
-.fin-exp-col-hdr { padding:8px 10px; font-family:var(--mono); font-size:9px; letter-spacing:0.1em;
-                   text-transform:uppercase; color:var(--muted); background:var(--bg);
-                   border-bottom:1px solid var(--border); border-right:1px solid var(--border); text-align:center; }
-.fin-exp-col-hdr:last-child { border-right:none; }
-.fin-exp-row { display:contents; }
-.fin-exp-cell { padding:6px 8px; border-bottom:1px solid var(--border); border-right:1px solid var(--border);
-                display:flex; align-items:center; }
-.fin-exp-cell:last-child { border-right:none; }
-.fin-exp-input { width:100%; border:none; background:transparent; font-family:var(--mono); font-size:11px;
-                 outline:none; color:var(--accent); text-align:right; padding:2px; }
-.fin-exp-input:focus { background:var(--bg); border-bottom:1px solid var(--accent); }
-.fin-exp-label { font-family:var(--mono); font-size:10px; color:var(--accent); }
-.fin-exp-total { font-family:var(--mono); font-size:11px; font-weight:500; color:var(--red);
-                 text-align:right; padding:6px 8px; background:var(--bg); }
+/* Ledger expenses */
+.fin-ledger { background:var(--surface); border:1px solid var(--border); }
+.fin-ledger-hdr { background:var(--accent); padding:10px 16px; font-family:var(--mono); font-size:9px;
+                  letter-spacing:0.15em; text-transform:uppercase; color:rgba(255,255,255,0.7);
+                  display:flex; justify-content:space-between; align-items:center; }
+.fin-cat-row { border-bottom:1px solid var(--border); }
+.fin-cat-hdr { display:flex; align-items:center; gap:8px; padding:9px 14px;
+               background:var(--bg); cursor:pointer; user-select:none;
+               font-family:var(--mono); font-size:10px; font-weight:500; color:var(--accent); }
+.fin-cat-hdr:hover { background:#f0ede8; }
+.fin-cat-toggle { width:16px; height:16px; border:1px solid var(--border-dark); display:flex;
+                  align-items:center; justify-content:center; font-size:11px; flex-shrink:0;
+                  color:var(--muted); transition:all 0.15s; }
+.fin-cat-name { flex:1; }
+.fin-cat-total { font-family:var(--mono); font-size:11px; color:var(--red); margin-left:auto; }
+.fin-cat-add { font-size:9px; padding:2px 8px; border:1px solid var(--border-dark); color:var(--muted);
+               cursor:pointer; background:var(--surface); transition:all 0.1s; margin-left:8px; }
+.fin-cat-add:hover { border-color:var(--green); color:var(--green); }
+
+.fin-lines { display:none; }
+.fin-lines.open { display:block; }
+
+/* Line header row */
+.fin-line-col-hdr { display:grid; grid-template-columns:200px repeat(12,1fr) 80px 24px;
+                    border-bottom:1px solid var(--border); background:var(--bg); }
+.fin-line-col-hdr > div { padding:5px 6px; font-family:var(--mono); font-size:9px; letter-spacing:0.08em;
+                           text-transform:uppercase; color:var(--muted); text-align:center; }
+.fin-line-col-hdr > div:first-child { text-align:left; padding-left:36px; }
+
+/* Each expense line */
+.fin-line { display:grid; grid-template-columns:200px repeat(12,1fr) 80px 24px;
+            border-bottom:1px solid var(--border); align-items:center; }
+.fin-line:hover { background:#faf9f7; }
+.fin-line-label { padding:6px 8px 6px 36px; }
+.fin-line-label input { border:none; background:transparent; font-size:12px; outline:none;
+                         color:var(--accent); width:100%; font-family:var(--sans); }
+.fin-line-label input:focus { border-bottom:1px solid var(--accent); }
+.fin-line-cell { padding:4px 3px; text-align:center; }
+.fin-line-cell input { width:100%; border:none; background:transparent; font-family:var(--mono);
+                        font-size:11px; outline:none; color:var(--accent); text-align:right;
+                        padding:3px 4px; }
+.fin-line-cell input:focus { background:var(--bg); border-bottom:1px solid var(--accent); }
+.fin-line-total { font-family:var(--mono); font-size:11px; font-weight:500; color:var(--red);
+                  text-align:right; padding:4px 8px; }
+.fin-line-del { display:flex; align-items:center; justify-content:center; cursor:pointer;
+                color:var(--muted); font-size:14px; padding:4px; transition:color 0.1s; }
+.fin-line-del:hover { color:var(--red); }
+
+/* Totals row */
+.fin-ledger-totals { display:grid; grid-template-columns:200px repeat(12,1fr) 80px 24px;
+                     border-top:2px solid var(--border); background:var(--bg); }
+.fin-ledger-totals > div { padding:7px 6px; font-family:var(--mono); font-size:10px;
+                            font-weight:500; color:var(--red); text-align:right; }
+.fin-ledger-totals > div:first-child { text-align:left; padding-left:14px; color:var(--muted);
+                                        font-size:9px; letter-spacing:0.1em; text-transform:uppercase; }
 /* ── FINANCE MODULE END ───────────────────────────────── */
 
 /* ── EMAIL MODAL ─────────────────────────────────────── */
@@ -1499,37 +1532,15 @@ tbody td { padding: 10px 14px; vertical-align: middle; }
           </div>
         </div>
 
-        <!-- Expenses editor -->
+        <!-- Ledger expenses editor -->
         <div>
-          <div class="fin-expenses">
-            <div class="fin-exp-hdr">
-              <span>Monthly Fixed Costs — <span id="fin-exp-year">2026</span></span>
-              <span style="font-size:9px;opacity:0.6">Click amounts to edit</span>
+          <div class="fin-ledger">
+            <div class="fin-ledger-hdr">
+              <span>Cost Ledger — <span id="fin-exp-year">2026</span></span>
+              <span style="font-size:9px;opacity:0.6">Click category to expand · Click amounts to edit</span>
             </div>
-            <div style="overflow-x:auto">
-              <div style="min-width:500px">
-                <!-- Headers: Category + 12 months + Total -->
-                <div style="display:grid;grid-template-columns:140px repeat(12,1fr) 80px;background:var(--bg);border-bottom:1px solid var(--border)">
-                  <div class="fin-exp-col-hdr" style="text-align:left">Category</div>
-                  <div class="fin-exp-col-hdr">Jan</div>
-                  <div class="fin-exp-col-hdr">Feb</div>
-                  <div class="fin-exp-col-hdr">Mar</div>
-                  <div class="fin-exp-col-hdr">Apr</div>
-                  <div class="fin-exp-col-hdr">May</div>
-                  <div class="fin-exp-col-hdr">Jun</div>
-                  <div class="fin-exp-col-hdr">Jul</div>
-                  <div class="fin-exp-col-hdr">Aug</div>
-                  <div class="fin-exp-col-hdr">Sep</div>
-                  <div class="fin-exp-col-hdr">Oct</div>
-                  <div class="fin-exp-col-hdr">Nov</div>
-                  <div class="fin-exp-col-hdr">Dec</div>
-                  <div class="fin-exp-col-hdr">Total</div>
-                </div>
-                <div id="fin-exp-rows"></div>
-                <!-- Totals row -->
-                <div style="display:grid;grid-template-columns:140px repeat(12,1fr) 80px;background:var(--bg);border-top:2px solid var(--border)" id="fin-exp-totals-row"></div>
-              </div>
-            </div>
+            <div id="fin-ledger-body"></div>
+            <div class="fin-ledger-totals" id="fin-ledger-totals"></div>
           </div>
         </div>
 
@@ -4897,11 +4908,14 @@ function renderDashboard() {
 
 
 // ── FINANCE ───────────────────────────────────────────────────
-const EXPENSE_CATEGORIES = ['Salaries', 'Office / Rent', 'Software', 'Travel', 'Marketing', 'Other'];
 const MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+const MONTH_KEYS = ['jan','feb','mar','apr','may','jun','jul','aug','sep','oct','nov','dec'];
 let finYear = new Date().getFullYear();
-let allExpenses = []; // loaded from DB
-let expenseEdits = {}; // { 'Category-month': amount }
+let allExpenseCategories = [];
+let allExpenseLines = [];
+let pendingLineChanges = {}; // lineId -> { field -> value }
+let pendingNewLines = [];    // { tempId, category_id, label, year, ...months }
+let pendingDeletes = [];     // lineIds to delete
 
 function finChangeYear(d) {
   finYear += d;
@@ -4910,20 +4924,22 @@ function finChangeYear(d) {
 }
 
 async function loadExpenses() {
-  const { data, error } = await db.from('expenses').select('*');
-  if (!error) allExpenses = data || [];
+  const [{ data: cats }, { data: lines }] = await Promise.all([
+    db.from('expense_categories').select('*').order('sort_order'),
+    db.from('expense_lines').select('*').order('created_at'),
+  ]);
+  allExpenseCategories = cats || [];
+  allExpenseLines = lines || [];
 }
 
 async function renderFinance() {
-  // Ensure expenses loaded
-  if (!allExpenses.length) await loadExpenses();
-
+  if (!allExpenseCategories.length) await loadExpenses();
   const year = finYear;
-  document.getElementById('fin-pl-year').textContent    = year;
-  document.getElementById('fin-exp-year').textContent   = year;
+  document.getElementById('fin-pl-year').textContent     = year;
+  document.getElementById('fin-exp-year').textContent    = year;
   document.getElementById('fin-artist-year').textContent = year;
 
-  // ── REVENUE from bookings ──
+  // ── REVENUE ──
   const confirmedBks = allBookings.filter(b =>
     ['confirmed','advancing','completed'].includes(b.status) &&
     b.show_date && new Date(b.show_date).getFullYear() === year &&
@@ -4934,170 +4950,234 @@ async function renderFinance() {
     b.show_date && new Date(b.show_date).getFullYear() === year &&
     b.fee_currency === 'EUR'
   );
-
-  const totalRevenue = confirmedBks.reduce((s,b) => s + ((b.fee_amount||0) * (b.commission_rate||15) / 100), 0);
-  const pipelineRev  = pipelineBks.reduce((s,b)  => s + ((b.fee_amount||0) * (b.commission_rate||15) / 100), 0);
+  const totalRevenue  = confirmedBks.reduce((s,b) => s + ((b.fee_amount||0)*(b.commission_rate||15)/100), 0);
+  const pipelineRev   = pipelineBks.reduce((s,b)  => s + ((b.fee_amount||0)*(b.commission_rate||15)/100), 0);
   const avgCommission = confirmedBks.length ? totalRevenue / confirmedBks.length : 0;
 
-  // ── EXPENSES from DB + edits ──
-  const yearExpenses = allExpenses.filter(e => e.year === year);
-  const totalExpenses = yearExpenses.reduce((s,e) => s + (e.amount||0), 0);
+  // ── EXPENSES from lines for this year ──
+  const yearLines = allExpenseLines.filter(l => l.year === year);
+  const getLineTotal = l => MONTH_KEYS.reduce((s,k) => s + (parseFloat(l[k])||0), 0);
+  const totalExpenses = yearLines.reduce((s,l) => s + getLineTotal(l), 0);
   const netProfit = totalRevenue - totalExpenses;
 
-  // ── OUTSTANDING INVOICES ──
-  const outstanding = allInvoices.filter(i => ['sent','overdue'].includes(i.status) && i.currency === 'EUR')
+  // ── OUTSTANDING ──
+  const outstanding = allInvoices.filter(i => ['sent','overdue'].includes(i.status) && i.currency==='EUR')
     .reduce((s,i) => s + (i.total_amount||0), 0);
 
   // ── KPI CARDS ──
   const fmt = n => '€ ' + Math.round(n).toLocaleString('nl-NL');
-  document.getElementById('fin-revenue').textContent    = fmt(totalRevenue);
+  document.getElementById('fin-revenue').textContent     = fmt(totalRevenue);
   document.getElementById('fin-revenue-sub').textContent = `${confirmedBks.length} confirmed shows`;
-  document.getElementById('fin-expenses').textContent   = fmt(totalExpenses);
-  document.getElementById('fin-pipeline').textContent   = fmt(pipelineRev);
-  document.getElementById('fin-avg').textContent        = fmt(avgCommission);
-  document.getElementById('fin-avg-sub').textContent    = `${confirmedBks.length} shows`;
+  document.getElementById('fin-expenses').textContent    = fmt(totalExpenses);
+  document.getElementById('fin-pipeline').textContent    = fmt(pipelineRev);
+  document.getElementById('fin-avg').textContent         = fmt(avgCommission);
+  document.getElementById('fin-avg-sub').textContent     = `${confirmedBks.length} shows`;
   document.getElementById('fin-outstanding').textContent = fmt(outstanding);
-
   const profitEl = document.getElementById('fin-profit');
   profitEl.textContent = fmt(netProfit);
   profitEl.style.color = netProfit >= 0 ? 'var(--green)' : 'var(--red)';
-  document.getElementById('fin-profit-sub').textContent = netProfit >= 0 ? 'profitable' : 'loss';
+  document.getElementById('fin-profit-sub').textContent  = netProfit >= 0 ? 'profitable' : 'loss';
 
   // ── MONTHLY P&L ──
-  let totalMonthRev = 0, totalMonthExp = 0;
-  const plRows = MONTHS.map((m, i) => {
+  let totRev = 0, totExp = 0;
+  const plRows = MONTHS.map((m,i) => {
     const month = i + 1;
-    const monthBks = confirmedBks.filter(b => new Date(b.show_date).getMonth() + 1 === month);
-    const monthRev = monthBks.reduce((s,b) => s + ((b.fee_amount||0) * (b.commission_rate||15) / 100), 0);
-    const monthExp = yearExpenses.filter(e => e.month === month).reduce((s,e) => s + (e.amount||0), 0);
-    const monthNet = monthRev - monthExp;
-    totalMonthRev += monthRev; totalMonthExp += monthExp;
-    const netCls = monthNet > 0 ? 'pos' : monthNet < 0 ? 'neg' : '';
+    const mBks  = confirmedBks.filter(b => new Date(b.show_date).getMonth()+1 === month);
+    const mRev  = mBks.reduce((s,b) => s + ((b.fee_amount||0)*(b.commission_rate||15)/100), 0);
+    const mExp  = yearLines.reduce((s,l) => s + (parseFloat(l[MONTH_KEYS[i]])||0), 0);
+    const mNet  = mRev - mExp;
+    totRev += mRev; totExp += mExp;
+    const nc = mNet > 0 ? 'pos' : mNet < 0 ? 'neg' : '';
     return `<div class="fin-pl-row">
       <div class="fin-pl-month">${m}</div>
-      <div class="fin-pl-num">${monthRev > 0 ? fmt(monthRev) : '—'}</div>
-      <div class="fin-pl-num neg">${monthExp > 0 ? '− '+fmt(monthExp) : '—'}</div>
-      <div class="fin-pl-num ${netCls}">${monthRev > 0 || monthExp > 0 ? fmt(monthNet) : '—'}</div>
+      <div class="fin-pl-num">${mRev>0?fmt(mRev):'—'}</div>
+      <div class="fin-pl-num neg">${mExp>0?'− '+fmt(mExp):'—'}</div>
+      <div class="fin-pl-num ${nc}">${mRev>0||mExp>0?fmt(mNet):'—'}</div>
     </div>`;
   }).join('');
   document.getElementById('fin-pl-rows').innerHTML = plRows;
-  document.getElementById('fin-pl-total-rev').textContent = fmt(totalMonthRev);
-  document.getElementById('fin-pl-total-exp').textContent = '− ' + fmt(totalMonthExp);
-  const totalNet = totalMonthRev - totalMonthExp;
-  const totalNetEl = document.getElementById('fin-pl-total-net');
-  totalNetEl.textContent = fmt(totalNet);
-  totalNetEl.className = 'fin-pl-num ' + (totalNet >= 0 ? 'pos' : 'neg');
+  document.getElementById('fin-pl-total-rev').textContent = fmt(totRev);
+  document.getElementById('fin-pl-total-exp').textContent = '− '+fmt(totExp);
+  const tNet = totRev - totExp;
+  const tNetEl = document.getElementById('fin-pl-total-net');
+  tNetEl.textContent = fmt(tNet);
+  tNetEl.className = 'fin-pl-num '+(tNet>=0?'pos':'neg');
 
-  // ── EXPENSES EDITOR ──
-  renderExpenseGrid(year, yearExpenses);
+  // ── LEDGER ──
+  renderLedger(year, yearLines);
 
   // ── PER ARTIST ──
   const artistRows = allArtists.map(a => {
     const bks = confirmedBks.filter(b => b.artist_id === a.id);
-    const totalFee = bks.reduce((s,b) => s + (b.fee_amount||0), 0);
-    const avgComm  = bks.length ? bks.reduce((s,b) => s + (b.commission_rate||15), 0) / bks.length : 15;
-    const commission = bks.reduce((s,b) => s + ((b.fee_amount||0) * (b.commission_rate||15) / 100), 0);
-    const bkIds = bks.map(b => b.id);
-    const invoiced = allInvoices.filter(i => bkIds.includes(i.booking_id) && i.currency === 'EUR' && i.status !== 'cancelled')
-      .reduce((s,i) => s + (i.total_amount||0), 0);
-    const paid = allInvoices.filter(i => bkIds.includes(i.booking_id) && i.currency === 'EUR' && i.status === 'paid')
-      .reduce((s,i) => s + (i.total_amount||0), 0);
     if (!bks.length) return '';
+    const totalFee   = bks.reduce((s,b) => s+(b.fee_amount||0), 0);
+    const avgComm    = bks.reduce((s,b) => s+(b.commission_rate||15),0)/bks.length;
+    const commission = bks.reduce((s,b) => s+((b.fee_amount||0)*(b.commission_rate||15)/100), 0);
+    const bkIds = bks.map(b=>b.id);
+    const invoiced = allInvoices.filter(i=>bkIds.includes(i.booking_id)&&i.currency==='EUR'&&i.status!=='cancelled').reduce((s,i)=>s+(i.total_amount||0),0);
+    const paid     = allInvoices.filter(i=>bkIds.includes(i.booking_id)&&i.currency==='EUR'&&i.status==='paid').reduce((s,i)=>s+(i.total_amount||0),0);
     return `<tr>
       <td class="td-name">${esc(a.name)}</td>
       <td class="td-mono">${bks.length}</td>
       <td class="fee-val">${fmt(totalFee)}</td>
       <td class="td-mono">${Math.round(avgComm)}%</td>
       <td class="fee-val" style="color:var(--green)">${fmt(commission)}</td>
-      <td class="td-mono">${invoiced > 0 ? fmt(invoiced) : '—'}</td>
-      <td class="td-mono" style="color:var(--green)">${paid > 0 ? fmt(paid) : '—'}</td>
+      <td class="td-mono">${invoiced>0?fmt(invoiced):'—'}</td>
+      <td class="td-mono" style="color:var(--green)">${paid>0?fmt(paid):'—'}</td>
     </tr>`;
   }).filter(Boolean).join('');
   document.getElementById('fin-artist-tbody').innerHTML = artistRows ||
     '<tr class="tbl-msg"><td colspan="7">No confirmed bookings this year</td></tr>';
 }
 
-function renderExpenseGrid(year, yearExpenses) {
-  const rows = EXPENSE_CATEGORIES.map(cat => {
-    const cells = MONTHS.map((m, i) => {
-      const month = i + 1;
-      const exp = yearExpenses.find(e => e.category === cat && e.month === month);
-      const val = exp?.amount || 0;
-      const key = `${cat}-${month}`;
-      return `<div class="fin-exp-cell">
-        <input class="fin-exp-input" type="number" min="0" step="100"
-          data-cat="${esc(cat)}" data-month="${month}"
-          value="${val > 0 ? val : ''}" placeholder="0"
-          onchange="expenseEdits['${key}']={cat:'${esc(cat)}',month:${month},amount:parseFloat(this.value)||0}">
+function renderLedger(year, yearLines) {
+  const fmtNum = n => n > 0 ? Math.round(n).toLocaleString('nl-NL') : '';
+
+  // Column header row
+  const colHdr = `<div class="fin-line-col-hdr">
+    <div>Label</div>
+    ${MONTHS.map(m=>`<div>${m}</div>`).join('')}
+    <div>Total</div><div></div>
+  </div>`;
+
+  // Month totals across all lines
+  const monthTotals = MONTH_KEYS.map(k => yearLines.reduce((s,l)=>s+(parseFloat(l[k])||0),0));
+
+  const catHtml = allExpenseCategories.map(cat => {
+    const catLines = yearLines.filter(l => l.category_id === cat.id);
+    const catTotal = catLines.reduce((s,l) => s + MONTH_KEYS.reduce((ss,k)=>ss+(parseFloat(l[k])||0),0), 0);
+
+    const linesHtml = catLines.map(line => {
+      const lineTotal = MONTH_KEYS.reduce((s,k)=>s+(parseFloat(line[k])||0),0);
+      const cells = MONTH_KEYS.map((k,i) => `<div class="fin-line-cell">
+        <input type="number" min="0" step="50"
+          value="${line[k]>0?line[k]:''}" placeholder=""
+          onchange="markLineChange('${line.id}','${k}',parseFloat(this.value)||0)">
+      </div>`).join('');
+      return `<div class="fin-line">
+        <div class="fin-line-label"><input type="text" value="${esc(line.label)}" placeholder="Label"
+          onchange="markLineChange('${line.id}','label',this.value)"></div>
+        ${cells}
+        <div class="fin-line-total">${lineTotal>0?'€'+Math.round(lineTotal).toLocaleString('nl-NL'):'—'}</div>
+        <div class="fin-line-del" onclick="deleteLine('${line.id}','${cat.id}')">×</div>
       </div>`;
     }).join('');
-    const rowTotal = yearExpenses.filter(e => e.category === cat).reduce((s,e) => s + (e.amount||0), 0);
-    return `<div style="display:grid;grid-template-columns:140px repeat(12,1fr) 80px;border-bottom:1px solid var(--border)">
-      <div class="fin-exp-cell"><span class="fin-exp-label">${esc(cat)}</span></div>
-      ${cells}
-      <div class="fin-exp-total">${rowTotal > 0 ? '€'+Math.round(rowTotal).toLocaleString('nl-NL') : '—'}</div>
+
+    return `<div class="fin-cat-row" id="cat-${cat.id}">
+      <div class="fin-cat-hdr" onclick="toggleCat('${cat.id}')">
+        <div class="fin-cat-toggle" id="cat-toggle-${cat.id}">+</div>
+        <div class="fin-cat-name">${esc(cat.name)}</div>
+        <div class="fin-cat-total">${catTotal>0?'€'+Math.round(catTotal).toLocaleString('nl-NL'):'—'}</div>
+        <button class="fin-cat-add" onclick="event.stopPropagation();addLine('${cat.id}')">+ Add line</button>
+      </div>
+      <div class="fin-lines" id="lines-${cat.id}">
+        ${catLines.length ? colHdr + linesHtml : `<div style="padding:10px 36px;font-family:var(--mono);font-size:10px;color:var(--muted)">No lines yet. Click "+ Add line" to add costs.</div>`}
+      </div>
     </div>`;
   }).join('');
-  document.getElementById('fin-exp-rows').innerHTML = rows;
 
-  // Totals row
-  const monthTotals = MONTHS.map((m, i) => {
-    const month = i + 1;
-    const t = yearExpenses.filter(e => e.month === month).reduce((s,e) => s + (e.amount||0), 0);
-    return `<div class="fin-exp-total" style="font-size:10px">${t > 0 ? '€'+Math.round(t).toLocaleString('nl-NL') : '—'}</div>`;
-  }).join('');
-  const grandTotal = yearExpenses.reduce((s,e) => s + (e.amount||0), 0);
-  document.getElementById('fin-exp-totals-row').innerHTML =
-    `<div class="fin-exp-total" style="text-align:left;color:var(--muted);font-size:9px;letter-spacing:0.1em">TOTAL</div>
-     ${monthTotals}
-     <div class="fin-exp-total">€${Math.round(grandTotal).toLocaleString('nl-NL')}</div>`;
+  document.getElementById('fin-ledger-body').innerHTML = catHtml;
+
+  // Grand totals row
+  const grandTotal = monthTotals.reduce((s,n)=>s+n,0);
+  const totCells = monthTotals.map(t=>`<div style="font-family:var(--mono);font-size:10px;font-weight:500;color:var(--red);text-align:right;padding:7px 6px">${t>0?'€'+Math.round(t).toLocaleString('nl-NL'):''}</div>`).join('');
+  document.getElementById('fin-ledger-totals').innerHTML =
+    `<div style="padding:7px 14px;font-family:var(--mono);font-size:9px;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted)">TOTAL</div>
+     ${totCells}
+     <div style="font-family:var(--mono);font-size:11px;font-weight:500;color:var(--red);text-align:right;padding:7px 8px">${grandTotal>0?'€'+Math.round(grandTotal).toLocaleString('nl-NL'):''}</div>
+     <div></div>`;
+}
+
+function toggleCat(catId) {
+  const lines = document.getElementById('lines-' + catId);
+  const toggle = document.getElementById('cat-toggle-' + catId);
+  const isOpen = lines.classList.contains('open');
+  lines.classList.toggle('open', !isOpen);
+  toggle.textContent = isOpen ? '+' : '−';
+}
+
+function markLineChange(lineId, field, value) {
+  if (!pendingLineChanges[lineId]) pendingLineChanges[lineId] = {};
+  pendingLineChanges[lineId][field] = value;
+}
+
+async function addLine(catId) {
+  // Open the category
+  const lines = document.getElementById('lines-' + catId);
+  const toggle = document.getElementById('cat-toggle-' + catId);
+  if (lines) { lines.classList.add('open'); if(toggle) toggle.textContent = '−'; }
+
+  // Insert new line in DB
+  const { data, error } = await db.from('expense_lines').insert({
+    category_id: catId, label: 'New line', year: finYear,
+    jan:0,feb:0,mar:0,apr:0,may:0,jun:0,jul:0,aug:0,sep:0,oct:0,nov:0,dec:0,
+  }).select('*');
+  if (error) { showToast('Error adding line: '+error.message,'error'); return; }
+  allExpenseLines.push(data[0]);
+  renderFinance();
+  // Re-open after re-render
+  setTimeout(() => {
+    const l = document.getElementById('lines-'+catId);
+    const t = document.getElementById('cat-toggle-'+catId);
+    if(l){l.classList.add('open');if(t)t.textContent='−';}
+  }, 50);
+}
+
+async function deleteLine(lineId, catId) {
+  if (!confirm('Delete this cost line?')) return;
+  const { error } = await db.from('expense_lines').delete().eq('id', lineId);
+  if (error) { showToast('Error deleting','error'); return; }
+  allExpenseLines = allExpenseLines.filter(l => l.id !== lineId);
+  renderFinance();
+  setTimeout(() => {
+    const l = document.getElementById('lines-'+catId);
+    const t = document.getElementById('cat-toggle-'+catId);
+    if(l){l.classList.add('open');if(t)t.textContent='−';}
+  }, 50);
 }
 
 async function saveExpenses() {
-  if (!Object.keys(expenseEdits).length) { showToast('No changes to save', 'info'); return; }
-  const year = finYear;
-  const upserts = Object.values(expenseEdits).map(e => ({
-    year, month: e.month, category: e.cat,
-    amount: e.amount, currency: 'EUR',
-  }));
-
-  const { error } = await db.from('expenses')
-    .upsert(upserts, { onConflict: 'year,month,category' });
-
-  if (error) { showToast('Error saving: ' + error.message, 'error'); return; }
-  showToast('Expenses saved ✓', 'success');
-  expenseEdits = {};
-  await loadExpenses();
+  const changes = Object.entries(pendingLineChanges);
+  if (!changes.length) { showToast('No changes to save','info'); return; }
+  let errors = 0;
+  for (const [lineId, fields] of changes) {
+    const { error } = await db.from('expense_lines').update(fields).eq('id', lineId);
+    if (error) errors++;
+    else {
+      const line = allExpenseLines.find(l => l.id === lineId);
+      if (line) Object.assign(line, fields);
+    }
+  }
+  pendingLineChanges = {};
+  if (errors) { showToast(`Saved with ${errors} errors`,'error'); }
+  else { showToast('Expenses saved ✓','success'); }
   renderFinance();
 }
 
 function exportFinance() {
   const year = finYear;
-  const yearExpenses = allExpenses.filter(e => e.year === year);
+  const yearLines = allExpenseLines.filter(l => l.year === year);
   const confirmedBks = allBookings.filter(b =>
     ['confirmed','advancing','completed'].includes(b.status) &&
-    b.show_date && new Date(b.show_date).getFullYear() === year &&
-    b.fee_currency === 'EUR'
+    b.show_date && new Date(b.show_date).getFullYear()===year && b.fee_currency==='EUR'
   );
-
-  const rows = MONTHS.map((m, i) => {
-    const month = i + 1;
-    const monthBks = confirmedBks.filter(b => new Date(b.show_date).getMonth() + 1 === month);
-    const rev = monthBks.reduce((s,b) => s + ((b.fee_amount||0) * (b.commission_rate||15) / 100), 0);
-    const exp = yearExpenses.filter(e => e.month === month).reduce((s,e) => s + (e.amount||0), 0);
-    const row = { Year: year, Month: m, Revenue: Math.round(rev), Expenses: Math.round(exp), Net: Math.round(rev - exp) };
-    EXPENSE_CATEGORIES.forEach(cat => {
-      const catExp = yearExpenses.find(e => e.month === month && e.category === cat);
-      row[cat] = catExp?.amount || 0;
+  const rows = MONTHS.map((m,i) => {
+    const month = i+1;
+    const mBks = confirmedBks.filter(b => new Date(b.show_date).getMonth()+1===month);
+    const rev   = mBks.reduce((s,b)=>s+((b.fee_amount||0)*(b.commission_rate||15)/100),0);
+    const exp   = yearLines.reduce((s,l)=>s+(parseFloat(l[MONTH_KEYS[i]])||0),0);
+    const row = { Year:year, Month:m, Revenue:Math.round(rev), Expenses:Math.round(exp), Net:Math.round(rev-exp) };
+    allExpenseCategories.forEach(cat => {
+      const catLines = yearLines.filter(l=>l.category_id===cat.id);
+      row[cat.name] = catLines.reduce((s,l)=>s+(parseFloat(l[MONTH_KEYS[i]])||0),0);
     });
     return row;
   });
-
   const ws = XLSX.utils.json_to_sheet(rows);
   const wb = XLSX.utils.book_new();
   XLSX.utils.book_append_sheet(wb, ws, `P&L ${year}`);
   XLSX.writeFile(wb, `deepbloe_pnl_${year}.xlsx`);
-  showToast(`P&L ${year} exported`, 'success');
+  showToast(`P&L ${year} exported`,'success');
 }
 // ── END FINANCE ────────────────────────────────────────────────
 
