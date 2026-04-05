@@ -5616,9 +5616,9 @@ function closeCalPopup() {
 }
 
 // Close popup on outside click
-document.addEventListener('click', e => {
+window.addEventListener('click', e => {
   const popup = document.getElementById('cal-popup');
-  if (popup?.classList.contains('open') && !popup.contains(e.target)) {
+  if (popup && popup.classList.contains('open') && !popup.contains(e.target)) {
     closeCalPopup();
   }
 });
