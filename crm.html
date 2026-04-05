@@ -747,6 +747,64 @@ tbody td { padding: 10px 14px; vertical-align: middle; }
 }
 /* ── ADVANCING MODULE END ────────────────────────────── */
 
+/* ── FINANCE MODULE ───────────────────────────────────── */
+.fin-year-nav { display:flex; align-items:center; gap:12px; margin-bottom:20px; }
+.fin-year-btn { background:none; border:1px solid var(--border-dark); color:var(--muted);
+                padding:5px 12px; font-family:var(--mono); font-size:11px; cursor:pointer; transition:all 0.1s; }
+.fin-year-btn:hover { border-color:var(--accent); color:var(--accent); }
+.fin-year { font-family:var(--mono); font-size:18px; font-weight:300; color:var(--accent); min-width:60px; text-align:center; }
+
+.fin-grid { display:grid; grid-template-columns:1fr 1fr 1fr; gap:16px; margin-bottom:20px; }
+.fin-card { background:var(--surface); border:1px solid var(--border); padding:20px; position:relative; }
+.fin-card::before { content:''; position:absolute; top:0; left:0; right:0; height:2px; background:var(--border); }
+.fin-card.green::before { background:var(--green); }
+.fin-card.red::before   { background:var(--red); }
+.fin-card.blue::before  { background:var(--blue); }
+.fin-card.amber::before { background:var(--amber); }
+.fin-card-lbl { font-family:var(--mono); font-size:9px; letter-spacing:0.15em; text-transform:uppercase;
+                color:var(--muted); margin-bottom:8px; }
+.fin-card-val { font-size:28px; font-weight:300; color:var(--accent); }
+.fin-card-sub { font-family:var(--mono); font-size:10px; color:var(--muted); margin-top:4px; }
+
+.fin-monthly { display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-bottom:20px; }
+
+/* Monthly P&L table */
+.fin-pl-table { background:var(--surface); border:1px solid var(--border); }
+.fin-pl-hdr { background:var(--accent); padding:10px 16px; font-family:var(--mono); font-size:9px;
+              letter-spacing:0.15em; text-transform:uppercase; color:rgba(255,255,255,0.7); }
+.fin-pl-row { display:grid; grid-template-columns:80px 1fr 1fr 1fr; padding:8px 16px;
+              border-bottom:1px solid var(--border); font-size:12px; align-items:center; }
+.fin-pl-row:last-child { border-bottom:none; }
+.fin-pl-row.total { background:var(--bg); font-weight:500; border-top:2px solid var(--border); }
+.fin-pl-row.profit { color:var(--green); }
+.fin-pl-row.loss   { color:var(--red); }
+.fin-pl-month { font-family:var(--mono); font-size:10px; color:var(--muted); }
+.fin-pl-num { font-family:var(--mono); font-size:11px; text-align:right; }
+.fin-pl-num.neg { color:var(--red); }
+.fin-pl-num.pos { color:var(--green); }
+
+/* Expenses editor */
+.fin-expenses { background:var(--surface); border:1px solid var(--border); }
+.fin-exp-hdr { background:var(--accent); padding:10px 16px; font-family:var(--mono); font-size:9px;
+               letter-spacing:0.15em; text-transform:uppercase; color:rgba(255,255,255,0.7);
+               display:flex; justify-content:space-between; align-items:center; }
+.fin-exp-grid { display:grid; grid-template-columns:repeat(6,1fr) auto; gap:0; }
+.fin-exp-col-hdr { padding:8px 10px; font-family:var(--mono); font-size:9px; letter-spacing:0.1em;
+                   text-transform:uppercase; color:var(--muted); background:var(--bg);
+                   border-bottom:1px solid var(--border); border-right:1px solid var(--border); text-align:center; }
+.fin-exp-col-hdr:last-child { border-right:none; }
+.fin-exp-row { display:contents; }
+.fin-exp-cell { padding:6px 8px; border-bottom:1px solid var(--border); border-right:1px solid var(--border);
+                display:flex; align-items:center; }
+.fin-exp-cell:last-child { border-right:none; }
+.fin-exp-input { width:100%; border:none; background:transparent; font-family:var(--mono); font-size:11px;
+                 outline:none; color:var(--accent); text-align:right; padding:2px; }
+.fin-exp-input:focus { background:var(--bg); border-bottom:1px solid var(--accent); }
+.fin-exp-label { font-family:var(--mono); font-size:10px; color:var(--accent); }
+.fin-exp-total { font-family:var(--mono); font-size:11px; font-weight:500; color:var(--red);
+                 text-align:right; padding:6px 8px; background:var(--bg); }
+/* ── FINANCE MODULE END ───────────────────────────────── */
+
 /* ── EMAIL MODAL ─────────────────────────────────────── */
 #email-overlay {
   position: fixed; inset: 0; background: rgba(26,26,26,0.7);
@@ -815,6 +873,7 @@ tbody td { padding: 10px 14px; vertical-align: middle; }
       <div class="h-tab" onclick="showPanel('contracts', this)">Contracts</div>
       <div class="h-tab" onclick="showPanel('invoices', this)">Invoices</div>
       <div class="h-tab" onclick="showPanel('advancing', this)">Advancing</div>
+      <div class="h-tab" onclick="showPanel('finance', this);renderFinance()">Finance</div>
       <div class="h-tab" onclick="showPanel('import', this)">Import</div>
     </nav>
     <div class="h-right">
@@ -1368,6 +1427,129 @@ tbody td { padding: 10px 14px; vertical-align: middle; }
         <span class="pg-info" id="adv-pinfo"></span>
         <button class="pg-btn" id="adv-next" onclick="advPage(1)">Next →</button>
       </div>
+    </div>
+
+    <!-- ── FINANCE PANEL ── -->
+    <div class="panel" id="panel-finance">
+
+      <!-- Year navigation -->
+      <div class="fin-year-nav">
+        <button class="fin-year-btn" onclick="finChangeYear(-1)">← </button>
+        <div class="fin-year" id="fin-year-display">2026</div>
+        <button class="fin-year-btn" onclick="finChangeYear(1)"> →</button>
+        <div style="flex:1"></div>
+        <button class="btn success" onclick="saveExpenses()">✓ Save Expenses</button>
+        <button class="btn" onclick="exportFinance()">↓ Export P&L</button>
+      </div>
+
+      <!-- Top KPI cards -->
+      <div class="fin-grid">
+        <div class="fin-card green">
+          <div class="fin-card-lbl">Total Revenue (Commission)</div>
+          <div class="fin-card-val" id="fin-revenue">€ —</div>
+          <div class="fin-card-sub" id="fin-revenue-sub">from confirmed bookings</div>
+        </div>
+        <div class="fin-card red">
+          <div class="fin-card-lbl">Total Expenses</div>
+          <div class="fin-card-val" id="fin-expenses">€ —</div>
+          <div class="fin-card-sub" id="fin-expenses-sub">fixed costs this year</div>
+        </div>
+        <div class="fin-card blue">
+          <div class="fin-card-lbl">Net Profit / Loss</div>
+          <div class="fin-card-val" id="fin-profit">€ —</div>
+          <div class="fin-card-sub" id="fin-profit-sub">revenue minus expenses</div>
+        </div>
+        <div class="fin-card">
+          <div class="fin-card-lbl">Pipeline (unconfirmed)</div>
+          <div class="fin-card-val" id="fin-pipeline">€ —</div>
+          <div class="fin-card-sub">potential commission</div>
+        </div>
+        <div class="fin-card">
+          <div class="fin-card-lbl">Avg Commission / Show</div>
+          <div class="fin-card-val" id="fin-avg">€ —</div>
+          <div class="fin-card-sub" id="fin-avg-sub">confirmed shows</div>
+        </div>
+        <div class="fin-card amber">
+          <div class="fin-card-lbl">Outstanding Invoices</div>
+          <div class="fin-card-val" id="fin-outstanding">€ —</div>
+          <div class="fin-card-sub">sent, not yet paid</div>
+        </div>
+      </div>
+
+      <!-- Monthly P&L + Expenses editor -->
+      <div class="fin-monthly">
+
+        <!-- Monthly P&L table -->
+        <div>
+          <div class="fin-pl-table">
+            <div class="fin-pl-hdr">Monthly P&L — <span id="fin-pl-year">2026</span></div>
+            <div class="fin-pl-row" style="background:var(--bg)">
+              <div class="fin-pl-month" style="font-weight:500">Month</div>
+              <div class="fin-pl-num" style="color:var(--muted);font-size:9px">REVENUE</div>
+              <div class="fin-pl-num" style="color:var(--muted);font-size:9px">EXPENSES</div>
+              <div class="fin-pl-num" style="color:var(--muted);font-size:9px">NET</div>
+            </div>
+            <div id="fin-pl-rows"></div>
+            <div class="fin-pl-row total" id="fin-pl-total">
+              <div class="fin-pl-month">TOTAL</div>
+              <div class="fin-pl-num" id="fin-pl-total-rev">—</div>
+              <div class="fin-pl-num" id="fin-pl-total-exp">—</div>
+              <div class="fin-pl-num" id="fin-pl-total-net">—</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Expenses editor -->
+        <div>
+          <div class="fin-expenses">
+            <div class="fin-exp-hdr">
+              <span>Monthly Fixed Costs — <span id="fin-exp-year">2026</span></span>
+              <span style="font-size:9px;opacity:0.6">Click amounts to edit</span>
+            </div>
+            <div style="overflow-x:auto">
+              <div style="min-width:500px">
+                <!-- Headers: Category + 12 months + Total -->
+                <div style="display:grid;grid-template-columns:140px repeat(12,1fr) 80px;background:var(--bg);border-bottom:1px solid var(--border)">
+                  <div class="fin-exp-col-hdr" style="text-align:left">Category</div>
+                  <div class="fin-exp-col-hdr">Jan</div>
+                  <div class="fin-exp-col-hdr">Feb</div>
+                  <div class="fin-exp-col-hdr">Mar</div>
+                  <div class="fin-exp-col-hdr">Apr</div>
+                  <div class="fin-exp-col-hdr">May</div>
+                  <div class="fin-exp-col-hdr">Jun</div>
+                  <div class="fin-exp-col-hdr">Jul</div>
+                  <div class="fin-exp-col-hdr">Aug</div>
+                  <div class="fin-exp-col-hdr">Sep</div>
+                  <div class="fin-exp-col-hdr">Oct</div>
+                  <div class="fin-exp-col-hdr">Nov</div>
+                  <div class="fin-exp-col-hdr">Dec</div>
+                  <div class="fin-exp-col-hdr">Total</div>
+                </div>
+                <div id="fin-exp-rows"></div>
+                <!-- Totals row -->
+                <div style="display:grid;grid-template-columns:140px repeat(12,1fr) 80px;background:var(--bg);border-top:2px solid var(--border)" id="fin-exp-totals-row"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Per artist breakdown -->
+      <div class="tbl-wrap">
+        <div style="background:var(--accent);padding:10px 14px;font-family:var(--mono);font-size:9px;letter-spacing:0.15em;text-transform:uppercase;color:rgba(255,255,255,0.7)">
+          Revenue by Artist — <span id="fin-artist-year">2026</span>
+        </div>
+        <table>
+          <thead>
+            <tr><th>Artist</th><th>Shows</th><th>Total Fee (EUR)</th><th>Commission %</th><th>Commission (EUR)</th><th>Invoiced</th><th>Paid</th></tr>
+          </thead>
+          <tbody id="fin-artist-tbody">
+            <tr class="tbl-msg"><td colspan="7">Loading...</td></tr>
+          </tbody>
+        </table>
+      </div>
+
     </div>
 
     <!-- ── IMPORT PANEL ── -->
@@ -2294,6 +2476,7 @@ async function startApp() {
   loadContracts();
   loadInvoices();
   loadAdvancing();
+  loadExpenses();
   setTimeout(renderDashboard, 2000);
 }
 db.auth.getSession().then(({ data: { session } }) => {
@@ -4712,6 +4895,211 @@ function renderDashboard() {
 
 
 
+
+// ── FINANCE ───────────────────────────────────────────────────
+const EXPENSE_CATEGORIES = ['Salaries', 'Office / Rent', 'Software', 'Travel', 'Marketing', 'Other'];
+const MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+let finYear = new Date().getFullYear();
+let allExpenses = []; // loaded from DB
+let expenseEdits = {}; // { 'Category-month': amount }
+
+function finChangeYear(d) {
+  finYear += d;
+  document.getElementById('fin-year-display').textContent = finYear;
+  renderFinance();
+}
+
+async function loadExpenses() {
+  const { data, error } = await db.from('expenses').select('*');
+  if (!error) allExpenses = data || [];
+}
+
+async function renderFinance() {
+  // Ensure expenses loaded
+  if (!allExpenses.length) await loadExpenses();
+
+  const year = finYear;
+  document.getElementById('fin-pl-year').textContent    = year;
+  document.getElementById('fin-exp-year').textContent   = year;
+  document.getElementById('fin-artist-year').textContent = year;
+
+  // ── REVENUE from bookings ──
+  const confirmedBks = allBookings.filter(b =>
+    ['confirmed','advancing','completed'].includes(b.status) &&
+    b.show_date && new Date(b.show_date).getFullYear() === year &&
+    b.fee_currency === 'EUR'
+  );
+  const pipelineBks = allBookings.filter(b =>
+    ['inquiry','hold','offer_sent','negotiating'].includes(b.status) &&
+    b.show_date && new Date(b.show_date).getFullYear() === year &&
+    b.fee_currency === 'EUR'
+  );
+
+  const totalRevenue = confirmedBks.reduce((s,b) => s + ((b.fee_amount||0) * (b.commission_rate||15) / 100), 0);
+  const pipelineRev  = pipelineBks.reduce((s,b)  => s + ((b.fee_amount||0) * (b.commission_rate||15) / 100), 0);
+  const avgCommission = confirmedBks.length ? totalRevenue / confirmedBks.length : 0;
+
+  // ── EXPENSES from DB + edits ──
+  const yearExpenses = allExpenses.filter(e => e.year === year);
+  const totalExpenses = yearExpenses.reduce((s,e) => s + (e.amount||0), 0);
+  const netProfit = totalRevenue - totalExpenses;
+
+  // ── OUTSTANDING INVOICES ──
+  const outstanding = allInvoices.filter(i => ['sent','overdue'].includes(i.status) && i.currency === 'EUR')
+    .reduce((s,i) => s + (i.total_amount||0), 0);
+
+  // ── KPI CARDS ──
+  const fmt = n => '€ ' + Math.round(n).toLocaleString('nl-NL');
+  document.getElementById('fin-revenue').textContent    = fmt(totalRevenue);
+  document.getElementById('fin-revenue-sub').textContent = `${confirmedBks.length} confirmed shows`;
+  document.getElementById('fin-expenses').textContent   = fmt(totalExpenses);
+  document.getElementById('fin-pipeline').textContent   = fmt(pipelineRev);
+  document.getElementById('fin-avg').textContent        = fmt(avgCommission);
+  document.getElementById('fin-avg-sub').textContent    = `${confirmedBks.length} shows`;
+  document.getElementById('fin-outstanding').textContent = fmt(outstanding);
+
+  const profitEl = document.getElementById('fin-profit');
+  profitEl.textContent = fmt(netProfit);
+  profitEl.style.color = netProfit >= 0 ? 'var(--green)' : 'var(--red)';
+  document.getElementById('fin-profit-sub').textContent = netProfit >= 0 ? 'profitable' : 'loss';
+
+  // ── MONTHLY P&L ──
+  let totalMonthRev = 0, totalMonthExp = 0;
+  const plRows = MONTHS.map((m, i) => {
+    const month = i + 1;
+    const monthBks = confirmedBks.filter(b => new Date(b.show_date).getMonth() + 1 === month);
+    const monthRev = monthBks.reduce((s,b) => s + ((b.fee_amount||0) * (b.commission_rate||15) / 100), 0);
+    const monthExp = yearExpenses.filter(e => e.month === month).reduce((s,e) => s + (e.amount||0), 0);
+    const monthNet = monthRev - monthExp;
+    totalMonthRev += monthRev; totalMonthExp += monthExp;
+    const netCls = monthNet > 0 ? 'pos' : monthNet < 0 ? 'neg' : '';
+    return `<div class="fin-pl-row">
+      <div class="fin-pl-month">${m}</div>
+      <div class="fin-pl-num">${monthRev > 0 ? fmt(monthRev) : '—'}</div>
+      <div class="fin-pl-num neg">${monthExp > 0 ? '− '+fmt(monthExp) : '—'}</div>
+      <div class="fin-pl-num ${netCls}">${monthRev > 0 || monthExp > 0 ? fmt(monthNet) : '—'}</div>
+    </div>`;
+  }).join('');
+  document.getElementById('fin-pl-rows').innerHTML = plRows;
+  document.getElementById('fin-pl-total-rev').textContent = fmt(totalMonthRev);
+  document.getElementById('fin-pl-total-exp').textContent = '− ' + fmt(totalMonthExp);
+  const totalNet = totalMonthRev - totalMonthExp;
+  const totalNetEl = document.getElementById('fin-pl-total-net');
+  totalNetEl.textContent = fmt(totalNet);
+  totalNetEl.className = 'fin-pl-num ' + (totalNet >= 0 ? 'pos' : 'neg');
+
+  // ── EXPENSES EDITOR ──
+  renderExpenseGrid(year, yearExpenses);
+
+  // ── PER ARTIST ──
+  const artistRows = allArtists.map(a => {
+    const bks = confirmedBks.filter(b => b.artist_id === a.id);
+    const totalFee = bks.reduce((s,b) => s + (b.fee_amount||0), 0);
+    const avgComm  = bks.length ? bks.reduce((s,b) => s + (b.commission_rate||15), 0) / bks.length : 15;
+    const commission = bks.reduce((s,b) => s + ((b.fee_amount||0) * (b.commission_rate||15) / 100), 0);
+    const bkIds = bks.map(b => b.id);
+    const invoiced = allInvoices.filter(i => bkIds.includes(i.booking_id) && i.currency === 'EUR' && i.status !== 'cancelled')
+      .reduce((s,i) => s + (i.total_amount||0), 0);
+    const paid = allInvoices.filter(i => bkIds.includes(i.booking_id) && i.currency === 'EUR' && i.status === 'paid')
+      .reduce((s,i) => s + (i.total_amount||0), 0);
+    if (!bks.length) return '';
+    return `<tr>
+      <td class="td-name">${esc(a.name)}</td>
+      <td class="td-mono">${bks.length}</td>
+      <td class="fee-val">${fmt(totalFee)}</td>
+      <td class="td-mono">${Math.round(avgComm)}%</td>
+      <td class="fee-val" style="color:var(--green)">${fmt(commission)}</td>
+      <td class="td-mono">${invoiced > 0 ? fmt(invoiced) : '—'}</td>
+      <td class="td-mono" style="color:var(--green)">${paid > 0 ? fmt(paid) : '—'}</td>
+    </tr>`;
+  }).filter(Boolean).join('');
+  document.getElementById('fin-artist-tbody').innerHTML = artistRows ||
+    '<tr class="tbl-msg"><td colspan="7">No confirmed bookings this year</td></tr>';
+}
+
+function renderExpenseGrid(year, yearExpenses) {
+  const rows = EXPENSE_CATEGORIES.map(cat => {
+    const cells = MONTHS.map((m, i) => {
+      const month = i + 1;
+      const exp = yearExpenses.find(e => e.category === cat && e.month === month);
+      const val = exp?.amount || 0;
+      const key = `${cat}-${month}`;
+      return `<div class="fin-exp-cell">
+        <input class="fin-exp-input" type="number" min="0" step="100"
+          data-cat="${esc(cat)}" data-month="${month}"
+          value="${val > 0 ? val : ''}" placeholder="0"
+          onchange="expenseEdits['${key}']={cat:'${esc(cat)}',month:${month},amount:parseFloat(this.value)||0}">
+      </div>`;
+    }).join('');
+    const rowTotal = yearExpenses.filter(e => e.category === cat).reduce((s,e) => s + (e.amount||0), 0);
+    return `<div style="display:grid;grid-template-columns:140px repeat(12,1fr) 80px;border-bottom:1px solid var(--border)">
+      <div class="fin-exp-cell"><span class="fin-exp-label">${esc(cat)}</span></div>
+      ${cells}
+      <div class="fin-exp-total">${rowTotal > 0 ? '€'+Math.round(rowTotal).toLocaleString('nl-NL') : '—'}</div>
+    </div>`;
+  }).join('');
+  document.getElementById('fin-exp-rows').innerHTML = rows;
+
+  // Totals row
+  const monthTotals = MONTHS.map((m, i) => {
+    const month = i + 1;
+    const t = yearExpenses.filter(e => e.month === month).reduce((s,e) => s + (e.amount||0), 0);
+    return `<div class="fin-exp-total" style="font-size:10px">${t > 0 ? '€'+Math.round(t).toLocaleString('nl-NL') : '—'}</div>`;
+  }).join('');
+  const grandTotal = yearExpenses.reduce((s,e) => s + (e.amount||0), 0);
+  document.getElementById('fin-exp-totals-row').innerHTML =
+    `<div class="fin-exp-total" style="text-align:left;color:var(--muted);font-size:9px;letter-spacing:0.1em">TOTAL</div>
+     ${monthTotals}
+     <div class="fin-exp-total">€${Math.round(grandTotal).toLocaleString('nl-NL')}</div>`;
+}
+
+async function saveExpenses() {
+  if (!Object.keys(expenseEdits).length) { showToast('No changes to save', 'info'); return; }
+  const year = finYear;
+  const upserts = Object.values(expenseEdits).map(e => ({
+    year, month: e.month, category: e.cat,
+    amount: e.amount, currency: 'EUR',
+  }));
+
+  const { error } = await db.from('expenses')
+    .upsert(upserts, { onConflict: 'year,month,category' });
+
+  if (error) { showToast('Error saving: ' + error.message, 'error'); return; }
+  showToast('Expenses saved ✓', 'success');
+  expenseEdits = {};
+  await loadExpenses();
+  renderFinance();
+}
+
+function exportFinance() {
+  const year = finYear;
+  const yearExpenses = allExpenses.filter(e => e.year === year);
+  const confirmedBks = allBookings.filter(b =>
+    ['confirmed','advancing','completed'].includes(b.status) &&
+    b.show_date && new Date(b.show_date).getFullYear() === year &&
+    b.fee_currency === 'EUR'
+  );
+
+  const rows = MONTHS.map((m, i) => {
+    const month = i + 1;
+    const monthBks = confirmedBks.filter(b => new Date(b.show_date).getMonth() + 1 === month);
+    const rev = monthBks.reduce((s,b) => s + ((b.fee_amount||0) * (b.commission_rate||15) / 100), 0);
+    const exp = yearExpenses.filter(e => e.month === month).reduce((s,e) => s + (e.amount||0), 0);
+    const row = { Year: year, Month: m, Revenue: Math.round(rev), Expenses: Math.round(exp), Net: Math.round(rev - exp) };
+    EXPENSE_CATEGORIES.forEach(cat => {
+      const catExp = yearExpenses.find(e => e.month === month && e.category === cat);
+      row[cat] = catExp?.amount || 0;
+    });
+    return row;
+  });
+
+  const ws = XLSX.utils.json_to_sheet(rows);
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, `P&L ${year}`);
+  XLSX.writeFile(wb, `deepbloe_pnl_${year}.xlsx`);
+  showToast(`P&L ${year} exported`, 'success');
+}
+// ── END FINANCE ────────────────────────────────────────────────
 
 // ── EMAIL ─────────────────────────────────────────────────────
 const EMAIL_FUNCTION_URL = 'https://ksnxgidklhonpsneerbu.supabase.co/functions/v1/send-email';
