@@ -1638,6 +1638,49 @@ tbody td { padding: 10px 14px; vertical-align: middle; }
         </table>
       </div>
 
+      <!-- BTW / VAT Report -->
+      <div style="margin-top:20px">
+        <div class="tbl-wrap">
+          <div style="background:var(--accent);padding:10px 14px;display:flex;justify-content:space-between;align-items:center">
+            <span style="font-family:var(--mono);font-size:9px;letter-spacing:0.15em;text-transform:uppercase;color:rgba(255,255,255,0.7)">
+              BTW / VAT Rapportage — <span id="fin-vat-year">2026</span>
+            </span>
+            <button class="btn" onclick="exportVAT()" style="padding:4px 12px;font-size:9px;border-color:rgba(255,255,255,0.3);color:rgba(255,255,255,0.7)">↓ Export voor boekhouder</button>
+          </div>
+          <table>
+            <thead>
+              <tr>
+                <th>Kwartaal</th>
+                <th>NL 21% BTW</th>
+                <th>BTW Bedrag (21%)</th>
+                <th>EU Reverse Charge</th>
+                <th>Buiten EU (0%)</th>
+                <th>Totaal Gefactureerd</th>
+                <th>BTW Afdracht</th>
+              </tr>
+            </thead>
+            <tbody id="fin-vat-tbody">
+              <tr class="tbl-msg"><td colspan="7">Loading...</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- VAT detail per invoice -->
+        <div class="tbl-wrap" style="margin-top:12px">
+          <div style="background:var(--accent);padding:10px 14px;font-family:var(--mono);font-size:9px;letter-spacing:0.15em;text-transform:uppercase;color:rgba(255,255,255,0.7)">
+            Factuurdetail BTW — <span id="fin-vat-detail-year">2026</span>
+          </div>
+          <table>
+            <thead>
+              <tr><th>Invoice #</th><th>Datum</th><th>Artist</th><th>Klant</th><th>Regime</th><th>Subtotaal</th><th>BTW %</th><th>BTW Bedrag</th><th>Totaal</th><th>Status</th></tr>
+            </thead>
+            <tbody id="fin-vat-detail-tbody">
+              <tr class="tbl-msg"><td colspan="10">Loading...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
     </div>
 
     <!-- ── CALENDAR PANEL ── -->
@@ -5174,6 +5217,9 @@ async function renderFinance() {
   }).filter(Boolean).join('');
   document.getElementById('fin-artist-tbody').innerHTML = artistRows ||
     '<tr class="tbl-msg"><td colspan="7">No confirmed bookings this year</td></tr>';
+
+  // ── VAT REPORT ──
+  renderVATReport(year);
 }
 
 function renderLedger(year, yearLines) {
@@ -5325,6 +5371,147 @@ function exportFinance() {
   XLSX.writeFile(wb, `deepbloe_pnl_${year}.xlsx`);
   showToast(`P&L ${year} exported`,'success');
 }
+function renderVATReport(year) {
+  document.getElementById('fin-vat-year').textContent = year;
+  document.getElementById('fin-vat-detail-year').textContent = year;
+
+  // Filter invoices for this year
+  const yearInvoices = allInvoices.filter(i => {
+    const d = i.issued_at || i.created_at;
+    return d && new Date(d).getFullYear() === year && i.status !== 'cancelled';
+  });
+
+  const fmt = n => '€ ' + Math.round(n).toLocaleString('nl-NL');
+
+  // ── QUARTERLY SUMMARY ──
+  const quarters = [
+    { label: 'Q1 (Jan–Mar)', months: [1,2,3] },
+    { label: 'Q2 (Apr–Jun)', months: [4,5,6] },
+    { label: 'Q3 (Jul–Sep)', months: [7,8,9] },
+    { label: 'Q4 (Okt–Dec)', months: [10,11,12] },
+  ];
+
+  let totalNL21 = 0, totalVATAmt = 0, totalRC = 0, totalExempt = 0, totalAll = 0, totalAfdracht = 0;
+
+  const qRows = quarters.map(q => {
+    const qInvs = yearInvoices.filter(i => {
+      const m = new Date(i.issued_at || i.created_at).getMonth() + 1;
+      return q.months.includes(m);
+    });
+
+    const nl21    = qInvs.filter(i => i.vat_rate === 21);
+    const rc      = qInvs.filter(i => i.vat_reverse_charge);
+    const exempt  = qInvs.filter(i => i.vat_exempt || (i.vat_rate === 0 && !i.vat_reverse_charge));
+
+    const nl21Sub  = nl21.reduce((s,i) => s + (i.subtotal||0), 0);
+    const nl21VAT  = nl21.reduce((s,i) => s + (i.vat_amount||0), 0);
+    const rcTotal  = rc.reduce((s,i) => s + (i.subtotal||0), 0);
+    const exTotal  = exempt.reduce((s,i) => s + (i.subtotal||0), 0);
+    const allTotal = qInvs.reduce((s,i) => s + (i.total_amount||0), 0);
+
+    totalNL21    += nl21Sub;
+    totalVATAmt  += nl21VAT;
+    totalRC      += rcTotal;
+    totalExempt  += exTotal;
+    totalAll     += allTotal;
+    totalAfdracht += nl21VAT;
+
+    const afdracht = nl21VAT;
+    const afdCls = afdracht > 0 ? 'color:var(--red)' : 'color:var(--green)';
+
+    return `<tr>
+      <td class="td-mono" style="font-weight:500">${q.label}</td>
+      <td class="td-mono">${nl21Sub > 0 ? fmt(nl21Sub) : '—'}</td>
+      <td class="td-mono" style="color:var(--red)">${nl21VAT > 0 ? fmt(nl21VAT) : '—'}</td>
+      <td class="td-mono">${rcTotal > 0 ? fmt(rcTotal) : '—'}</td>
+      <td class="td-mono">${exTotal > 0 ? fmt(exTotal) : '—'}</td>
+      <td class="td-mono" style="font-weight:500">${allTotal > 0 ? fmt(allTotal) : '—'}</td>
+      <td class="td-mono" style="${afdCls};font-weight:500">${afdracht > 0 ? fmt(afdracht) : '—'}</td>
+    </tr>`;
+  }).join('');
+
+  // Totals row
+  const qTotal = `<tr style="background:var(--bg);border-top:2px solid var(--border)">
+    <td class="td-mono" style="font-weight:500">TOTAAL ${year}</td>
+    <td class="td-mono">${fmt(totalNL21)}</td>
+    <td class="td-mono" style="color:var(--red);font-weight:500">${fmt(totalVATAmt)}</td>
+    <td class="td-mono">${fmt(totalRC)}</td>
+    <td class="td-mono">${fmt(totalExempt)}</td>
+    <td class="td-mono" style="font-weight:500">${fmt(totalAll)}</td>
+    <td class="td-mono" style="color:var(--red);font-weight:500">${fmt(totalAfdracht)}</td>
+  </tr>`;
+
+  document.getElementById('fin-vat-tbody').innerHTML = qRows + qTotal;
+
+  // ── INVOICE DETAIL ──
+  const vatRegimeLabel = i => {
+    if (i.vat_rate === 21) return '<span style="color:var(--red);font-family:var(--mono);font-size:10px">NL 21%</span>';
+    if (i.vat_reverse_charge) return '<span style="color:var(--blue);font-family:var(--mono);font-size:10px">EU Reverse Charge</span>';
+    if (i.vat_exempt) return '<span style="color:var(--muted);font-family:var(--mono);font-size:10px">Buiten EU 0%</span>';
+    return '<span style="color:var(--muted);font-family:var(--mono);font-size:10px">0%</span>';
+  };
+
+  const detailRows = yearInvoices
+    .sort((a,b) => (a.issued_at||'').localeCompare(b.issued_at||''))
+    .map(i => {
+      const bk  = allBookings.find(b => b.id === i.booking_id);
+      const sym = {EUR:'€',USD:'$',GBP:'£',SGD:'S$'}[i.currency||'EUR']||'';
+      const eff = i.status === 'sent' && i.due_date && i.due_date < new Date().toISOString().slice(0,10) ? 'overdue' : i.status;
+      return `<tr>
+        <td class="td-mono" style="font-size:10px">${esc(i.invoice_number||'—')}</td>
+        <td class="td-mono" style="font-size:10px">${i.issued_at ? fmtDate(i.issued_at) : '—'}</td>
+        <td class="td-name">${esc(bk?.artists?.name||'—')}</td>
+        <td class="td-trunc">${esc(i.bill_to_name||'—')}</td>
+        <td>${vatRegimeLabel(i)}</td>
+        <td class="td-mono" style="font-size:11px">${sym}${(i.subtotal||0).toLocaleString()}</td>
+        <td class="td-mono" style="font-size:11px">${i.vat_rate > 0 ? i.vat_rate+'%' : (i.vat_reverse_charge?'RC':'0%')}</td>
+        <td class="td-mono" style="font-size:11px;color:var(--red)">${i.vat_amount > 0 ? sym+(i.vat_amount||0).toLocaleString() : '—'}</td>
+        <td class="td-mono" style="font-size:11px;font-weight:500">${sym}${(i.total_amount||0).toLocaleString()}</td>
+        <td><span class="badge inv-status-${eff}">${eff}</span></td>
+      </tr>`;
+    }).join('');
+
+  document.getElementById('fin-vat-detail-tbody').innerHTML = detailRows ||
+    '<tr class="tbl-msg"><td colspan="10">Geen facturen dit jaar</td></tr>';
+}
+
+function exportVAT() {
+  const year = finYear;
+  const yearInvoices = allInvoices.filter(i => {
+    const d = i.issued_at || i.created_at;
+    return d && new Date(d).getFullYear() === year && i.status !== 'cancelled';
+  });
+
+  const rows = yearInvoices.sort((a,b) => (a.issued_at||'').localeCompare(b.issued_at||'')).map(i => {
+    const bk = allBookings.find(b => b.id === i.booking_id);
+    let regime = 'Buiten EU 0%';
+    if (i.vat_rate === 21) regime = 'NL 21% BTW';
+    else if (i.vat_reverse_charge) regime = 'EU Reverse Charge';
+    else if (i.vat_exempt) regime = 'Vrijgesteld 0%';
+    const m = new Date(i.issued_at || i.created_at).getMonth() + 1;
+    const q = m <= 3 ? 'Q1' : m <= 6 ? 'Q2' : m <= 9 ? 'Q3' : 'Q4';
+    return {
+      Kwartaal: q,
+      Factuurnummer: i.invoice_number,
+      Datum: i.issued_at ? fmtDate(i.issued_at) : '',
+      Artist: bk?.artists?.name || '',
+      Klant: i.bill_to_name || '',
+      BTW_Regime: regime,
+      Subtotaal_EUR: i.subtotal || 0,
+      BTW_Percentage: i.vat_rate || 0,
+      BTW_Bedrag_EUR: i.vat_amount || 0,
+      Totaal_EUR: i.total_amount || 0,
+      Status: i.status,
+    };
+  });
+
+  const ws = XLSX.utils.json_to_sheet(rows);
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, `BTW ${year}`);
+  XLSX.writeFile(wb, `deepbloe_btw_rapport_${year}.xlsx`);
+  showToast(`BTW rapport ${year} geëxporteerd`, 'success');
+}
+
 // ── END FINANCE ────────────────────────────────────────────────
 
 // ── EMAIL ─────────────────────────────────────────────────────
