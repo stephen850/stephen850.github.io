@@ -2294,7 +2294,7 @@ async function startApp() {
   loadContracts();
   loadInvoices();
   loadAdvancing();
-  setTimeout(renderDashboard, 1200);
+  setTimeout(renderDashboard, 2000);
 }
 db.auth.getSession().then(({ data: { session } }) => {
   if (session) startApp();
@@ -2346,6 +2346,7 @@ async function loadBookings() {
   allBookings = data || [];
   updateBookingStats();
   filterBookings();
+  if (document.getElementById('panel-dashboard')?.classList.contains('active')) renderDashboard();
 }
 
 function updateBookingStats() {
@@ -3701,6 +3702,7 @@ async function loadInvoices() {
   allInvoices = data || [];
   updateInvoiceStats();
   filterInvoices();
+  if (document.getElementById('panel-dashboard')?.classList.contains('active')) renderDashboard();
 }
 
 function updateInvoiceStats() {
@@ -4723,14 +4725,20 @@ function openEmailModal(type, id) {
 
   if (type === 'invoice') {
     const inv = allInvoices.find(i => i.id === id);
-    const bk  = allBookings.find(b => b.id === inv?.booking_id);
-    const org  = allOrgs.find(o => o.id === bk?.company_id);
+    const bk  = inv?.bookings || allBookings.find(b => b.id === inv?.booking_id);
+    const org  = allOrgs.find(o => o.id === (bk?.company_id || inv?.company_id));
     const con  = allCons.find(c => c.organisation_id === org?.id);
+    const artistName = bk?.artists?.name || inv?.bookings?.artists?.name || '';
+    const venueName  = bk?.venue_name || inv?.bookings?.venue_name || '';
+    const showDate   = bk?.show_date || inv?.bookings?.show_date || '';
+    const invNum     = inv?.invoice_number || '';
+
     titleEl.textContent = 'Send Invoice';
-    subEl.textContent   = inv?.invoice_number || '';
+    subEl.textContent   = invNum;
     document.getElementById('email-to').value = con?.email || '';
     document.getElementById('email-subject').value =
-      `Invoice ${inv?.invoice_number||''} — ${bk?.artists?.name||''} · ${bk?.venue_name||''}`;
+      `Invoice ${invNum}${artistName ? ' — ' + artistName : ''}${venueName ? ' · ' + venueName : ''}`;
+
     const sym = {EUR:'€',USD:'$',GBP:'£',SGD:'S$',AED:'AED ',IDR:'Rp',THB:'฿'}[inv?.currency||'EUR']||'';
     const amount = inv?.total_amount ? sym + inv.total_amount.toLocaleString() : '';
     const typeLabel = {deposit:'deposit invoice',second_deposit:'2nd deposit invoice',balance:'balance invoice',full:'invoice',credit_note:'credit note'}[inv?.type]||'invoice';
@@ -4739,18 +4747,18 @@ function openEmailModal(type, id) {
 
 Please find below the ${typeLabel} for the upcoming performance.
 
-Artist: ${bk?.artists?.name||''}
-Venue: ${[bk?.venue_name,bk?.venue_city,bk?.venue_country].filter(Boolean).join(', ')}
-Date: ${bk?.show_date?fmtDate(bk.show_date):''}
+Artist: ${artistName}
+Venue: ${[venueName, bk?.venue_city||inv?.bookings?.venue_city, bk?.venue_country||inv?.bookings?.venue_country].filter(Boolean).join(', ')}
+Date: ${showDate ? fmtDate(showDate) : ''}
 
-Invoice: ${inv?.invoice_number||''}
+Invoice: ${invNum}
 Amount Due: ${amount}
-Due Date: ${inv?.due_date?fmtDate(inv.due_date):''}
+Due Date: ${inv?.due_date ? fmtDate(inv.due_date) : ''}
 
 Payment details:
 IBAN: NL84RABO0190352701
 BIC: RABONL2U
-Reference: ${inv?.invoice_number||''}
+Reference: ${invNum}
 
 Please do not hesitate to reach out with any questions.
 
@@ -4760,22 +4768,26 @@ finance@deepbloe.com`;
 
   } else if (type === 'contract') {
     const ct  = allContracts.find(c => c.id === id);
-    const bk  = allBookings.find(b => b.id === ct?.booking_id);
+    const bk  = ct?.bookings || allBookings.find(b => b.id === ct?.booking_id);
     const org = allOrgs.find(o => o.id === bk?.company_id);
     const con = allCons.find(c => c.organisation_id === org?.id);
+    const artistName = bk?.artists?.name || ct?.bookings?.artists?.name || '';
+    const venueName  = bk?.venue_name || ct?.bookings?.venue_name || '';
+    const showDate   = bk?.show_date || ct?.bookings?.show_date || '';
+
     titleEl.textContent = 'Send Contract';
-    subEl.textContent   = bk?.reference || '';
+    subEl.textContent   = bk?.reference || ct?.bookings?.reference || '';
     document.getElementById('email-to').value = con?.email || '';
     document.getElementById('email-subject').value =
-      `Booking Contract — ${bk?.artists?.name||''} · ${bk?.venue_name||''} · ${bk?.show_date?fmtDate(bk.show_date):''}`;
+      `Booking Contract — ${artistName}${venueName ? ' · ' + venueName : ''}${showDate ? ' · ' + fmtDate(showDate) : ''}`;
     document.getElementById('email-body').value =
 `Dear ${con?.first_name||'Team'},
 
 Please find attached the booking contract for the following performance.
 
-Artist: ${bk?.artists?.name||''}
-Venue: ${[bk?.venue_name,bk?.venue_city,bk?.venue_country].filter(Boolean).join(', ')}
-Date: ${bk?.show_date?fmtDate(bk.show_date):''}
+Artist: ${artistName}
+Venue: ${[venueName, bk?.venue_city||ct?.bookings?.venue_city, bk?.venue_country||ct?.bookings?.venue_country].filter(Boolean).join(', ')}
+Date: ${showDate ? fmtDate(showDate) : ''}
 
 Please review, sign and return at your earliest convenience. If you have any questions or require amendments, please contact us directly.
 
