@@ -5679,8 +5679,7 @@ function fmtDate(d) {
 function esc(s) {
   return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 }
-func
-tion showToast(msg, type='info') {
+function showToast(msg, type='info') {
   const t = document.getElementById('toast');
   t.textContent = msg; t.className = type; t.style.display = 'block';
   setTimeout(() => t.style.display = 'none', 3500);
