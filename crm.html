@@ -747,6 +747,29 @@ tbody td { padding: 10px 14px; vertical-align: middle; }
 }
 /* ── ADVANCING MODULE END ────────────────────────────── */
 
+/* ── EMAIL MODAL ─────────────────────────────────────── */
+#email-overlay {
+  position: fixed; inset: 0; background: rgba(26,26,26,0.7);
+  display: none; align-items: center; justify-content: center; z-index: 400;
+}
+#email-overlay.open { display: flex; }
+.email-modal {
+  background: var(--surface); border-top: 3px solid var(--blue);
+  width: 640px; max-height: 90vh; overflow-y: auto; padding: 32px;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.2);
+}
+.email-field { display: flex; flex-direction: column; gap: 5px; margin-bottom: 14px; }
+.email-field label { font-family: var(--mono); font-size: 9px; letter-spacing: 0.1em;
+                     text-transform: uppercase; color: var(--muted); }
+.email-field input, .email-field textarea {
+  border: 1px solid var(--border-dark); padding: 9px 11px;
+  font-family: var(--sans); font-size: 13px; outline: none;
+  background: var(--bg); color: var(--text);
+}
+.email-field input:focus, .email-field textarea:focus { border-color: var(--blue); background: #fff; }
+.email-field textarea { resize: vertical; min-height: 200px; line-height: 1.6; }
+/* ── EMAIL MODAL END ─────────────────────────────────── */
+
 /* toast */
 #toast {
   position: fixed; bottom: 24px; right: 24px; padding: 12px 20px;
@@ -2187,6 +2210,40 @@ The Netherlands</textarea>
   </div>
 </div>
 
+<!-- EMAIL MODAL -->
+<div id="email-overlay">
+  <div class="email-modal">
+    <div class="modal-hdr">
+      <div>
+        <div class="modal-title" id="email-modal-title">Send Email</div>
+        <div style="font-family:var(--mono);font-size:10px;color:var(--muted);margin-top:4px" id="email-modal-sub"></div>
+      </div>
+      <button class="modal-close" onclick="closeEmailModal()">×</button>
+    </div>
+    <div class="email-field">
+      <label>To *</label>
+      <input id="email-to" type="email" placeholder="promoter@venue.com">
+    </div>
+    <div class="email-field">
+      <label>From</label>
+      <input id="email-from" value="finance@deepbloe.com" readonly style="color:var(--muted);background:#f7f5f0">
+    </div>
+    <div style="font-family:var(--mono);font-size:10px;color:var(--muted);margin-bottom:14px">CC: stephen@deepbloe.com (always)</div>
+    <div class="email-field">
+      <label>Subject *</label>
+      <input id="email-subject" placeholder="Invoice DBL-INV-2026-0001">
+    </div>
+    <div class="email-field">
+      <label>Message</label>
+      <textarea id="email-body"></textarea>
+    </div>
+    <div class="modal-ftr">
+      <button class="btn" onclick="closeEmailModal()">Cancel</button>
+      <button class="btn primary" id="email-send-btn" onclick="sendEmail()" style="border-color:var(--blue);background:var(--blue)">✉ Send Email</button>
+    </div>
+  </div>
+</div>
+
 <div id="toast"></div>
 
 <script>
@@ -3194,6 +3251,7 @@ function renderContracts() {
       <td class="td-mono" style="font-size:10px">${fmtDate(c.created_at?.slice(0,10))}</td>
       <td><div class="row-actions">
         <button class="ra" onclick="openContractEditorById('${c.id}')">Open</button>
+        <button class="ra" style="border-color:var(--blue);color:var(--blue)" onclick="openEmailModal('contract','${c.id}')">✉ Send</button>
         <button class="ra" onclick="updateContractStatus('${c.id}','sent')">Mark Sent</button>
         <button class="ra confirm" onclick="updateContractStatus('${c.id}','fully_signed')">Mark Signed</button>
         <button class="ra del" onclick="deleteContract('${c.id}')">Del</button>
@@ -3698,6 +3756,7 @@ function renderInvoices() {
       <td><span class="badge inv-status-${es}">${es}</span></td>
       <td><div class="row-actions">
         <button class="ra" onclick="openInvoiceEditorById('${i.id}')">Open</button>
+        <button class="ra" style="border-color:var(--blue);color:var(--blue)" onclick="openEmailModal('invoice','${i.id}')">✉ Send</button>
         <button class="ra" onclick="updateInvoiceStatus('${i.id}','sent')">Sent</button>
         <button class="ra confirm" onclick="updateInvoiceStatus('${i.id}','paid')">Paid</button>
         <button class="ra del" onclick="deleteInvoice('${i.id}')">Del</button>
@@ -4651,6 +4710,137 @@ function renderDashboard() {
 
 
 
+
+// ── EMAIL ─────────────────────────────────────────────────────
+const EMAIL_FUNCTION_URL = 'https://ksnxgidklhonpsneerbu.supabase.co/functions/v1/send-email';
+let emailContext = null;
+
+function openEmailModal(type, id) {
+  emailContext = { type, id };
+  document.getElementById('email-overlay').classList.add('open');
+  const titleEl = document.getElementById('email-modal-title');
+  const subEl   = document.getElementById('email-modal-sub');
+
+  if (type === 'invoice') {
+    const inv = allInvoices.find(i => i.id === id);
+    const bk  = allBookings.find(b => b.id === inv?.booking_id);
+    const org  = allOrgs.find(o => o.id === bk?.company_id);
+    const con  = allCons.find(c => c.organisation_id === org?.id);
+    titleEl.textContent = 'Send Invoice';
+    subEl.textContent   = inv?.invoice_number || '';
+    document.getElementById('email-to').value = con?.email || '';
+    document.getElementById('email-subject').value =
+      `Invoice ${inv?.invoice_number||''} — ${bk?.artists?.name||''} · ${bk?.venue_name||''}`;
+    const sym = {EUR:'€',USD:'$',GBP:'£',SGD:'S$',AED:'AED ',IDR:'Rp',THB:'฿'}[inv?.currency||'EUR']||'';
+    const amount = inv?.total_amount ? sym + inv.total_amount.toLocaleString() : '';
+    const typeLabel = {deposit:'deposit invoice',second_deposit:'2nd deposit invoice',balance:'balance invoice',full:'invoice',credit_note:'credit note'}[inv?.type]||'invoice';
+    document.getElementById('email-body').value =
+`Dear ${con?.first_name||'Team'},
+
+Please find below the ${typeLabel} for the upcoming performance.
+
+Artist: ${bk?.artists?.name||''}
+Venue: ${[bk?.venue_name,bk?.venue_city,bk?.venue_country].filter(Boolean).join(', ')}
+Date: ${bk?.show_date?fmtDate(bk.show_date):''}
+
+Invoice: ${inv?.invoice_number||''}
+Amount Due: ${amount}
+Due Date: ${inv?.due_date?fmtDate(inv.due_date):''}
+
+Payment details:
+IBAN: NL84RABO0190352701
+BIC: RABONL2U
+Reference: ${inv?.invoice_number||''}
+
+Please do not hesitate to reach out with any questions.
+
+Kind regards,
+Deepbloe Agency B.V.
+finance@deepbloe.com`;
+
+  } else if (type === 'contract') {
+    const ct  = allContracts.find(c => c.id === id);
+    const bk  = allBookings.find(b => b.id === ct?.booking_id);
+    const org = allOrgs.find(o => o.id === bk?.company_id);
+    const con = allCons.find(c => c.organisation_id === org?.id);
+    titleEl.textContent = 'Send Contract';
+    subEl.textContent   = bk?.reference || '';
+    document.getElementById('email-to').value = con?.email || '';
+    document.getElementById('email-subject').value =
+      `Booking Contract — ${bk?.artists?.name||''} · ${bk?.venue_name||''} · ${bk?.show_date?fmtDate(bk.show_date):''}`;
+    document.getElementById('email-body').value =
+`Dear ${con?.first_name||'Team'},
+
+Please find attached the booking contract for the following performance.
+
+Artist: ${bk?.artists?.name||''}
+Venue: ${[bk?.venue_name,bk?.venue_city,bk?.venue_country].filter(Boolean).join(', ')}
+Date: ${bk?.show_date?fmtDate(bk.show_date):''}
+
+Please review, sign and return at your earliest convenience. If you have any questions or require amendments, please contact us directly.
+
+Kind regards,
+Deepbloe Agency B.V.
+stephen@deepbloe.com`;
+  }
+}
+
+function closeEmailModal() {
+  document.getElementById('email-overlay').classList.remove('open');
+  emailContext = null;
+}
+
+async function sendEmail() {
+  const to      = document.getElementById('email-to').value.trim();
+  const subject = document.getElementById('email-subject').value.trim();
+  const body    = document.getElementById('email-body').value.trim();
+  if (!to)      { showToast('Email address required', 'error'); return; }
+  if (!subject) { showToast('Subject required', 'error'); return; }
+  if (!body)    { showToast('Message required', 'error'); return; }
+  const btn = document.getElementById('email-send-btn');
+  btn.disabled = true; btn.textContent = 'Sending...';
+  const html = `<div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto">
+    <div style="background:#1a1a1a;padding:20px 28px">
+      <span style="font-family:monospace;font-size:12px;letter-spacing:0.3em;color:#fff">DEEPBLOE AGENCY</span>
+    </div>
+    <div style="padding:32px 28px;border:1px solid #e2ddd6;border-top:none">
+      <pre style="font-family:Arial,sans-serif;font-size:14px;line-height:1.7;white-space:pre-wrap;margin:0">${esc(body)}</pre>
+    </div>
+    <div style="padding:14px 28px;background:#f7f5f0;border:1px solid #e2ddd6;border-top:none;
+                font-family:monospace;font-size:10px;color:#8a8278;text-align:center">
+      Deepbloe Agency B.V. · deepbloe.com · KvK: 86099477 · VAT: NL863860734B01
+    </div>
+  </div>`;
+  try {
+    const { data: { session } } = await db.auth.getSession();
+    const res = await fetch(EMAIL_FUNCTION_URL, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${session?.access_token || SUPABASE_KEY}`,
+        'apikey': SUPABASE_KEY,
+      },
+      body: JSON.stringify({ to, subject, html }),
+    });
+    const data = await res.json();
+    if (data.error) {
+      showToast('Send failed: ' + JSON.stringify(data.error), 'error');
+    } else {
+      showToast('Email sent ✓', 'success');
+      if (emailContext?.type === 'invoice') {
+        await db.from('invoices').update({ status: 'sent', sent_at: new Date().toISOString() }).eq('id', emailContext.id);
+        loadInvoices();
+      }
+      if (emailContext?.type === 'contract') {
+        await db.from('contracts').update({ status: 'sent', sent_at: new Date().toISOString() }).eq('id', emailContext.id);
+        loadContracts();
+      }
+      closeEmailModal();
+    }
+  } catch(e) { showToast('Error: ' + e.message, 'error'); }
+  btn.disabled = false; btn.textContent = '✉ Send Email';
+}
+// ── END EMAIL ──────────────────────────────────────────────────
 
 function closeModal(id) { document.getElementById(id).classList.remove('open'); }
 
