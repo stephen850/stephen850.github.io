@@ -2560,9 +2560,9 @@ The Netherlands</textarea>
     </div>
     <div class="email-field">
       <label>From</label>
-      <input id="email-from" value="finance@deepbloe.com" readonly style="color:var(--muted);background:#f7f5f0">
+      <input id="email-from" value="" readonly style="color:var(--muted);background:#f7f5f0">
     </div>
-    <div style="font-family:var(--mono);font-size:10px;color:var(--muted);margin-bottom:14px">CC: stephen&#64;deepbloe.com (always)</div>
+    <div style="font-family:var(--mono);font-size:10px;color:var(--muted);margin-bottom:14px">CC: stephen [at] deepbloe.com (always)</div>
     <div class="email-field">
       <label>Subject *</label>
       <input id="email-subject" placeholder="Invoice DBL-INV-2026-0001">
@@ -2586,6 +2586,11 @@ const SUPABASE_URL = 'https://ksnxgidklhonpsneerbu.supabase.co';
 const SUPABASE_KEY = 'sb_publishable_JsOkmXlOxBWKXcraBE7gGg_qErTkqX9';
 const { createClient } = supabase;
 const db = createClient(SUPABASE_URL, SUPABASE_KEY);
+// Set email fields via JS to avoid Cloudflare obfuscation
+document.addEventListener('DOMContentLoaded', () => {
+  const fromEl = document.getElementById('email-from');
+  if (fromEl) fromEl.value = 'finance' + '@' + 'deepbloe.com';
+});
 
 // ── STATE ─────────────────────────────────────────────────────
 let allOrgs = [], filtOrgs = [], orgPageN = 0;
