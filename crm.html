@@ -2587,12 +2587,10 @@ const SUPABASE_KEY = 'sb_publishable_JsOkmXlOxBWKXcraBE7gGg_qErTkqX9';
 const { createClient } = supabase;
 const db = createClient(SUPABASE_URL, SUPABASE_KEY);
 // Set email fields via JS to avoid Cloudflare obfuscation
-document.addEventListener('DOMContentLoaded', () => {
-  const fromEl = document.getElementById('email-from');
-  if (fromEl) fromEl.value = 'finance' + '@' + 'deepbloe.com';
-  const loginBtn = document.getElementById('login-btn');
-  if (loginBtn) loginBtn.addEventListener('click', doLogin);
-});
+const fromEl = document.getElementById('email-from');
+if (fromEl) fromEl.value = 'finance' + '@' + 'deepbloe.com';
+const loginBtn = document.getElementById('login-btn');
+if (loginBtn) loginBtn.addEventListener('click', doLogin);
 
 // ── STATE ─────────────────────────────────────────────────────
 let allOrgs = [], filtOrgs = [], orgPageN = 0;
@@ -5682,3 +5680,11 @@ function esc(s) {
   return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 }
 func
+tion showToast(msg, type='info') {
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.className = type; t.style.display = 'block';
+  setTimeout(() => t.style.display = 'none', 3500);
+}
+</script>
+</body>
+</html>
