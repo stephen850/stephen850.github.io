@@ -1035,8 +1035,7 @@ tbody td { padding: 10px 14px; vertical-align: middle; }
     <div class="h-brand"><strong>DEEPBLOE</strong> · CRM</div>
     <nav class="h-nav">
       <div class="h-tab active" onclick="showPanel('dashboard', this);renderDashboard()">Dashboard</div>
-      <div class="h-tab" onclick="showPanel('orgs', this)">Organisations</div>
-      <div class="h-tab" onclick="showPanel('contacts', this)">Contacts</div>
+      <div class="h-tab" onclick="showPanel('contacts', this);showContactsView('companies')">Contacts</div>
       <div class="h-tab" onclick="showPanel('bookings', this)">Bookings</div>
       <div class="h-tab" onclick="showPanel('contracts', this)">Contracts</div>
       <div class="h-tab" onclick="showPanel('invoices', this)">Invoices</div>
@@ -1157,138 +1156,110 @@ tbody td { padding: 10px 14px; vertical-align: middle; }
     </div>
 
     <!-- ── ORGANISATIONS PANEL ── -->
-    <div class="panel" id="panel-orgs">
-      <div class="stats" id="org-stats">
-        <div class="stat red">
-          <div class="stat-lbl">Total Orgs</div>
-          <div class="stat-val" id="s-total">—</div>
-        </div>
-        <div class="stat blue">
-          <div class="stat-lbl">Clubs</div>
-          <div class="stat-val" id="s-clubs">—</div>
-        </div>
-        <div class="stat green">
-          <div class="stat-lbl">Festivals</div>
-          <div class="stat-val" id="s-fests">—</div>
-        </div>
-        <div class="stat">
-          <div class="stat-lbl">Promoters</div>
-          <div class="stat-val" id="s-proms">—</div>
-        </div>
-        <div class="stat">
-          <div class="stat-lbl">Countries</div>
-          <div class="stat-val" id="s-countries">—</div>
-        </div>
-      </div>
-
-      <div class="toolbar">
-        <input class="tb-search" type="text" id="org-search" placeholder="Search name, city..." oninput="filterOrgs()">
-        <select class="tb-select" id="org-type" onchange="filterOrgs()">
-          <option value="">All types</option>
-          <option>Club</option><option>Festival</option><option>Promoter</option>
-          <option>Agency</option><option>Brand</option><option>Other</option>
-        </select>
-        <select class="tb-select" id="org-country" onchange="filterOrgs()">
-          <option value="">All countries</option>
-          <option>Indonesia</option><option>Thailand</option><option>UAE</option>
-          <option>Singapore</option><option>Cambodia</option><option>Netherlands</option>
-          <option>Belgium</option><option>Germany</option><option>Spain</option>
-          <option>Italy</option><option>France</option><option>United Kingdom</option>
-          <option>Other</option>
-        </select>
-        <select class="tb-select" id="org-genre" onchange="filterOrgs()">
-          <option value="">All genres</option>
-          <option>Afro House</option><option>Melodic House</option><option>Tech House</option>
-          <option>Deep House</option><option>House</option><option>Techno</option>
-          <option>EDM</option><option>Melodic Techno</option><option>Progressive</option><option>Disco</option>
-        </select>
-        <div class="tb-right">
-          <button class="btn" onclick="exportOrgs()">↓ Export</button>
-          <button class="btn primary" onclick="openOrgModal()">+ Add Organisation</button>
-        </div>
-      </div>
-
-      <div class="tbl-wrap">
-        <table>
-          <thead>
-            <tr>
-              <th>Name</th><th>Type</th><th>Country</th><th>City</th>
-              <th>Genre</th><th>Contact Name</th><th>Contact Email</th><th>Actions</th>
-            </tr>
-          </thead>
-          <tbody id="org-tbody">
-            <tr class="tbl-msg"><td colspan="8">Loading...</td></tr>
-          </tbody>
-        </table>
-      </div>
-      <div class="pagination">
-        <button class="pg-btn" id="org-prev" onclick="orgPage(-1)" disabled>← Prev</button>
-        <span class="pg-info" id="org-pinfo"></span>
-        <button class="pg-btn" id="org-next" onclick="orgPage(1)">Next →</button>
-      </div>
-    </div>
-
-    <!-- ── CONTACTS PANEL ── -->
     <div class="panel" id="panel-contacts">
-      <div class="stats">
-        <div class="stat red">
-          <div class="stat-lbl">Total Contacts</div>
-          <div class="stat-val" id="sc-total">—</div>
+
+      <!-- View toggle -->
+      <div style="display:flex;align-items:center;gap:0;margin-bottom:16px;border:1px solid var(--border);width:fit-content">
+        <button id="cv-btn-companies" onclick="showContactsView('companies')"
+          style="padding:8px 20px;font-family:var(--mono);font-size:10px;letter-spacing:0.1em;text-transform:uppercase;border:none;cursor:pointer;background:var(--accent);color:#fff">
+          Companies
+        </button>
+        <button id="cv-btn-people" onclick="showContactsView('people')"
+          style="padding:8px 20px;font-family:var(--mono);font-size:10px;letter-spacing:0.1em;text-transform:uppercase;border:none;cursor:pointer;background:var(--surface);color:var(--muted)">
+          People
+        </button>
+      </div>
+
+      <!-- COMPANIES VIEW -->
+      <div id="cv-companies">
+        <div class="stats" id="org-stats">
+          <div class="stat red"><div class="stat-lbl">Total</div><div class="stat-val" id="s-total">—</div></div>
+          <div class="stat blue"><div class="stat-lbl">Clubs</div><div class="stat-val" id="s-clubs">—</div></div>
+          <div class="stat green"><div class="stat-lbl">Festivals</div><div class="stat-val" id="s-fests">—</div></div>
+          <div class="stat"><div class="stat-lbl">Promoters</div><div class="stat-val" id="s-proms">—</div></div>
+          <div class="stat"><div class="stat-lbl">Countries</div><div class="stat-val" id="s-countries">—</div></div>
         </div>
-        <div class="stat green">
-          <div class="stat-lbl">Mailchimp Synced</div>
-          <div class="stat-val" id="sc-synced">—</div>
+        <div class="toolbar">
+          <input class="tb-search" type="text" id="org-search" placeholder="Search name, city..." oninput="filterOrgs()">
+          <select class="tb-select" id="org-type" onchange="filterOrgs()">
+            <option value="">All types</option>
+            <option>Club</option><option>Festival</option><option>Promoter</option>
+            <option>Agency</option><option>Brand</option><option>Other</option>
+          </select>
+          <select class="tb-select" id="org-country" onchange="filterOrgs()">
+            <option value="">All countries</option>
+            <option>Indonesia</option><option>Thailand</option><option>UAE</option>
+            <option>Singapore</option><option>Cambodia</option><option>Netherlands</option>
+            <option>Belgium</option><option>Germany</option><option>Spain</option>
+            <option>Italy</option><option>France</option><option>United Kingdom</option><option>Other</option>
+          </select>
+          <select class="tb-select" id="org-genre" onchange="filterOrgs()">
+            <option value="">All genres</option>
+            <option>Afro House</option><option>Melodic House</option><option>Tech House</option>
+            <option>Deep House</option><option>House</option><option>Techno</option>
+            <option>EDM</option><option>Melodic Techno</option><option>Progressive</option><option>Disco</option>
+          </select>
+          <div class="tb-right">
+            <button class="btn" onclick="exportOrgs()">↓ Export</button>
+            <button class="btn primary" onclick="openOrgModal()">+ Add Company</button>
+          </div>
         </div>
-        <div class="stat blue">
-          <div class="stat-lbl">Manual</div>
-          <div class="stat-val" id="sc-manual">—</div>
+        <div class="tbl-wrap">
+          <table>
+            <thead>
+              <tr><th>Company</th><th>Type</th><th>Country</th><th>City</th><th>Genre</th><th>Contact</th><th>Email</th><th>Actions</th></tr>
+            </thead>
+            <tbody id="org-tbody"><tr class="tbl-msg"><td colspan="8">Loading...</td></tr></tbody>
+          </table>
         </div>
-        <div class="stat">
-          <div class="stat-lbl">Imported</div>
-          <div class="stat-val" id="sc-import">—</div>
-        </div>
-        <div class="stat">
-          <div class="stat-lbl">Claude</div>
-          <div class="stat-val" id="sc-claude">—</div>
+        <div class="pagination">
+          <button class="pg-btn" id="org-prev" onclick="orgPage(-1)" disabled>← Prev</button>
+          <span class="pg-info" id="org-pinfo"></span>
+          <button class="pg-btn" id="org-next" onclick="orgPage(1)">Next →</button>
         </div>
       </div>
 
-      <div class="toolbar">
-        <input class="tb-search" type="text" id="con-search" placeholder="Search name, email..." oninput="filterContacts()">
-        <select class="tb-select" id="con-source" onchange="filterContacts()">
-          <option value="">All sources</option>
-          <option>Manual</option><option>Import</option><option>Claude</option>
-        </select>
-        <select class="tb-select" id="con-synced" onchange="filterContacts()">
-          <option value="">All sync status</option>
-          <option value="true">Synced</option>
-          <option value="false">Not synced</option>
-        </select>
-        <div class="tb-right">
-          <button class="btn" onclick="exportContacts()">↓ Export</button>
-          <button class="btn" id="sync-btn" onclick="syncAllToMailchimp()" style="border-color:#1a6b3c;color:#1a6b3c">⟳ Sync to Mailchimp</button>
-          <button class="btn primary" onclick="openConModal()">+ Add Contact</button>
+      <!-- PEOPLE VIEW -->
+      <div id="cv-people" style="display:none">
+        <div class="stats">
+          <div class="stat red"><div class="stat-lbl">Total Contacts</div><div class="stat-val" id="sc-total">—</div></div>
+          <div class="stat green"><div class="stat-lbl">Mailchimp Synced</div><div class="stat-val" id="sc-synced">—</div></div>
+          <div class="stat blue"><div class="stat-lbl">Manual</div><div class="stat-val" id="sc-manual">—</div></div>
+          <div class="stat"><div class="stat-lbl">Imported</div><div class="stat-val" id="sc-import">—</div></div>
+          <div class="stat"><div class="stat-lbl">Claude</div><div class="stat-val" id="sc-claude">—</div></div>
+        </div>
+        <div class="toolbar">
+          <input class="tb-search" type="text" id="con-search" placeholder="Search name, email..." oninput="filterContacts()">
+          <select class="tb-select" id="con-source" onchange="filterContacts()">
+            <option value="">All sources</option>
+            <option>Manual</option><option>Import</option><option>Claude</option>
+          </select>
+          <select class="tb-select" id="con-synced" onchange="filterContacts()">
+            <option value="">All sync status</option>
+            <option value="true">Synced</option>
+            <option value="false">Not synced</option>
+          </select>
+          <div class="tb-right">
+            <button class="btn" onclick="exportContacts()">↓ Export</button>
+            <button class="btn" id="sync-btn" onclick="syncAllToMailchimp()" style="border-color:#1a6b3c;color:#1a6b3c">⟳ Sync to Mailchimp</button>
+            <button class="btn primary" onclick="openConModal()">+ Add Contact</button>
+          </div>
+        </div>
+        <div class="tbl-wrap">
+          <table>
+            <thead>
+              <tr><th>Name</th><th>Email</th><th>Phone</th><th>Company</th><th>Tags</th><th>Source</th><th>MC Sync</th><th>Actions</th></tr>
+            </thead>
+            <tbody id="con-tbody"><tr class="tbl-msg"><td colspan="8">Loading...</td></tr></tbody>
+          </table>
+        </div>
+        <div class="pagination">
+          <button class="pg-btn" id="con-prev" onclick="conPage(-1)" disabled>← Prev</button>
+          <span class="pg-info" id="con-pinfo"></span>
+          <button class="pg-btn" id="con-next" onclick="conPage(1)">Next →</button>
         </div>
       </div>
 
-      <div class="tbl-wrap">
-        <table>
-          <thead>
-            <tr>
-              <th>Name</th><th>Email</th><th>Phone</th>
-              <th>Organisation</th><th>Tags</th><th>Source</th><th>MC Sync</th><th>Actions</th>
-            </tr>
-          </thead>
-          <tbody id="con-tbody">
-            <tr class="tbl-msg"><td colspan="8">Loading...</td></tr>
-          </tbody>
-        </table>
-      </div>
-      <div class="pagination">
-        <button class="pg-btn" id="con-prev" onclick="conPage(-1)" disabled>← Prev</button>
-        <span class="pg-info" id="con-pinfo"></span>
-        <button class="pg-btn" id="con-next" onclick="conPage(1)">Next →</button>
-      </div>
     </div>
 
     <!-- ── BOOKINGS PANEL ── -->
@@ -3120,6 +3091,7 @@ function goToContact(email) {
   document.querySelectorAll('.h-tab').forEach(t => t.classList.remove('active'));
   document.getElementById('panel-contacts').classList.add('active');
   document.querySelectorAll('.h-tab')[1].classList.add('active');
+  showContactsView('people');
   document.getElementById('con-search').value = email;
   document.getElementById('con-source').value = '';
   document.getElementById('con-synced').value = '';
@@ -7080,6 +7052,28 @@ async function runRemindersNow() {
   btn.disabled = false; btn.textContent = '▶ Run Now';
 }
 // ── END REMINDERS ──────────────────────────────────────────────
+
+// ── CONTACTS VIEW TOGGLE ──────────────────────────────────────
+function showContactsView(view) {
+  const companies = document.getElementById('cv-companies');
+  const people    = document.getElementById('cv-people');
+  const btnCo     = document.getElementById('cv-btn-companies');
+  const btnPe     = document.getElementById('cv-btn-people');
+  if (!companies || !people) return;
+
+  if (view === 'companies') {
+    companies.style.display = 'block';
+    people.style.display    = 'none';
+    btnCo.style.background  = 'var(--accent)'; btnCo.style.color = '#fff';
+    btnPe.style.background  = 'var(--surface)'; btnPe.style.color = 'var(--muted)';
+  } else {
+    companies.style.display = 'none';
+    people.style.display    = 'block';
+    btnPe.style.background  = 'var(--accent)'; btnPe.style.color = '#fff';
+    btnCo.style.background  = 'var(--surface)'; btnCo.style.color = 'var(--muted)';
+  }
+}
+// ── END CONTACTS VIEW TOGGLE ───────────────────────────────────
 
 function closeModal(id) { document.getElementById(id).classList.remove('open'); }
 
