@@ -2296,16 +2296,20 @@ tbody td { padding: 10px 14px; vertical-align: middle; }
     <div class="form-section">Promoter / Buyer</div>
     <div class="form-grid">
       <div class="fg">
-        <label>Organisation</label>
-        <select id="bm-org">
-          <option value="">Select organisation</option>
+        <label>Organisation *</label>
+        <select id="bm-org" onchange="loadContactsForOrg()">
+          <option value="">Select organisation...</option>
         </select>
       </div>
       <div class="fg">
-        <label>Contact (Talent Buyer)</label>
-        <select id="bm-contact">
-          <option value="">Select contact</option>
+        <label>Contact * <span id="bm-contact-hint" style="font-family:var(--mono);font-size:9px;color:var(--amber)"></span></label>
+        <select id="bm-contact" required>
+          <option value="">— select organisation first —</option>
         </select>
+        <div style="margin-top:4px;display:flex;gap:8px;align-items:center">
+          <span id="bm-contact-info" style="font-family:var(--mono);font-size:10px;color:var(--muted)"></span>
+          <button type="button" id="bm-add-contact-btn" onclick="addContactFromBooking()" style="display:none;font-family:var(--mono);font-size:9px;padding:2px 8px;border:1px solid var(--green);color:var(--green);background:none;cursor:pointer">+ New contact for this org</button>
+        </div>
       </div>
       <div class="fg">
         <label>Territory</label>
@@ -3432,15 +3436,15 @@ function openBookingModal(id = null) {
 
   // Populate org dropdown
   const orgSel = document.getElementById('bm-org');
-  orgSel.innerHTML = '<option value="">Select organisation</option>' +
+  orgSel.innerHTML = '<option value="">Select organisation...</option>' +
     allOrgs.map(o => `<option value="${o.id}">${esc(o.name)}</option>`).join('');
 
+  // Reset contact dropdown
   const conSel = document.getElementById('bm-contact');
-  conSel.innerHTML = '<option value="">Select contact</option>' +
-    allCons.map(c => {
-      const name = [c.first_name, c.last_name].filter(Boolean).join(' ') || c.email;
-      return `<option value="${c.id}">${esc(name)}</option>`;
-    }).join('');
+  conSel.innerHTML = '<option value="">— select organisation first —</option>';
+  document.getElementById('bm-contact-hint').textContent = '';
+  document.getElementById('bm-contact-info').textContent = '';
+  document.getElementById('bm-add-contact-btn').style.display = 'none';
 
   if (!id) {
     // Clear form
@@ -3460,6 +3464,65 @@ function openBookingModal(id = null) {
   }
 
   document.getElementById('bk-modal').classList.add('open');
+}
+
+function loadContactsForOrg(preSelectId = null) {
+  const orgId  = document.getElementById('bm-org').value;
+  const conSel = document.getElementById('bm-contact');
+  const hint   = document.getElementById('bm-contact-hint');
+  const info   = document.getElementById('bm-contact-info');
+  const addBtn = document.getElementById('bm-add-contact-btn');
+
+  if (!orgId) {
+    conSel.innerHTML = '<option value="">— select organisation first —</option>';
+    hint.textContent = '';
+    info.textContent = '';
+    addBtn.style.display = 'none';
+    return;
+  }
+
+  const orgCons = allCons.filter(c => c.organisation_id === orgId);
+  addBtn.style.display = 'inline-block';
+
+  if (!orgCons.length) {
+    conSel.innerHTML = '<option value="">No contacts yet</option>';
+    hint.textContent = '⚠ No contacts for this org';
+    info.textContent = '';
+    return;
+  }
+
+  conSel.innerHTML = '<option value="">Select contact *</option>' +
+    orgCons.map(c => {
+      const name = [c.first_name, c.last_name].filter(Boolean).join(' ') || c.email || '—';
+      return `<option value="${c.id}">${esc(name)}${c.role ? ' — '+esc(c.role) : ''}</option>`;
+    }).join('');
+
+  if (preSelectId) conSel.value = preSelectId;
+  hint.textContent = '';
+
+  // Show contact info when selected
+  conSel.onchange = () => {
+    const con = allCons.find(c => c.id === conSel.value);
+    info.textContent = con ? [con.email, con.phone].filter(Boolean).join(' · ') : '';
+  };
+  if (preSelectId) conSel.onchange();
+}
+
+function addContactFromBooking() {
+  const orgId = document.getElementById('bm-org').value;
+  const org   = allOrgs.find(o => o.id === orgId);
+  closeModal('bk-modal');
+  setTimeout(() => {
+    openConModal();
+    setTimeout(() => {
+      const sel = document.getElementById('cm-org');
+      if (sel && orgId) {
+        sel.value = orgId;
+        const hint = document.querySelector('#con-modal .modal-hdr .modal-title');
+        if (hint) hint.textContent = `New Contact for ${org?.name || 'Organisation'}`;
+      }
+    }, 100);
+  }, 100);
 }
 
 function editBooking(id) {
@@ -3492,7 +3555,9 @@ function editBooking(id) {
   document.getElementById('bm-withholding').value = b.withholding_rate || 0;
   document.getElementById('bm-wh-country').value = b.withholding_country || '';
   document.getElementById('bm-org').value       = b.company_id || '';
-  document.getElementById('bm-contact').value   = b.contact_id || '';
+  if (b.company_id) {
+    loadContactsForOrg(b.contact_id);
+  }
   document.getElementById('bm-territory').value = b.territory || '';
   document.getElementById('bm-notes').value     = b.internal_notes || '';
   if (b.hold_expires_at) {
@@ -3523,10 +3588,14 @@ async function setBookingStatus(status) {
 }
 
 async function saveBooking() {
-  const artistId = document.getElementById('bm-artist').value;
-  const date     = document.getElementById('bm-date').value;
-  if (!artistId) { showToast('Artist is required', 'error'); return; }
-  if (!date)     { showToast('Show date is required', 'error'); return; }
+  const artistId  = document.getElementById('bm-artist').value;
+  const date      = document.getElementById('bm-date').value;
+  const orgId     = document.getElementById('bm-org').value;
+  const contactId = document.getElementById('bm-contact').value;
+  if (!artistId)  { showToast('Artist is required', 'error'); return; }
+  if (!date)      { showToast('Show date is required', 'error'); return; }
+  if (!orgId)     { showToast('Organisation is required', 'error'); return; }
+  if (!contactId) { showToast('Contact is required — please select or create a contact for this organisation', 'error'); return; }
 
   const data = {
     artist_id:           artistId,
