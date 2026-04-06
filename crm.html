@@ -996,6 +996,45 @@ tbody td { padding: 10px 14px; vertical-align: middle; }
                       font-weight:500; font-size:14px; }
 /* ── SETTLEMENT MODULE END ───────────────────────────── */
 
+/* ── COMPANY DETAIL ──────────────────────────────────── */
+#company-detail-overlay {
+  position:fixed;inset:0;background:var(--bg);z-index:300;display:none;flex-direction:column;
+}
+#company-detail-overlay.open { display:flex; }
+.cd-header {
+  background:var(--accent);padding:14px 24px;display:flex;align-items:center;gap:16px;flex-shrink:0;
+}
+.cd-back { background:none;border:1px solid rgba(255,255,255,0.3);color:#fff;padding:5px 12px;
+           font-family:var(--mono);font-size:10px;cursor:pointer;transition:all 0.1s; }
+.cd-back:hover { background:rgba(255,255,255,0.1); }
+.cd-title { font-size:15px;font-weight:500;color:#fff; }
+.cd-subtitle { font-family:var(--mono);font-size:10px;color:rgba(255,255,255,0.5);margin-top:2px; }
+.cd-tabs { display:flex;border-bottom:1px solid var(--border);background:var(--surface);flex-shrink:0; }
+.cd-tab { padding:12px 20px;font-family:var(--mono);font-size:10px;letter-spacing:0.1em;
+          text-transform:uppercase;cursor:pointer;color:var(--muted);border-bottom:2px solid transparent;
+          transition:all 0.15s; }
+.cd-tab:hover { color:var(--accent); }
+.cd-tab.active { color:var(--accent);border-bottom-color:var(--red); }
+.cd-body { flex:1;overflow-y:auto;padding:28px; }
+.cd-panel { display:none; }
+.cd-panel.active { display:block; }
+.cd-section { background:var(--surface);border:1px solid var(--border);margin-bottom:16px; }
+.cd-section-hdr { background:var(--bg);padding:10px 16px;font-family:var(--mono);font-size:9px;
+                  letter-spacing:0.15em;text-transform:uppercase;color:var(--muted);
+                  border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center; }
+.cd-fields { display:grid;grid-template-columns:1fr 1fr;gap:0; }
+.cd-field { padding:12px 16px;border-bottom:1px solid var(--border); }
+.cd-field:nth-child(odd) { border-right:1px solid var(--border); }
+.cd-field-label { font-family:var(--mono);font-size:9px;letter-spacing:0.1em;text-transform:uppercase;
+                  color:var(--muted);margin-bottom:4px; }
+.cd-field-val { font-size:13px;color:var(--accent); }
+.cd-field-input { width:100%;border:none;border-bottom:1px solid transparent;background:transparent;
+                  font-size:13px;color:var(--accent);outline:none;padding:2px 0;font-family:var(--sans); }
+.cd-field-input:focus { border-bottom-color:var(--accent); }
+.cd-save-bar { position:sticky;bottom:0;background:var(--surface);border-top:1px solid var(--border);
+               padding:12px 28px;display:flex;justify-content:flex-end;gap:8px; }
+/* ── COMPANY DETAIL END ──────────────────────────────── */
+
 /* toast */
 #toast {
   position: fixed; bottom: 24px; right: 24px; padding: 12px 20px;
@@ -2976,6 +3015,147 @@ The Netherlands</textarea>
   </div>
 </div>
 
+<!-- COMPANY DETAIL OVERLAY -->
+<div id="company-detail-overlay">
+  <div class="cd-header">
+    <button class="cd-back" onclick="closeCompanyDetail()">← Back</button>
+    <div>
+      <div class="cd-title" id="cd-title">Company</div>
+      <div class="cd-subtitle" id="cd-subtitle"></div>
+    </div>
+    <div style="margin-left:auto;display:flex;gap:8px">
+      <button class="btn" onclick="saveCompanyDetail()" style="border-color:rgba(255,255,255,0.4);color:#fff;background:rgba(255,255,255,0.1)">✓ Save</button>
+    </div>
+  </div>
+
+  <div class="cd-tabs">
+    <div class="cd-tab active" onclick="showCdTab('details',this)">Company Details</div>
+    <div class="cd-tab" onclick="showCdTab('contacts',this)">Contacts</div>
+    <div class="cd-tab" onclick="showCdTab('bookings',this)">Bookings</div>
+  </div>
+
+  <div class="cd-body">
+
+    <!-- DETAILS TAB -->
+    <div class="cd-panel active" id="cdp-details">
+      <input type="hidden" id="cd-org-id">
+
+      <div class="cd-section">
+        <div class="cd-section-hdr">Company Info</div>
+        <div class="cd-fields">
+          <div class="cd-field">
+            <div class="cd-field-label">Company Name *</div>
+            <input class="cd-field-input" id="cd-name" placeholder="Company name">
+          </div>
+          <div class="cd-field">
+            <div class="cd-field-label">Type</div>
+            <select class="cd-field-input" id="cd-type">
+              <option value="">Select type</option>
+              <option>Club</option><option>Festival</option><option>Promoter</option>
+              <option>Agency</option><option>Brand</option><option>Other</option>
+            </select>
+          </div>
+          <div class="cd-field">
+            <div class="cd-field-label">Website</div>
+            <input class="cd-field-input" id="cd-website" placeholder="https://...">
+          </div>
+          <div class="cd-field">
+            <div class="cd-field-label">Phone</div>
+            <input class="cd-field-input" id="cd-phone" placeholder="+31 6...">
+          </div>
+          <div class="cd-field" style="grid-column:1/-1">
+            <div class="cd-field-label">Genre / Market</div>
+            <input class="cd-field-input" id="cd-genre" placeholder="Tech House, Melodic...">
+          </div>
+        </div>
+      </div>
+
+      <div class="cd-section">
+        <div class="cd-section-hdr">Financial & Legal</div>
+        <div class="cd-fields">
+          <div class="cd-field">
+            <div class="cd-field-label">VAT Number</div>
+            <input class="cd-field-input" id="cd-vat" placeholder="NL000000000B01">
+          </div>
+          <div class="cd-field">
+            <div class="cd-field-label">KVK / Chamber of Commerce</div>
+            <input class="cd-field-input" id="cd-kvk" placeholder="12345678">
+          </div>
+          <div class="cd-field">
+            <div class="cd-field-label">IBAN</div>
+            <input class="cd-field-input" id="cd-iban" placeholder="NL00 BANK 0000 0000 00">
+          </div>
+          <div class="cd-field">
+            <div class="cd-field-label">BIC / SWIFT</div>
+            <input class="cd-field-input" id="cd-bic" placeholder="ABNANL2A">
+          </div>
+        </div>
+      </div>
+
+      <div class="cd-section">
+        <div class="cd-section-hdr">Address</div>
+        <div class="cd-fields">
+          <div class="cd-field" style="grid-column:1/-1">
+            <div class="cd-field-label">Street Address</div>
+            <input class="cd-field-input" id="cd-address" placeholder="Street 1">
+          </div>
+          <div class="cd-field">
+            <div class="cd-field-label">Postal Code</div>
+            <input class="cd-field-input" id="cd-postal" placeholder="1234 AB">
+          </div>
+          <div class="cd-field">
+            <div class="cd-field-label">City</div>
+            <input class="cd-field-input" id="cd-city" placeholder="Amsterdam">
+          </div>
+          <div class="cd-field" style="grid-column:1/-1">
+            <div class="cd-field-label">Country</div>
+            <input class="cd-field-input" id="cd-country" list="country-list" placeholder="Netherlands">
+          </div>
+        </div>
+      </div>
+
+      <div class="cd-section">
+        <div class="cd-section-hdr">Notes</div>
+        <div style="padding:12px 16px">
+          <textarea class="cd-field-input" id="cd-notes" placeholder="Internal notes..." style="min-height:80px;resize:vertical;width:100%;box-sizing:border-box"></textarea>
+        </div>
+      </div>
+    </div>
+
+    <!-- CONTACTS TAB -->
+    <div class="cd-panel" id="cdp-contacts">
+      <div style="display:flex;justify-content:flex-end;margin-bottom:12px">
+        <button class="btn primary" onclick="openConModalForOrg()">+ Add Contact</button>
+      </div>
+      <div class="tbl-wrap">
+        <table>
+          <thead>
+            <tr><th>Name</th><th>Email</th><th>Phone</th><th>Role</th><th>MC Sync</th><th>Actions</th></tr>
+          </thead>
+          <tbody id="cd-contacts-tbody">
+            <tr class="tbl-msg"><td colspan="6">Loading...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- BOOKINGS TAB -->
+    <div class="cd-panel" id="cdp-bookings">
+      <div class="tbl-wrap">
+        <table>
+          <thead>
+            <tr><th>Date</th><th>Artist</th><th>Venue</th><th>Status</th><th>Fee</th><th>Actions</th></tr>
+          </thead>
+          <tbody id="cd-bookings-tbody">
+            <tr class="tbl-msg"><td colspan="6">Loading...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  </div>
+</div>
+
 <!-- EMAIL MODAL -->
 <div id="email-overlay">
   <div class="email-modal">
@@ -3492,7 +3672,7 @@ function renderOrgs() {
     const extraLabel = extraCount > 0
       ? `<span style="font-family:var(--mono);font-size:9px;color:var(--muted);margin-left:4px">+${extraCount} more</span>`
       : '';
-    return `<tr>
+    return `<tr style="cursor:pointer" onclick="openCompanyDetail('${o.id}')">
       <td class="td-name td-trunc">${esc(o.name)}</td>
       <td>${typeBadge(o.type)}</td>
       <td>${esc(o.country||'—')}</td>
@@ -3501,9 +3681,9 @@ function renderOrgs() {
       <td>${conName}${extraLabel}</td>
       <td class="td-trunc">${conEmail}</td>
       <td><div class="row-actions">
-        <button class="ra" onclick="addContactToOrg('${o.id}','${esc(o.name)}')">+ Contact</button>
-        <button class="ra" onclick="editOrg('${o.id}')">Edit</button>
-        <button class="ra del" onclick="deleteOrg('${o.id}','${esc(o.name)}')">Del</button>
+        <button class="ra" onclick="event.stopPropagation();addContactToOrg('${o.id}','${esc(o.name)}')">+ Contact</button>
+        <button class="ra" onclick="event.stopPropagation();openCompanyDetail('${o.id}')">Open</button>
+        <button class="ra del" onclick="event.stopPropagation();deleteOrg('${o.id}','${esc(o.name)}')">Del</button>
       </div></td>
     </tr>`;
   }).join('');
@@ -7074,6 +7254,154 @@ function showContactsView(view) {
   }
 }
 // ── END CONTACTS VIEW TOGGLE ───────────────────────────────────
+
+// ── COMPANY DETAIL ────────────────────────────────────────────
+let currentOrgId = null;
+
+function showCdTab(tab, el) {
+  document.querySelectorAll('.cd-tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.cd-panel').forEach(p => p.classList.remove('active'));
+  document.getElementById('cdp-' + tab).classList.add('active');
+  if (el) el.classList.add('active');
+}
+
+async function openCompanyDetail(orgId) {
+  currentOrgId = orgId;
+  const overlay = document.getElementById('company-detail-overlay');
+  overlay.classList.add('open');
+  showCdTab('details', document.querySelector('.cd-tab'));
+
+  // Load org from DB with full fields
+  const { data: o, error } = await db.from('organisations').select('*').eq('id', orgId).single();
+  if (error || !o) { showToast('Error loading company', 'error'); return; }
+
+  document.getElementById('cd-org-id').value  = o.id;
+  document.getElementById('cd-title').textContent    = o.name || 'Company';
+  document.getElementById('cd-subtitle').textContent = [o.type, o.city, o.country].filter(Boolean).join(' · ');
+  document.getElementById('cd-name').value    = o.name || '';
+  document.getElementById('cd-type').value    = o.type || '';
+  document.getElementById('cd-website').value = o.website || '';
+  document.getElementById('cd-phone').value   = o.phone || '';
+  document.getElementById('cd-genre').value   = (o.genre || []).join(', ');
+  document.getElementById('cd-vat').value     = o.vat_number || '';
+  document.getElementById('cd-kvk').value     = o.kvk_number || '';
+  document.getElementById('cd-iban').value    = o.iban || '';
+  document.getElementById('cd-bic').value     = o.bic || '';
+  document.getElementById('cd-address').value = o.address || '';
+  document.getElementById('cd-postal').value  = o.postal_code || '';
+  document.getElementById('cd-city').value    = o.city || '';
+  document.getElementById('cd-country').value = o.country || '';
+  document.getElementById('cd-notes').value   = o.notes || '';
+
+  // Load contacts
+  loadCdContacts(orgId);
+  // Load bookings
+  loadCdBookings(orgId);
+}
+
+async function saveCompanyDetail() {
+  const id = document.getElementById('cd-org-id').value;
+  if (!id) return;
+  const genreRaw = document.getElementById('cd-genre').value;
+  const genre = genreRaw ? genreRaw.split(',').map(g => g.trim()).filter(Boolean) : [];
+
+  const { error } = await db.from('organisations').update({
+    name:        document.getElementById('cd-name').value.trim(),
+    type:        document.getElementById('cd-type').value || null,
+    website:     document.getElementById('cd-website').value.trim() || null,
+    phone:       document.getElementById('cd-phone').value.trim() || null,
+    genre,
+    vat_number:  document.getElementById('cd-vat').value.trim() || null,
+    kvk_number:  document.getElementById('cd-kvk').value.trim() || null,
+    iban:        document.getElementById('cd-iban').value.trim() || null,
+    bic:         document.getElementById('cd-bic').value.trim() || null,
+    address:     document.getElementById('cd-address').value.trim() || null,
+    postal_code: document.getElementById('cd-postal').value.trim() || null,
+    city:        document.getElementById('cd-city').value.trim() || null,
+    country:     document.getElementById('cd-country').value.trim() || null,
+    notes:       document.getElementById('cd-notes').value.trim() || null,
+  }).eq('id', id);
+
+  if (error) { showToast('Error saving: ' + error.message, 'error'); return; }
+  showToast('Company saved ✓', 'success');
+  document.getElementById('cd-title').textContent =
+    document.getElementById('cd-name').value;
+  document.getElementById('cd-subtitle').textContent =
+    [document.getElementById('cd-type').value, document.getElementById('cd-city').value,
+     document.getElementById('cd-country').value].filter(Boolean).join(' · ');
+  loadOrgs(); // refresh list
+}
+
+async function loadCdContacts(orgId) {
+  const tbody = document.getElementById('cd-contacts-tbody');
+  const { data: cons } = await db.from('contacts').select('*').eq('organisation_id', orgId);
+  if (!cons?.length) {
+    tbody.innerHTML = '<tr class="tbl-msg"><td colspan="6">No contacts yet — click "+ Add Contact"</td></tr>';
+    return;
+  }
+  tbody.innerHTML = cons.map(c => {
+    const name = [c.first_name, c.last_name].filter(Boolean).join(' ') || '—';
+    const synced = c.mailchimp_id ? '<span class="badge bs-confirmed">synced</span>' : '<span class="badge bs-cancelled">not synced</span>';
+    return `<tr>
+      <td class="td-name">${esc(name)}</td>
+      <td class="td-mono" style="font-size:11px">${esc(c.email||'—')}</td>
+      <td class="td-mono" style="font-size:11px">${esc(c.phone||'—')}</td>
+      <td class="td-mono" style="font-size:11px">${esc(c.role||'—')}</td>
+      <td>${synced}</td>
+      <td><div class="row-actions">
+        <button class="ra" onclick="editConFromDetail('${c.id}')">Edit</button>
+        <button class="ra del" onclick="deleteConFromDetail('${c.id}','${orgId}')">Del</button>
+      </div></td>
+    </tr>`;
+  }).join('');
+}
+
+async function loadCdBookings(orgId) {
+  const tbody = document.getElementById('cd-bookings-tbody');
+  const bks = allBookings.filter(b => b.company_id === orgId);
+  if (!bks.length) {
+    tbody.innerHTML = '<tr class="tbl-msg"><td colspan="6">No bookings found</td></tr>';
+    return;
+  }
+  const sym = s => ({EUR:'€',USD:'$',GBP:'£',SGD:'S$'}[s]||s);
+  tbody.innerHTML = bks.sort((a,b) => (b.show_date||'').localeCompare(a.show_date||'')).map(b => `<tr>
+    <td class="td-mono" style="font-size:11px">${b.show_date?fmtDate(b.show_date):'—'}</td>
+    <td class="td-name">${esc(b.artists?.name||'—')}</td>
+    <td class="td-trunc">${esc([b.venue_name,b.venue_city].filter(Boolean).join(', ')||'—')}</td>
+    <td>${statusBadge(b.status)}</td>
+    <td class="td-mono">${b.fee_amount?(sym(b.fee_currency)+b.fee_amount.toLocaleString()):'—'}</td>
+    <td><button class="ra" onclick="editBooking('${b.id}')">Open</button></td>
+  </tr>`).join('');
+}
+
+function openConModalForOrg() {
+  closeCompanyDetail();
+  setTimeout(() => {
+    openConModal();
+    // Pre-select the org
+    setTimeout(() => {
+      const sel = document.getElementById('cm-org');
+      if (sel && currentOrgId) sel.value = currentOrgId;
+    }, 100);
+  }, 100);
+}
+
+function editConFromDetail(conId) {
+  editCon(conId);
+}
+
+async function deleteConFromDetail(conId, orgId) {
+  if (!confirm('Delete this contact?')) return;
+  await db.from('contacts').delete().eq('id', conId);
+  loadCdContacts(orgId);
+  loadContacts();
+}
+
+function closeCompanyDetail() {
+  document.getElementById('company-detail-overlay').classList.remove('open');
+  currentOrgId = null;
+}
+// ── END COMPANY DETAIL ─────────────────────────────────────────
 
 function closeModal(id) { document.getElementById(id).classList.remove('open'); }
 
