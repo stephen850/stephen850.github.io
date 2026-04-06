@@ -1043,6 +1043,7 @@ tbody td { padding: 10px 14px; vertical-align: middle; }
       <div class="h-tab" onclick="showPanel('advancing', this)">Advancing</div>
       <div class="h-tab" onclick="showPanel('finance', this);renderFinance()">Finance</div>
       <div class="h-tab" onclick="showPanel('calendar', this);renderCalendar()">Calendar</div>
+      <div class="h-tab" onclick="showPanel('reminders', this);renderReminders()">Reminders</div>
       <div class="h-tab" onclick="showPanel('import', this)">Import</div>
     </nav>
     <div class="h-right">
@@ -1918,6 +1919,80 @@ tbody td { padding: 10px 14px; vertical-align: middle; }
         <button class="btn" id="cal-popup-adv" style="font-size:9px;padding:4px 10px;border-color:var(--blue);color:var(--blue)">Advance</button>
         <button class="btn primary" onclick="closeCalPopup();openBookingModal()" style="font-size:9px;padding:4px 10px;margin-left:auto">+ New Booking</button>
       </div>
+    </div>
+
+    <!-- ── REMINDERS PANEL ── -->
+    <div class="panel" id="panel-reminders">
+
+      <!-- Header -->
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px">
+        <div>
+          <div style="font-family:var(--mono);font-size:11px;font-weight:500;color:var(--accent)">Automated Reminders</div>
+          <div style="font-family:var(--mono);font-size:10px;color:var(--muted);margin-top:4px">Configure and trigger automated email reminders</div>
+        </div>
+        <div style="display:flex;gap:8px">
+          <button class="btn" id="rem-run-btn" onclick="runRemindersNow()" style="border-color:var(--green);color:var(--green)">▶ Run Now</button>
+          <button class="btn" onclick="renderReminders()">↻ Refresh</button>
+        </div>
+      </div>
+
+      <!-- Rules -->
+      <div class="tbl-wrap" style="margin-bottom:20px">
+        <div style="background:var(--accent);padding:10px 14px;font-family:var(--mono);font-size:9px;letter-spacing:0.15em;text-transform:uppercase;color:rgba(255,255,255,0.7)">
+          Reminder Rules
+        </div>
+        <table>
+          <thead>
+            <tr><th>Type</th><th>Trigger (days)</th><th>Subject</th><th>Enabled</th><th>Actions</th></tr>
+          </thead>
+          <tbody id="rem-rules-tbody">
+            <tr class="tbl-msg"><td colspan="5">Loading...</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Edit rule modal inline -->
+      <div id="rem-edit-panel" style="display:none;background:var(--surface);border:1px solid var(--border);padding:24px;margin-bottom:20px">
+        <div style="font-family:var(--mono);font-size:10px;font-weight:500;color:var(--accent);margin-bottom:16px">Edit Rule — <span id="rem-edit-type"></span></div>
+        <input type="hidden" id="rem-edit-id">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px">
+          <div class="fg"><label>Trigger after (days)</label>
+            <input type="number" id="rem-edit-days" min="1" max="90" placeholder="7"></div>
+          <div class="fg"><label>Enabled</label>
+            <select id="rem-edit-enabled">
+              <option value="true">Yes — active</option>
+              <option value="false">No — disabled</option>
+            </select></div>
+        </div>
+        <div class="fg" style="margin-bottom:12px"><label>Email Subject</label>
+          <input id="rem-edit-subject" placeholder="Subject line with {{merge_fields}}"></div>
+        <div class="fg" style="margin-bottom:16px"><label>Email Body</label>
+          <textarea id="rem-edit-body" style="min-height:200px;resize:vertical;font-size:12px;line-height:1.6" placeholder="Use {{contact}}, {{artist}}, {{venue}}, {{date}}, {{amount}}, {{invoice_number}}, {{due_date}}"></textarea>
+        </div>
+        <div style="font-family:var(--mono);font-size:9px;color:var(--muted);margin-bottom:16px">
+          Available merge fields: {{contact}} {{artist}} {{venue}} {{date}} {{amount}} {{invoice_number}} {{due_date}} {{days_until_due}}
+        </div>
+        <div style="display:flex;gap:8px">
+          <button class="btn primary" onclick="saveReminderRule()">✓ Save Rule</button>
+          <button class="btn" onclick="document.getElementById('rem-edit-panel').style.display='none'">Cancel</button>
+        </div>
+      </div>
+
+      <!-- Log -->
+      <div class="tbl-wrap">
+        <div style="background:var(--accent);padding:10px 14px;font-family:var(--mono);font-size:9px;letter-spacing:0.15em;text-transform:uppercase;color:rgba(255,255,255,0.7)">
+          Reminder Log — Recent
+        </div>
+        <table>
+          <thead>
+            <tr><th>Type</th><th>Sent To</th><th>Date/Time</th><th>Status</th></tr>
+          </thead>
+          <tbody id="rem-log-tbody">
+            <tr class="tbl-msg"><td colspan="4">Loading...</td></tr>
+          </tbody>
+        </table>
+      </div>
+
     </div>
 
     <!-- ── IMPORT PANEL ── -->
@@ -6903,6 +6978,108 @@ async function markPayoutUnpaid() {
 
 function printSettlement() { window.print(); }
 // ── END SETTLEMENT ─────────────────────────────────────────────
+
+// ── REMINDERS ─────────────────────────────────────────────────
+const REMINDER_FUNCTION_URL = 'https://ksnxgidklhonpsneerbu.supabase.co/functions/v1/send-reminders';
+
+const REMINDER_TYPE_LABELS = {
+  invoice_due_soon:     'Invoice — Due Soon',
+  invoice_overdue:      'Invoice — Overdue',
+  contract_unsigned:    'Contract — Unsigned',
+  advancing_incomplete: 'Advancing — Incomplete',
+};
+
+async function renderReminders() {
+  // Load rules
+  const { data: rules } = await db.from('reminder_rules').select('*').order('type');
+  const rulesBody = document.getElementById('rem-rules-tbody');
+  if (!rules?.length) {
+    rulesBody.innerHTML = '<tr class="tbl-msg"><td colspan="5">No rules found</td></tr>';
+  } else {
+    rulesBody.innerHTML = rules.map(r => `<tr>
+      <td class="td-mono" style="font-size:11px">${REMINDER_TYPE_LABELS[r.type]||r.type}</td>
+      <td class="td-mono">${r.days_trigger} days</td>
+      <td style="font-size:12px;max-width:300px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(r.email_subject)}</td>
+      <td><span class="${r.enabled?'badge bs-confirmed':'badge bs-cancelled'}">${r.enabled?'Active':'Disabled'}</span></td>
+      <td><button class="ra" onclick="editReminderRule('${r.id}')">Edit</button></td>
+    </tr>`).join('');
+  }
+
+  // Load log
+  const { data: logs } = await db.from('reminder_log').select('*').order('sent_at', { ascending: false }).limit(50);
+  const logBody = document.getElementById('rem-log-tbody');
+  if (!logs?.length) {
+    logBody.innerHTML = '<tr class="tbl-msg"><td colspan="4">No reminders sent yet</td></tr>';
+  } else {
+    logBody.innerHTML = logs.map(l => {
+      const dt = new Date(l.sent_at);
+      const dateStr = dt.toLocaleDateString('nl-NL', { day:'2-digit', month:'short', year:'numeric' });
+      const timeStr = dt.toLocaleTimeString('nl-NL', { hour:'2-digit', minute:'2-digit' });
+      return `<tr>
+        <td class="td-mono" style="font-size:10px">${REMINDER_TYPE_LABELS[l.type]||l.type}</td>
+        <td class="td-mono" style="font-size:11px">${esc(l.sent_to)}</td>
+        <td class="td-mono" style="font-size:10px">${dateStr} ${timeStr}</td>
+        <td><span class="badge ${l.status==='sent'?'bs-confirmed':'bs-cancelled'}">${l.status}</span></td>
+      </tr>`;
+    }).join('');
+  }
+}
+
+async function editReminderRule(id) {
+  const { data: r } = await db.from('reminder_rules').select('*').eq('id', id).single();
+  if (!r) return;
+  document.getElementById('rem-edit-id').value      = r.id;
+  document.getElementById('rem-edit-type').textContent = REMINDER_TYPE_LABELS[r.type]||r.type;
+  document.getElementById('rem-edit-days').value    = r.days_trigger;
+  document.getElementById('rem-edit-enabled').value = r.enabled ? 'true' : 'false';
+  document.getElementById('rem-edit-subject').value = r.email_subject;
+  document.getElementById('rem-edit-body').value    = r.email_body;
+  document.getElementById('rem-edit-panel').style.display = 'block';
+  document.getElementById('rem-edit-panel').scrollIntoView({ behavior: 'smooth' });
+}
+
+async function saveReminderRule() {
+  const id = document.getElementById('rem-edit-id').value;
+  const { error } = await db.from('reminder_rules').update({
+    days_trigger:  parseInt(document.getElementById('rem-edit-days').value),
+    enabled:       document.getElementById('rem-edit-enabled').value === 'true',
+    email_subject: document.getElementById('rem-edit-subject').value.trim(),
+    email_body:    document.getElementById('rem-edit-body').value.trim(),
+    updated_at:    new Date().toISOString(),
+  }).eq('id', id);
+  if (error) { showToast('Error saving rule', 'error'); return; }
+  showToast('Rule saved ✓', 'success');
+  document.getElementById('rem-edit-panel').style.display = 'none';
+  renderReminders();
+}
+
+async function runRemindersNow() {
+  const btn = document.getElementById('rem-run-btn');
+  btn.disabled = true; btn.textContent = 'Running...';
+  try {
+    const { data: { session } } = await db.auth.getSession();
+    const res = await fetch(REMINDER_FUNCTION_URL, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${session?.access_token || SUPABASE_KEY}`,
+        'apikey': SUPABASE_KEY,
+      },
+      body: JSON.stringify({}),
+    });
+    const data = await res.json();
+    if (data.results) {
+      showToast(`Done — ${data.results.sent} sent, ${data.results.skipped} skipped`, 'success');
+    } else {
+      showToast('Ran — check log', 'success');
+    }
+    renderReminders();
+  } catch(e) {
+    showToast('Error: ' + e.message, 'error');
+  }
+  btn.disabled = false; btn.textContent = '▶ Run Now';
+}
+// ── END REMINDERS ──────────────────────────────────────────────
 
 function closeModal(id) { document.getElementById(id).classList.remove('open'); }
 
