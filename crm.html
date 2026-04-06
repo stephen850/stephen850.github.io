@@ -1075,6 +1075,7 @@ tbody td { padding: 10px 14px; vertical-align: middle; }
     <nav class="h-nav">
       <div class="h-tab active" onclick="showPanel('dashboard', this);renderDashboard()">Dashboard</div>
       <div class="h-tab" onclick="showPanel('contacts', this);showContactsView('companies')">Contacts</div>
+      <div class="h-tab" onclick="showPanel('venues', this);renderVenues()">Venues</div>
       <div class="h-tab" onclick="showPanel('bookings', this)">Bookings</div>
       <div class="h-tab" onclick="showPanel('contracts', this)">Contracts</div>
       <div class="h-tab" onclick="showPanel('invoices', this)">Invoices</div>
@@ -1299,6 +1300,48 @@ tbody td { padding: 10px 14px; vertical-align: middle; }
         </div>
       </div>
 
+    </div>
+
+    <!-- ── VENUES PANEL ── -->
+    <div class="panel" id="panel-venues">
+      <div class="stats">
+        <div class="stat red"><div class="stat-lbl">Total Venues</div><div class="stat-val" id="sv-total">—</div></div>
+        <div class="stat blue"><div class="stat-lbl">Clubs</div><div class="stat-val" id="sv-clubs">—</div></div>
+        <div class="stat green"><div class="stat-lbl">Festivals</div><div class="stat-val" id="sv-fests">—</div></div>
+        <div class="stat"><div class="stat-lbl">Countries</div><div class="stat-val" id="sv-countries">—</div></div>
+      </div>
+      <div class="toolbar">
+        <input class="tb-search" type="text" id="venue-search" placeholder="Search venue, city..." oninput="filterVenues()">
+        <select class="tb-select" id="venue-type" onchange="filterVenues()">
+          <option value="">All types</option>
+          <option value="club">Club</option>
+          <option value="festival">Festival</option>
+        </select>
+        <select class="tb-select" id="venue-country" onchange="filterVenues()">
+          <option value="">All countries</option>
+          <option>Indonesia</option><option>Thailand</option><option>UAE</option>
+          <option>Singapore</option><option>Cambodia</option><option>Netherlands</option>
+          <option>Belgium</option><option>Germany</option><option>Spain</option>
+          <option>United Kingdom</option><option>Other</option>
+        </select>
+        <div class="tb-right">
+          <button class="btn" onclick="exportVenues()">↓ Export</button>
+          <button class="btn primary" onclick="openVenueModal()">+ Add Venue</button>
+        </div>
+      </div>
+      <div class="tbl-wrap">
+        <table>
+          <thead>
+            <tr><th>Venue</th><th>Type</th><th>City</th><th>Country</th><th>Organisation</th><th>Primary Contact</th><th>Tags</th><th>Actions</th></tr>
+          </thead>
+          <tbody id="venue-tbody"><tr class="tbl-msg"><td colspan="8">Loading...</td></tr></tbody>
+        </table>
+      </div>
+      <div class="pagination">
+        <button class="pg-btn" id="venue-prev" onclick="venuePage(-1)" disabled>← Prev</button>
+        <span class="pg-info" id="venue-pinfo"></span>
+        <button class="pg-btn" id="venue-next" onclick="venuePage(1)">Next →</button>
+      </div>
     </div>
 
     <!-- ── BOOKINGS PANEL ── -->
@@ -3048,15 +3091,22 @@ The Netherlands</textarea>
         <div class="cd-section-hdr">Company Info</div>
         <div class="cd-fields">
           <div class="cd-field">
-            <div class="cd-field-label">Company Name *</div>
-            <input class="cd-field-input" id="cd-name" placeholder="Company name">
+            <div class="cd-field-label">Legal Name * <span style="font-size:9px;color:var(--muted)">(for contracts & invoices)</span></div>
+            <input class="cd-field-input" id="cd-legal-name" placeholder="Legal entity name">
           </div>
           <div class="cd-field">
-            <div class="cd-field-label">Type</div>
+            <div class="cd-field-label">Trading Name <span style="font-size:9px;color:var(--muted)">(brand / venue name)</span></div>
+            <input class="cd-field-input" id="cd-trading-name" placeholder="Brand or venue name">
+          </div>
+          <div class="cd-field">
+            <div class="cd-field-label">Company Type</div>
             <select class="cd-field-input" id="cd-type">
               <option value="">Select type</option>
-              <option>Club</option><option>Festival</option><option>Promoter</option>
-              <option>Agency</option><option>Brand</option><option>Other</option>
+              <option value="promoter">Promoter</option>
+              <option value="agency">Agency</option>
+              <option value="company">Company</option>
+              <option value="brand">Brand</option>
+              <option value="other">Other</option>
             </select>
           </div>
           <div class="cd-field">
@@ -3067,7 +3117,7 @@ The Netherlands</textarea>
             <div class="cd-field-label">Phone</div>
             <input class="cd-field-input" id="cd-phone" placeholder="+31 6...">
           </div>
-          <div class="cd-field" style="grid-column:1/-1">
+          <div class="cd-field">
             <div class="cd-field-label">Genre / Market</div>
             <input class="cd-field-input" id="cd-genre" placeholder="Tech House, Melodic...">
           </div>
@@ -3160,6 +3210,60 @@ The Netherlands</textarea>
   </div>
 </div>
 
+<!-- VENUE MODAL -->
+<div class="overlay" id="venue-modal">
+  <div class="modal" style="width:640px">
+    <div class="modal-hdr">
+      <div>
+        <div class="modal-title" id="venue-modal-title">New Venue</div>
+      </div>
+      <button class="modal-close" onclick="closeModal('venue-modal')">×</button>
+    </div>
+    <input type="hidden" id="vm-id">
+    <div class="form-grid">
+      <div class="fg"><label>Venue Name *</label><input id="vm-name" placeholder="Muin"></div>
+      <div class="fg"><label>Type *</label>
+        <select id="vm-type">
+          <option value="club">Club</option>
+          <option value="festival">Festival</option>
+        </select>
+      </div>
+      <div class="fg"><label>City</label><input id="vm-city" placeholder="Amsterdam"></div>
+      <div class="fg"><label>Country</label><input id="vm-country" list="country-list" placeholder="Netherlands"></div>
+    </div>
+
+    <div class="form-section">Links</div>
+    <div class="form-grid">
+      <div class="fg"><label>Organisation (billing party)</label>
+        <select id="vm-org" onchange="loadVenueContacts()">
+          <option value="">Select organisation...</option>
+        </select>
+      </div>
+      <div class="fg"><label>Primary Contact</label>
+        <select id="vm-contact">
+          <option value="">— select organisation first —</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="form-section">Tags</div>
+    <div style="padding:0 0 12px 0">
+      <div id="vm-tags-container" style="display:flex;flex-wrap:wrap;gap:6px;padding:8px 0"></div>
+    </div>
+
+    <div class="form-section">Notes</div>
+    <div class="form-grid">
+      <div class="fg full"><textarea id="vm-notes" placeholder="Internal notes..." style="min-height:60px"></textarea></div>
+    </div>
+
+    <div class="modal-ftr">
+      <button class="btn danger" id="vm-delete-btn" style="display:none;margin-right:auto" onclick="deleteVenue()">Delete</button>
+      <button class="btn" onclick="closeModal('venue-modal')">Cancel</button>
+      <button class="btn primary" onclick="saveVenue()">Save Venue</button>
+    </div>
+  </div>
+</div>
+
 <!-- EMAIL MODAL -->
 <div id="email-overlay">
   <div class="email-modal">
@@ -3217,6 +3321,8 @@ if (commentInput) commentInput.addEventListener('keydown', e => {
 // ── STATE ─────────────────────────────────────────────────────
 let allOrgs = [], filtOrgs = [], orgPageN = 0;
 let allCons = [], filtCons = [], conPageN = 0;
+let allVenues = [], filtVenues = [], venuePageN = 0;
+let allTags = [];
 let allBookings = [], filtBookings = [], bkPageN = 0;
 let allArtists = [];
 let editOrgId = null, editConId = null, editBkId = null, _pendingOrgId = null;
@@ -3256,6 +3362,8 @@ async function startApp() {
   loadInvoices();
   loadAdvancing();
   loadExpenses();
+  loadVenues();
+  loadTags();
   setTimeout(renderDashboard, 2000);
 }
 db.auth.getSession().then(({ data: { session } }) => {
@@ -3685,19 +3793,21 @@ function exportBookings() {
 // ── ORGANISATIONS ─────────────────────────────────────────────
 async function loadOrgs() {
   const { data, error } = await db.from('organisations')
-    .select('*, contacts(id, first_name, last_name, email, phone)')
+    .select('*, contacts(id, first_name, last_name, email, phone, role, is_primary, marketing_enabled, is_active)')
+    .eq('is_active', true)
     .order('name');
   if (error) { showToast('Error loading organisations', 'error'); return; }
-  allOrgs = data;
+  // Normalise: use legal_name as display name if name is empty
+  allOrgs = (data || []).map(o => ({ ...o, name: o.legal_name || o.name || o.trading_name || '—' }));
   updateOrgStats();
   filterOrgs();
 }
 
 function updateOrgStats() {
   document.getElementById('s-total').textContent    = allOrgs.length;
-  document.getElementById('s-clubs').textContent    = allOrgs.filter(o => o.type === 'Club').length;
+  document.getElementById('s-clubs').textContent    = allOrgs.filter(o => o.company_type === 'promoter' || o.type === 'Club').length;
   document.getElementById('s-fests').textContent    = allOrgs.filter(o => o.type === 'Festival').length;
-  document.getElementById('s-proms').textContent    = allOrgs.filter(o => o.type === 'Promoter').length;
+  document.getElementById('s-proms').textContent    = allOrgs.filter(o => o.company_type === 'promoter').length;
   const countries = new Set(allOrgs.map(o => o.country).filter(Boolean));
   document.getElementById('s-countries').textContent = countries.size;
 }
@@ -7344,23 +7454,24 @@ async function openCompanyDetail(orgId) {
   const { data: o, error } = await db.from('organisations').select('*').eq('id', orgId).single();
   if (error || !o) { showToast('Error loading company', 'error'); return; }
 
-  document.getElementById('cd-org-id').value  = o.id;
-  document.getElementById('cd-title').textContent    = o.name || 'Company';
-  document.getElementById('cd-subtitle').textContent = [o.type, o.city, o.country].filter(Boolean).join(' · ');
-  document.getElementById('cd-name').value    = o.name || '';
-  document.getElementById('cd-type').value    = o.type || '';
-  document.getElementById('cd-website').value = o.website || '';
-  document.getElementById('cd-phone').value   = o.phone || '';
-  document.getElementById('cd-genre').value   = (o.genre || []).join(', ');
-  document.getElementById('cd-vat').value     = o.vat_number || '';
-  document.getElementById('cd-kvk').value     = o.kvk_number || '';
-  document.getElementById('cd-iban').value    = o.iban || '';
-  document.getElementById('cd-bic').value     = o.bic || '';
-  document.getElementById('cd-address').value = o.address || '';
-  document.getElementById('cd-postal').value  = o.postal_code || '';
-  document.getElementById('cd-city').value    = o.city || '';
-  document.getElementById('cd-country').value = o.country || '';
-  document.getElementById('cd-notes').value   = o.notes || '';
+  document.getElementById('cd-org-id').value        = o.id;
+  document.getElementById('cd-title').textContent   = o.legal_name || o.name || 'Company';
+  document.getElementById('cd-subtitle').textContent = [o.company_type, o.city, o.country].filter(Boolean).join(' · ');
+  document.getElementById('cd-legal-name').value    = o.legal_name || o.name || '';
+  document.getElementById('cd-trading-name').value  = o.trading_name || '';
+  document.getElementById('cd-type').value          = o.company_type || o.type || '';
+  document.getElementById('cd-website').value       = o.website || '';
+  document.getElementById('cd-phone').value         = o.phone || '';
+  document.getElementById('cd-genre').value         = (o.genre || []).join(', ');
+  document.getElementById('cd-vat').value           = o.vat_number || '';
+  document.getElementById('cd-kvk').value           = o.kvk_number || '';
+  document.getElementById('cd-iban').value          = o.iban || '';
+  document.getElementById('cd-bic').value           = o.bic || '';
+  document.getElementById('cd-address').value       = o.address || '';
+  document.getElementById('cd-postal').value        = o.postal_code || '';
+  document.getElementById('cd-city').value          = o.city || '';
+  document.getElementById('cd-country').value       = o.country || '';
+  document.getElementById('cd-notes').value         = o.notes || '';
 
   // Load contacts
   loadCdContacts(orgId);
@@ -7375,26 +7486,28 @@ async function saveCompanyDetail() {
   const genre = genreRaw ? genreRaw.split(',').map(g => g.trim()).filter(Boolean) : [];
 
   const { error } = await db.from('organisations').update({
-    name:        document.getElementById('cd-name').value.trim(),
-    type:        document.getElementById('cd-type').value || null,
-    website:     document.getElementById('cd-website').value.trim() || null,
-    phone:       document.getElementById('cd-phone').value.trim() || null,
+    legal_name:   document.getElementById('cd-legal-name').value.trim(),
+    trading_name: document.getElementById('cd-trading-name').value.trim() || null,
+    name:         document.getElementById('cd-legal-name').value.trim(), // keep name in sync
+    company_type: document.getElementById('cd-type').value || null,
+    website:      document.getElementById('cd-website').value.trim() || null,
+    phone:        document.getElementById('cd-phone').value.trim() || null,
     genre,
-    vat_number:  document.getElementById('cd-vat').value.trim() || null,
-    kvk_number:  document.getElementById('cd-kvk').value.trim() || null,
-    iban:        document.getElementById('cd-iban').value.trim() || null,
-    bic:         document.getElementById('cd-bic').value.trim() || null,
-    address:     document.getElementById('cd-address').value.trim() || null,
-    postal_code: document.getElementById('cd-postal').value.trim() || null,
-    city:        document.getElementById('cd-city').value.trim() || null,
-    country:     document.getElementById('cd-country').value.trim() || null,
-    notes:       document.getElementById('cd-notes').value.trim() || null,
+    vat_number:   document.getElementById('cd-vat').value.trim() || null,
+    kvk_number:   document.getElementById('cd-kvk').value.trim() || null,
+    iban:         document.getElementById('cd-iban').value.trim() || null,
+    bic:          document.getElementById('cd-bic').value.trim() || null,
+    address:      document.getElementById('cd-address').value.trim() || null,
+    postal_code:  document.getElementById('cd-postal').value.trim() || null,
+    city:         document.getElementById('cd-city').value.trim() || null,
+    country:      document.getElementById('cd-country').value.trim() || null,
+    notes:        document.getElementById('cd-notes').value.trim() || null,
   }).eq('id', id);
 
   if (error) { showToast('Error saving: ' + error.message, 'error'); return; }
   showToast('Company saved ✓', 'success');
   document.getElementById('cd-title').textContent =
-    document.getElementById('cd-name').value;
+    document.getElementById('cd-legal-name').value;
   document.getElementById('cd-subtitle').textContent =
     [document.getElementById('cd-type').value, document.getElementById('cd-city').value,
      document.getElementById('cd-country').value].filter(Boolean).join(' · ');
@@ -7471,6 +7584,231 @@ function closeCompanyDetail() {
   currentOrgId = null;
 }
 // ── END COMPANY DETAIL ─────────────────────────────────────────
+
+// ── VENUES ────────────────────────────────────────────────────
+async function loadVenues() {
+  const { data } = await db.from('venues')
+    .select('*, organisations(id,name,legal_name), contacts(id,first_name,last_name,email), venue_tags(tag_id, tags(id,name,tag_type))')
+    .eq('is_active', true)
+    .order('name');
+  allVenues = data || [];
+  filterVenues();
+}
+
+async function loadTags() {
+  const { data } = await db.from('tags').select('*').order('tag_type').order('name');
+  allTags = data || [];
+}
+
+function filterVenues() {
+  const q  = document.getElementById('venue-search')?.value.toLowerCase() || '';
+  const tp = document.getElementById('venue-type')?.value || '';
+  const ct = document.getElementById('venue-country')?.value || '';
+  filtVenues = allVenues.filter(v => {
+    const search = `${v.name||''}${v.city||''}${v.country||''}`.toLowerCase();
+    if (q && !search.includes(q)) return false;
+    if (tp && v.venue_type !== tp) return false;
+    if (ct && v.country !== ct) return false;
+    return true;
+  });
+  venuePageN = 0;
+  renderVenues();
+}
+
+function renderVenues() {
+  const tbody = document.getElementById('venue-tbody');
+  if (!tbody) return;
+  const slice = filtVenues.slice(venuePageN * PG, (venuePageN+1)*PG);
+
+  // Stats
+  const sv = document.getElementById('sv-total');
+  if (sv) {
+    document.getElementById('sv-total').textContent    = allVenues.length;
+    document.getElementById('sv-clubs').textContent    = allVenues.filter(v=>v.venue_type==='club').length;
+    document.getElementById('sv-fests').textContent    = allVenues.filter(v=>v.venue_type==='festival').length;
+    const countries = new Set(allVenues.map(v=>v.country).filter(Boolean));
+    document.getElementById('sv-countries').textContent = countries.size;
+  }
+
+  if (!slice.length) {
+    tbody.innerHTML = '<tr class="tbl-msg"><td colspan="8">No venues found</td></tr>';
+    return;
+  }
+
+  tbody.innerHTML = slice.map(v => {
+    const org     = v.organisations;
+    const con     = v.contacts;
+    const conName = con ? [con.first_name, con.last_name].filter(Boolean).join(' ') : '—';
+    const tags    = (v.venue_tags||[]).map(vt => `<span class="genre-pill">${esc(vt.tags?.name||'')}</span>`).join('');
+    return `<tr style="cursor:pointer" onclick="openVenueModal('${v.id}')">
+      <td class="td-name">${esc(v.name)}</td>
+      <td><span class="genre-pill">${v.venue_type||'club'}</span></td>
+      <td>${esc(v.city||'—')}</td>
+      <td>${esc(v.country||'—')}</td>
+      <td class="td-trunc">${esc(org?.legal_name||org?.name||'—')}</td>
+      <td class="td-trunc">${esc(conName)}</td>
+      <td>${tags||'—'}</td>
+      <td><div class="row-actions">
+        <button class="ra" onclick="event.stopPropagation();openVenueModal('${v.id}')">Edit</button>
+        <button class="ra del" onclick="event.stopPropagation();deleteVenueById('${v.id}')">Del</button>
+      </div></td>
+    </tr>`;
+  }).join('');
+
+  const total = filtVenues.length;
+  const pages = Math.ceil(total/PG);
+  document.getElementById('venue-pinfo').textContent = `${venuePageN*PG+1}–${Math.min((venuePageN+1)*PG,total)} of ${total}`;
+  document.getElementById('venue-prev').disabled = venuePageN === 0;
+  document.getElementById('venue-next').disabled = venuePageN >= pages-1;
+}
+
+function venuePage(d) { venuePageN += d; renderVenues(); }
+
+let editVenueId = null;
+let selectedVenueTags = new Set();
+
+async function openVenueModal(id = null) {
+  editVenueId = id;
+  document.getElementById('venue-modal-title').textContent = id ? 'Edit Venue' : 'New Venue';
+  document.getElementById('vm-delete-btn').style.display = id ? 'inline-block' : 'none';
+
+  // Populate org dropdown
+  const orgSel = document.getElementById('vm-org');
+  orgSel.innerHTML = '<option value="">Select organisation...</option>' +
+    allOrgs.map(o => `<option value="${o.id}">${esc(o.legal_name||o.name)}</option>`).join('');
+
+  // Reset
+  selectedVenueTags = new Set();
+  document.getElementById('vm-name').value = '';
+  document.getElementById('vm-type').value = 'club';
+  document.getElementById('vm-city').value = '';
+  document.getElementById('vm-country').value = '';
+  document.getElementById('vm-notes').value = '';
+  document.getElementById('vm-contact').innerHTML = '<option value="">— select organisation first —</option>';
+  renderVenueTagPicker();
+
+  if (id) {
+    const v = allVenues.find(x => x.id === id);
+    if (v) {
+      document.getElementById('vm-name').value    = v.name || '';
+      document.getElementById('vm-type').value    = v.venue_type || 'club';
+      document.getElementById('vm-city').value    = v.city || '';
+      document.getElementById('vm-country').value = v.country || '';
+      document.getElementById('vm-notes').value   = v.notes || '';
+      orgSel.value = v.organisation_id || '';
+      if (v.organisation_id) loadVenueContacts(v.primary_contact_id);
+      (v.venue_tags||[]).forEach(vt => selectedVenueTags.add(vt.tag_id));
+      renderVenueTagPicker();
+    }
+  }
+
+  document.getElementById('venue-modal').classList.add('open');
+}
+
+function loadVenueContacts(preSelectId = null) {
+  const orgId = document.getElementById('vm-org').value;
+  const conSel = document.getElementById('vm-contact');
+  if (!orgId) { conSel.innerHTML = '<option value="">— select organisation first —</option>'; return; }
+  const orgCons = allCons.filter(c => c.organisation_id === orgId && c.is_active !== false);
+  conSel.innerHTML = '<option value="">Select primary contact...</option>' +
+    orgCons.map(c => {
+      const name = [c.first_name, c.last_name].filter(Boolean).join(' ') || c.email;
+      return `<option value="${c.id}">${esc(name)}</option>`;
+    }).join('');
+  if (preSelectId) conSel.value = preSelectId;
+}
+
+function renderVenueTagPicker() {
+  const container = document.getElementById('vm-tags-container');
+  if (!container) return;
+  const grouped = {};
+  allTags.forEach(t => {
+    if (!grouped[t.tag_type]) grouped[t.tag_type] = [];
+    grouped[t.tag_type].push(t);
+  });
+  container.innerHTML = Object.entries(grouped).map(([type, tags]) =>
+    `<div style="width:100%;margin-bottom:8px">
+      <div style="font-family:var(--mono);font-size:9px;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);margin-bottom:4px">${type}</div>
+      <div style="display:flex;flex-wrap:wrap;gap:4px">
+        ${tags.map(t => `<button type="button" onclick="toggleVenueTag('${t.id}')"
+          id="vtag-${t.id}"
+          style="padding:3px 10px;font-family:var(--mono);font-size:10px;border:1px solid ${selectedVenueTags.has(t.id)?'var(--accent)':'var(--border)'};
+                 background:${selectedVenueTags.has(t.id)?'var(--accent)':'transparent'};
+                 color:${selectedVenueTags.has(t.id)?'#fff':'var(--muted)'};cursor:pointer;transition:all 0.1s">
+          ${esc(t.name)}
+        </button>`).join('')}
+      </div>
+    </div>`
+  ).join('');
+}
+
+function toggleVenueTag(tagId) {
+  if (selectedVenueTags.has(tagId)) selectedVenueTags.delete(tagId);
+  else selectedVenueTags.add(tagId);
+  renderVenueTagPicker();
+}
+
+async function saveVenue() {
+  const name = document.getElementById('vm-name').value.trim();
+  if (!name) { showToast('Venue name is required', 'error'); return; }
+
+  const venueData = {
+    name,
+    venue_type:          document.getElementById('vm-type').value,
+    city:                document.getElementById('vm-city').value.trim() || null,
+    country:             document.getElementById('vm-country').value.trim() || null,
+    organisation_id:     document.getElementById('vm-org').value || null,
+    primary_contact_id:  document.getElementById('vm-contact').value || null,
+    notes:               document.getElementById('vm-notes').value.trim() || null,
+    is_active:           true,
+  };
+
+  let venueId = editVenueId;
+  if (venueId) {
+    await db.from('venues').update(venueData).eq('id', venueId);
+  } else {
+    const { data } = await db.from('venues').insert(venueData).select('id').single();
+    venueId = data?.id;
+  }
+
+  // Save tags
+  if (venueId) {
+    await db.from('venue_tags').delete().eq('venue_id', venueId);
+    if (selectedVenueTags.size > 0) {
+      await db.from('venue_tags').insert([...selectedVenueTags].map(tagId => ({ venue_id: venueId, tag_id: tagId })));
+    }
+  }
+
+  showToast(editVenueId ? 'Venue updated ✓' : 'Venue created ✓', 'success');
+  closeModal('venue-modal');
+  await loadVenues();
+}
+
+async function deleteVenueById(id) {
+  if (!confirm('Delete this venue?')) return;
+  await db.from('venues').update({ is_active: false }).eq('id', id);
+  showToast('Venue deleted', 'success');
+  await loadVenues();
+}
+
+async function deleteVenue() {
+  if (editVenueId) { await deleteVenueById(editVenueId); closeModal('venue-modal'); }
+}
+
+function exportVenues() {
+  const rows = filtVenues.map(v => ({
+    Name: v.name, Type: v.venue_type, City: v.city, Country: v.country,
+    Organisation: v.organisations?.legal_name || '',
+    Contact: v.contacts ? [v.contacts.first_name, v.contacts.last_name].filter(Boolean).join(' ') : '',
+    Tags: (v.venue_tags||[]).map(vt=>vt.tags?.name).join(', '),
+  }));
+  const ws = XLSX.utils.json_to_sheet(rows);
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, 'Venues');
+  XLSX.writeFile(wb, 'deepbloe_venues.xlsx');
+  showToast('Venues exported', 'success');
+}
+// ── END VENUES ─────────────────────────────────────────────────
 
 function closeModal(id) { document.getElementById(id).classList.remove('open'); }
 
