@@ -1281,7 +1281,7 @@ tbody td { padding: 10px 14px; vertical-align: middle; }
           </select>
           <div class="tb-right">
             <button class="btn" onclick="exportContacts()">↓ Export</button>
-            <button class="btn" id="sync-btn" onclick="syncAllToMailchimp()" style="border-color:#1a6b3c;color:#1a6b3c">⟳ Sync to Mailchimp</button>
+            <button class="btn" id="sync-btn" onclick="syncAllToMailchimp()" style="border-color:#1a6b3c;color:#1a6b3c">⟳ Sync Venues to Mailchimp</button>
             <button class="btn primary" onclick="openConModal()">+ Add Contact</button>
           </div>
         </div>
@@ -2317,29 +2317,47 @@ tbody td { padding: 10px 14px; vertical-align: middle; }
       </div>
     </div>
 
-    <div class="form-section">Venue & Promoter</div>
+    <div class="form-section">Promoter / Buyer — 3 steps required</div>
     <div class="form-grid">
+
+      <!-- STEP 1: Company -->
       <div class="fg">
-        <label>Venue *</label>
-        <select id="bm-venue-id" onchange="loadVenueIntoBooking()">
-          <option value="">Select venue...</option>
+        <label style="display:flex;align-items:center;gap:6px">
+          <span style="background:var(--accent);color:#fff;font-family:var(--mono);font-size:9px;padding:1px 6px">1</span>
+          Company *
+        </label>
+        <select id="bm-org" onchange="bookingStep1()">
+          <option value="">Select company...</option>
         </select>
-        <div style="margin-top:4px;font-family:var(--mono);font-size:9px;color:var(--muted)" id="bm-venue-info"></div>
       </div>
+
+      <!-- STEP 2: Contact Person -->
       <div class="fg">
-        <label>Contact * <span id="bm-contact-hint" style="font-family:var(--mono);font-size:9px;color:var(--amber)"></span></label>
-        <select id="bm-contact">
-          <option value="">— select venue first —</option>
+        <label style="display:flex;align-items:center;gap:6px">
+          <span id="bm-step2-badge" style="background:var(--border);color:var(--muted);font-family:var(--mono);font-size:9px;padding:1px 6px">2</span>
+          Contact Person *
+        </label>
+        <select id="bm-contact" disabled onchange="bookingStep2()">
+          <option value="">— select company first —</option>
         </select>
-        <div style="margin-top:4px;display:flex;gap:8px;align-items:center">
-          <span id="bm-contact-info" style="font-family:var(--mono);font-size:10px;color:var(--muted)"></span>
-        </div>
+        <div style="margin-top:4px;font-family:var(--mono);font-size:10px;color:var(--muted)" id="bm-contact-info"></div>
       </div>
-      <div class="fg">
-        <label>Organisation <span style="font-family:var(--mono);font-size:9px;color:var(--muted)">(auto from venue)</span></label>
-        <input id="bm-org-display" readonly style="background:var(--bg);color:var(--muted);font-size:12px" placeholder="Set by venue">
-        <input type="hidden" id="bm-org">
+
+      <!-- STEP 3: Venue -->
+      <div class="fg full">
+        <label style="display:flex;align-items:center;gap:6px">
+          <span id="bm-step3-badge" style="background:var(--border);color:var(--muted);font-family:var(--mono);font-size:9px;padding:1px 6px">3</span>
+          Venue / Festival *
+        </label>
+        <select id="bm-venue-id" disabled onchange="bookingStep3()">
+          <option value="">— select contact first —</option>
+        </select>
+        <div style="margin-top:4px;font-family:var(--mono);font-size:10px;color:var(--muted)" id="bm-venue-info"></div>
       </div>
+
+    </div>
+
+    <div class="form-grid">
       <div class="fg">
         <label>Territory</label>
         <input id="bm-territory" placeholder="Southeast Asia">
@@ -3528,18 +3546,24 @@ function openBookingModal(id = null) {
   document.getElementById('bm-delete-btn').style.display = id ? 'inline-block' : 'none';
   document.getElementById('bm-settlement-btn').style.display = id ? 'inline-block' : 'none';
 
-  // Populate venue dropdown
-  const venueSel = document.getElementById('bm-venue-id');
-  venueSel.innerHTML = '<option value="">Select venue...</option>' +
-    allVenues.map(v => `<option value="${v.id}">${esc(v.name)}${v.city?' — '+esc(v.city):''}${v.country?' ('+esc(v.country)+')':''}</option>`).join('');
+  // Populate company dropdown (step 1)
+  const orgSel = document.getElementById('bm-org');
+  orgSel.innerHTML = '<option value="">Select company...</option>' +
+    allOrgs.map(o => `<option value="${o.id}">${esc(o.legal_name||o.name)}</option>`).join('');
 
-  // Reset contact/org
-  document.getElementById('bm-contact').innerHTML = '<option value="">— select venue first —</option>';
-  document.getElementById('bm-org').value = '';
-  document.getElementById('bm-org-display').value = '';
-  document.getElementById('bm-contact-hint').textContent = '';
+  // Reset steps 2+3
+  const conSel = document.getElementById('bm-contact');
+  conSel.innerHTML = '<option value="">— select company first —</option>';
+  conSel.disabled = true;
+  const venueSel = document.getElementById('bm-venue-id');
+  venueSel.innerHTML = '<option value="">— select contact first —</option>';
+  venueSel.disabled = true;
   document.getElementById('bm-contact-info').textContent = '';
   document.getElementById('bm-venue-info').textContent = '';
+  const s2 = document.getElementById('bm-step2-badge');
+  const s3 = document.getElementById('bm-step3-badge');
+  if (s2) { s2.style.background='var(--border)'; s2.style.color='var(--muted)'; }
+  if (s3) { s3.style.background='var(--border)'; s3.style.color='var(--muted)'; }
 
   if (!id) {
     // Clear form
@@ -3561,86 +3585,103 @@ function openBookingModal(id = null) {
   document.getElementById('bk-modal').classList.add('open');
 }
 
-function loadVenueIntoBooking(preSelectContactId = null) {
-  const venueId = document.getElementById('bm-venue-id').value;
-  const conSel  = document.getElementById('bm-contact');
-  const orgDisp = document.getElementById('bm-org-display');
-  const orgHid  = document.getElementById('bm-org');
-  const info    = document.getElementById('bm-venue-info');
-  const hint    = document.getElementById('bm-contact-hint');
+function bookingStep1() {
+  const orgId  = document.getElementById('bm-org').value;
+  const conSel = document.getElementById('bm-contact');
+  const venueSel = document.getElementById('bm-venue-id');
+  const step2 = document.getElementById('bm-step2-badge');
+  const step3 = document.getElementById('bm-step3-badge');
 
-  if (!venueId) {
-    conSel.innerHTML = '<option value="">— select venue first —</option>';
-    orgDisp.value = ''; orgHid.value = '';
-    info.textContent = ''; hint.textContent = '';
-    return;
-  }
+  // Reset steps 2 + 3
+  conSel.innerHTML = '<option value="">— select company first —</option>';
+  conSel.disabled = true;
+  venueSel.innerHTML = '<option value="">— select contact first —</option>';
+  venueSel.disabled = true;
+  document.getElementById('bm-contact-info').textContent = '';
+  document.getElementById('bm-venue-info').textContent = '';
+  step2.style.background = 'var(--border)'; step2.style.color = 'var(--muted)';
+  step3.style.background = 'var(--border)'; step3.style.color = 'var(--muted)';
 
-  const venue = allVenues.find(v => v.id === venueId);
-  if (!venue) return;
+  if (!orgId) return;
 
-  // Show venue info
-  info.textContent = [venue.venue_type, venue.city, venue.country].filter(Boolean).join(' · ');
-
-  // Auto-fill venue fields in booking form
-  if (document.getElementById('bm-city') && !document.getElementById('bm-city').value) {
-    document.getElementById('bm-city').value    = venue.city || '';
-    document.getElementById('bm-country').value = venue.country || '';
-  }
-
-  // Set organisation
-  const org = allOrgs.find(o => o.id === venue.organisation_id);
-  orgHid.value  = venue.organisation_id || '';
-  orgDisp.value = org?.legal_name || org?.name || '—';
-
-  // Load contacts for this org
-  const orgCons = venue.organisation_id
-    ? allCons.filter(c => c.organisation_id === venue.organisation_id && c.is_active !== false)
-    : [];
-
+  // Load contacts for this company
+  const orgCons = allCons.filter(c => c.organisation_id === orgId && c.is_active !== false);
   if (!orgCons.length) {
-    conSel.innerHTML = '<option value="">No contacts for this venue\'s organisation</option>';
-    hint.textContent = '⚠ Add contacts first';
+    conSel.innerHTML = '<option value="">No contacts — add one first</option>';
+    conSel.disabled = false;
+    showToast('No contacts for this company — add a contact first', 'error');
     return;
   }
 
-  conSel.innerHTML = '<option value="">Select contact *</option>' +
+  conSel.innerHTML = '<option value="">Select contact person...</option>' +
     orgCons.map(c => {
       const name = [c.first_name, c.last_name].filter(Boolean).join(' ') || c.email;
-      const isPrimary = c.id === venue.primary_contact_id;
-      return `<option value="${c.id}" ${isPrimary?'selected':''}>${esc(name)}${isPrimary?' ★':''}</option>`;
+      return `<option value="${c.id}">${esc(name)}${c.role?' — '+esc(c.role):''}</option>`;
     }).join('');
+  conSel.disabled = false;
+  step2.style.background = 'var(--accent)'; step2.style.color = '#fff';
+}
 
-  // Pre-select primary contact or specified contact
-  if (preSelectContactId) conSel.value = preSelectContactId;
-  else if (venue.primary_contact_id) conSel.value = venue.primary_contact_id;
+function bookingStep2() {
+  const conId  = document.getElementById('bm-contact').value;
+  const orgId  = document.getElementById('bm-org').value;
+  const venueSel = document.getElementById('bm-venue-id');
+  const step3  = document.getElementById('bm-step3-badge');
+
+  document.getElementById('bm-venue-info').textContent = '';
+  venueSel.innerHTML = '<option value="">— select contact first —</option>';
+  venueSel.disabled = true;
+  step3.style.background = 'var(--border)'; step3.style.color = 'var(--muted)';
+
+  if (!conId) return;
 
   // Show contact info
-  const selectedCon = allCons.find(c => c.id === conSel.value);
+  const con = allCons.find(c => c.id === conId);
   document.getElementById('bm-contact-info').textContent =
-    selectedCon ? [selectedCon.email, selectedCon.phone].filter(Boolean).join(' · ') : '';
+    con ? [con.email, con.phone].filter(Boolean).join(' · ') : '';
 
-  hint.textContent = '';
+  // Load venues for this company
+  const orgVenues = allVenues.filter(v => v.organisation_id === orgId);
+  if (!orgVenues.length) {
+    venueSel.innerHTML = '<option value="">No venues for this company — add one first</option>';
+    venueSel.disabled = false;
+    showToast('No venues for this company — add a venue first', 'error');
+    return;
+  }
 
-  conSel.onchange = () => {
-    const con = allCons.find(c => c.id === conSel.value);
-    document.getElementById('bm-contact-info').textContent =
-      con ? [con.email, con.phone].filter(Boolean).join(' · ') : '';
-  };
+  venueSel.innerHTML = '<option value="">Select venue / festival...</option>' +
+    orgVenues.map(v => `<option value="${v.id}">${esc(v.name)}${v.city?' — '+esc(v.city):''}${v.venue_type?' ('+esc(v.venue_type)+')':''}</option>`).join('');
+  venueSel.disabled = false;
+  step3.style.background = 'var(--accent)'; step3.style.color = '#fff';
+}
+
+function bookingStep3() {
+  const venueId = document.getElementById('bm-venue-id').value;
+  if (!venueId) { document.getElementById('bm-venue-info').textContent = ''; return; }
+  const venue = allVenues.find(v => v.id === venueId);
+  if (!venue) return;
+  document.getElementById('bm-venue-info').textContent =
+    [venue.venue_type, venue.city, venue.country].filter(Boolean).join(' · ');
+  // Auto-fill venue city/country
+  const cityEl = document.getElementById('bm-city');
+  const countryEl = document.getElementById('bm-country');
+  if (cityEl && !cityEl.value && venue.city) cityEl.value = venue.city;
+  if (countryEl && !countryEl.value && venue.country) countryEl.value = venue.country;
+}
+
+function loadVenueIntoBooking(preSelectContactId = null) {
+  // Legacy — no-op, handled by step functions
 }
 
 function loadContactsForOrg(preSelectId = null) {
-  // Legacy function — redirect to venue-based loading or handle direct org loading
-  const orgId  = document.getElementById('bm-org').value;
-  const conSel = document.getElementById('bm-contact');
-  if (!orgId) { conSel.innerHTML = '<option value="">— select venue first —</option>'; return; }
-  const orgCons = allCons.filter(c => c.organisation_id === orgId && c.is_active !== false);
-  conSel.innerHTML = '<option value="">Select contact *</option>' +
-    orgCons.map(c => {
-      const name = [c.first_name, c.last_name].filter(Boolean).join(' ') || c.email;
-      return `<option value="${c.id}">${esc(name)}</option>`;
-    }).join('');
-  if (preSelectId) conSel.value = preSelectId;
+  // Legacy — redirect to step1
+  bookingStep1();
+  if (preSelectId) {
+    setTimeout(() => {
+      document.getElementById('bm-contact').value = preSelectId;
+      bookingStep2();
+    }, 50);
+  }
 }
 
 function editBooking(id) {
@@ -3672,24 +3713,23 @@ function editBooking(id) {
   document.getElementById('bm-commission').value  = b.commission_rate || 15;
   document.getElementById('bm-withholding').value  = b.withholding_rate || 0;
   document.getElementById('bm-wh-country').value   = b.withholding_country || '';
-  // Load venue — find venue linked to this booking's venue_name/company
-  document.getElementById('bm-org').value          = b.company_id || '';
-  if (b.venue_id) {
-    document.getElementById('bm-venue-id').value = b.venue_id;
-    loadVenueIntoBooking(b.contact_id);
-  } else if (b.company_id) {
-    // Legacy: show org name
-    const org = allOrgs.find(o => o.id === b.company_id);
-    document.getElementById('bm-org-display').value = org?.legal_name || org?.name || '';
-    // Load contacts for org
-    const orgCons = allCons.filter(c => c.organisation_id === b.company_id);
-    const conSel = document.getElementById('bm-contact');
-    conSel.innerHTML = '<option value="">Select contact</option>' +
-      orgCons.map(c => {
-        const name = [c.first_name, c.last_name].filter(Boolean).join(' ') || c.email;
-        return `<option value="${c.id}">${esc(name)}</option>`;
-      }).join('');
-    if (b.contact_id) conSel.value = b.contact_id;
+
+  // Restore 3-step flow
+  if (b.company_id) {
+    document.getElementById('bm-org').value = b.company_id;
+    bookingStep1();
+    setTimeout(() => {
+      if (b.contact_id) {
+        document.getElementById('bm-contact').value = b.contact_id;
+        bookingStep2();
+        setTimeout(() => {
+          if (b.venue_id) {
+            document.getElementById('bm-venue-id').value = b.venue_id;
+            bookingStep3();
+          }
+        }, 50);
+      }
+    }, 50);
   }
   document.getElementById('bm-territory').value = b.territory || '';
   document.getElementById('bm-notes').value     = b.internal_notes || '';
@@ -3723,13 +3763,14 @@ async function setBookingStatus(status) {
 async function saveBooking() {
   const artistId  = document.getElementById('bm-artist').value;
   const date      = document.getElementById('bm-date').value;
-  const venueId   = document.getElementById('bm-venue-id').value;
-  const contactId = document.getElementById('bm-contact').value;
   const orgId     = document.getElementById('bm-org').value;
+  const contactId = document.getElementById('bm-contact').value;
+  const venueId   = document.getElementById('bm-venue-id').value;
   if (!artistId)  { showToast('Artist is required', 'error'); return; }
   if (!date)      { showToast('Show date is required', 'error'); return; }
-  if (!venueId && !orgId) { showToast('Venue is required', 'error'); return; }
-  if (!contactId) { showToast('Contact is required', 'error'); return; }
+  if (!orgId)     { showToast('Step 1: Select a company', 'error'); return; }
+  if (!contactId) { showToast('Step 2: Select a contact person', 'error'); return; }
+  if (!venueId)   { showToast('Step 3: Select a venue', 'error'); return; }
 
   const data = {
     artist_id:           artistId,
@@ -4131,49 +4172,76 @@ async function saveContact() {
 const FUNCTION_URL = 'https://ksnxgidklhonpsneerbu.supabase.co/functions/v1/mailchimp-sync';
 const ANON_KEY = 'sb_publishable_JsOkmXlOxBWKXcraBE7gGg_qErTkqX9';
 
-async function syncContactToMailchimp(contactId) {
-  try {
-    const { data: { session } } = await db.auth.getSession();
-    const token = session?.access_token || ANON_KEY;
-    const res = await fetch(FUNCTION_URL, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}`, 'apikey': ANON_KEY },
-      body: JSON.stringify({ contact_id: contactId })
-    });
-    const data = await res.json();
-    return data.success;
-  } catch(e) { return false; }
-}
-
 async function syncAllToMailchimp() {
   const btn = document.getElementById('sync-btn');
-  const unsynced = allCons.filter(c => !c.mailchimp_synced && c.email);
-  if (unsynced.length === 0) { showToast('All contacts already synced', 'info'); return; }
   btn.disabled = true;
-  btn.textContent = `Syncing ${unsynced.length} contacts...`;
+  btn.textContent = 'Syncing venues...';
+
   try {
+    // Load venues with primary contact + org + tags
+    const { data: venues } = await db.from('venues')
+      .select('*, contacts(id,first_name,last_name,email,role,marketing_enabled,is_active), organisations(legal_name,trading_name,company_type,city,country), venue_tags(tags(name,tag_type))')
+      .or('is_active.is.null,is_active.eq.true');
+
+    // Filter: only venues where primary contact has email + marketing_enabled
+    const syncable = (venues||[]).filter(v =>
+      v.contacts?.email &&
+      v.contacts?.is_active !== false &&
+      v.contacts?.marketing_enabled === true
+    );
+
+    if (!syncable.length) {
+      showToast('No venues with marketing-enabled contacts to sync', 'info');
+      btn.disabled = false; btn.textContent = '⟳ Sync Venues to Mailchimp';
+      return;
+    }
+
     const { data: { session } } = await db.auth.getSession();
     const token = session?.access_token || ANON_KEY;
-    const res = await fetch(FUNCTION_URL, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}`, 'apikey': ANON_KEY },
-      body: JSON.stringify({ sync_all: true })
-    });
-    const data = await res.json();
-    btn.disabled = false; btn.textContent = '⟳ Sync to Mailchimp';
-    if (data.error) { showToast('Sync error: ' + data.error, 'error'); }
-    else { showToast(`Synced ${data.synced} contacts${data.failed ? `, ${data.failed} failed` : ''}`, 'success'); loadContacts(); }
+
+    let synced = 0, failed = 0;
+    for (const venue of syncable) {
+      const con = venue.contacts;
+      const org = venue.organisations;
+      const tags = (venue.venue_tags||[]).map(vt => vt.tags?.name).filter(Boolean);
+
+      const payload = {
+        email:        con.email,
+        first_name:   con.first_name || '',
+        last_name:    con.last_name || '',
+        role:         con.role || '',
+        venue_name:   venue.name,
+        venue_type:   venue.venue_type,
+        city:         venue.city || org?.city || '',
+        country:      venue.country || org?.country || '',
+        company:      org?.trading_name || org?.legal_name || '',
+        company_type: org?.company_type || '',
+        tags,
+      };
+
+      const res = await fetch(FUNCTION_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}`, 'apikey': ANON_KEY },
+        body: JSON.stringify(payload),
+      });
+      const data = await res.json();
+      if (data.success) synced++; else failed++;
+    }
+
+    showToast(`Synced ${synced} venues${failed?' ('+failed+' failed)':''}`, 'success');
   } catch(e) {
-    btn.disabled = false; btn.textContent = '⟳ Sync to Mailchimp';
     showToast('Sync error: ' + e.message, 'error');
   }
+
+  btn.disabled = false; btn.textContent = '⟳ Sync Venues to Mailchimp';
 }
 
 async function deleteContact(id, email) {
   if (!confirm(`Delete contact "${email}"?`)) return;
-  const { error } = await db.from('contacts').delete().eq('id', id);
+  // Soft delete
+  const { error } = await db.from('contacts').update({ is_active: false }).eq('id', id);
   if (error) { showToast('Error deleting', 'error'); return; }
-  showToast('Deleted', 'success');
+  showToast('Contact deleted', 'success');
   loadContacts();
 }
 
