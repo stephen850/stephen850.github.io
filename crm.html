@@ -3775,10 +3775,9 @@ function exportBookings() {
 async function loadOrgs() {
   const { data, error } = await db.from('organisations')
     .select('*, contacts(id, first_name, last_name, email, phone, role, is_primary, marketing_enabled, is_active)')
-    .eq('is_active', true)
+    .or('is_active.is.null,is_active.eq.true')
     .order('name');
-  if (error) { showToast('Error loading organisations', 'error'); return; }
-  // Normalise: use legal_name as display name if name is empty
+  if (error) { showToast('Error loading organisations: ' + error.message, 'error'); return; }
   allOrgs = (data || []).map(o => ({ ...o, name: o.legal_name || o.name || o.trading_name || '—' }));
   updateOrgStats();
   filterOrgs();
@@ -7509,7 +7508,7 @@ function closeCompanyDetail() {
 async function loadVenues() {
   const { data } = await db.from('venues')
     .select('*, organisations(id,name,legal_name), contacts(id,first_name,last_name,email), venue_tags(tag_id, tags(id,name,tag_type))')
-    .eq('is_active', true)
+    .or('is_active.is.null,is_active.eq.true')
     .order('name');
   allVenues = data || [];
   filterVenues();
