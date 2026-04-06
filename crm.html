@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+ <!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -2303,22 +2303,6 @@ tbody td { padding: 10px 14px; vertical-align: middle; }
         <input type="date" id="bm-date">
       </div>
       <div class="fg">
-        <label>Venue Name</label>
-        <input id="bm-venue" placeholder="Ancol Beach Club">
-      </div>
-      <div class="fg">
-        <label>City</label>
-        <input id="bm-city" placeholder="Jakarta">
-      </div>
-      <div class="fg">
-        <label>Country</label>
-        <input id="bm-country" list="country-list" placeholder="Indonesia" autocomplete="off">
-      </div>
-      <div class="fg">
-        <label>Venue Capacity</label>
-        <input type="number" id="bm-capacity" placeholder="2000">
-      </div>
-      <div class="fg">
         <label>Set Time</label>
         <input type="time" id="bm-settime">
       </div>
@@ -2326,6 +2310,11 @@ tbody td { padding: 10px 14px; vertical-align: middle; }
         <label>Set Length (min)</label>
         <input type="number" id="bm-setlength" placeholder="60">
       </div>
+      <!-- Hidden fields populated from venue selection -->
+      <input type="hidden" id="bm-venue">
+      <input type="hidden" id="bm-city">
+      <input type="hidden" id="bm-country">
+      <input type="hidden" id="bm-capacity">
     </div>
 
     <div class="form-section">Deal & Finance</div>
@@ -3907,11 +3896,10 @@ function bookingStep3() {
   if (!venue) return;
   document.getElementById('bm-venue-info').textContent =
     [venue.venue_type, venue.city, venue.country].filter(Boolean).join(' · ');
-  // Auto-fill venue city/country
-  const cityEl = document.getElementById('bm-city');
-  const countryEl = document.getElementById('bm-country');
-  if (cityEl && !cityEl.value && venue.city) cityEl.value = venue.city;
-  if (countryEl && !countryEl.value && venue.country) countryEl.value = venue.country;
+  // Fill hidden fields for saving
+  document.getElementById('bm-venue').value   = venue.name || '';
+  document.getElementById('bm-city').value    = venue.city || '';
+  document.getElementById('bm-country').value = venue.country || '';
 }
 
 function loadVenueIntoBooking(preSelectContactId = null) {
