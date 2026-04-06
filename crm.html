@@ -946,6 +946,56 @@ tbody td { padding: 10px 14px; vertical-align: middle; }
 .cal-avail-day.other     { background:var(--border); }
 /* ── CALENDAR END ─────────────────────────────────────── */
 
+/* ── SETTLEMENT MODULE ───────────────────────────────── */
+.sett-section { background:var(--surface); border:1px solid var(--border); margin-bottom:16px; }
+.sett-section-hdr { background:var(--accent); padding:10px 16px; font-family:var(--mono);
+                    font-size:9px; letter-spacing:0.15em; text-transform:uppercase;
+                    color:rgba(255,255,255,0.7); display:flex; justify-content:space-between; align-items:center; }
+.sett-row { display:grid; grid-template-columns:1fr 1fr; gap:12px; padding:14px 16px;
+            border-bottom:1px solid var(--border); align-items:center; }
+.sett-row:last-child { border-bottom:none; }
+.sett-label { font-family:var(--mono); font-size:10px; color:var(--muted); }
+.sett-val { font-family:var(--mono); font-size:13px; font-weight:500; color:var(--accent); text-align:right; }
+.sett-val.green { color:var(--green); }
+.sett-val.red   { color:var(--red); }
+.sett-val.blue  { color:var(--blue); }
+.sett-total { display:grid; grid-template-columns:1fr 1fr; gap:12px; padding:16px;
+              background:var(--bg); border-top:2px solid var(--border); }
+.sett-total-label { font-family:var(--mono); font-size:11px; font-weight:500; color:var(--accent); }
+.sett-total-val { font-family:var(--mono); font-size:18px; font-weight:300; color:var(--green); text-align:right; }
+.sett-total-val.red { color:var(--red); }
+
+/* Expense lines */
+.sett-exp-line { display:grid; grid-template-columns:1fr 120px 80px 28px;
+                 gap:8px; padding:8px 16px; border-bottom:1px solid var(--border); align-items:center; }
+.sett-exp-input { border:none; background:transparent; font-family:var(--mono); font-size:11px;
+                  outline:none; color:var(--accent); width:100%; padding:2px 4px; }
+.sett-exp-input:focus { background:var(--bg); border-bottom:1px solid var(--accent); }
+.sett-exp-del { display:flex; align-items:center; justify-content:center; cursor:pointer;
+                color:var(--muted); font-size:14px; padding:4px; transition:color 0.1s; }
+.sett-exp-del:hover { color:var(--red); }
+
+/* Payout badge */
+.payout-paid    { background:#edf7f2; color:var(--green); padding:3px 8px; font-family:var(--mono); font-size:9px; border:1px solid var(--green); }
+.payout-pending { background:#fff9f0; color:var(--amber); padding:3px 8px; font-family:var(--mono); font-size:9px; border:1px solid var(--amber); }
+
+/* Statement */
+.stmt-doc { background:#fff; max-width:700px; margin:0 auto; padding:40px; font-family:var(--sans); font-size:13px; }
+.stmt-hdr { display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:32px; border-bottom:2px solid var(--accent); padding-bottom:20px; }
+.stmt-brand { font-family:var(--mono); font-size:11px; letter-spacing:0.2em; text-transform:uppercase; color:var(--accent); }
+.stmt-title { font-size:20px; font-weight:300; color:var(--accent); margin-top:8px; }
+.stmt-table { width:100%; border-collapse:collapse; margin-top:16px; font-size:11px; }
+.stmt-table th { font-family:var(--mono); font-size:9px; letter-spacing:0.1em; text-transform:uppercase;
+                 color:var(--muted); border-bottom:2px solid var(--border); padding:8px 6px; text-align:left; }
+.stmt-table td { padding:8px 6px; border-bottom:1px solid var(--border); vertical-align:top; }
+.stmt-table tr:last-child td { border-bottom:none; }
+.stmt-table .num { text-align:right; font-family:var(--mono); font-size:11px; }
+.stmt-summary { background:var(--bg); padding:16px; margin-top:20px; display:grid; grid-template-columns:1fr 1fr; gap:8px; }
+.stmt-summary-row { display:flex; justify-content:space-between; padding:4px 0; font-size:12px; }
+.stmt-summary-total { border-top:2px solid var(--border); margin-top:8px; padding-top:8px;
+                      font-weight:500; font-size:14px; }
+/* ── SETTLEMENT MODULE END ───────────────────────────── */
+
 /* toast */
 #toast {
   position: fixed; bottom: 24px; right: 24px; padding: 12px 20px;
@@ -1747,6 +1797,63 @@ tbody td { padding: 10px 14px; vertical-align: middle; }
         </div>
       </div>
 
+      <!-- Openstaande Payouts -->
+      <div style="margin-top:20px">
+        <div class="tbl-wrap">
+          <div style="background:var(--accent);padding:10px 14px;display:flex;justify-content:space-between;align-items:center">
+            <span style="font-family:var(--mono);font-size:9px;letter-spacing:0.15em;text-transform:uppercase;color:rgba(255,255,255,0.7)">
+              Openstaande Artist Payouts
+            </span>
+            <button class="btn" onclick="exportPayouts()" style="padding:4px 12px;font-size:9px;border-color:rgba(255,255,255,0.3);color:rgba(255,255,255,0.7)">↓ Export</button>
+          </div>
+          <table>
+            <thead>
+              <tr><th>Show</th><th>Artist</th><th>Venue</th><th>Gross Fee</th><th>Commission</th><th>Expenses</th><th>Net Payout</th><th>Status</th><th></th></tr>
+            </thead>
+            <tbody id="fin-payouts-tbody">
+              <tr class="tbl-msg"><td colspan="9">Loading...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Statement Generator -->
+      <div style="margin-top:20px">
+        <div class="tbl-wrap">
+          <div style="background:var(--accent);padding:10px 14px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px">
+            <span style="font-family:var(--mono);font-size:9px;letter-spacing:0.15em;text-transform:uppercase;color:rgba(255,255,255,0.7)">
+              Statement Generator
+            </span>
+            <div style="display:flex;gap:8px;align-items:center">
+              <select id="stmt-artist" style="background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.2);color:#fff;padding:4px 8px;font-family:var(--mono);font-size:10px">
+                <option value="">All artists</option>
+              </select>
+              <select id="stmt-period" style="background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.2);color:#fff;padding:4px 8px;font-family:var(--mono);font-size:10px">
+                <option value="">All time</option>
+                <option value="q1">Q1</option><option value="q2">Q2</option>
+                <option value="q3">Q3</option><option value="q4">Q4</option>
+                <option value="year">This year</option>
+              </select>
+              <select id="stmt-status" style="background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.2);color:#fff;padding:4px 8px;font-family:var(--mono);font-size:10px">
+                <option value="">All statuses</option>
+                <option value="pending">Unpaid only</option>
+                <option value="paid">Paid only</option>
+              </select>
+              <button class="btn" onclick="generateStatement()" style="padding:4px 12px;font-size:9px;border-color:rgba(255,255,255,0.3);color:rgba(255,255,255,0.7)">Generate</button>
+            </div>
+          </div>
+          <table>
+            <thead>
+              <tr><th>Date</th><th>Artist</th><th>Venue</th><th>Gross</th><th>Withholding</th><th>Net Fee</th><th>Commission</th><th>Expenses</th><th>Net Payout</th><th>Status</th></tr>
+            </thead>
+            <tbody id="fin-stmt-tbody">
+              <tr class="tbl-msg"><td colspan="10">Click Generate to load statement</td></tr>
+            </tbody>
+          </table>
+          <div id="fin-stmt-totals" style="display:none;padding:12px 16px;background:var(--bg);border-top:2px solid var(--border);display:flex;gap:24px;font-family:var(--mono);font-size:11px"></div>
+        </div>
+      </div>
+
     </div>
 
     <!-- ── CALENDAR PANEL ── -->
@@ -2136,7 +2243,131 @@ tbody td { padding: 10px 14px; vertical-align: middle; }
     <div class="modal-ftr">
       <button class="btn danger" id="bm-delete-btn" style="display:none;margin-right:auto" onclick="deleteBooking()">Delete</button>
       <button class="btn" onclick="closeModal('bk-modal')">Cancel</button>
+      <button class="btn" id="bm-settlement-btn" style="display:none;border-color:var(--green);color:var(--green)" onclick="openSettlement(editBookingId)">⊞ Settlement</button>
       <button class="btn primary" id="bk-save-btn" onclick="saveBooking()">Save Booking</button>
+    </div>
+  </div>
+</div>
+
+<!-- SETTLEMENT OVERLAY -->
+<div id="settlement-overlay" style="position:fixed;inset:0;background:#1a1a1a;z-index:350;display:none;flex-direction:column">
+  <div style="background:#111;padding:12px 24px;display:flex;align-items:center;gap:16px;border-bottom:1px solid #333;flex-shrink:0">
+    <div style="font-family:var(--mono);font-size:11px;letter-spacing:0.2em;text-transform:uppercase;color:rgba(255,255,255,0.5)">DEEPBLOE · SETTLEMENT</div>
+    <div style="font-family:var(--mono);font-size:11px;color:rgba(255,255,255,0.7)" id="sett-booking-ref"></div>
+    <div style="margin-left:auto;display:flex;gap:8px">
+      <button class="ie-btn" onclick="printSettlement()">⎙ Print / PDF</button>
+      <button class="ie-btn success" onclick="saveSettlement()">✓ Save Settlement</button>
+      <button class="ie-btn" onclick="closeSettlement()">✕ Close</button>
+    </div>
+  </div>
+  <div style="flex:1;overflow-y:auto;display:flex;gap:0">
+
+    <!-- LEFT: inputs -->
+    <div style="width:380px;flex-shrink:0;padding:24px;overflow-y:auto;border-right:1px solid #333;background:#1a1a1a">
+
+      <!-- Fee & commission -->
+      <div class="sett-section">
+        <div class="sett-section-hdr">Fee & Commission</div>
+        <div style="padding:14px 16px;display:flex;flex-direction:column;gap:10px">
+          <div class="fg"><label>Gross Fee</label>
+            <input type="number" id="sett-gross" placeholder="10000" oninput="calcSettlement()"></div>
+          <div class="fg"><label>Currency</label>
+            <select id="sett-currency" onchange="calcSettlement()">
+              <option value="EUR">EUR €</option><option value="USD">USD $</option>
+              <option value="GBP">GBP £</option><option value="SGD">SGD S$</option>
+              <option value="AED">AED</option><option value="IDR">IDR Rp</option>
+              <option value="THB">THB ฿</option>
+            </select></div>
+          <div class="fg"><label>Tax Withholding %</label>
+            <input type="number" id="sett-wh-rate" placeholder="0" min="0" max="100" value="0" oninput="calcSettlement()"></div>
+          <div class="fg"><label>Commission %</label>
+            <input type="number" id="sett-comm-rate" placeholder="15" value="15" oninput="calcSettlement()"></div>
+          <div class="fg"><label>Commission calculated on</label>
+            <select id="sett-comm-base" onchange="calcSettlement()">
+              <option value="gross">Gross fee</option>
+              <option value="net">Net fee (after withholding)</option>
+            </select></div>
+        </div>
+      </div>
+
+      <!-- Show expenses -->
+      <div class="sett-section">
+        <div class="sett-section-hdr">
+          <span>Show Expenses</span>
+          <button class="fin-cat-add" onclick="addSettExpense()" style="color:rgba(255,255,255,0.6);border-color:rgba(255,255,255,0.3)">+ Add</button>
+        </div>
+        <div style="padding:0">
+          <div style="display:grid;grid-template-columns:1fr 120px 80px 28px;gap:0;padding:6px 16px;background:rgba(255,255,255,0.03);border-bottom:1px solid #333">
+            <div style="font-family:var(--mono);font-size:9px;color:rgba(255,255,255,0.3);text-transform:uppercase">Label</div>
+            <div style="font-family:var(--mono);font-size:9px;color:rgba(255,255,255,0.3);text-transform:uppercase">Category</div>
+            <div style="font-family:var(--mono);font-size:9px;color:rgba(255,255,255,0.3);text-transform:uppercase;text-align:right">Amount</div>
+            <div></div>
+          </div>
+          <div id="sett-expenses-list"></div>
+          <div style="padding:8px 16px;display:flex;justify-content:space-between;border-top:1px solid #333">
+            <span style="font-family:var(--mono);font-size:10px;color:rgba(255,255,255,0.4)">Total expenses</span>
+            <span style="font-family:var(--mono);font-size:11px;font-weight:500;color:var(--red)" id="sett-exp-total">€ 0</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Notes -->
+      <div class="fg"><label>Notes</label>
+        <textarea id="sett-notes" placeholder="Settlement notes..." style="min-height:60px;resize:vertical"></textarea></div>
+    </div>
+
+    <!-- RIGHT: calculated settlement -->
+    <div style="flex:1;padding:24px;overflow-y:auto;background:#1e1e1e" id="sett-preview">
+
+      <div style="max-width:600px;margin:0 auto">
+        <div style="font-family:var(--mono);font-size:9px;letter-spacing:0.2em;text-transform:uppercase;color:rgba(255,255,255,0.3);margin-bottom:20px">Settlement Statement</div>
+
+        <div class="sett-section">
+          <div class="sett-section-hdr">Revenue</div>
+          <div class="sett-row"><div class="sett-label">Gross Fee</div><div class="sett-val" id="sp-gross">—</div></div>
+          <div class="sett-row" id="sp-wh-row" style="display:none">
+            <div class="sett-label">Tax Withholding (<span id="sp-wh-pct">0</span>%)</div>
+            <div class="sett-val red" id="sp-wh-amt">—</div>
+          </div>
+          <div class="sett-row"><div class="sett-label">Net Fee</div><div class="sett-val blue" id="sp-net">—</div></div>
+        </div>
+
+        <div class="sett-section">
+          <div class="sett-section-hdr">Commission</div>
+          <div class="sett-row">
+            <div class="sett-label">Commission (<span id="sp-comm-pct">15</span>% on <span id="sp-comm-base">gross</span>)</div>
+            <div class="sett-val red" id="sp-comm-amt">—</div>
+          </div>
+        </div>
+
+        <div class="sett-section" id="sp-exp-section" style="display:none">
+          <div class="sett-section-hdr">Show Expenses</div>
+          <div id="sp-exp-lines"></div>
+          <div class="sett-row">
+            <div class="sett-label" style="font-weight:500">Total Expenses</div>
+            <div class="sett-val red" id="sp-exp-total">—</div>
+          </div>
+        </div>
+
+        <div class="sett-section">
+          <div class="sett-total">
+            <div class="sett-total-label">Net Payout to Artist</div>
+            <div class="sett-total-val" id="sp-payout">—</div>
+          </div>
+        </div>
+
+        <!-- Payout tracking -->
+        <div class="sett-section" id="sett-payout-section" style="margin-top:16px">
+          <div class="sett-section-hdr">Payout Status</div>
+          <div style="padding:16px;display:flex;align-items:center;gap:12px">
+            <div id="sett-payout-status" style="font-family:var(--mono);font-size:11px"></div>
+            <button class="btn success" id="sett-mark-paid-btn" onclick="markPayoutPaid()" style="font-size:10px">✓ Mark as Paid to Artist</button>
+            <button class="btn danger" id="sett-mark-unpaid-btn" onclick="markPayoutUnpaid()" style="display:none;font-size:10px">✕ Mark as Unpaid</button>
+          </div>
+          <div style="padding:0 16px 12px;font-family:var(--mono);font-size:10px;color:rgba(255,255,255,0.4)" id="sett-paid-info"></div>
+        </div>
+
+      </div>
     </div>
   </div>
 </div>
@@ -2939,6 +3170,7 @@ function openBookingModal(id = null) {
   document.getElementById('bk-modal-ref').textContent = '';
   document.getElementById('bk-status-bar').style.display = id ? 'block' : 'none';
   document.getElementById('bm-delete-btn').style.display = id ? 'inline-block' : 'none';
+  document.getElementById('bm-settlement-btn').style.display = id ? 'inline-block' : 'none';
 
   // Populate org dropdown
   const orgSel = document.getElementById('bm-org');
@@ -5367,6 +5599,16 @@ async function renderFinance() {
 
   // ── COMMENTS OVERVIEW ──
   renderCommentsOverview();
+
+  // ── PAYOUTS ──
+  renderPayoutsOverview();
+
+  // ── STATEMENT FILTER: populate artist dropdown ──
+  const stmtArtist = document.getElementById('stmt-artist');
+  if (stmtArtist) {
+    stmtArtist.innerHTML = '<option value="">All artists</option>' +
+      allArtists.map(a => `<option value="${a.id}">${esc(a.name)}</option>`).join('');
+  }
 }
 
 function renderLedger(year, yearLines) {
@@ -5829,6 +6071,148 @@ async function renderCommentsOverview() {
   tbody.innerHTML = rows || '<tr class="tbl-msg"><td colspan="8">Geen comments gevonden</td></tr>';
 }
 
+async function renderPayoutsOverview() {
+  const tbody = document.getElementById('fin-payouts-tbody');
+  tbody.innerHTML = '<tr class="tbl-msg"><td colspan="9">Loading...</td></tr>';
+
+  const { data: payouts } = await db.from('payouts')
+    .select('*, settlements(*)')
+    .order('created_at', { ascending: false });
+
+  if (!payouts?.length) {
+    tbody.innerHTML = '<tr class="tbl-msg"><td colspan="9">Geen payouts gevonden</td></tr>';
+    return;
+  }
+
+  const fmt = (n, sym) => (sym||'€') + Math.round(n||0).toLocaleString('nl-NL');
+  const rows = payouts.map(p => {
+    const sett = p.settlements;
+    const b    = allBookings.find(x => x.id === p.booking_id);
+    const a    = allArtists.find(x => x.id === p.artist_id);
+    const sym  = {EUR:'€',USD:'$',GBP:'£',SGD:'S$',AED:'AED ',IDR:'Rp',THB:'฿'}[p.currency||'EUR']||'€';
+    const paid = p.status === 'paid';
+    return `<tr>
+      <td class="td-mono" style="font-size:10px">${b?.show_date ? fmtDate(b.show_date) : '—'}</td>
+      <td class="td-name">${esc(a?.name||'—')}</td>
+      <td class="td-trunc">${esc(b?.venue_name||'—')}</td>
+      <td class="td-mono">${sett ? fmt(sett.gross_fee, sym) : '—'}</td>
+      <td class="td-mono" style="color:var(--red)">${sett ? '− '+fmt(sett.commission_amount, sym) : '—'}</td>
+      <td class="td-mono" style="color:var(--red)">${sett?.total_expenses > 0 ? '− '+fmt(sett.total_expenses, sym) : '—'}</td>
+      <td class="td-mono" style="color:var(--green);font-weight:500">${fmt(p.amount, sym)}</td>
+      <td><span class="${paid?'payout-paid':'payout-pending'}">${paid?'✓ PAID':'⏳ PENDING'}</span></td>
+      <td><button class="ra" style="font-size:9px" onclick="openSettlementFromPayout('${p.booking_id}')">Open</button></td>
+    </tr>`;
+  }).join('');
+  tbody.innerHTML = rows;
+}
+
+async function openSettlementFromPayout(bookingId) {
+  await openSettlement(bookingId);
+}
+
+async function exportPayouts() {
+  const { data: payouts } = await db.from('payouts').select('*, settlements(*)').order('created_at', { ascending: false });
+  if (!payouts?.length) { showToast('Geen payouts', 'error'); return; }
+  const rows = payouts.map(p => {
+    const b = allBookings.find(x => x.id === p.booking_id);
+    const a = allArtists.find(x => x.id === p.artist_id);
+    return {
+      Date: b?.show_date || '',
+      Artist: a?.name || '',
+      Venue: b?.venue_name || '',
+      Gross: p.settlements?.gross_fee || 0,
+      Commission: p.settlements?.commission_amount || 0,
+      Expenses: p.settlements?.total_expenses || 0,
+      Net_Payout: p.amount || 0,
+      Currency: p.currency || 'EUR',
+      Status: p.status,
+      Paid_At: p.paid_at ? p.paid_at.slice(0,10) : '',
+    };
+  });
+  const ws = XLSX.utils.json_to_sheet(rows);
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, 'Payouts');
+  XLSX.writeFile(wb, 'deepbloe_payouts.xlsx');
+  showToast('Payouts geëxporteerd', 'success');
+}
+
+async function generateStatement() {
+  const artistId = document.getElementById('stmt-artist').value;
+  const period   = document.getElementById('stmt-period').value;
+  const status   = document.getElementById('stmt-status').value;
+  const tbody    = document.getElementById('fin-stmt-tbody');
+  const totalsEl = document.getElementById('fin-stmt-totals');
+  tbody.innerHTML = '<tr class="tbl-msg"><td colspan="10">Loading...</td></tr>';
+
+  let query = db.from('payouts').select('*, settlements(*)');
+  if (artistId) query = query.eq('artist_id', artistId);
+  if (status)   query = query.eq('status', status);
+  const { data: payouts } = await query.order('created_at', { ascending: false });
+
+  let filtered = (payouts || []).filter(p => {
+    const b = allBookings.find(x => x.id === p.booking_id);
+    if (!b?.show_date) return false;
+    const d = new Date(b.show_date);
+    const m = d.getMonth() + 1;
+    const y = d.getFullYear();
+    const curYear = finYear;
+    if (period === 'q1') return y === curYear && m <= 3;
+    if (period === 'q2') return y === curYear && m >= 4 && m <= 6;
+    if (period === 'q3') return y === curYear && m >= 7 && m <= 9;
+    if (period === 'q4') return y === curYear && m >= 10;
+    if (period === 'year') return y === curYear;
+    return true;
+  });
+
+  if (!filtered.length) {
+    tbody.innerHTML = '<tr class="tbl-msg"><td colspan="10">Geen resultaten</td></tr>';
+    totalsEl.style.display = 'none';
+    return;
+  }
+
+  let totGross=0, totWh=0, totNet=0, totComm=0, totExp=0, totPayout=0;
+  const fmt = (n) => '€ ' + Math.round(n||0).toLocaleString('nl-NL');
+
+  const rows = filtered.map(p => {
+    const sett = p.settlements;
+    const b    = allBookings.find(x => x.id === p.booking_id);
+    const a    = allArtists.find(x => x.id === p.artist_id);
+    const paid = p.status === 'paid';
+    const sym  = {EUR:'€',USD:'$',GBP:'£'}[p.currency||'EUR']||'€';
+    const f    = n => sym + Math.round(n||0).toLocaleString('nl-NL');
+    if (p.currency === 'EUR') {
+      totGross += sett?.gross_fee||0; totWh += sett?.withholding_amount||0;
+      totNet += sett?.net_fee||0; totComm += sett?.commission_amount||0;
+      totExp += sett?.total_expenses||0; totPayout += p.amount||0;
+    }
+    return `<tr>
+      <td class="td-mono" style="font-size:10px">${b?.show_date?fmtDate(b.show_date):'—'}</td>
+      <td class="td-name">${esc(a?.name||'—')}</td>
+      <td class="td-trunc">${esc([b?.venue_name,b?.venue_city].filter(Boolean).join(', ')||'—')}</td>
+      <td class="td-mono">${sett?f(sett.gross_fee):'—'}</td>
+      <td class="td-mono" style="color:var(--red)">${sett?.withholding_amount>0?'−'+f(sett.withholding_amount):'—'}</td>
+      <td class="td-mono">${sett?f(sett.net_fee):'—'}</td>
+      <td class="td-mono" style="color:var(--red)">${sett?'−'+f(sett.commission_amount):'—'}</td>
+      <td class="td-mono" style="color:var(--red)">${sett?.total_expenses>0?'−'+f(sett.total_expenses):'—'}</td>
+      <td class="td-mono" style="color:var(--green);font-weight:500">${f(p.amount)}</td>
+      <td><span class="${paid?'payout-paid':'payout-pending'}">${paid?'✓ PAID':'⏳ PENDING'}</span></td>
+    </tr>`;
+  }).join('');
+
+  tbody.innerHTML = rows;
+  totalsEl.style.display = 'flex';
+  totalsEl.innerHTML = `
+    <div><span style="color:var(--muted)">Gross: </span><strong>€ ${Math.round(totGross).toLocaleString('nl-NL')}</strong></div>
+    <div><span style="color:var(--muted)">Commission: </span><strong style="color:var(--red)">− € ${Math.round(totComm).toLocaleString('nl-NL')}</strong></div>
+    <div><span style="color:var(--muted)">Expenses: </span><strong style="color:var(--red)">− € ${Math.round(totExp).toLocaleString('nl-NL')}</strong></div>
+    <div><span style="color:var(--muted)">Net Payout: </span><strong style="color:var(--green)">€ ${Math.round(totPayout).toLocaleString('nl-NL')}</strong></div>
+    <div style="margin-left:auto"><button class="btn" onclick="exportStatement()" style="font-size:10px">↓ Export</button></div>`;
+}
+
+function exportStatement() {
+  showToast('Export functie — genereer eerst de statement', 'info');
+}
+
 // ── END FINANCE ────────────────────────────────────────────────
 
 // ── EMAIL ─────────────────────────────────────────────────────
@@ -6155,6 +6539,251 @@ function renderAvailStrip(daysInMonth) {
   document.getElementById('cal-avail-rows').innerHTML = rows;
 }
 // ── END CALENDAR ───────────────────────────────────────────────
+
+// ── SETTLEMENT ────────────────────────────────────────────────
+let currentSettlementBookingId = null;
+let currentSettlementId = null;
+let currentPayoutId = null;
+let settExpenses = []; // { id, label, category, amount, isNew, isDeleted }
+
+const SETT_CURRENCIES = {EUR:'€',USD:'$',GBP:'£',SGD:'S$',AED:'AED ',IDR:'Rp',THB:'฿'};
+
+async function openSettlement(bookingId) {
+  if (!bookingId) return;
+  currentSettlementBookingId = bookingId;
+  const b = allBookings.find(x => x.id === bookingId);
+  if (!b) return;
+
+  // Set header
+  document.getElementById('sett-booking-ref').textContent =
+    [b.reference, b.artists?.name, b.venue_name, b.show_date ? fmtDate(b.show_date) : ''].filter(Boolean).join(' · ');
+
+  // Load or pre-fill settlement
+  const { data: sett } = await db.from('settlements').select('*').eq('booking_id', bookingId).maybeSingle();
+
+  if (sett) {
+    currentSettlementId = sett.id;
+    document.getElementById('sett-gross').value      = sett.gross_fee || b.fee_amount || '';
+    document.getElementById('sett-currency').value   = sett.currency || b.fee_currency || 'EUR';
+    document.getElementById('sett-wh-rate').value    = sett.withholding_rate || b.withholding_rate || 0;
+    document.getElementById('sett-comm-rate').value  = sett.commission_rate || b.commission_rate || 15;
+    document.getElementById('sett-comm-base').value  = sett.commission_base || 'gross';
+    document.getElementById('sett-notes').value      = sett.notes || '';
+  } else {
+    currentSettlementId = null;
+    document.getElementById('sett-gross').value      = b.fee_amount || '';
+    document.getElementById('sett-currency').value   = b.fee_currency || 'EUR';
+    document.getElementById('sett-wh-rate').value    = b.withholding_rate || 0;
+    document.getElementById('sett-comm-rate').value  = b.commission_rate || 15;
+    document.getElementById('sett-comm-base').value  = 'gross';
+    document.getElementById('sett-notes').value      = '';
+  }
+
+  // Load show expenses
+  const { data: exps } = await db.from('show_expenses').select('*').eq('booking_id', bookingId).order('created_at');
+  settExpenses = (exps || []).map(e => ({ ...e, isNew: false, isDeleted: false }));
+  renderSettExpenses();
+
+  // Load payout status
+  await loadPayoutStatus();
+
+  calcSettlement();
+
+  // Show overlay
+  const overlay = document.getElementById('settlement-overlay');
+  overlay.style.display = 'flex';
+  closeModal('bk-modal');
+}
+
+function closeSettlement() {
+  document.getElementById('settlement-overlay').style.display = 'none';
+  currentSettlementBookingId = null;
+  currentSettlementId = null;
+  currentPayoutId = null;
+  settExpenses = [];
+}
+
+function addSettExpense() {
+  settExpenses.push({ id: 'new_' + Date.now(), label: '', category: 'other', amount: 0, isNew: true, isDeleted: false });
+  renderSettExpenses();
+}
+
+function renderSettExpenses() {
+  const list = document.getElementById('sett-expenses-list');
+  const active = settExpenses.filter(e => !e.isDeleted);
+  if (!active.length) {
+    list.innerHTML = '<div style="padding:10px 16px;font-family:var(--mono);font-size:10px;color:rgba(255,255,255,0.3)">No expenses yet</div>';
+    calcSettlement(); return;
+  }
+  list.innerHTML = active.map((e,i) => `
+    <div class="sett-exp-line" style="background:rgba(255,255,255,0.02);border-bottom:1px solid #333">
+      <input class="sett-exp-input" placeholder="Label (e.g. Flight AMS-JKT)" value="${esc(e.label)}"
+        onchange="settExpenses.find(x=>x.id==='${e.id}').label=this.value">
+      <select style="background:#222;border:none;color:rgba(255,255,255,0.7);font-family:var(--mono);font-size:10px;outline:none;padding:2px 4px"
+        onchange="settExpenses.find(x=>x.id==='${e.id}').category=this.value">
+        ${['flights','hotels','visa','transport','hospitality','other'].map(c =>
+          `<option value="${c}" ${e.category===c?'selected':''}>${c}</option>`).join('')}
+      </select>
+      <input class="sett-exp-input" type="number" placeholder="0" value="${e.amount||''}" style="text-align:right"
+        onchange="settExpenses.find(x=>x.id==='${e.id}').amount=parseFloat(this.value)||0;calcSettlement()">
+      <div class="sett-exp-del" onclick="removeSettExpense('${e.id}')">×</div>
+    </div>`).join('');
+  calcSettlement();
+}
+
+function removeSettExpense(id) {
+  const e = settExpenses.find(x => x.id === id);
+  if (e) { if (e.isNew) settExpenses = settExpenses.filter(x => x.id !== id); else e.isDeleted = true; }
+  renderSettExpenses();
+}
+
+function calcSettlement() {
+  const gross    = parseFloat(document.getElementById('sett-gross').value) || 0;
+  const whRate   = parseFloat(document.getElementById('sett-wh-rate').value) || 0;
+  const commRate = parseFloat(document.getElementById('sett-comm-rate').value) || 15;
+  const commBase = document.getElementById('sett-comm-base').value;
+  const cur      = document.getElementById('sett-currency').value;
+  const sym      = SETT_CURRENCIES[cur] || cur;
+  const fmt      = n => sym + Math.round(n).toLocaleString('nl-NL');
+
+  const whAmt    = gross * whRate / 100;
+  const netFee   = gross - whAmt;
+  const commAmt  = (commBase === 'net' ? netFee : gross) * commRate / 100;
+  const totalExp = settExpenses.filter(e=>!e.isDeleted).reduce((s,e)=>s+(parseFloat(e.amount)||0),0);
+  const payout   = netFee - commAmt - totalExp;
+
+  // Update preview
+  document.getElementById('sp-gross').textContent = gross > 0 ? fmt(gross) : '—';
+  document.getElementById('sp-wh-row').style.display = whRate > 0 ? 'grid' : 'none';
+  document.getElementById('sp-wh-pct').textContent = whRate;
+  document.getElementById('sp-wh-amt').textContent = whAmt > 0 ? '− '+fmt(whAmt) : '—';
+  document.getElementById('sp-net').textContent = netFee > 0 ? fmt(netFee) : '—';
+  document.getElementById('sp-comm-pct').textContent = commRate;
+  document.getElementById('sp-comm-base').textContent = commBase === 'net' ? 'net' : 'gross';
+  document.getElementById('sp-comm-amt').textContent = commAmt > 0 ? '− '+fmt(commAmt) : '—';
+
+  // Expenses in preview
+  const expSection = document.getElementById('sp-exp-section');
+  const activeExps = settExpenses.filter(e=>!e.isDeleted && e.amount > 0);
+  if (activeExps.length) {
+    expSection.style.display = 'block';
+    document.getElementById('sp-exp-lines').innerHTML = activeExps.map(e =>
+      `<div class="sett-row"><div class="sett-label">${esc(e.label||e.category)}</div><div class="sett-val red">− ${sym}${Math.round(e.amount).toLocaleString('nl-NL')}</div></div>`
+    ).join('');
+    document.getElementById('sp-exp-total').textContent = '− ' + fmt(totalExp);
+  } else {
+    expSection.style.display = 'none';
+  }
+
+  document.getElementById('sett-exp-total').textContent = fmt(totalExp);
+  const payoutEl = document.getElementById('sp-payout');
+  payoutEl.textContent = fmt(payout);
+  payoutEl.className = 'sett-total-val' + (payout < 0 ? ' red' : '');
+}
+
+async function saveSettlement() {
+  const bookingId = currentSettlementBookingId;
+  if (!bookingId) return;
+
+  const gross    = parseFloat(document.getElementById('sett-gross').value) || 0;
+  const whRate   = parseFloat(document.getElementById('sett-wh-rate').value) || 0;
+  const commRate = parseFloat(document.getElementById('sett-comm-rate').value) || 15;
+  const commBase = document.getElementById('sett-comm-base').value;
+  const cur      = document.getElementById('sett-currency').value;
+
+  const whAmt   = gross * whRate / 100;
+  const netFee  = gross - whAmt;
+  const commAmt = (commBase === 'net' ? netFee : gross) * commRate / 100;
+  const totalExp = settExpenses.filter(e=>!e.isDeleted).reduce((s,e)=>s+(parseFloat(e.amount)||0),0);
+  const payout  = netFee - commAmt - totalExp;
+
+  const settData = {
+    booking_id: bookingId,
+    gross_fee: gross, currency: cur,
+    withholding_rate: whRate, withholding_amount: whAmt,
+    net_fee: netFee, commission_base: commBase,
+    commission_rate: commRate, commission_amount: commAmt,
+    total_expenses: totalExp, net_payout: payout,
+    notes: document.getElementById('sett-notes').value.trim(),
+    updated_at: new Date().toISOString(),
+  };
+
+  let settId = currentSettlementId;
+  if (settId) {
+    await db.from('settlements').update(settData).eq('id', settId);
+  } else {
+    const { data } = await db.from('settlements').insert(settData).select('*').single();
+    settId = data?.id;
+    currentSettlementId = settId;
+  }
+
+  // Save expenses
+  for (const e of settExpenses) {
+    if (e.isNew && !e.isDeleted && e.label) {
+      await db.from('show_expenses').insert({ booking_id: bookingId, label: e.label, category: e.category, amount: e.amount, currency: cur });
+    } else if (!e.isNew && e.isDeleted) {
+      await db.from('show_expenses').delete().eq('id', e.id);
+    } else if (!e.isNew && !e.isDeleted) {
+      await db.from('show_expenses').update({ label: e.label, category: e.category, amount: e.amount }).eq('id', e.id);
+    }
+  }
+
+  // Create/update payout record
+  if (settId) {
+    const b = allBookings.find(x => x.id === bookingId);
+    const { data: existing } = await db.from('payouts').select('id').eq('settlement_id', settId).maybeSingle();
+    if (!existing) {
+      const { data: po } = await db.from('payouts').insert({
+        settlement_id: settId, booking_id: bookingId,
+        artist_id: b?.artist_id, amount: payout, currency: cur, status: 'pending',
+      }).select('*').single();
+      currentPayoutId = po?.id;
+    }
+  }
+
+  showToast('Settlement saved ✓', 'success');
+  await loadPayoutStatus();
+}
+
+async function loadPayoutStatus() {
+  if (!currentSettlementId) {
+    document.getElementById('sett-payout-status').textContent = 'Save settlement first to track payout';
+    document.getElementById('sett-mark-paid-btn').style.display = 'none';
+    document.getElementById('sett-mark-unpaid-btn').style.display = 'none';
+    return;
+  }
+  const { data: po } = await db.from('payouts').select('*').eq('settlement_id', currentSettlementId).maybeSingle();
+  if (!po) return;
+  currentPayoutId = po.id;
+  const paid = po.status === 'paid';
+  document.getElementById('sett-mark-paid-btn').style.display   = paid ? 'none' : 'inline-block';
+  document.getElementById('sett-mark-unpaid-btn').style.display = paid ? 'inline-block' : 'none';
+  document.getElementById('sett-payout-status').innerHTML = paid
+    ? `<span class="payout-paid">✓ PAID</span>`
+    : `<span class="payout-pending">⏳ PENDING</span>`;
+  document.getElementById('sett-paid-info').textContent = paid && po.paid_at
+    ? `Paid on ${fmtDate(po.paid_at.slice(0,10))} by ${po.paid_by_email||'agent'}`
+    : '';
+}
+
+async function markPayoutPaid() {
+  if (!currentPayoutId) { showToast('Save settlement first', 'error'); return; }
+  const { data: { user } } = await db.auth.getUser();
+  await db.from('payouts').update({ status: 'paid', paid_at: new Date().toISOString(), paid_by_email: user?.email }).eq('id', currentPayoutId);
+  showToast('Marked as paid ✓', 'success');
+  await loadPayoutStatus();
+  loadBookings();
+}
+
+async function markPayoutUnpaid() {
+  if (!currentPayoutId) return;
+  await db.from('payouts').update({ status: 'pending', paid_at: null, paid_by_email: null }).eq('id', currentPayoutId);
+  showToast('Marked as unpaid', 'info');
+  await loadPayoutStatus();
+}
+
+function printSettlement() { window.print(); }
+// ── END SETTLEMENT ─────────────────────────────────────────────
 
 function closeModal(id) { document.getElementById(id).classList.remove('open'); }
 
