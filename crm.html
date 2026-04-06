@@ -2294,7 +2294,7 @@ tbody td { padding: 10px 14px; vertical-align: middle; }
       <div class="sett-section">
         <div class="sett-section-hdr">
           <span>Show Expenses</span>
-          <button class="fin-cat-add" onclick="addSettExpense()" style="color:rgba(255,255,255,0.6);border-color:rgba(255,255,255,0.3)">+ Add</button>
+          <span style="font-family:var(--mono);font-size:9px;color:rgba(255,255,255,0.4)">Ingevoerd via Advancing → Costs</span>
         </div>
         <div style="padding:0">
           <div style="display:grid;grid-template-columns:1fr 120px 80px 28px;gap:0;padding:6px 16px;background:rgba(255,255,255,0.03);border-bottom:1px solid #333">
@@ -2724,6 +2724,7 @@ The Netherlands</textarea>
     <div class="adv-tab" onclick="showAdvancingTab('hospitality')">Hospitality</div>
     <div class="adv-tab" onclick="showAdvancingTab('travel')">Travel</div>
     <div class="adv-tab" onclick="showAdvancingTab('checklist')">Checklist</div>
+    <div class="adv-tab" onclick="showAdvancingTab('costs')">Costs</div>
     <div class="adv-tab" onclick="showAdvancingTab('showpack')">Show Pack</div>
   </div>
 
@@ -2888,6 +2889,36 @@ The Netherlands</textarea>
     </div>
 
     <!-- SHOW PACK -->
+    <!-- COSTS -->
+    <div class="adv-panel" id="adv-panel-costs">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px">
+        <div>
+          <div style="font-family:var(--mono);font-size:11px;font-weight:500;color:var(--accent)">Show Costs</div>
+          <div style="font-family:var(--mono);font-size:10px;color:var(--muted);margin-top:4px">Kosten die automatisch worden meegenomen in de settlement</div>
+        </div>
+        <button class="btn success" onclick="saveCosts()" style="font-size:10px">✓ Save Costs</button>
+      </div>
+
+      <!-- Column headers -->
+      <div style="display:grid;grid-template-columns:1fr 140px 120px 120px 36px;gap:8px;padding:6px 0;border-bottom:1px solid var(--border);margin-bottom:4px">
+        <div style="font-family:var(--mono);font-size:9px;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted)">Description</div>
+        <div style="font-family:var(--mono);font-size:9px;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted)">Category</div>
+        <div style="font-family:var(--mono);font-size:9px;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);text-align:right">Amount</div>
+        <div style="font-family:var(--mono);font-size:9px;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted)">Currency</div>
+        <div></div>
+      </div>
+
+      <div id="adv-costs-list"></div>
+
+      <button class="btn" onclick="addAdvCost()" style="margin-top:12px;font-size:10px">+ Add Cost</button>
+
+      <div style="margin-top:16px;padding-top:12px;border-top:2px solid var(--border);display:flex;justify-content:space-between;align-items:center">
+        <span style="font-family:var(--mono);font-size:10px;color:var(--muted)">Total (EUR equivalent)</span>
+        <span style="font-family:var(--mono);font-size:14px;font-weight:500;color:var(--red)" id="adv-costs-total">€ 0</span>
+      </div>
+    </div>
+
+    <!-- SHOWPACK -->
     <div class="adv-panel" id="adv-panel-showpack">
       <div style="margin-bottom:16px;display:flex;gap:8px">
         <button class="btn primary" onclick="printShowPack()">⎙ Print Show Pack</button>
@@ -4961,7 +4992,13 @@ function openAdvancingEditor(bookingId = null) {
   if (bookingId) sel.value = bookingId;
 
   resetAdvancingFields();
-  if (bookingId) loadBookingIntoAdvancing();
+  if (bookingId) {
+    loadBookingIntoAdvancing();
+    loadAdvCosts(bookingId);
+  } else {
+    advCosts = [];
+    renderAdvCosts();
+  }
 
   showAdvancingTab('production');
   renderChecklist({});
@@ -5043,6 +5080,7 @@ async function openAdvancingEditorById(advancingId) {
   renderChecklist(d);
   updateShowPack();
   showAdvancingTab('production');
+  loadAdvCosts(a.booking_id);
   document.getElementById('advancing-editor-overlay').classList.add('open');
 }
 
@@ -5323,6 +5361,90 @@ function closeAdvancingEditor() {
   document.getElementById('advancing-editor-overlay').classList.remove('open');
   editAdvancingId = null; currentAdvancingBookingId = null; lockedSections = {};
 }
+// ── SHOW COSTS ────────────────────────────────────────────────
+let advCosts = []; // { id, label, category, amount, currency, isNew, isDeleted }
+
+async function loadAdvCosts(bookingId) {
+  const { data } = await db.from('show_expenses').select('*').eq('booking_id', bookingId).order('created_at');
+  advCosts = (data || []).map(e => ({ ...e, isNew: false, isDeleted: false }));
+  renderAdvCosts();
+}
+
+function renderAdvCosts() {
+  const list = document.getElementById('adv-costs-list');
+  if (!list) return;
+  const active = advCosts.filter(e => !e.isDeleted);
+  if (!active.length) {
+    list.innerHTML = '<div style="font-family:var(--mono);font-size:10px;color:var(--muted);padding:12px 0">Geen kosten ingevoerd. Klik "+ Add Cost" om te beginnen.</div>';
+    document.getElementById('adv-costs-total').textContent = '€ 0';
+    return;
+  }
+  list.innerHTML = active.map(e => `
+    <div style="display:grid;grid-template-columns:1fr 140px 120px 120px 36px;gap:8px;padding:8px 0;border-bottom:1px solid var(--border);align-items:center">
+      <input style="border:none;border-bottom:1px solid var(--border);padding:4px;font-size:12px;outline:none;background:transparent;color:var(--accent);width:100%"
+        placeholder="Bijv. KLM vlucht AMS-DXB" value="${esc(e.label)}"
+        onchange="advCosts.find(x=>x.id==='${e.id}').label=this.value">
+      <select style="border:1px solid var(--border);padding:4px 8px;font-family:var(--mono);font-size:11px;outline:none;background:var(--bg);color:var(--accent)"
+        onchange="advCosts.find(x=>x.id==='${e.id}').category=this.value">
+        ${['flights','hotels','visa','transport','hospitality','other'].map(c =>
+          `<option value="${c}" ${e.category===c?'selected':''}>${c}</option>`).join('')}
+      </select>
+      <input type="number" min="0" step="50"
+        style="border:none;border-bottom:1px solid var(--border);padding:4px;font-family:var(--mono);font-size:12px;outline:none;background:transparent;color:var(--accent);text-align:right;width:100%"
+        placeholder="0" value="${e.amount||''}"
+        onchange="advCosts.find(x=>x.id==='${e.id}').amount=parseFloat(this.value)||0;renderAdvCostTotal()">
+      <select style="border:1px solid var(--border);padding:4px 8px;font-family:var(--mono);font-size:11px;outline:none;background:var(--bg);color:var(--accent)"
+        onchange="advCosts.find(x=>x.id==='${e.id}').currency=this.value">
+        ${['EUR','USD','GBP','SGD','AED','IDR','THB'].map(c =>
+          `<option value="${c}" ${(e.currency||'EUR')===c?'selected':''}>${c}</option>`).join('')}
+      </select>
+      <div onclick="removeAdvCost('${e.id}')" style="cursor:pointer;color:var(--muted);font-size:16px;text-align:center;padding:4px;transition:color 0.1s" onmouseover="this.style.color='var(--red)'" onmouseout="this.style.color='var(--muted)'">×</div>
+    </div>`).join('');
+  renderAdvCostTotal();
+}
+
+function renderAdvCostTotal() {
+  const total = advCosts.filter(e=>!e.isDeleted&&e.currency==='EUR').reduce((s,e)=>s+(parseFloat(e.amount)||0),0);
+  const el = document.getElementById('adv-costs-total');
+  if (el) el.textContent = '€ ' + Math.round(total).toLocaleString('nl-NL');
+}
+
+function addAdvCost() {
+  advCosts.push({ id: 'new_'+Date.now(), label:'', category:'other', amount:0, currency:'EUR', isNew:true, isDeleted:false });
+  renderAdvCosts();
+}
+
+function removeAdvCost(id) {
+  const e = advCosts.find(x=>x.id===id);
+  if (e) { if (e.isNew) advCosts = advCosts.filter(x=>x.id!==id); else e.isDeleted = true; }
+  renderAdvCosts();
+}
+
+async function saveCosts() {
+  const bookingId = currentAdvancingBookingId;
+  if (!bookingId) { showToast('Geen boeking geselecteerd', 'error'); return; }
+
+  for (const e of advCosts) {
+    if (e.isNew && !e.isDeleted && e.label) {
+      await db.from('show_expenses').insert({
+        booking_id: bookingId, label: e.label, category: e.category,
+        amount: e.amount, currency: e.currency || 'EUR',
+      });
+    } else if (!e.isNew && e.isDeleted) {
+      await db.from('show_expenses').delete().eq('id', e.id);
+    } else if (!e.isNew && !e.isDeleted) {
+      await db.from('show_expenses').update({
+        label: e.label, category: e.category, amount: e.amount, currency: e.currency,
+      }).eq('id', e.id);
+    }
+  }
+
+  showToast('Costs saved ✓', 'success');
+  // Reload to get fresh IDs
+  await loadAdvCosts(bookingId);
+}
+// ── END SHOW COSTS ─────────────────────────────────────────────
+
 // ── END ADVANCING ─────────────────────────────────────────────
 
 // ── DASHBOARD ─────────────────────────────────────────────────
@@ -6612,21 +6734,18 @@ function renderSettExpenses() {
   const list = document.getElementById('sett-expenses-list');
   const active = settExpenses.filter(e => !e.isDeleted);
   if (!active.length) {
-    list.innerHTML = '<div style="padding:10px 16px;font-family:var(--mono);font-size:10px;color:rgba(255,255,255,0.3)">No expenses yet</div>';
+    list.innerHTML = '<div style="padding:10px 16px;font-family:var(--mono);font-size:10px;color:rgba(255,255,255,0.3)">Geen kosten gevonden. Voer kosten in via Advancing → Costs tab.</div>';
     calcSettlement(); return;
   }
-  list.innerHTML = active.map((e,i) => `
-    <div class="sett-exp-line" style="background:rgba(255,255,255,0.02);border-bottom:1px solid #333">
-      <input class="sett-exp-input" placeholder="Label (e.g. Flight AMS-JKT)" value="${esc(e.label)}"
-        onchange="settExpenses.find(x=>x.id==='${e.id}').label=this.value">
-      <select style="background:#222;border:none;color:rgba(255,255,255,0.7);font-family:var(--mono);font-size:10px;outline:none;padding:2px 4px"
-        onchange="settExpenses.find(x=>x.id==='${e.id}').category=this.value">
-        ${['flights','hotels','visa','transport','hospitality','other'].map(c =>
-          `<option value="${c}" ${e.category===c?'selected':''}>${c}</option>`).join('')}
-      </select>
-      <input class="sett-exp-input" type="number" placeholder="0" value="${e.amount||''}" style="text-align:right"
-        onchange="settExpenses.find(x=>x.id==='${e.id}').amount=parseFloat(this.value)||0;calcSettlement()">
-      <div class="sett-exp-del" onclick="removeSettExpense('${e.id}')">×</div>
+  const sym = s => ({EUR:'€',USD:'$',GBP:'£',SGD:'S$',AED:'AED ',IDR:'Rp',THB:'฿'}[s]||s);
+  list.innerHTML = active.map(e => `
+    <div style="display:grid;grid-template-columns:1fr 80px 80px;gap:8px;padding:8px 16px;border-bottom:1px solid #333;align-items:center">
+      <div>
+        <div style="font-family:var(--mono);font-size:11px;color:rgba(255,255,255,0.8)">${esc(e.label||e.category)}</div>
+        <div style="font-family:var(--mono);font-size:9px;color:rgba(255,255,255,0.3);margin-top:2px">${e.category}</div>
+      </div>
+      <div style="font-family:var(--mono);font-size:10px;color:rgba(255,255,255,0.4);text-align:center">${e.currency||'EUR'}</div>
+      <div style="font-family:var(--mono);font-size:11px;color:var(--red);text-align:right">${sym(e.currency||'EUR')}${(e.amount||0).toLocaleString()}</div>
     </div>`).join('');
   calcSettlement();
 }
