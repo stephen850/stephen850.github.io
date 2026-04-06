@@ -2092,28 +2092,41 @@ tbody td { padding: 10px 14px; vertical-align: middle; }
 
 <!-- ORG MODAL -->
 <div class="overlay" id="org-modal">
-  <div class="modal">
+  <div class="modal" style="width:640px">
     <div class="modal-hdr">
-      <div class="modal-title" id="org-modal-title">Add Organisation</div>
+      <div class="modal-title" id="org-modal-title">Add Company</div>
       <button class="modal-close" onclick="closeModal('org-modal')">×</button>
     </div>
-    <div class="form-section">Organisation Details</div>
+    <input type="hidden" id="om-id">
+
+    <div class="form-section">Company Info</div>
     <div class="form-grid">
       <div class="fg">
-        <label>Type *</label>
+        <label>Legal Name * <span style="font-family:var(--mono);font-size:9px;color:var(--muted)">(for contracts & invoices)</span></label>
+        <input id="om-legal-name" placeholder="ACME Events B.V.">
+      </div>
+      <div class="fg">
+        <label>Trading Name <span style="font-family:var(--mono);font-size:9px;color:var(--muted)">(brand / venue name)</span></label>
+        <input id="om-trading-name" placeholder="Muin Club">
+      </div>
+      <div class="fg">
+        <label>Company Type *</label>
         <select id="om-type">
           <option value="">Select type</option>
-          <option>Club</option><option>Festival</option><option>Promoter</option>
-          <option>Agency</option><option>Brand</option><option>Other</option>
+          <option value="promoter">Promoter</option>
+          <option value="agency">Agency</option>
+          <option value="company">Company</option>
+          <option value="brand">Brand</option>
+          <option value="other">Other</option>
         </select>
       </div>
       <div class="fg">
-        <label>Name *</label>
-        <input id="om-name" placeholder="Illuzion Phuket">
+        <label>Phone</label>
+        <input id="om-phone" placeholder="+31 6...">
       </div>
       <div class="fg">
         <label>Country *</label>
-        <input id="om-country" list="country-list" placeholder="Type or select..." autocomplete="off">
+        <input id="om-country" list="country-list" placeholder="Netherlands" autocomplete="off">
         <datalist id="country-list">
           <option>Indonesia</option><option>Thailand</option><option>UAE</option>
           <option>Singapore</option><option>Cambodia</option><option>Netherlands</option>
@@ -2126,62 +2139,30 @@ tbody td { padding: 10px 14px; vertical-align: middle; }
       </div>
       <div class="fg">
         <label>City</label>
-        <input id="om-city" placeholder="Phuket">
+        <input id="om-city" placeholder="Amsterdam">
       </div>
       <div class="fg">
         <label>Website</label>
         <input id="om-website" placeholder="https://...">
       </div>
       <div class="fg">
-        <label>Instagram</label>
-        <input id="om-instagram" placeholder="@handle">
-      </div>
-      <div class="fg full">
-        <label>Genre</label>
-        <div class="genre-checkboxes" id="om-genres">
-          <label class="genre-cb"><input type="checkbox" value="Afro House"> Afro House</label>
-          <label class="genre-cb"><input type="checkbox" value="Melodic House"> Melodic House</label>
-          <label class="genre-cb"><input type="checkbox" value="Tech House"> Tech House</label>
-          <label class="genre-cb"><input type="checkbox" value="Deep House"> Deep House</label>
-          <label class="genre-cb"><input type="checkbox" value="House"> House</label>
-          <label class="genre-cb"><input type="checkbox" value="Techno"> Techno</label>
-          <label class="genre-cb"><input type="checkbox" value="EDM"> EDM</label>
-          <label class="genre-cb"><input type="checkbox" value="Melodic Techno"> Melodic Techno</label>
-          <label class="genre-cb"><input type="checkbox" value="Progressive"> Progressive</label>
-          <label class="genre-cb"><input type="checkbox" value="Disco"> Disco</label>
-          <label class="genre-cb"><input type="checkbox" value="Amapiano"> Amapiano</label>
-          <label class="genre-cb"><input type="checkbox" value="Organic"> Organic</label>
-        </div>
-        <div style="display:flex;gap:6px;margin-top:8px;align-items:center">
-          <input id="om-genre-custom" class="form-input" placeholder="Add custom genre..." style="flex:1;padding:6px 10px;font-size:12px">
-          <button type="button" class="btn" onclick="addCustomGenre()" style="padding:6px 12px;white-space:nowrap">+ Add</button>
-        </div>
-      </div>
-    </div>
-
-    <div class="form-section" id="om-con-section">Contact Person <span style="font-weight:300;text-transform:none;letter-spacing:0;color:var(--muted);font-family:var(--sans)">(optional)</span></div>
-    <div class="form-grid" id="om-con-fields">
-      <div class="fg">
-        <label>First Name</label>
-        <input id="om-fname" placeholder="John">
+        <label>VAT Number</label>
+        <input id="om-vat" placeholder="NL000000000B01">
       </div>
       <div class="fg">
-        <label>Email</label>
-        <input id="om-email" type="email" placeholder="booking@venue.com">
+        <label>KVK / Chamber of Commerce</label>
+        <input id="om-kvk" placeholder="12345678">
       </div>
       <div class="fg">
-        <label>Phone</label>
-        <input id="om-phone" placeholder="+66 ...">
-      </div>
-      <div class="fg">
-        <label>Tags (comma separated)</label>
-        <input id="om-ctags" placeholder="booking, main contact">
+        <label>IBAN</label>
+        <input id="om-iban" placeholder="NL00 BANK 0000 0000 00">
       </div>
     </div>
 
     <div class="modal-ftr">
+      <button class="btn danger" id="om-delete-btn" style="display:none;margin-right:auto" onclick="deleteOrg(editOrgId, document.getElementById('om-legal-name').value)">Delete</button>
       <button class="btn" onclick="closeModal('org-modal')">Cancel</button>
-      <button class="btn primary" id="org-save-btn" onclick="saveOrg()">Save Organisation</button>
+      <button class="btn primary" onclick="saveOrg()">Save Company</button>
     </div>
   </div>
 </div>
@@ -3861,8 +3842,8 @@ function renderOrgs() {
       <td class="td-trunc">${conEmail}</td>
       <td><div class="row-actions">
         <button class="ra" onclick="event.stopPropagation();addContactToOrg('${o.id}','${esc(o.name)}')">+ Contact</button>
-        <button class="ra" onclick="event.stopPropagation();openCompanyDetail('${o.id}')">Open</button>
-        <button class="ra del" onclick="event.stopPropagation();deleteOrg('${o.id}','${esc(o.name)}')">Del</button>
+        <button class="ra" onclick="event.stopPropagation();openOrgModal('${o.id}')">Edit</button>
+        <button class="ra del" onclick="event.stopPropagation();deleteOrg('${o.id}','${esc(o.legal_name||o.name)}')">Del</button>
       </div></td>
     </tr>`;
   }).join('');
@@ -3879,144 +3860,83 @@ function orgPage(d) { orgPageN += d; renderOrgs(); }
 // ── ORG MODAL ─────────────────────────────────────────────────
 function openOrgModal(id=null) {
   editOrgId = id;
-  document.getElementById('org-modal-title').textContent = id ? 'Edit Organisation' : 'Add Organisation';
-  const conSection = document.getElementById('om-con-section');
-  const conFields  = document.getElementById('om-con-fields');
-  conSection.style.display = id ? 'none' : '';
-  conFields.style.display  = id ? 'none' : '';
-  if (!id) {
-    document.getElementById('om-type').value      = '';
-    document.getElementById('om-name').value      = '';
-    document.getElementById('om-country').value   = '';
-    document.getElementById('om-city').value      = '';
-    document.getElementById('om-website').value   = '';
-    document.getElementById('om-instagram').value = '';
-    document.getElementById('om-fname').value     = '';
-    document.getElementById('om-email').value     = '';
-    document.getElementById('om-phone').value     = '';
-    document.getElementById('om-ctags').value     = '';
-    document.getElementById('om-genre-custom').value = '';
-    document.querySelectorAll('#om-genres input').forEach(cb => cb.checked = false);
-    document.querySelectorAll('#om-genres .custom-genre-cb').forEach(el => el.remove());
-  }
-  document.getElementById('org-modal').classList.add('open');
-}
+  document.getElementById('org-modal-title').textContent = id ? 'Edit Company' : 'Add Company';
+  document.getElementById('om-delete-btn').style.display = id ? 'inline-block' : 'none';
+  document.getElementById('om-legal-name').value  = '';
+  document.getElementById('om-trading-name').value = '';
+  document.getElementById('om-type').value         = '';
+  document.getElementById('om-phone').value        = '';
+  document.getElementById('om-country').value      = '';
+  document.getElementById('om-city').value         = '';
+  document.getElementById('om-website').value      = '';
+  document.getElementById('om-vat').value          = '';
+  document.getElementById('om-kvk').value          = '';
+  document.getElementById('om-iban').value         = '';
 
-function addCustomGenre() {
-  const input = document.getElementById('om-genre-custom');
-  const val = input.value.trim();
-  if (!val) return;
-  const existing = [...document.querySelectorAll('#om-genres input')].map(cb => cb.value.toLowerCase());
-  if (existing.includes(val.toLowerCase())) {
-    document.querySelectorAll('#om-genres input').forEach(cb => {
-      if (cb.value.toLowerCase() === val.toLowerCase()) cb.checked = true;
-    });
-    input.value = '';
-    return;
-  }
-  const label = document.createElement('label');
-  label.className = 'genre-cb custom-genre-cb';
-  label.innerHTML = `<input type="checkbox" value="${esc(val)}" checked> ${esc(val)}`;
-  document.getElementById('om-genres').appendChild(label);
-  input.value = '';
-}
-
-function editOrg(id) {
-  const o = allOrgs.find(x => x.id === id);
-  if (!o) return;
-  document.getElementById('om-con-section').style.display = 'none';
-  document.getElementById('om-con-fields').style.display  = 'none';
-  document.getElementById('org-modal-title').textContent  = 'Edit Organisation';
-  editOrgId = id;
-  document.getElementById('om-type').value      = o.type || '';
-  document.getElementById('om-name').value      = o.name || '';
-  document.getElementById('om-country').value   = o.country || '';
-  document.getElementById('om-city').value      = o.city || '';
-  document.getElementById('om-website').value   = o.website || '';
-  document.getElementById('om-instagram').value = o.instagram || '';
-  document.getElementById('om-genre-custom').value = '';
-  document.querySelectorAll('#om-genres .custom-genre-cb').forEach(el => el.remove());
-  const savedGenres = o.genre || [];
-  const builtInValues = [...document.querySelectorAll('#om-genres input')].map(cb => cb.value);
-  document.querySelectorAll('#om-genres input').forEach(cb => {
-    cb.checked = savedGenres.includes(cb.value);
-  });
-  savedGenres.forEach(g => {
-    if (!builtInValues.includes(g)) {
-      const label = document.createElement('label');
-      label.className = 'genre-cb custom-genre-cb';
-      label.innerHTML = `<input type="checkbox" value="${esc(g)}" checked> ${esc(g)}`;
-      document.getElementById('om-genres').appendChild(label);
+  if (id) {
+    const o = allOrgs.find(x => x.id === id);
+    if (o) {
+      document.getElementById('om-legal-name').value  = o.legal_name || o.name || '';
+      document.getElementById('om-trading-name').value = o.trading_name || '';
+      document.getElementById('om-type').value         = o.company_type || '';
+      document.getElementById('om-phone').value        = o.phone || '';
+      document.getElementById('om-country').value      = o.country || '';
+      document.getElementById('om-city').value         = o.city || '';
+      document.getElementById('om-website').value      = o.website || '';
+      document.getElementById('om-vat').value          = o.vat_number || '';
+      document.getElementById('om-kvk').value          = o.kvk_number || '';
+      document.getElementById('om-iban').value         = o.iban || '';
     }
-  });
+  }
   document.getElementById('org-modal').classList.add('open');
 }
 
 async function saveOrg() {
-  const name = document.getElementById('om-name').value.trim();
-  if (!name) { showToast('Name is required', 'error'); return; }
-  const genre = [...document.querySelectorAll('#om-genres input:checked')].map(cb => cb.value);
+  const legalName = document.getElementById('om-legal-name').value.trim();
+  if (!legalName) { showToast('Legal name is required', 'error'); return; }
+
   const data = {
-    type:      document.getElementById('om-type').value || null,
-    name,
-    country:   document.getElementById('om-country').value.trim() || null,
-    city:      document.getElementById('om-city').value.trim() || null,
-    website:   document.getElementById('om-website').value.trim() || null,
-    instagram: document.getElementById('om-instagram').value.trim() || null,
-    genre:     genre.length ? genre : null,
+    legal_name:    legalName,
+    trading_name:  document.getElementById('om-trading-name').value.trim() || null,
+    name:          legalName, // keep name in sync
+    company_type:  document.getElementById('om-type').value || null,
+    phone:         document.getElementById('om-phone').value.trim() || null,
+    country:       document.getElementById('om-country').value.trim() || null,
+    city:          document.getElementById('om-city').value.trim() || null,
+    website:       document.getElementById('om-website').value.trim() || null,
+    vat_number:    document.getElementById('om-vat').value.trim() || null,
+    kvk_number:    document.getElementById('om-kvk').value.trim() || null,
+    iban:          document.getElementById('om-iban').value.trim() || null,
+    is_active:     true,
   };
-  const btn = document.getElementById('org-save-btn');
-  btn.disabled = true; btn.textContent = 'Saving...';
+
   let error, orgId;
   if (editOrgId) {
     ({ error } = await db.from('organisations').update(data).eq('id', editOrgId));
     orgId = editOrgId;
+    if (!error) showToast('Company updated ✓', 'success');
   } else {
     const { data: inserted, error: err } = await db.from('organisations').insert(data).select('id');
     error = err;
     orgId = inserted?.[0]?.id;
+    if (!error) showToast('Company added ✓', 'success');
   }
-  btn.disabled = false; btn.textContent = 'Save Organisation';
-  if (error) {
-    showToast(error.code === '23505' ? 'Organisation already exists' : 'Error saving', 'error');
-    return;
-  }
-  if (!editOrgId && orgId) {
-    const email = document.getElementById('om-email').value.trim();
-    if (email) {
-      const tagsRaw = document.getElementById('om-ctags').value;
-      const tags = tagsRaw.split(',').map(t => t.trim()).filter(Boolean);
-      const { error: cerr } = await db.from('contacts').insert({
-        first_name:      document.getElementById('om-fname').value.trim() || null,
-        email,
-        phone:           document.getElementById('om-phone').value.trim() || null,
-        organisation_id: orgId,
-        tags:            tags.length ? tags : null,
-        source:          'Manual',
-      });
-      if (cerr && cerr.code !== '23505') {
-        showToast('Organisation saved, but contact email already exists', 'error');
-      } else {
-        showToast('Organisation + contact saved', 'success');
-      }
-    } else {
-      showToast('Organisation added', 'success');
-    }
-  } else {
-    showToast('Organisation updated', 'success');
-  }
+
+  if (error) { showToast('Error saving: ' + error.message, 'error'); return; }
   closeModal('org-modal');
-  loadOrgs();
-  loadContacts();
+  await loadOrgs();
 }
 
 async function deleteOrg(id, name) {
-  if (!confirm(`Delete "${name}"?`)) return;
-  const { error } = await db.from('organisations').delete().eq('id', id);
+  if (!confirm(`Delete "${name}"? This will soft-delete the company.`)) return;
+  // Soft delete
+  const { error } = await db.from('organisations').update({ is_active: false }).eq('id', id);
   if (error) { showToast('Error deleting', 'error'); return; }
-  showToast('Deleted', 'success');
+  showToast('Company deleted', 'success');
+  closeModal('org-modal');
   loadOrgs();
 }
+
 
 // ── CONTACTS ──────────────────────────────────────────────────
 async function loadContacts() {
