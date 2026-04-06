@@ -2894,7 +2894,7 @@ The Netherlands</textarea>
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px">
         <div>
           <div style="font-family:var(--mono);font-size:11px;font-weight:500;color:var(--accent)">Show Costs</div>
-          <div style="font-family:var(--mono);font-size:10px;color:var(--muted);margin-top:4px">Kosten die automatisch worden meegenomen in de settlement</div>
+          <div style="font-family:var(--mono);font-size:10px;color:var(--muted);margin-top:4px">Costs linked to this show — automatically included in settlement</div>
         </div>
         <button class="btn success" onclick="saveCosts()" style="font-size:10px">✓ Save Costs</button>
       </div>
@@ -2913,7 +2913,7 @@ The Netherlands</textarea>
       <button class="btn" onclick="addAdvCost()" style="margin-top:12px;font-size:10px">+ Add Cost</button>
 
       <div style="margin-top:16px;padding-top:12px;border-top:2px solid var(--border);display:flex;justify-content:space-between;align-items:center">
-        <span style="font-family:var(--mono);font-size:10px;color:var(--muted)">Total (EUR equivalent)</span>
+        <span style="font-family:var(--mono);font-size:10px;color:var(--muted)">Total (EUR)</span>
         <span style="font-family:var(--mono);font-size:14px;font-weight:500;color:var(--red)" id="adv-costs-total">€ 0</span>
       </div>
     </div>
@@ -5375,7 +5375,7 @@ function renderAdvCosts() {
   if (!list) return;
   const active = advCosts.filter(e => !e.isDeleted);
   if (!active.length) {
-    list.innerHTML = '<div style="font-family:var(--mono);font-size:10px;color:var(--muted);padding:12px 0">Geen kosten ingevoerd. Klik "+ Add Cost" om te beginnen.</div>';
+    list.innerHTML = '<div style="font-family:var(--mono);font-size:10px;color:var(--muted);padding:12px 0">No costs added yet. Click "+ Add Cost" to get started.</div>';
     document.getElementById('adv-costs-total').textContent = '€ 0';
     return;
   }
@@ -6734,7 +6734,7 @@ function renderSettExpenses() {
   const list = document.getElementById('sett-expenses-list');
   const active = settExpenses.filter(e => !e.isDeleted);
   if (!active.length) {
-    list.innerHTML = '<div style="padding:10px 16px;font-family:var(--mono);font-size:10px;color:rgba(255,255,255,0.3)">Geen kosten gevonden. Voer kosten in via Advancing → Costs tab.</div>';
+    list.innerHTML = '<div style="padding:10px 16px;font-family:var(--mono);font-size:10px;color:rgba(255,255,255,0.3)">No expenses found. Add costs via Advancing → Costs tab.</div>';
     calcSettlement(); return;
   }
   const sym = s => ({EUR:'€',USD:'$',GBP:'£',SGD:'S$',AED:'AED ',IDR:'Rp',THB:'฿'}[s]||s);
