@@ -2317,23 +2317,28 @@ tbody td { padding: 10px 14px; vertical-align: middle; }
       </div>
     </div>
 
-    <div class="form-section">Promoter / Buyer</div>
+    <div class="form-section">Venue & Promoter</div>
     <div class="form-grid">
       <div class="fg">
-        <label>Organisation *</label>
-        <select id="bm-org" onchange="loadContactsForOrg()">
-          <option value="">Select organisation...</option>
+        <label>Venue *</label>
+        <select id="bm-venue-id" onchange="loadVenueIntoBooking()">
+          <option value="">Select venue...</option>
         </select>
+        <div style="margin-top:4px;font-family:var(--mono);font-size:9px;color:var(--muted)" id="bm-venue-info"></div>
       </div>
       <div class="fg">
         <label>Contact * <span id="bm-contact-hint" style="font-family:var(--mono);font-size:9px;color:var(--amber)"></span></label>
-        <select id="bm-contact" required>
-          <option value="">— select organisation first —</option>
+        <select id="bm-contact">
+          <option value="">— select venue first —</option>
         </select>
         <div style="margin-top:4px;display:flex;gap:8px;align-items:center">
           <span id="bm-contact-info" style="font-family:var(--mono);font-size:10px;color:var(--muted)"></span>
-          <button type="button" id="bm-add-contact-btn" onclick="addContactFromBooking()" style="display:none;font-family:var(--mono);font-size:9px;padding:2px 8px;border:1px solid var(--green);color:var(--green);background:none;cursor:pointer">+ New contact for this org</button>
         </div>
+      </div>
+      <div class="fg">
+        <label>Organisation <span style="font-family:var(--mono);font-size:9px;color:var(--muted)">(auto from venue)</span></label>
+        <input id="bm-org-display" readonly style="background:var(--bg);color:var(--muted);font-size:12px" placeholder="Set by venue">
+        <input type="hidden" id="bm-org">
       </div>
       <div class="fg">
         <label>Territory</label>
@@ -3523,22 +3528,23 @@ function openBookingModal(id = null) {
   document.getElementById('bm-delete-btn').style.display = id ? 'inline-block' : 'none';
   document.getElementById('bm-settlement-btn').style.display = id ? 'inline-block' : 'none';
 
-  // Populate org dropdown
-  const orgSel = document.getElementById('bm-org');
-  orgSel.innerHTML = '<option value="">Select organisation...</option>' +
-    allOrgs.map(o => `<option value="${o.id}">${esc(o.name)}</option>`).join('');
+  // Populate venue dropdown
+  const venueSel = document.getElementById('bm-venue-id');
+  venueSel.innerHTML = '<option value="">Select venue...</option>' +
+    allVenues.map(v => `<option value="${v.id}">${esc(v.name)}${v.city?' — '+esc(v.city):''}${v.country?' ('+esc(v.country)+')':''}</option>`).join('');
 
-  // Reset contact dropdown
-  const conSel = document.getElementById('bm-contact');
-  conSel.innerHTML = '<option value="">— select organisation first —</option>';
+  // Reset contact/org
+  document.getElementById('bm-contact').innerHTML = '<option value="">— select venue first —</option>';
+  document.getElementById('bm-org').value = '';
+  document.getElementById('bm-org-display').value = '';
   document.getElementById('bm-contact-hint').textContent = '';
   document.getElementById('bm-contact-info').textContent = '';
-  document.getElementById('bm-add-contact-btn').style.display = 'none';
+  document.getElementById('bm-venue-info').textContent = '';
 
   if (!id) {
     // Clear form
-    ['bm-artist','bm-dealtype','bm-currency','bm-org','bm-contact'].forEach(f => {
-      document.getElementById(f).value = '';
+    ['bm-artist','bm-dealtype','bm-currency','bm-venue-id','bm-contact'].forEach(f => {
+      const el = document.getElementById(f); if (el) el.value = '';
     });
     ['bm-date','bm-venue','bm-city','bm-country','bm-capacity','bm-settime',
      'bm-setlength','bm-fee','bm-guarantee','bm-pct','bm-territory',
@@ -3555,63 +3561,86 @@ function openBookingModal(id = null) {
   document.getElementById('bk-modal').classList.add('open');
 }
 
-function loadContactsForOrg(preSelectId = null) {
-  const orgId  = document.getElementById('bm-org').value;
-  const conSel = document.getElementById('bm-contact');
-  const hint   = document.getElementById('bm-contact-hint');
-  const info   = document.getElementById('bm-contact-info');
-  const addBtn = document.getElementById('bm-add-contact-btn');
+function loadVenueIntoBooking(preSelectContactId = null) {
+  const venueId = document.getElementById('bm-venue-id').value;
+  const conSel  = document.getElementById('bm-contact');
+  const orgDisp = document.getElementById('bm-org-display');
+  const orgHid  = document.getElementById('bm-org');
+  const info    = document.getElementById('bm-venue-info');
+  const hint    = document.getElementById('bm-contact-hint');
 
-  if (!orgId) {
-    conSel.innerHTML = '<option value="">— select organisation first —</option>';
-    hint.textContent = '';
-    info.textContent = '';
-    addBtn.style.display = 'none';
+  if (!venueId) {
+    conSel.innerHTML = '<option value="">— select venue first —</option>';
+    orgDisp.value = ''; orgHid.value = '';
+    info.textContent = ''; hint.textContent = '';
     return;
   }
 
-  const orgCons = allCons.filter(c => c.organisation_id === orgId);
-  addBtn.style.display = 'inline-block';
+  const venue = allVenues.find(v => v.id === venueId);
+  if (!venue) return;
+
+  // Show venue info
+  info.textContent = [venue.venue_type, venue.city, venue.country].filter(Boolean).join(' · ');
+
+  // Auto-fill venue fields in booking form
+  if (document.getElementById('bm-city') && !document.getElementById('bm-city').value) {
+    document.getElementById('bm-city').value    = venue.city || '';
+    document.getElementById('bm-country').value = venue.country || '';
+  }
+
+  // Set organisation
+  const org = allOrgs.find(o => o.id === venue.organisation_id);
+  orgHid.value  = venue.organisation_id || '';
+  orgDisp.value = org?.legal_name || org?.name || '—';
+
+  // Load contacts for this org
+  const orgCons = venue.organisation_id
+    ? allCons.filter(c => c.organisation_id === venue.organisation_id && c.is_active !== false)
+    : [];
 
   if (!orgCons.length) {
-    conSel.innerHTML = '<option value="">No contacts yet</option>';
-    hint.textContent = '⚠ No contacts for this org';
-    info.textContent = '';
+    conSel.innerHTML = '<option value="">No contacts for this venue\'s organisation</option>';
+    hint.textContent = '⚠ Add contacts first';
     return;
   }
 
   conSel.innerHTML = '<option value="">Select contact *</option>' +
     orgCons.map(c => {
-      const name = [c.first_name, c.last_name].filter(Boolean).join(' ') || c.email || '—';
-      return `<option value="${c.id}">${esc(name)}${c.role ? ' — '+esc(c.role) : ''}</option>`;
+      const name = [c.first_name, c.last_name].filter(Boolean).join(' ') || c.email;
+      const isPrimary = c.id === venue.primary_contact_id;
+      return `<option value="${c.id}" ${isPrimary?'selected':''}>${esc(name)}${isPrimary?' ★':''}</option>`;
     }).join('');
 
-  if (preSelectId) conSel.value = preSelectId;
+  // Pre-select primary contact or specified contact
+  if (preSelectContactId) conSel.value = preSelectContactId;
+  else if (venue.primary_contact_id) conSel.value = venue.primary_contact_id;
+
+  // Show contact info
+  const selectedCon = allCons.find(c => c.id === conSel.value);
+  document.getElementById('bm-contact-info').textContent =
+    selectedCon ? [selectedCon.email, selectedCon.phone].filter(Boolean).join(' · ') : '';
+
   hint.textContent = '';
 
-  // Show contact info when selected
   conSel.onchange = () => {
     const con = allCons.find(c => c.id === conSel.value);
-    info.textContent = con ? [con.email, con.phone].filter(Boolean).join(' · ') : '';
+    document.getElementById('bm-contact-info').textContent =
+      con ? [con.email, con.phone].filter(Boolean).join(' · ') : '';
   };
-  if (preSelectId) conSel.onchange();
 }
 
-function addContactFromBooking() {
-  const orgId = document.getElementById('bm-org').value;
-  const org   = allOrgs.find(o => o.id === orgId);
-  closeModal('bk-modal');
-  setTimeout(() => {
-    openConModal();
-    setTimeout(() => {
-      const sel = document.getElementById('cm-org');
-      if (sel && orgId) {
-        sel.value = orgId;
-        const hint = document.querySelector('#con-modal .modal-hdr .modal-title');
-        if (hint) hint.textContent = `New Contact for ${org?.name || 'Organisation'}`;
-      }
-    }, 100);
-  }, 100);
+function loadContactsForOrg(preSelectId = null) {
+  // Legacy function — redirect to venue-based loading or handle direct org loading
+  const orgId  = document.getElementById('bm-org').value;
+  const conSel = document.getElementById('bm-contact');
+  if (!orgId) { conSel.innerHTML = '<option value="">— select venue first —</option>'; return; }
+  const orgCons = allCons.filter(c => c.organisation_id === orgId && c.is_active !== false);
+  conSel.innerHTML = '<option value="">Select contact *</option>' +
+    orgCons.map(c => {
+      const name = [c.first_name, c.last_name].filter(Boolean).join(' ') || c.email;
+      return `<option value="${c.id}">${esc(name)}</option>`;
+    }).join('');
+  if (preSelectId) conSel.value = preSelectId;
 }
 
 function editBooking(id) {
@@ -3640,12 +3669,27 @@ function editBooking(id) {
   document.getElementById('bm-fee').value       = b.fee_amount || '';
   document.getElementById('bm-guarantee').value = b.guarantee_amount || '';
   document.getElementById('bm-pct').value       = b.percentage || '';
-  document.getElementById('bm-commission').value= b.commission_rate || 15;
-  document.getElementById('bm-withholding').value = b.withholding_rate || 0;
-  document.getElementById('bm-wh-country').value = b.withholding_country || '';
-  document.getElementById('bm-org').value       = b.company_id || '';
-  if (b.company_id) {
-    loadContactsForOrg(b.contact_id);
+  document.getElementById('bm-commission').value  = b.commission_rate || 15;
+  document.getElementById('bm-withholding').value  = b.withholding_rate || 0;
+  document.getElementById('bm-wh-country').value   = b.withholding_country || '';
+  // Load venue — find venue linked to this booking's venue_name/company
+  document.getElementById('bm-org').value          = b.company_id || '';
+  if (b.venue_id) {
+    document.getElementById('bm-venue-id').value = b.venue_id;
+    loadVenueIntoBooking(b.contact_id);
+  } else if (b.company_id) {
+    // Legacy: show org name
+    const org = allOrgs.find(o => o.id === b.company_id);
+    document.getElementById('bm-org-display').value = org?.legal_name || org?.name || '';
+    // Load contacts for org
+    const orgCons = allCons.filter(c => c.organisation_id === b.company_id);
+    const conSel = document.getElementById('bm-contact');
+    conSel.innerHTML = '<option value="">Select contact</option>' +
+      orgCons.map(c => {
+        const name = [c.first_name, c.last_name].filter(Boolean).join(' ') || c.email;
+        return `<option value="${c.id}">${esc(name)}</option>`;
+      }).join('');
+    if (b.contact_id) conSel.value = b.contact_id;
   }
   document.getElementById('bm-territory').value = b.territory || '';
   document.getElementById('bm-notes').value     = b.internal_notes || '';
@@ -3679,12 +3723,13 @@ async function setBookingStatus(status) {
 async function saveBooking() {
   const artistId  = document.getElementById('bm-artist').value;
   const date      = document.getElementById('bm-date').value;
-  const orgId     = document.getElementById('bm-org').value;
+  const venueId   = document.getElementById('bm-venue-id').value;
   const contactId = document.getElementById('bm-contact').value;
+  const orgId     = document.getElementById('bm-org').value;
   if (!artistId)  { showToast('Artist is required', 'error'); return; }
   if (!date)      { showToast('Show date is required', 'error'); return; }
-  if (!orgId)     { showToast('Organisation is required', 'error'); return; }
-  if (!contactId) { showToast('Contact is required — please select or create a contact for this organisation', 'error'); return; }
+  if (!venueId && !orgId) { showToast('Venue is required', 'error'); return; }
+  if (!contactId) { showToast('Contact is required', 'error'); return; }
 
   const data = {
     artist_id:           artistId,
@@ -3705,6 +3750,7 @@ async function saveBooking() {
     withholding_country: document.getElementById('bm-wh-country').value.trim() || null,
     company_id:          document.getElementById('bm-org').value || null,
     contact_id:          document.getElementById('bm-contact').value || null,
+    venue_id:            document.getElementById('bm-venue-id').value || null,
     territory:           document.getElementById('bm-territory').value.trim() || null,
     internal_notes:      document.getElementById('bm-notes').value.trim() || null,
     hold_expires_at:     document.getElementById('bm-holdexpiry').value || null,
