@@ -459,7 +459,7 @@ async function loadShow(bookingId) {
   renderAdvancing(booking, advancing);
   renderVCC(booking, venue);
   renderSettlement(booking, settlement);
-  renderActivity(booking, contracts, invoices, advancing, settlement);
+  await renderActivity(booking, contracts, invoices, advancing, settlement);
 }
 
 // ── HERO ──────────────────────────────────────────────────────
@@ -843,52 +843,66 @@ function renderSettlement(b, sett) {
 }
 
 // ── ACTIVITY ─────────────────────────────────────────────────
-function renderActivity(b, contracts, invoices, advancing, settlement) {
-  const events = [];
+async function renderActivity(b, contracts, invoices, advancing, settlement) {
+  const body = document.getElementById('sd-activity-body');
 
-  // Booking created
-  events.push({ date: b.created_at, text: 'Booking created', color: 'blue', user: '' });
+  // Load real audit log entries
+  const { data: logs } = await db.from('audit_log')
+    .select('*')
+    .eq('booking_id', b.id)
+    .order('created_at', { ascending: false })
+    .limit(30);
 
-  // Status changes — infer from data
-  if (['hold','offer_sent','negotiating','confirmed','advancing','completed'].includes(b.status)) {
-    events.push({ date: b.updated_at || b.created_at, text: `Status: ${b.status.replace('_',' ')}`, color: 'blue', user: '' });
+  // Build synthetic events from existing data as fallback
+  const syntheticEvents = [];
+  syntheticEvents.push({ date: b.created_at, text: 'Booking created', color: 'blue' });
+  if (b.status && b.status !== 'inquiry') {
+    syntheticEvents.push({ date: b.updated_at || b.created_at, text: `Status: ${b.status.replace(/_/g,' ')}`, color: 'blue' });
   }
-
-  // Contracts
   contracts?.forEach(c => {
-    if (c.created_at) events.push({ date: c.created_at, text: 'Contract created', color: 'blue', user: '' });
-    if (c.sent_at) events.push({ date: c.sent_at, text: 'Contract sent', color: 'amber', user: '' });
-    if (c.signed_at) events.push({ date: c.signed_at, text: 'Contract signed ✓', color: 'green', user: '' });
+    if (c.created_at) syntheticEvents.push({ date: c.created_at, text: 'Contract created', color: 'blue' });
+    if (c.sent_at)    syntheticEvents.push({ date: c.sent_at,    text: 'Contract sent', color: 'amber' });
+    if (c.signed_at)  syntheticEvents.push({ date: c.signed_at,  text: 'Contract signed ✓', color: 'green' });
   });
-
-  // Invoices
   invoices?.forEach(i => {
-    const typeLabel = {deposit:'Deposit invoice',second_deposit:'2nd deposit invoice',balance:'Balance invoice',full:'Invoice'}[i.type]||'Invoice';
-    if (i.created_at) events.push({ date: i.created_at, text: `${typeLabel} created (${i.invoice_number})`, color: 'blue', user: '' });
-    if (i.sent_at) events.push({ date: i.sent_at, text: `${typeLabel} sent`, color: 'amber', user: '' });
-    if (i.status === 'paid') events.push({ date: i.updated_at||i.created_at, text: `${typeLabel} paid ✓`, color: 'green', user: '' });
+    const lbl = {deposit:'Deposit invoice',second_deposit:'2nd deposit invoice',balance:'Balance invoice',full:'Invoice'}[i.type]||'Invoice';
+    if (i.created_at) syntheticEvents.push({ date: i.created_at, text: `${lbl} created (${i.invoice_number||''})`, color: 'blue' });
+    if (i.status === 'paid') syntheticEvents.push({ date: i.updated_at||i.created_at, text: `${lbl} paid ✓`, color: 'green' });
   });
-
-  // Advancing
-  if (advancing?.created_at) events.push({ date: advancing.created_at, text: 'Advancing case created', color: 'blue', user: '' });
-  if (advancing?.status === 'in_progress') events.push({ date: advancing.updated_at||advancing.created_at, text: 'Advancing in progress', color: 'amber', user: '' });
-  if (advancing?.status === 'completed') events.push({ date: advancing.updated_at, text: 'Advancing completed ✓', color: 'green', user: '' });
-
-  // Settlement
-  if (settlement?.created_at) events.push({ date: settlement.created_at, text: 'Settlement created', color: 'blue', user: '' });
+  if (advancing?.created_at) syntheticEvents.push({ date: advancing.created_at, text: 'Advancing started', color: 'blue' });
+  if (settlement?.created_at) syntheticEvents.push({ date: settlement.created_at, text: 'Settlement created', color: 'blue' });
   const payout = settlement?.payouts?.[0];
-  if (payout?.paid_at) events.push({ date: payout.paid_at, text: 'Artist payout completed ✓', color: 'green', user: '' });
+  if (payout?.paid_at) syntheticEvents.push({ date: payout.paid_at, text: 'Artist payout completed ✓', color: 'green' });
 
-  // Sort by date descending
-  events.sort((a, b) => (b.date||'').localeCompare(a.date||''));
+  // Merge real logs + synthetic, deduplicate by preferring real logs
+  const eventColorMap = {
+    booking_created: 'blue', booking_updated: 'blue',
+    status_change: 'amber', contract_created: 'blue', contract_updated: 'blue',
+    invoice_created: 'blue', invoice_updated: 'blue',
+    settlement_saved: 'blue', payout_paid: 'green',
+  };
 
-  if (!events.length) {
-    document.getElementById('sd-activity-body').innerHTML =
-      `<div style="padding:12px 0;font-family:var(--mono);font-size:11px;color:var(--muted)">No activity yet</div>`;
+  const realEvents = (logs || []).map(l => ({
+    date: l.created_at,
+    text: l.description,
+    color: eventColorMap[l.event_type] || 'blue',
+    user: l.user_email || '',
+    real: true,
+  }));
+
+  // Use real events if available, supplement with synthetic for events not yet in audit log
+  const allEvents = realEvents.length > 0
+    ? [...realEvents, ...syntheticEvents.filter(s => !realEvents.some(r => r.text === s.text))].slice(0, 20)
+    : syntheticEvents;
+
+  allEvents.sort((a, b) => (b.date||'').localeCompare(a.date||''));
+
+  if (!allEvents.length) {
+    body.innerHTML = `<div style="padding:12px 0;font-family:var(--mono);font-size:11px;color:var(--muted)">No activity yet</div>`;
     return;
   }
 
-  document.getElementById('sd-activity-body').innerHTML = events.slice(0, 15).map(e => {
+  body.innerHTML = allEvents.slice(0, 20).map(e => {
     const dt = e.date ? new Date(e.date) : null;
     const dateStr = dt ? dt.toLocaleDateString('en-GB', { day:'2-digit', month:'short', year:'numeric' }) : '';
     const timeStr = dt ? dt.toLocaleTimeString('nl-NL', { hour:'2-digit', minute:'2-digit' }) : '';

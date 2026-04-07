@@ -4060,6 +4060,8 @@ async function setBookingStatus(status) {
   const { error } = await db.from('bookings').update({ status }).eq('id', editBkId);
   if (error) { showToast('Error updating status', 'error'); return; }
 
+  await logEvent(editBkId, 'status_change', `Status changed to: ${status.replace(/_/g,' ')}`, { status });
+
   document.querySelectorAll('.status-btn').forEach(btn => {
     btn.classList.toggle('active-status', btn.dataset.status === status);
   });
@@ -4123,6 +4125,17 @@ async function saveBooking() {
 
   btn.disabled = false; btn.textContent = 'Save Booking';
   if (error) { showToast('Error: ' + error.message, 'error'); return; }
+
+  // Get booking id for new bookings
+  let logBkId = editBkId;
+  if (!editBkId) {
+    const { data: nb } = await db.from('bookings').select('id').order('created_at',{ascending:false}).limit(1).single();
+    logBkId = nb?.id;
+  }
+  await logEvent(logBkId, editBkId ? 'booking_updated' : 'booking_created',
+    editBkId ? `Booking updated` : `Booking created for ${data.show_date||''}`,
+    { artist_id: data.artist_id, show_date: data.show_date });
+
   showToast(editBkId ? 'Booking updated' : 'Booking created', 'success');
   closeModal('bk-modal');
   loadBookings();
@@ -4984,6 +4997,9 @@ async function saveContract() {
   }
 
   if (error) { showToast('Error saving contract: ' + error.message, 'error'); return; }
+  await logEvent(payload.booking_id, editContractId ? 'contract_updated' : 'contract_created',
+    editContractId ? `Contract updated (v${payload.version})` : 'Contract created as draft',
+    { version: payload.version });
   showToast(editContractId ? 'Contract updated (v' + payload.version + ')' : 'Contract saved as draft', 'success');
   loadContracts();
 }
@@ -5568,6 +5584,9 @@ async function saveInvoice() {
   }
   btn.disabled=false; btn.textContent='✓ Save Invoice';
   if (error) { showToast('Error: '+error.message,'error'); return; }
+  await logEvent(payload.booking_id, editInvoiceId ? 'invoice_updated' : 'invoice_created',
+    editInvoiceId ? `Invoice updated (${payload.invoice_number||''})` : `Invoice created: ${payload.invoice_number||''} — ${payload.type||''} — ${payload.total_amount||0} ${payload.currency||'EUR'}`,
+    { invoice_number: payload.invoice_number, type: payload.type, amount: payload.total_amount });
   showToast(editInvoiceId?'Invoice updated':'Invoice saved as draft','success');
   loadInvoices();
 }
@@ -7652,6 +7671,7 @@ async function saveSettlement() {
   }
 
   showToast('Settlement saved ✓', 'success');
+  await logEvent(bookingId, 'settlement_saved', 'Settlement saved', { settlement_id: settId });
   await loadPayoutStatus();
 }
 
@@ -7680,6 +7700,7 @@ async function markPayoutPaid() {
   if (!currentPayoutId) { showToast('Save settlement first', 'error'); return; }
   const { data: { user } } = await db.auth.getUser();
   await db.from('payouts').update({ status: 'paid', paid_at: new Date().toISOString(), paid_by_email: user?.email }).eq('id', currentPayoutId);
+  await logEvent(currentSettlementBookingId, 'payout_paid', 'Artist payout marked as paid', { payout_id: currentPayoutId });
   showToast('Marked as paid ✓', 'success');
   await loadPayoutStatus();
   loadBookings();
@@ -8530,6 +8551,25 @@ async function wizSave() {
   btn.disabled = false; btn.textContent = '✓ Save All & Use';
 }
 // ── END SETUP WIZARD ───────────────────────────────────────────
+
+// ── AUDIT LOG ──────────────────────────────────────────────────
+async function logEvent(bookingId, eventType, description, metadata = null) {
+  try {
+    const { data: { user } } = await db.auth.getUser();
+    await db.from('audit_log').insert({
+      booking_id:  bookingId || null,
+      event_type:  eventType,
+      description,
+      user_id:     user?.id || null,
+      user_email:  user?.email || null,
+      metadata:    metadata ? metadata : null,
+    });
+  } catch(e) {
+    // Silent fail — audit log should never break the app
+    console.warn('Audit log failed:', e.message);
+  }
+}
+// ── END AUDIT LOG ──────────────────────────────────────────────
 
 function closeModal(id) { document.getElementById(id).classList.remove('open'); }
 
