@@ -1,0 +1,914 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Show Dashboard — Deepbloe CRM</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@300;400;500&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+:root {
+  --bg: #f7f5f0; --surface: #ffffff; --border: #e2ddd6; --border-dark: #c8c2b8;
+  --accent: #1a1a1a; --red: #c0392b; --green: #1a6b3c; --blue: #1a3a6b;
+  --amber: #8b5e00; --text: #1a1a1a; --muted: #8a8278;
+  --mono: 'DM Mono', monospace; --sans: 'DM Sans', sans-serif;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { background: var(--bg); color: var(--text); font-family: var(--sans); font-size: 13px; }
+
+/* ── HEADER ── */
+.sd-topbar {
+  background: var(--accent); padding: 0 28px; display: flex; align-items: center;
+  height: 48px; gap: 20px; position: sticky; top: 0; z-index: 50;
+}
+.sd-back {
+  background: none; border: 1px solid rgba(255,255,255,0.2); color: rgba(255,255,255,0.6);
+  padding: 5px 12px; font-family: var(--mono); font-size: 10px; letter-spacing: 0.1em;
+  text-transform: uppercase; cursor: pointer; text-decoration: none; display: flex; align-items: center; gap: 6px;
+}
+.sd-back:hover { border-color: rgba(255,255,255,0.5); color: #fff; }
+.sd-brand { font-family: var(--mono); font-size: 10px; letter-spacing: 0.3em; text-transform: uppercase; color: rgba(255,255,255,0.3); }
+.sd-brand strong { color: #fff; }
+.sd-topbar-right { margin-left: auto; display: flex; gap: 8px; align-items: center; }
+.sd-user { font-family: var(--mono); font-size: 10px; color: rgba(255,255,255,0.3); }
+
+/* ── HERO HEADER ── */
+.sd-hero {
+  background: var(--accent); padding: 24px 28px 0; border-bottom: 1px solid #333;
+}
+.sd-hero-top { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 20px; gap: 20px; }
+.sd-artist { font-size: 28px; font-weight: 300; color: #fff; margin-bottom: 4px; }
+.sd-venue-line { font-family: var(--mono); font-size: 12px; color: rgba(255,255,255,0.5); }
+.sd-venue-line strong { color: rgba(255,255,255,0.8); }
+.sd-meta { display: flex; gap: 20px; flex-wrap: wrap; margin-top: 12px; }
+.sd-meta-item { display: flex; flex-direction: column; gap: 3px; }
+.sd-meta-label { font-family: var(--mono); font-size: 9px; letter-spacing: 0.12em; text-transform: uppercase; color: rgba(255,255,255,0.3); }
+.sd-meta-val { font-family: var(--mono); font-size: 12px; color: rgba(255,255,255,0.8); }
+.sd-ref { font-family: var(--mono); font-size: 10px; color: rgba(255,255,255,0.3); margin-top: 4px; }
+
+/* Status badge */
+.sd-badge {
+  padding: 4px 12px; font-family: var(--mono); font-size: 10px; letter-spacing: 0.1em;
+  text-transform: uppercase; border: 1px solid; white-space: nowrap;
+}
+.sd-badge-inquiry    { color: #c8a020; border-color: #c8a020; }
+.sd-badge-hold       { color: #5b8dee; border-color: #5b8dee; }
+.sd-badge-offer_sent { color: #e08030; border-color: #e08030; }
+.sd-badge-negotiating { color: #a050c0; border-color: #a050c0; }
+.sd-badge-confirmed  { color: var(--green); border-color: var(--green); }
+.sd-badge-advancing  { color: #3a6bbf; border-color: #3a6bbf; }
+.sd-badge-completed  { color: var(--muted); border-color: var(--border-dark); }
+.sd-badge-cancelled  { color: var(--red); border-color: var(--red); }
+
+/* ── LIFECYCLE BAR ── */
+.sd-lifecycle {
+  display: flex; align-items: center; padding: 0 0 0 0; overflow-x: auto;
+  background: #111; border-top: 1px solid #333;
+}
+.sd-lc-step {
+  display: flex; align-items: center; padding: 12px 16px; gap: 8px;
+  font-family: var(--mono); font-size: 9px; letter-spacing: 0.12em; text-transform: uppercase;
+  white-space: nowrap; position: relative; flex-shrink: 0;
+}
+.sd-lc-step:not(:last-child)::after {
+  content: '→'; color: rgba(255,255,255,0.2); margin-left: 4px; font-size: 12px;
+}
+.sd-lc-dot {
+  width: 8px; height: 8px; border-radius: 50%; border: 1px solid;
+  flex-shrink: 0;
+}
+.sd-lc-step.done .sd-lc-dot   { background: var(--green); border-color: var(--green); }
+.sd-lc-step.active .sd-lc-dot { background: #fff; border-color: #fff; animation: pulse 1.5s infinite; }
+.sd-lc-step.pending .sd-lc-dot { background: transparent; border-color: rgba(255,255,255,0.2); }
+.sd-lc-step.done   { color: rgba(255,255,255,0.5); }
+.sd-lc-step.active { color: #fff; }
+.sd-lc-step.pending { color: rgba(255,255,255,0.2); }
+@keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
+
+/* ── LAYOUT ── */
+.sd-body { padding: 24px 28px; max-width: 1400px; }
+.sd-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; margin-bottom: 16px; }
+.sd-grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px; }
+.sd-grid-wide { display: grid; grid-template-columns: 2fr 1fr; gap: 16px; margin-bottom: 16px; }
+
+/* ── CARD ── */
+.sd-card {
+  background: var(--surface); border: 1px solid var(--border);
+  display: flex; flex-direction: column;
+}
+.sd-card-hdr {
+  background: var(--accent); padding: 9px 14px;
+  display: flex; justify-content: space-between; align-items: center; flex-shrink: 0;
+}
+.sd-card-title {
+  font-family: var(--mono); font-size: 9px; letter-spacing: 0.15em;
+  text-transform: uppercase; color: rgba(255,255,255,0.6);
+}
+.sd-card-hdr-badge { font-family: var(--mono); font-size: 9px; }
+.sd-card-body { padding: 14px; flex: 1; }
+.sd-card-actions {
+  padding: 10px 14px; border-top: 1px solid var(--border);
+  display: flex; gap: 6px; flex-wrap: wrap;
+}
+
+/* ── FIELDS ── */
+.sd-field { display: flex; justify-content: space-between; align-items: flex-start;
+            padding: 7px 0; border-bottom: 1px solid var(--border); gap: 12px; }
+.sd-field:last-child { border-bottom: none; }
+.sd-field-label { font-family: var(--mono); font-size: 10px; color: var(--muted); flex-shrink: 0; }
+.sd-field-val { font-family: var(--mono); font-size: 11px; color: var(--accent); text-align: right; }
+.sd-field-val.green { color: var(--green); }
+.sd-field-val.red   { color: var(--red); }
+.sd-field-val.blue  { color: var(--blue); }
+.sd-field-val.amber { color: var(--amber); }
+
+/* ── ACTIONS ── */
+.sd-btn {
+  padding: 5px 10px; font-family: var(--mono); font-size: 9px; letter-spacing: 0.08em;
+  text-transform: uppercase; border: 1px solid var(--border-dark); background: none;
+  color: var(--muted); cursor: pointer; transition: all 0.1s; white-space: nowrap;
+}
+.sd-btn:hover { border-color: var(--accent); color: var(--accent); }
+.sd-btn.primary { border-color: var(--accent); background: var(--accent); color: #fff; }
+.sd-btn.primary:hover { background: #333; }
+.sd-btn.green { border-color: var(--green); color: var(--green); }
+.sd-btn.red   { border-color: var(--red); color: var(--red); }
+.sd-btn.blue  { border-color: var(--blue); color: var(--blue); }
+
+/* ── OPEN ACTIONS ── */
+.sd-action-item {
+  display: flex; align-items: center; gap: 10px; padding: 8px 0;
+  border-bottom: 1px solid var(--border); font-size: 12px;
+}
+.sd-action-item:last-child { border-bottom: none; }
+.sd-action-dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
+
+/* ── INVOICE ROW ── */
+.sd-inv-row {
+  display: grid; grid-template-columns: 1fr 80px 90px 70px 70px;
+  gap: 8px; padding: 8px 0; border-bottom: 1px solid var(--border);
+  align-items: center; font-size: 12px;
+}
+.sd-inv-row:last-child { border-bottom: none; }
+.sd-inv-row-hdr { font-family: var(--mono); font-size: 9px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.1em; }
+
+/* ── ADVANCING ── */
+.sd-adv-row {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 8px 0; border-bottom: 1px solid var(--border); gap: 8px;
+}
+.sd-adv-row:last-child { border-bottom: none; }
+.sd-adv-label { font-size: 12px; }
+.sd-adv-status {
+  font-family: var(--mono); font-size: 9px; padding: 2px 8px;
+  border: 1px solid; text-transform: uppercase; letter-spacing: 0.08em;
+}
+.sd-adv-status.complete   { color: var(--green); border-color: var(--green); }
+.sd-adv-status.incomplete { color: var(--amber); border-color: var(--amber); }
+.sd-adv-status.pending    { color: var(--muted); border-color: var(--border-dark); }
+
+/* ── ACTIVITY ── */
+.sd-activity-item {
+  display: flex; gap: 12px; padding: 10px 0; border-bottom: 1px solid var(--border);
+}
+.sd-activity-item:last-child { border-bottom: none; }
+.sd-activity-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--border-dark); flex-shrink: 0; margin-top: 4px; }
+.sd-activity-dot.green { background: var(--green); }
+.sd-activity-dot.blue  { background: var(--blue); }
+.sd-activity-dot.amber { background: var(--amber); }
+.sd-activity-dot.red   { background: var(--red); }
+.sd-activity-content { flex: 1; }
+.sd-activity-text { font-size: 12px; color: var(--accent); margin-bottom: 3px; }
+.sd-activity-meta { font-family: var(--mono); font-size: 10px; color: var(--muted); }
+
+/* ── LOADING / EMPTY ── */
+.sd-loading { padding: 24px; text-align: center; font-family: var(--mono); font-size: 11px; color: var(--muted); }
+.sd-warning {
+  display: flex; align-items: center; gap: 8px; padding: 8px 12px;
+  background: #fff9f0; border: 1px solid var(--amber); border-left: 3px solid var(--amber);
+  font-family: var(--mono); font-size: 10px; color: var(--amber); margin-bottom: 8px;
+}
+.sd-warning-red { background: #fff5f5; border-color: var(--red); border-left-color: var(--red); color: var(--red); }
+
+/* ── STATUS BADGES (inline) ── */
+.inv-badge { font-family: var(--mono); font-size: 9px; padding: 2px 7px; border: 1px solid; text-transform: uppercase; }
+.inv-badge-draft    { color: var(--muted); border-color: var(--border-dark); }
+.inv-badge-sent     { color: var(--blue); border-color: var(--blue); }
+.inv-badge-paid     { color: var(--green); border-color: var(--green); }
+.inv-badge-overdue  { color: var(--red); border-color: var(--red); }
+.inv-badge-cancelled { color: var(--muted); border-color: var(--border-dark); text-decoration: line-through; }
+
+/* ── GENRE PILL ── */
+.tag-pill { font-family: var(--mono); font-size: 9px; padding: 2px 7px; background: var(--bg); border: 1px solid var(--border); }
+
+/* Toast */
+#toast { position:fixed; bottom:24px; right:24px; padding:10px 18px; font-family:var(--mono); font-size:11px;
+         display:none; z-index:999; }
+#toast.success { background:var(--green); color:#fff; }
+#toast.error   { background:var(--red); color:#fff; }
+#toast.info    { background:var(--accent); color:#fff; }
+</style>
+</head>
+<body>
+
+<!-- LOGIN SCREEN -->
+<div id="login-screen" style="min-height:100vh;display:flex;align-items:center;justify-content:center;background:var(--accent)">
+  <div style="background:#fff;padding:40px;width:360px;border-top:3px solid var(--red)">
+    <div style="font-family:var(--mono);font-size:10px;letter-spacing:0.3em;color:var(--muted);text-transform:uppercase;margin-bottom:24px"><strong style="color:var(--accent)">DEEPBLOE</strong> · SHOW</div>
+    <div style="display:flex;flex-direction:column;gap:5px;margin-bottom:14px">
+      <label style="font-family:var(--mono);font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted)">Email</label>
+      <input type="email" id="l-email" placeholder="your email" style="border:1px solid var(--border-dark);padding:10px 12px;font-family:var(--sans);font-size:13px;outline:none;background:var(--bg)">
+    </div>
+    <div style="display:flex;flex-direction:column;gap:5px;margin-bottom:14px">
+      <label style="font-family:var(--mono);font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted)">Password</label>
+      <input type="password" id="l-pass" style="border:1px solid var(--border-dark);padding:10px 12px;font-family:var(--sans);font-size:13px;outline:none;background:var(--bg)">
+    </div>
+    <button id="login-btn" style="width:100%;background:var(--accent);color:#fff;border:none;padding:12px;font-family:var(--mono);font-size:11px;letter-spacing:0.15em;text-transform:uppercase;cursor:pointer">Sign In</button>
+    <div id="login-err" style="color:var(--red);font-size:11px;margin-top:10px;display:none;font-family:var(--mono)"></div>
+  </div>
+</div>
+
+<!-- APP -->
+<div id="app" style="display:none">
+
+  <!-- Top bar -->
+  <div class="sd-topbar">
+    <a href="crm.html" class="sd-back">← Back to CRM</a>
+    <div class="sd-brand"><strong>DEEPBLOE</strong> · SHOW DASHBOARD</div>
+    <div class="sd-topbar-right">
+      <span class="sd-user" id="sd-user"></span>
+    </div>
+  </div>
+
+  <!-- Hero -->
+  <div class="sd-hero">
+    <div class="sd-hero-top">
+      <div>
+        <div class="sd-artist" id="sd-artist">—</div>
+        <div class="sd-venue-line" id="sd-venue-line">—</div>
+        <div class="sd-ref" id="sd-ref"></div>
+      </div>
+      <div id="sd-status-badge"></div>
+    </div>
+    <div class="sd-meta" id="sd-meta"></div>
+    <!-- Lifecycle bar -->
+    <div class="sd-lifecycle" id="sd-lifecycle"></div>
+  </div>
+
+  <!-- Body -->
+  <div class="sd-body">
+
+    <!-- Open Actions -->
+    <div id="sd-open-actions-wrap" style="margin-bottom:16px;display:none">
+      <div class="sd-card">
+        <div class="sd-card-hdr">
+          <div class="sd-card-title">⚠ Open Actions — This Show</div>
+        </div>
+        <div class="sd-card-body" id="sd-open-actions"></div>
+      </div>
+    </div>
+
+    <!-- Row 1: Deal + Contract + Invoices -->
+    <div class="sd-grid">
+
+      <!-- Deal & Finance -->
+      <div class="sd-card">
+        <div class="sd-card-hdr">
+          <div class="sd-card-title">Deal & Finance</div>
+          <div id="sd-deal-badge" class="sd-card-hdr-badge"></div>
+        </div>
+        <div class="sd-card-body" id="sd-deal-body">
+          <div class="sd-loading">Loading...</div>
+        </div>
+        <div class="sd-card-actions">
+          <button class="sd-btn" onclick="openCRM('bookings')">Edit Booking</button>
+          <button class="sd-btn blue" onclick="openSettlement()">Settlement</button>
+        </div>
+      </div>
+
+      <!-- Contract -->
+      <div class="sd-card">
+        <div class="sd-card-hdr">
+          <div class="sd-card-title">Contract</div>
+          <div id="sd-contract-status-badge" class="sd-card-hdr-badge"></div>
+        </div>
+        <div class="sd-card-body" id="sd-contract-body">
+          <div class="sd-loading">Loading...</div>
+        </div>
+        <div class="sd-card-actions" id="sd-contract-actions"></div>
+      </div>
+
+      <!-- Invoices -->
+      <div class="sd-card">
+        <div class="sd-card-hdr">
+          <div class="sd-card-title">Invoices</div>
+          <div id="sd-invoice-summary" class="sd-card-hdr-badge"></div>
+        </div>
+        <div class="sd-card-body" id="sd-invoice-body">
+          <div class="sd-loading">Loading...</div>
+        </div>
+        <div class="sd-card-actions" id="sd-invoice-actions"></div>
+      </div>
+
+    </div>
+
+    <!-- Row 2: Advancing + Venue/Contact -->
+    <div class="sd-grid-wide">
+
+      <!-- Advancing -->
+      <div class="sd-card">
+        <div class="sd-card-hdr">
+          <div class="sd-card-title">Advancing</div>
+          <div id="sd-advancing-badge" class="sd-card-hdr-badge"></div>
+        </div>
+        <div class="sd-card-body" id="sd-advancing-body">
+          <div class="sd-loading">Loading...</div>
+        </div>
+        <div class="sd-card-actions" id="sd-advancing-actions"></div>
+      </div>
+
+      <!-- Venue / Company / Contact -->
+      <div class="sd-card">
+        <div class="sd-card-hdr">
+          <div class="sd-card-title">Venue · Company · Contact</div>
+        </div>
+        <div class="sd-card-body" id="sd-vcc-body">
+          <div class="sd-loading">Loading...</div>
+        </div>
+        <div class="sd-card-actions" id="sd-vcc-actions"></div>
+      </div>
+
+    </div>
+
+    <!-- Row 3: Settlement + Activity -->
+    <div class="sd-grid-2">
+
+      <!-- Settlement -->
+      <div class="sd-card">
+        <div class="sd-card-hdr">
+          <div class="sd-card-title">Settlement & Payout</div>
+          <div id="sd-settlement-badge" class="sd-card-hdr-badge"></div>
+        </div>
+        <div class="sd-card-body" id="sd-settlement-body">
+          <div class="sd-loading">Loading...</div>
+        </div>
+        <div class="sd-card-actions" id="sd-settlement-actions"></div>
+      </div>
+
+      <!-- Activity -->
+      <div class="sd-card">
+        <div class="sd-card-hdr">
+          <div class="sd-card-title">Activity Log</div>
+        </div>
+        <div class="sd-card-body" id="sd-activity-body">
+          <div class="sd-loading">Loading...</div>
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<script data-cfasync="false">
+const SUPABASE_URL = 'https://ksnxgidklhonpsneerbu.supabase.co';
+const SUPABASE_KEY = 'sb_publishable_JsOkmXlOxBWKXcraBE7gGg_qErTkqX9';
+const { createClient } = supabase;
+const db = createClient(SUPABASE_URL, SUPABASE_KEY);
+
+// Wire up login
+document.getElementById('login-btn').addEventListener('click', doLogin);
+document.getElementById('l-pass').addEventListener('keydown', e => { if (e.key === 'Enter') doLogin(); });
+
+async function doLogin() {
+  const email = document.getElementById('l-email').value.trim();
+  const pass  = document.getElementById('l-pass').value;
+  const err   = document.getElementById('login-err');
+  err.style.display = 'none';
+  const { error } = await db.auth.signInWithPassword({ email, password: pass });
+  if (error) { err.textContent = error.message; err.style.display = 'block'; return; }
+  startApp();
+}
+
+db.auth.getSession().then(({ data: { session } }) => { if (session) startApp(); });
+
+async function startApp() {
+  const { data: { user } } = await db.auth.getUser();
+  document.getElementById('login-screen').style.display = 'none';
+  document.getElementById('app').style.display = 'block';
+  document.getElementById('sd-user').textContent = user?.email || '';
+
+  // Get booking ID from URL
+  const params = new URLSearchParams(window.location.search);
+  const bookingId = params.get('id');
+  if (!bookingId) { showToast('No booking ID in URL', 'error'); return; }
+  await loadShow(bookingId);
+}
+
+// ── HELPERS ──────────────────────────────────────────────────
+function esc(s) { return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+function fmtDate(d) {
+  if (!d) return '—';
+  return new Date(d + 'T00:00:00').toLocaleDateString('en-GB', { day:'2-digit', month:'short', year:'numeric' });
+}
+function fmtMoney(amount, currency='EUR') {
+  const sym = {EUR:'€',USD:'$',GBP:'£',SGD:'S$',AED:'AED ',IDR:'Rp',THB:'฿'}[currency]||currency;
+  return sym + (amount||0).toLocaleString('nl-NL');
+}
+function showToast(msg, type='info') {
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.className = type; t.style.display = 'block';
+  setTimeout(() => t.style.display = 'none', 3500);
+}
+function openCRM(tab) { window.location.href = 'crm.html'; }
+
+// ── MAIN LOAD ─────────────────────────────────────────────────
+async function loadShow(bookingId) {
+  // Load all data in parallel
+  const [
+    { data: booking },
+    { data: contracts },
+    { data: invoices },
+    { data: advancing },
+    { data: settlement },
+  ] = await Promise.all([
+    db.from('bookings').select('*, artists(name), organisations:company_id(id,name,legal_name,trading_name,vat_number,city,country), contact:contact_id(id,first_name,last_name,email,phone,role)').eq('id', bookingId).single(),
+    db.from('contracts').select('*').eq('booking_id', bookingId).order('created_at', { ascending: false }),
+    db.from('invoices').select('*').eq('booking_id', bookingId).neq('status','cancelled').order('created_at'),
+    db.from('advancing_cases').select('*').eq('booking_id', bookingId).maybeSingle(),
+    db.from('settlements').select('*, payouts(*)').eq('booking_id', bookingId).maybeSingle(),
+  ]);
+
+  // Load venue separately
+  let venue = null;
+  if (booking?.venue_id) {
+    const { data: v } = await db.from('venues').select('*, venue_tags(tags(name,tag_type))').eq('id', booking.venue_id).single();
+    venue = v;
+  }
+
+  if (!booking) { showToast('Booking not found', 'error'); return; }
+
+  renderHero(booking, venue);
+  renderLifecycle(booking, contracts, invoices, advancing, settlement);
+  renderOpenActions(booking, contracts, invoices, advancing, settlement);
+  renderDeal(booking);
+  renderContract(booking, contracts);
+  renderInvoices(booking, invoices);
+  renderAdvancing(booking, advancing);
+  renderVCC(booking, venue);
+  renderSettlement(booking, settlement);
+  renderActivity(booking, contracts, invoices, advancing, settlement);
+}
+
+// ── HERO ──────────────────────────────────────────────────────
+function renderHero(b, venue) {
+  const artist = b.artists?.name || '—';
+  const venueName = venue?.name || b.venue_name || '—';
+  const city = b.venue_city || venue?.city || '';
+  const country = b.venue_country || venue?.country || '';
+  const loc = [city, country].filter(Boolean).join(', ');
+
+  document.getElementById('sd-artist').textContent = artist;
+  document.getElementById('sd-venue-line').innerHTML = `<strong>${esc(venueName)}</strong>${loc ? ' · '+esc(loc) : ''}`;
+  document.getElementById('sd-ref').textContent = b.reference || '';
+  document.title = `${artist} · ${venueName} — Deepbloe`;
+
+  // Status badge
+  const statusColors = {
+    inquiry:'sd-badge-inquiry', hold:'sd-badge-hold', offer_sent:'sd-badge-offer_sent',
+    negotiating:'sd-badge-negotiating', confirmed:'sd-badge-confirmed', advancing:'sd-badge-advancing',
+    completed:'sd-badge-completed', cancelled:'sd-badge-cancelled',
+  };
+  const s = b.status || 'inquiry';
+  document.getElementById('sd-status-badge').innerHTML =
+    `<div class="sd-badge ${statusColors[s]||'sd-badge-inquiry'}">${s.replace('_',' ')}</div>`;
+
+  // Meta row
+  const meta = [
+    { label: 'Date', val: b.show_date ? fmtDate(b.show_date) : '—' },
+    { label: 'Set Time', val: b.set_time || '—' },
+    { label: 'Set Length', val: b.set_length_minutes ? b.set_length_minutes+'min' : '—' },
+    { label: 'Territory', val: b.territory || '—' },
+    { label: 'Deal Type', val: (b.deal_type||'').replace('_',' ') || '—' },
+  ];
+  document.getElementById('sd-meta').innerHTML = meta.map(m => `
+    <div class="sd-meta-item">
+      <div class="sd-meta-label">${esc(m.label)}</div>
+      <div class="sd-meta-val">${esc(m.val)}</div>
+    </div>`).join('');
+}
+
+// ── LIFECYCLE ─────────────────────────────────────────────────
+function renderLifecycle(b, contracts, invoices, advancing, settlement) {
+  const status = b.status || 'inquiry';
+  const showDate = b.show_date ? new Date(b.show_date) : null;
+  const today = new Date();
+  const showPassed = showDate && showDate < today;
+
+  const hasSigned = contracts?.some(c => c.status === 'fully_signed');
+  const hasInvoice = invoices?.length > 0;
+  const hasAdvancing = advancing?.status && advancing.status !== 'not_started';
+  const hasPayout = settlement?.payouts?.[0]?.status === 'paid';
+
+  const steps = [
+    { key: 'inquiry',    label: 'Inquiry',    done: true },
+    { key: 'hold',       label: 'Hold',       done: ['hold','offer_sent','negotiating','confirmed','advancing','completed'].includes(status) },
+    { key: 'confirmed',  label: 'Confirmed',  done: ['confirmed','advancing','completed'].includes(status) },
+    { key: 'contract',   label: 'Contract',   done: hasSigned },
+    { key: 'invoice',    label: 'Invoice',    done: hasInvoice },
+    { key: 'advancing',  label: 'Advancing',  done: hasAdvancing },
+    { key: 'show',       label: 'Show Day',   done: showPassed && status !== 'cancelled' },
+    { key: 'settlement', label: 'Settlement', done: !!settlement },
+    { key: 'paid',       label: 'Paid',       done: hasPayout },
+  ];
+
+  // Determine active step
+  let activeIdx = steps.findLastIndex(s => s.done);
+  if (activeIdx < steps.length - 1) activeIdx++;
+
+  document.getElementById('sd-lifecycle').innerHTML = steps.map((s, i) => {
+    const cls = s.done ? 'done' : (i === activeIdx ? 'active' : 'pending');
+    return `<div class="sd-lc-step ${cls}">
+      <div class="sd-lc-dot"></div>
+      <span>${esc(s.label)}</span>
+    </div>`;
+  }).join('');
+}
+
+// ── OPEN ACTIONS ──────────────────────────────────────────────
+function renderOpenActions(b, contracts, invoices, advancing, settlement) {
+  const actions = [];
+  const today = new Date().toISOString().slice(0,10);
+  const status = b.status || 'inquiry';
+
+  if (['confirmed','advancing'].includes(status)) {
+    const hasSigned = contracts?.some(c => c.status === 'fully_signed');
+    if (!hasSigned) actions.push({ color:'var(--amber)', text: 'Contract not signed', action: 'openCRM()' });
+
+    const hasDeposit = invoices?.some(i => i.type === 'deposit' || i.type === 'full');
+    if (!hasDeposit) actions.push({ color:'var(--blue)', text: 'No invoice created yet', action: 'openCRM()' });
+
+    const overdue = invoices?.filter(i => i.status === 'sent' && i.due_date && i.due_date < today);
+    overdue?.forEach(i => actions.push({ color:'var(--red)', text: `Invoice ${i.invoice_number} is overdue (due ${fmtDate(i.due_date)})`, action: '' }));
+
+    if (!advancing || advancing.status === 'not_started') {
+      actions.push({ color:'var(--amber)', text: 'Advancing not started', action: '' });
+    }
+  }
+
+  const showDate = b.show_date ? new Date(b.show_date + 'T00:00:00') : null;
+  if (showDate && showDate < new Date() && status === 'confirmed') {
+    if (!settlement) actions.push({ color:'var(--red)', text: 'Show passed — settlement not completed', action: 'openSettlement()' });
+    else if (settlement.payouts?.[0]?.status !== 'paid') {
+      actions.push({ color:'var(--amber)', text: 'Settlement done — artist payout pending', action: 'openSettlement()' });
+    }
+  }
+
+  const wrap = document.getElementById('sd-open-actions-wrap');
+  if (!actions.length) { wrap.style.display = 'none'; return; }
+  wrap.style.display = 'block';
+  document.getElementById('sd-open-actions').innerHTML = actions.map(a => `
+    <div class="sd-action-item">
+      <div class="sd-action-dot" style="background:${a.color}"></div>
+      <span style="flex:1">${esc(a.text)}</span>
+    </div>`).join('');
+}
+
+// ── DEAL ──────────────────────────────────────────────────────
+function renderDeal(b) {
+  const cur = b.fee_currency || 'EUR';
+  const gross = b.fee_amount || 0;
+  const whRate = b.withholding_rate || 0;
+  const whAmt = gross * whRate / 100;
+  const commRate = b.commission_rate || 15;
+  const commAmt = gross * commRate / 100;
+  const net = gross - whAmt;
+
+  const fields = [
+    { label: 'Deal Type', val: (b.deal_type||'flat_fee').replace('_',' ') },
+    { label: 'Artist Fee', val: fmtMoney(gross, cur), cls: 'green' },
+    { label: `Commission (${commRate}%)`, val: '− ' + fmtMoney(commAmt, cur), cls: 'red' },
+    { label: `Withholding (${whRate}%)`, val: whAmt > 0 ? '− ' + fmtMoney(whAmt, cur) : '—' },
+    { label: 'Net Fee', val: fmtMoney(net, cur), cls: 'blue' },
+    { label: 'Currency', val: cur },
+  ];
+  if (b.withholding_country) fields.push({ label: 'WH Country', val: b.withholding_country });
+
+  document.getElementById('sd-deal-body').innerHTML = fields.map(f =>
+    `<div class="sd-field">
+      <div class="sd-field-label">${esc(f.label)}</div>
+      <div class="sd-field-val ${f.cls||''}">${esc(f.val)}</div>
+    </div>`).join('');
+}
+
+// ── CONTRACT ─────────────────────────────────────────────────
+function renderContract(b, contracts) {
+  const latest = contracts?.[0];
+  const statusColors = { draft:'var(--muted)', sent:'var(--blue)', fully_signed:'var(--green)', cancelled:'var(--red)' };
+  const statusLabel  = { draft:'Draft', sent:'Sent', fully_signed:'Signed ✓', cancelled:'Cancelled' };
+
+  if (!latest) {
+    document.getElementById('sd-contract-body').innerHTML =
+      `<div style="padding:12px 0;font-family:var(--mono);font-size:11px;color:var(--muted)">No contract yet</div>`;
+    document.getElementById('sd-contract-actions').innerHTML =
+      `<button class="sd-btn primary" onclick="openCRM()">+ Generate Contract</button>`;
+    return;
+  }
+
+  const s = latest.status || 'draft';
+  document.getElementById('sd-contract-status-badge').innerHTML =
+    `<span style="font-family:var(--mono);font-size:9px;color:${statusColors[s]||'var(--muted)'}">${statusLabel[s]||s}</span>`;
+
+  const fields = [
+    { label: 'Status', val: statusLabel[s] || s },
+    { label: 'Version', val: latest.version || '1' },
+    { label: 'Created', val: fmtDate(latest.created_at?.slice(0,10)) },
+    { label: 'Sent', val: latest.sent_at ? fmtDate(latest.sent_at.slice(0,10)) : '—' },
+    { label: 'Signed', val: latest.signed_at ? fmtDate(latest.signed_at.slice(0,10)) : '—' },
+  ];
+  document.getElementById('sd-contract-body').innerHTML = fields.map(f =>
+    `<div class="sd-field"><div class="sd-field-label">${esc(f.label)}</div><div class="sd-field-val">${esc(f.val)}</div></div>`).join('');
+
+  document.getElementById('sd-contract-actions').innerHTML =
+    `<button class="sd-btn" onclick="openCRM()">Open Contract</button>
+     ${s !== 'fully_signed' ? '<button class="sd-btn blue" onclick="openCRM()">Resend</button>' : ''}`;
+}
+
+// ── INVOICES ─────────────────────────────────────────────────
+function renderInvoices(b, invoices) {
+  const today = new Date().toISOString().slice(0,10);
+
+  if (!invoices?.length) {
+    document.getElementById('sd-invoice-body').innerHTML =
+      `<div style="padding:12px 0;font-family:var(--mono);font-size:11px;color:var(--muted)">No invoices yet</div>`;
+    document.getElementById('sd-invoice-actions').innerHTML =
+      `<button class="sd-btn primary" onclick="openCRM()">+ Create Invoice</button>`;
+    return;
+  }
+
+  const totalOpen = invoices.filter(i => ['sent','overdue'].includes(i.status)).reduce((s,i) => s+(i.total_amount||0), 0);
+  const totalPaid = invoices.filter(i => i.status === 'paid').reduce((s,i) => s+(i.total_amount||0), 0);
+  const cur = invoices[0]?.currency || 'EUR';
+
+  document.getElementById('sd-invoice-summary').innerHTML =
+    `<span style="font-family:var(--mono);font-size:9px;color:${totalOpen>0?'var(--amber)':'var(--green)'}">
+      ${totalOpen > 0 ? fmtMoney(totalOpen,cur)+' open' : '✓ All paid'}
+    </span>`;
+
+  const rows = invoices.map(i => {
+    const eff = i.status === 'sent' && i.due_date && i.due_date < today ? 'overdue' : i.status;
+    const typeLabel = {deposit:'Deposit',second_deposit:'2nd Dep.',balance:'Balance',full:'Full',credit_note:'Credit'}[i.type]||i.type;
+    return `<div class="sd-inv-row">
+      <div>
+        <div style="font-family:var(--mono);font-size:10px">${esc(i.invoice_number||'—')}</div>
+        <div style="font-family:var(--mono);font-size:9px;color:var(--muted)">${esc(typeLabel)}</div>
+      </div>
+      <div style="font-family:var(--mono);font-size:11px">${fmtMoney(i.total_amount,i.currency)}</div>
+      <div style="font-family:var(--mono);font-size:10px;color:var(--muted)">${i.due_date?fmtDate(i.due_date):'—'}</div>
+      <div><span class="inv-badge inv-badge-${eff}">${eff}</span></div>
+      <div></div>
+    </div>`;
+  }).join('');
+
+  document.getElementById('sd-invoice-body').innerHTML =
+    `<div class="sd-inv-row sd-inv-row-hdr">
+      <div>Invoice</div><div>Amount</div><div>Due</div><div>Status</div><div></div>
+    </div>` + rows;
+
+  document.getElementById('sd-invoice-actions').innerHTML =
+    `<button class="sd-btn" onclick="openCRM()">Open Invoices</button>
+     <button class="sd-btn primary" onclick="openCRM()">+ New Invoice</button>`;
+}
+
+// ── ADVANCING ────────────────────────────────────────────────
+function renderAdvancing(b, adv) {
+  const statusBadge = (s) => {
+    const map = { complete: 'complete', incomplete: 'incomplete', not_started: 'pending' };
+    const labels = { complete: '✓ Complete', incomplete: '⚠ Incomplete', not_started: 'Pending' };
+    return `<div class="sd-adv-status ${map[s]||'pending'}">${labels[s]||s}</div>`;
+  };
+
+  const d = adv?.advancing_data || {};
+  const sections = [
+    { label: 'Production', fields: ['venue_contact_name','load_in_time','set_time','pa_system'] },
+    { label: 'Hospitality', fields: ['hotel_name','meals_confirmed','green_room'] },
+    { label: 'Travel', fields: ['flight_arrival','ground_transport','driver_name'] },
+    { label: 'Schedule', fields: ['soundcheck_time','doors','curfew'] },
+    { label: 'Contact Sheet', fields: ['venue_contact_name','venue_contact_phone'] },
+  ];
+
+  const getStatus = (fields) => {
+    const filled = fields.filter(f => d[f] && d[f] !== '').length;
+    if (filled === 0) return 'not_started';
+    if (filled === fields.length) return 'complete';
+    return 'incomplete';
+  };
+
+  if (!adv) {
+    document.getElementById('sd-advancing-body').innerHTML =
+      `<div style="padding:12px 0;font-family:var(--mono);font-size:11px;color:var(--muted)">Advancing not started</div>`;
+    document.getElementById('sd-advancing-actions').innerHTML =
+      `<button class="sd-btn primary" onclick="openCRM()">Start Advancing</button>`;
+    document.getElementById('sd-advancing-badge').innerHTML =
+      `<span style="font-family:var(--mono);font-size:9px;color:var(--muted)">Not started</span>`;
+    return;
+  }
+
+  const allComplete = sections.every(s => getStatus(s.fields) === 'complete');
+  const allPending  = sections.every(s => getStatus(s.fields) === 'not_started');
+  document.getElementById('sd-advancing-badge').innerHTML =
+    `<span style="font-family:var(--mono);font-size:9px;color:${allComplete?'var(--green)':allPending?'var(--muted)':'var(--amber)'}">
+      ${allComplete ? '✓ Complete' : allPending ? 'Not started' : 'In progress'}
+    </span>`;
+
+  // Key details
+  const keyFields = [
+    { label: 'Load In', val: d.load_in_time || '—' },
+    { label: 'Soundcheck', val: d.soundcheck_time || '—' },
+    { label: 'Set Time', val: d.set_time || d.set_times || '—' },
+    { label: 'Doors', val: d.doors || '—' },
+    { label: 'Curfew', val: d.curfew || '—' },
+    { label: 'Hotel', val: d.hotel_name || '—' },
+    { label: 'Status', val: adv.status || '—' },
+  ];
+
+  document.getElementById('sd-advancing-body').innerHTML =
+    `<div style="display:grid;grid-template-columns:1fr 1fr;gap:0">
+      ${keyFields.map(f => `<div class="sd-field">
+        <div class="sd-field-label">${esc(f.label)}</div>
+        <div class="sd-field-val">${esc(f.val)}</div>
+      </div>`).join('')}
+    </div>
+    <div style="margin-top:12px;padding-top:12px;border-top:1px solid var(--border)">
+      <div style="font-family:var(--mono);font-size:9px;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);margin-bottom:8px">Sections</div>
+      ${sections.map(s => `
+        <div class="sd-adv-row">
+          <div class="sd-adv-label">${esc(s.label)}</div>
+          ${statusBadge(getStatus(s.fields))}
+        </div>`).join('')}
+    </div>`;
+
+  document.getElementById('sd-advancing-actions').innerHTML =
+    `<button class="sd-btn" onclick="openCRM()">Open Advancing</button>
+     <button class="sd-btn blue" onclick="openCRM()">Promoter Portal</button>`;
+}
+
+// ── VENUE / COMPANY / CONTACT ─────────────────────────────────
+function renderVCC(b, venue) {
+  const org = b.organisations;
+  const con = b.contact;
+  const tags = venue?.venue_tags?.map(vt => vt.tags?.name).filter(Boolean) || [];
+
+  document.getElementById('sd-vcc-body').innerHTML = `
+    ${venue ? `
+      <div style="margin-bottom:12px">
+        <div style="font-family:var(--mono);font-size:9px;letter-spacing:0.12em;text-transform:uppercase;color:var(--muted);margin-bottom:6px">Venue</div>
+        <div style="font-size:13px;font-weight:500;margin-bottom:3px">${esc(venue.name)}</div>
+        <div style="font-family:var(--mono);font-size:10px;color:var(--muted)">${[venue.venue_type, venue.city, venue.country].filter(Boolean).join(' · ')}</div>
+        ${tags.length ? `<div style="margin-top:6px;display:flex;flex-wrap:wrap;gap:3px">${tags.map(t=>`<span class="tag-pill">${esc(t)}</span>`).join('')}</div>` : ''}
+      </div>
+      <div style="border-top:1px solid var(--border);padding-top:10px;margin-bottom:12px">` : ''}
+
+    ${org ? `
+      <div style="margin-bottom:12px">
+        <div style="font-family:var(--mono);font-size:9px;letter-spacing:0.12em;text-transform:uppercase;color:var(--muted);margin-bottom:6px">Company</div>
+        <div style="font-size:13px;font-weight:500;margin-bottom:3px">${esc(org.legal_name||org.name||'—')}</div>
+        ${org.trading_name && org.trading_name !== org.legal_name ? `<div style="font-family:var(--mono);font-size:10px;color:var(--muted)">${esc(org.trading_name)}</div>` : ''}
+        ${org.vat_number ? `<div style="font-family:var(--mono);font-size:10px;color:var(--muted)">VAT: ${esc(org.vat_number)}</div>` : ''}
+      </div>` : '<div style="font-family:var(--mono);font-size:11px;color:var(--muted);margin-bottom:12px">No company linked</div>'}
+
+    ${org && venue ? '<div style="border-top:1px solid var(--border);padding-top:10px;margin-bottom:12px">' : ''}
+
+    ${con ? `
+      <div>
+        <div style="font-family:var(--mono);font-size:9px;letter-spacing:0.12em;text-transform:uppercase;color:var(--muted);margin-bottom:6px">Contact</div>
+        <div style="font-size:13px;font-weight:500;margin-bottom:3px">${esc([con.first_name,con.last_name].filter(Boolean).join(' ')||'—')}</div>
+        ${con.role ? `<div style="font-family:var(--mono);font-size:10px;color:var(--muted)">${esc(con.role)}</div>` : ''}
+        ${con.email ? `<div style="font-family:var(--mono);font-size:10px;color:var(--blue)">${esc(con.email)}</div>` : ''}
+        ${con.phone ? `<div style="font-family:var(--mono);font-size:10px;color:var(--muted)">${esc(con.phone)}</div>` : ''}
+      </div>` : '<div style="font-family:var(--mono);font-size:11px;color:var(--muted)">No contact linked</div>'}
+
+    ${(venue || org) ? '</div>' : ''}
+  `;
+
+  document.getElementById('sd-vcc-actions').innerHTML =
+    `${con?.email ? `<button class="sd-btn blue" onclick="showToast('Open email client','info')">✉ Email Contact</button>` : ''}
+     <button class="sd-btn" onclick="openCRM()">Open CRM</button>`;
+}
+
+// ── SETTLEMENT ────────────────────────────────────────────────
+function renderSettlement(b, sett) {
+  if (!sett) {
+    const showDate = b.show_date ? new Date(b.show_date + 'T00:00:00') : null;
+    const showPassed = showDate && showDate < new Date();
+    document.getElementById('sd-settlement-body').innerHTML =
+      `<div style="padding:12px 0;font-family:var(--mono);font-size:11px;color:var(--muted)">
+        ${showPassed ? '⚠ Show has passed — settlement not created' : 'Settlement not yet created'}
+      </div>`;
+    document.getElementById('sd-settlement-actions').innerHTML =
+      `<button class="sd-btn primary" onclick="openSettlement()">Create Settlement</button>`;
+    return;
+  }
+
+  const payout = sett.payouts?.[0];
+  const paid = payout?.status === 'paid';
+  const cur = sett.currency || 'EUR';
+
+  document.getElementById('sd-settlement-badge').innerHTML =
+    `<span style="font-family:var(--mono);font-size:9px;color:${paid?'var(--green)':'var(--amber)'}">
+      ${paid ? '✓ Paid' : '⏳ Pending'}
+    </span>`;
+
+  const fields = [
+    { label: 'Gross Fee', val: fmtMoney(sett.gross_fee, cur), cls: '' },
+    { label: `Withholding (${sett.withholding_rate||0}%)`, val: sett.withholding_amount > 0 ? '− '+fmtMoney(sett.withholding_amount, cur) : '—' },
+    { label: 'Net Fee', val: fmtMoney(sett.net_fee, cur) },
+    { label: `Commission (${sett.commission_rate||15}% on ${sett.commission_base||'gross'})`, val: '− '+fmtMoney(sett.commission_amount, cur), cls: 'red' },
+    { label: 'Show Expenses', val: sett.total_expenses > 0 ? '− '+fmtMoney(sett.total_expenses, cur) : '—' },
+    { label: 'Net Payout', val: fmtMoney(sett.net_payout, cur), cls: 'green' },
+    { label: 'Payout Status', val: paid ? `✓ Paid${payout.paid_at?' on '+fmtDate(payout.paid_at.slice(0,10)):''}` : '⏳ Pending', cls: paid?'green':'amber' },
+  ];
+
+  document.getElementById('sd-settlement-body').innerHTML = fields.map(f =>
+    `<div class="sd-field">
+      <div class="sd-field-label">${esc(f.label)}</div>
+      <div class="sd-field-val ${f.cls||''}">${esc(f.val)}</div>
+    </div>`).join('');
+
+  document.getElementById('sd-settlement-actions').innerHTML =
+    `<button class="sd-btn" onclick="openSettlement()">Open Settlement</button>
+     ${!paid ? '<button class="sd-btn green" onclick="openSettlement()">Mark Paid</button>' : ''}`;
+}
+
+// ── ACTIVITY ─────────────────────────────────────────────────
+function renderActivity(b, contracts, invoices, advancing, settlement) {
+  const events = [];
+
+  // Booking created
+  events.push({ date: b.created_at, text: 'Booking created', color: 'blue', user: '' });
+
+  // Status changes — infer from data
+  if (['hold','offer_sent','negotiating','confirmed','advancing','completed'].includes(b.status)) {
+    events.push({ date: b.updated_at || b.created_at, text: `Status: ${b.status.replace('_',' ')}`, color: 'blue', user: '' });
+  }
+
+  // Contracts
+  contracts?.forEach(c => {
+    if (c.created_at) events.push({ date: c.created_at, text: 'Contract created', color: 'blue', user: '' });
+    if (c.sent_at) events.push({ date: c.sent_at, text: 'Contract sent', color: 'amber', user: '' });
+    if (c.signed_at) events.push({ date: c.signed_at, text: 'Contract signed ✓', color: 'green', user: '' });
+  });
+
+  // Invoices
+  invoices?.forEach(i => {
+    const typeLabel = {deposit:'Deposit invoice',second_deposit:'2nd deposit invoice',balance:'Balance invoice',full:'Invoice'}[i.type]||'Invoice';
+    if (i.created_at) events.push({ date: i.created_at, text: `${typeLabel} created (${i.invoice_number})`, color: 'blue', user: '' });
+    if (i.sent_at) events.push({ date: i.sent_at, text: `${typeLabel} sent`, color: 'amber', user: '' });
+    if (i.status === 'paid') events.push({ date: i.updated_at||i.created_at, text: `${typeLabel} paid ✓`, color: 'green', user: '' });
+  });
+
+  // Advancing
+  if (advancing?.created_at) events.push({ date: advancing.created_at, text: 'Advancing case created', color: 'blue', user: '' });
+  if (advancing?.status === 'in_progress') events.push({ date: advancing.updated_at||advancing.created_at, text: 'Advancing in progress', color: 'amber', user: '' });
+  if (advancing?.status === 'completed') events.push({ date: advancing.updated_at, text: 'Advancing completed ✓', color: 'green', user: '' });
+
+  // Settlement
+  if (settlement?.created_at) events.push({ date: settlement.created_at, text: 'Settlement created', color: 'blue', user: '' });
+  const payout = settlement?.payouts?.[0];
+  if (payout?.paid_at) events.push({ date: payout.paid_at, text: 'Artist payout completed ✓', color: 'green', user: '' });
+
+  // Sort by date descending
+  events.sort((a, b) => (b.date||'').localeCompare(a.date||''));
+
+  if (!events.length) {
+    document.getElementById('sd-activity-body').innerHTML =
+      `<div style="padding:12px 0;font-family:var(--mono);font-size:11px;color:var(--muted)">No activity yet</div>`;
+    return;
+  }
+
+  document.getElementById('sd-activity-body').innerHTML = events.slice(0, 15).map(e => {
+    const dt = e.date ? new Date(e.date) : null;
+    const dateStr = dt ? dt.toLocaleDateString('en-GB', { day:'2-digit', month:'short', year:'numeric' }) : '';
+    const timeStr = dt ? dt.toLocaleTimeString('nl-NL', { hour:'2-digit', minute:'2-digit' }) : '';
+    return `<div class="sd-activity-item">
+      <div class="sd-activity-dot ${e.color}"></div>
+      <div class="sd-activity-content">
+        <div class="sd-activity-text">${esc(e.text)}</div>
+        <div class="sd-activity-meta">${dateStr}${timeStr ? ' · '+timeStr : ''}${e.user ? ' · '+esc(e.user) : ''}</div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// ── QUICK ACTIONS ─────────────────────────────────────────────
+function openSettlement() {
+  const params = new URLSearchParams(window.location.search);
+  const bookingId = params.get('id');
+  // Open CRM and trigger settlement
+  window.location.href = `crm.html?open=settlement&booking=${bookingId}`;
+}
+</script>
+</body>
+</html>
