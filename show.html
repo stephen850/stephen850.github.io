@@ -212,7 +212,7 @@ body { background: var(--bg); color: var(--text); font-family: var(--sans); font
 <body>
 
 <!-- LOGIN SCREEN -->
-<div id="login-screen" style="min-height:100vh;display:flex;align-items:center;justify-content:center;background:var(--accent)">
+<div id="login-screen" style="min-height:100vh;display:none;align-items:center;justify-content:center;background:var(--accent)">
   <div style="background:#fff;padding:40px;width:360px;border-top:3px solid var(--red)">
     <div style="font-family:var(--mono);font-size:10px;letter-spacing:0.3em;color:var(--muted);text-transform:uppercase;margin-bottom:24px"><strong style="color:var(--accent)">DEEPBLOE</strong> · SHOW</div>
     <div style="display:flex;flex-direction:column;gap:5px;margin-bottom:14px">
@@ -392,7 +392,12 @@ async function doLogin() {
   startApp();
 }
 
-db.auth.getSession().then(({ data: { session } }) => { if (session) startApp(); });
+db.auth.getSession().then(({ data: { session } }) => {
+  if (session) startApp();
+  else {
+    document.getElementById('login-screen').style.display = 'flex';
+  }
+});
 
 async function startApp() {
   const { data: { user } } = await db.auth.getUser();
