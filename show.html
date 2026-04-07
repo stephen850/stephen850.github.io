@@ -906,8 +906,34 @@ function renderActivity(b, contracts, invoices, advancing, settlement) {
 function openSettlement() {
   const params = new URLSearchParams(window.location.search);
   const bookingId = params.get('id');
-  // Open CRM and trigger settlement
   window.location.href = `crm.html?open=settlement&booking=${bookingId}`;
+}
+
+function getStatusWarnings(booking, contracts, invoices, advancing, settlement) {
+  const warnings = [];
+  const today = new Date().toISOString().slice(0,10);
+  const status = booking?.status || 'inquiry';
+
+  if (['confirmed','advancing'].includes(status)) {
+    if (!contracts?.some(c => c.status === 'fully_signed'))
+      warnings.push({ level: 'amber', text: 'No signed contract' });
+    if (!invoices?.length)
+      warnings.push({ level: 'amber', text: 'No invoice created' });
+    if (invoices?.some(i => i.status === 'sent' && i.due_date && i.due_date < today))
+      warnings.push({ level: 'red', text: 'Invoice overdue' });
+    if (!advancing)
+      warnings.push({ level: 'amber', text: 'Advancing not started' });
+  }
+
+  const showDate = booking?.show_date;
+  if (showDate && showDate < today && status !== 'completed' && status !== 'cancelled') {
+    if (!settlement)
+      warnings.push({ level: 'red', text: 'Show passed — settlement pending' });
+    else if (settlement.payouts?.[0]?.status !== 'paid')
+      warnings.push({ level: 'amber', text: 'Payout not completed' });
+  }
+
+  return warnings;
 }
 </script>
 </body>

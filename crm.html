@@ -3979,16 +3979,100 @@ function updateDealFields() {
     ['guarantee_vs_percentage','percentage_only'].includes(type) ? 'flex' : 'none';
 }
 
+// ── STATUS MACHINE ────────────────────────────────────────────
+// Rules:
+// inquiry    → always allowed
+// hold       → needs artist + date
+// offer_sent → needs artist + date + company + contact
+// negotiating→ needs artist + date + company + contact
+// confirmed  → needs artist + date + company + contact + venue + contract signed OR explicit override
+// advancing  → needs confirmed first
+// completed  → needs show date in past
+// cancelled  → always allowed
+
+const STATUS_ORDER = ['inquiry','hold','offer_sent','negotiating','confirmed','advancing','completed','cancelled'];
+
+async function checkStatusRequirements(targetStatus, bookingId) {
+  // Load booking with related data
+  const b = allBookings.find(x => x.id === bookingId) || {};
+  const today = new Date().toISOString().slice(0,10);
+
+  const issues = [];
+
+  if (targetStatus === 'hold') {
+    if (!b.artist_id)  issues.push('Artist is required');
+    if (!b.show_date)  issues.push('Show date is required');
+  }
+
+  if (['offer_sent','negotiating'].includes(targetStatus)) {
+    if (!b.artist_id)   issues.push('Artist is required');
+    if (!b.show_date)   issues.push('Show date is required');
+    if (!b.company_id)  issues.push('Company is required');
+    if (!b.contact_id)  issues.push('Contact person is required');
+  }
+
+  if (targetStatus === 'confirmed') {
+    if (!b.artist_id)   issues.push('Artist is required');
+    if (!b.show_date)   issues.push('Show date is required');
+    if (!b.company_id)  issues.push('Company is required');
+    if (!b.contact_id)  issues.push('Contact person is required');
+    if (!b.venue_id && !b.venue_name) issues.push('Venue is required');
+    // Check contract
+    const { data: contracts } = await db.from('contracts').select('status').eq('booking_id', bookingId);
+    const hasSigned = contracts?.some(c => c.status === 'fully_signed');
+    if (!hasSigned) issues.push('Signed contract required — or confirm without contract?');
+  }
+
+  if (targetStatus === 'advancing') {
+    const currentStatus = b.status;
+    if (!['confirmed','advancing'].includes(currentStatus)) {
+      issues.push('Booking must be confirmed first');
+    }
+  }
+
+  if (targetStatus === 'completed') {
+    if (!b.show_date) issues.push('Show date is required');
+    if (b.show_date && b.show_date > today) issues.push(`Show date is in the future (${fmtDate(b.show_date)})`);
+  }
+
+  return issues;
+}
+
 async function setBookingStatus(status) {
   if (!editBkId) return;
+
+  const issues = await checkStatusRequirements(status, editBkId);
+
+  // For "confirmed" without signed contract — allow with warning
+  const softIssues = issues.filter(i => i.includes('Signed contract required'));
+  const hardIssues = issues.filter(i => !i.includes('Signed contract required'));
+
+  if (hardIssues.length > 0) {
+    showToast('Cannot set status: ' + hardIssues[0], 'error');
+    return;
+  }
+
+  if (softIssues.length > 0) {
+    const ok = confirm('⚠️ No signed contract yet.\n\nAre you sure you want to confirm this booking without a signed contract?');
+    if (!ok) return;
+  }
+
   const { error } = await db.from('bookings').update({ status }).eq('id', editBkId);
   if (error) { showToast('Error updating status', 'error'); return; }
+
   document.querySelectorAll('.status-btn').forEach(btn => {
     btn.classList.toggle('active-status', btn.dataset.status === status);
   });
-  showToast('Status updated: ' + status.replace('_',' '), 'success');
+
+  showToast('Status updated: ' + status.replace(/_/g,' '), 'success');
   loadBookings();
+
+  // Auto-actions on status change
+  if (status === 'confirmed') {
+    showToast('✓ Confirmed — remember to send contract & create invoice', 'info');
+  }
 }
+// ── END STATUS MACHINE ─────────────────────────────────────────
 
 async function saveBooking() {
   const artistId  = document.getElementById('bm-artist').value;
@@ -4688,6 +4772,17 @@ async function deleteContract(id) {
 
 // ── CONTRACT EDITOR ───────────────────────────────────────────
 function openContractEditor(bookingId = null) {
+  // Guard: needs company + contact
+  if (bookingId) {
+    const b = allBookings.find(x => x.id === bookingId);
+    if (b && !b.company_id) {
+      showToast('Contract requires a company — edit the booking first', 'error'); return;
+    }
+    if (b && !b.contact_id) {
+      showToast('Contract requires a contact person — edit the booking first', 'error'); return;
+    }
+  }
+
   editContractId = null;
   currentContractBookingId = bookingId;
 
@@ -5205,6 +5300,16 @@ function exportInvoices() {
 }
 
 function openInvoiceEditor(bookingId = null) {
+  // Guard: invoice needs company + contact
+  if (bookingId) {
+    const b = allBookings.find(x => x.id === bookingId);
+    if (b && !b.company_id) {
+      showToast('Invoice requires a company — edit the booking first', 'error'); return;
+    }
+    if (b && !b.contact_id) {
+      showToast('Invoice requires a contact person — edit the booking first', 'error'); return;
+    }
+  }
   editInvoiceId = null; currentInvoiceBookingId = bookingId;
   const sel = document.getElementById('ie-booking');
   sel.innerHTML = '<option value="">Select booking...</option>' +
@@ -7341,31 +7446,48 @@ const SETT_CURRENCIES = {EUR:'€',USD:'$',GBP:'£',SGD:'S$',AED:'AED ',IDR:'Rp'
 
 async function openSettlement(bookingId) {
   if (!bookingId) return;
-  currentSettlementBookingId = bookingId;
   const b = allBookings.find(x => x.id === bookingId);
-  if (!b) return;
+  if (b) {
+    const today = new Date().toISOString().slice(0,10);
+    // Guard: needs show date
+    if (!b.show_date) {
+      showToast('Settlement requires a show date — edit the booking first', 'error'); return;
+    }
+    // Guard: show date must be in past (or today)
+    if (b.show_date > today) {
+      showToast(`Show is on ${fmtDate(b.show_date)} — settlement can only be created after the show`, 'error'); return;
+    }
+    // Guard: needs company + contact
+    if (!b.company_id) {
+      showToast('Settlement requires a company — edit the booking first', 'error'); return;
+    }
+  }
+
+  currentSettlementBookingId = bookingId;
+  const bk = allBookings.find(x => x.id === bookingId);
+  if (!bk) return;
 
   // Set header
   document.getElementById('sett-booking-ref').textContent =
-    [b.reference, b.artists?.name, b.venue_name, b.show_date ? fmtDate(b.show_date) : ''].filter(Boolean).join(' · ');
+    [bk.reference, bk.artists?.name, bk.venue_name, bk.show_date ? fmtDate(bk.show_date) : ''].filter(Boolean).join(' · ');
 
   // Load or pre-fill settlement
   const { data: sett } = await db.from('settlements').select('*').eq('booking_id', bookingId).maybeSingle();
 
   if (sett) {
     currentSettlementId = sett.id;
-    document.getElementById('sett-gross').value      = sett.gross_fee || b.fee_amount || '';
-    document.getElementById('sett-currency').value   = sett.currency || b.fee_currency || 'EUR';
-    document.getElementById('sett-wh-rate').value    = sett.withholding_rate || b.withholding_rate || 0;
-    document.getElementById('sett-comm-rate').value  = sett.commission_rate || b.commission_rate || 15;
+    document.getElementById('sett-gross').value      = sett.gross_fee || bk.fee_amount || '';
+    document.getElementById('sett-currency').value   = sett.currency || bk.fee_currency || 'EUR';
+    document.getElementById('sett-wh-rate').value    = sett.withholding_rate || bk.withholding_rate || 0;
+    document.getElementById('sett-comm-rate').value  = sett.commission_rate || bk.commission_rate || 15;
     document.getElementById('sett-comm-base').value  = sett.commission_base || 'gross';
     document.getElementById('sett-notes').value      = sett.notes || '';
   } else {
     currentSettlementId = null;
-    document.getElementById('sett-gross').value      = b.fee_amount || '';
-    document.getElementById('sett-currency').value   = b.fee_currency || 'EUR';
-    document.getElementById('sett-wh-rate').value    = b.withholding_rate || 0;
-    document.getElementById('sett-comm-rate').value  = b.commission_rate || 15;
+    document.getElementById('sett-gross').value      = bk.fee_amount || '';
+    document.getElementById('sett-currency').value   = bk.fee_currency || 'EUR';
+    document.getElementById('sett-wh-rate').value    = bk.withholding_rate || 0;
+    document.getElementById('sett-comm-rate').value  = bk.commission_rate || 15;
     document.getElementById('sett-comm-base').value  = 'gross';
     document.getElementById('sett-notes').value      = '';
   }
