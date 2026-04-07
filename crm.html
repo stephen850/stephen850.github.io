@@ -3598,7 +3598,31 @@ async function startApp() {
   loadExpenses();
   loadVenues();
   loadTags();
-  setTimeout(renderDashboard, 2000);
+  setTimeout(() => {
+    renderDashboard();
+    // Handle URL params — e.g. from show.html links
+    const params = new URLSearchParams(window.location.search);
+    const open = params.get('open');
+    const bookingId = params.get('booking');
+    if (open === 'settlement' && bookingId) {
+      // Navigate to bookings tab and open settlement
+      const bkTab = document.querySelector('.h-tab[onclick*="bookings"]');
+      showPanel('bookings', bkTab);
+      setTimeout(() => openSettlement(bookingId), 500);
+    } else if (open === 'contract' && bookingId) {
+      const bkTab = document.querySelector('.h-tab[onclick*="bookings"]');
+      showPanel('bookings', bkTab);
+      setTimeout(() => openContractEditor(bookingId), 500);
+    } else if (open === 'invoice' && bookingId) {
+      const bkTab = document.querySelector('.h-tab[onclick*="bookings"]');
+      showPanel('bookings', bkTab);
+      setTimeout(() => openInvoiceEditor(bookingId), 500);
+    } else if (open === 'advancing' && bookingId) {
+      const bkTab = document.querySelector('.h-tab[onclick*="bookings"]');
+      showPanel('bookings', bkTab);
+      setTimeout(() => openAdvancingEditor(bookingId), 500);
+    }
+  }, 2000);
 }
 db.auth.getSession().then(({ data: { session } }) => {
   if (session) startApp();

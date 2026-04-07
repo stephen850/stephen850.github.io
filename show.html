@@ -613,7 +613,7 @@ function renderContract(b, contracts) {
     document.getElementById('sd-contract-body').innerHTML =
       `<div style="padding:12px 0;font-family:var(--mono);font-size:11px;color:var(--muted)">No contract yet</div>`;
     document.getElementById('sd-contract-actions').innerHTML =
-      `<button class="sd-btn primary" onclick="openCRM()">+ Generate Contract</button>`;
+      `<button class="sd-btn primary" onclick="openContract()">+ Generate Contract</button>`;
     return;
   }
 
@@ -632,9 +632,12 @@ function renderContract(b, contracts) {
     `<div class="sd-field"><div class="sd-field-label">${esc(f.label)}</div><div class="sd-field-val">${esc(f.val)}</div></div>`).join('');
 
   document.getElementById('sd-contract-actions').innerHTML =
-    `<button class="sd-btn" onclick="openCRM()">Open Contract</button>
-     ${s !== 'fully_signed' ? '<button class="sd-btn blue" onclick="openCRM()">Resend</button>' : ''}`;
+    `<button class="sd-btn" onclick="openContract()">Open Contract</button>
+     ${s !== 'fully_signed' ? '<button class="sd-btn blue" onclick="openContract()">Resend</button>' : ''}`;
 }
+
+// no-contract case
+
 
 // ── INVOICES ─────────────────────────────────────────────────
 function renderInvoices(b, invoices) {
@@ -644,7 +647,7 @@ function renderInvoices(b, invoices) {
     document.getElementById('sd-invoice-body').innerHTML =
       `<div style="padding:12px 0;font-family:var(--mono);font-size:11px;color:var(--muted)">No invoices yet</div>`;
     document.getElementById('sd-invoice-actions').innerHTML =
-      `<button class="sd-btn primary" onclick="openCRM()">+ Create Invoice</button>`;
+      `<button class="sd-btn primary" onclick="openInvoice()">+ Create Invoice</button>`;
     return;
   }
 
@@ -678,8 +681,8 @@ function renderInvoices(b, invoices) {
     </div>` + rows;
 
   document.getElementById('sd-invoice-actions').innerHTML =
-    `<button class="sd-btn" onclick="openCRM()">Open Invoices</button>
-     <button class="sd-btn primary" onclick="openCRM()">+ New Invoice</button>`;
+    `<button class="sd-btn" onclick="openInvoice()">Open Invoices</button>
+     <button class="sd-btn primary" onclick="openInvoice()">+ New Invoice</button>`;
 }
 
 // ── ADVANCING ────────────────────────────────────────────────
@@ -710,7 +713,7 @@ function renderAdvancing(b, adv) {
     document.getElementById('sd-advancing-body').innerHTML =
       `<div style="padding:12px 0;font-family:var(--mono);font-size:11px;color:var(--muted)">Advancing not started</div>`;
     document.getElementById('sd-advancing-actions').innerHTML =
-      `<button class="sd-btn primary" onclick="openCRM()">Start Advancing</button>`;
+      `<button class="sd-btn primary" onclick="openAdvancing()">Start Advancing</button>`;
     document.getElementById('sd-advancing-badge').innerHTML =
       `<span style="font-family:var(--mono);font-size:9px;color:var(--muted)">Not started</span>`;
     return;
@@ -751,7 +754,7 @@ function renderAdvancing(b, adv) {
     </div>`;
 
   document.getElementById('sd-advancing-actions').innerHTML =
-    `<button class="sd-btn" onclick="openCRM()">Open Advancing</button>
+    `<button class="sd-btn" onclick="openAdvancing()">Open Advancing</button>
      <button class="sd-btn blue" onclick="openCRM()">Promoter Portal</button>`;
 }
 
@@ -921,6 +924,24 @@ function openSettlement() {
   const params = new URLSearchParams(window.location.search);
   const bookingId = params.get('id');
   window.location.href = `crm.html?open=settlement&booking=${bookingId}`;
+}
+
+function openContract() {
+  const params = new URLSearchParams(window.location.search);
+  const bookingId = params.get('id');
+  window.location.href = `crm.html?open=contract&booking=${bookingId}`;
+}
+
+function openInvoice() {
+  const params = new URLSearchParams(window.location.search);
+  const bookingId = params.get('id');
+  window.location.href = `crm.html?open=invoice&booking=${bookingId}`;
+}
+
+function openAdvancing() {
+  const params = new URLSearchParams(window.location.search);
+  const bookingId = params.get('id');
+  window.location.href = `crm.html?open=advancing&booking=${bookingId}`;
 }
 
 function getStatusWarnings(booking, contracts, invoices, advancing, settlement) {
