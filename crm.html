@@ -2190,6 +2190,53 @@ tbody td { padding: 10px 14px; vertical-align: middle; }
           </tbody>
         </table>
       </div>
+
+      <!-- ── CONTACTS POOL ───────────────────────────────────────── -->
+      <div id="tour-pool-section" style="display:none;border-top:2px solid var(--border);margin-top:32px;">
+        <div style="padding:20px 20px 12px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;">
+          <div>
+            <div style="font-family:var(--mono);font-size:10px;letter-spacing:0.15em;text-transform:uppercase;color:var(--muted);margin-bottom:4px;">Contacts Pool</div>
+            <div style="font-family:var(--mono);font-size:11px;color:var(--accent);" id="tour-pool-artist-label"></div>
+          </div>
+          <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
+            <select id="pool-filter-country" class="tb-select" onchange="renderContactsPool()" style="min-width:130px;">
+              <option value="">All Countries</option>
+            </select>
+            <select id="pool-filter-type" class="tb-select" onchange="renderContactsPool()">
+              <option value="">All Types</option>
+              <option value="promoter">Promoter</option>
+              <option value="festival">Festival</option>
+              <option value="agency">Agency</option>
+              <option value="brand">Brand</option>
+            </select>
+            <input id="pool-search" class="tb-search" placeholder="Search..." oninput="renderContactsPool()" style="min-width:160px;">
+            <span id="pool-sel-label" style="font-family:var(--mono);font-size:10px;color:var(--muted);"></span>
+            <button class="btn" id="pool-export-sel-btn" onclick="exportPoolSelected()" style="display:none;border-color:var(--green);color:var(--green);">↓ Export Selected</button>
+            <button class="btn" onclick="exportPoolAll()">↓ Export All</button>
+          </div>
+        </div>
+
+        <div style="overflow-x:auto;">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th style="width:28px;padding:8px 6px;"><input type="checkbox" id="pool-check-all" onchange="poolToggleAll(this.checked)"></th>
+                <th>Organisation</th>
+                <th>Type</th>
+                <th>Country</th>
+                <th>City</th>
+                <th>Contact Person</th>
+                <th>Email</th>
+                <th>Phone</th>
+                <th>Genre</th>
+              </tr>
+            </thead>
+            <tbody id="pool-tbody">
+              <tr class="tbl-msg"><td colspan="9">No contacts found.</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
     </div>
 
     <!-- Add Dates Modal -->
@@ -2325,8 +2372,8 @@ tbody td { padding: 10px 14px; vertical-align: middle; }
     <div class="panel" id="panel-pipeline">
       <div class="tb-bar" style="flex-wrap:wrap;gap:10px;">
         <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
-          <select id="sb-artist" class="tb-select" onchange="renderSalesBoard()" style="min-width:150px;">
-            <option value="">All Artists</option>
+          <select id="sb-artist" class="tb-select" onchange="sbArtistChanged()" style="min-width:160px;">
+            <option value="">Select artist...</option>
           </select>
           <select id="sb-country" class="tb-select" onchange="renderSalesBoard()" style="min-width:130px;">
             <option value="">All Countries</option>
@@ -2338,22 +2385,27 @@ tbody td { padding: 10px 14px; vertical-align: middle; }
             <option value="agency">Agency</option>
             <option value="brand">Brand</option>
           </select>
-          <input id="sb-search" class="tb-search" placeholder="Search name, contact, city..." oninput="renderSalesBoard()" style="min-width:200px;">
+          <input id="sb-search" class="tb-search" placeholder="Search name, contact, city..." oninput="renderSalesBoard()" style="min-width:180px;">
         </div>
         <div style="display:flex;gap:8px;align-items:center;">
-          <span id="sb-sel-label" style="font-family:var(--mono);font-size:10px;color:var(--muted);"></span>
-          <button class="btn" id="sb-export-sel-btn" onclick="exportSalesSelected()" style="display:none;border-color:var(--green);color:var(--green);">↓ Export Selected</button>
+          <span id="sb-pool-label" style="font-family:var(--mono);font-size:10px;color:var(--muted);"></span>
+          <button class="btn success" id="sb-save-pool-btn" onclick="savePoolForArtist()" style="display:none;border-color:var(--green);color:var(--green);">✓ Save Pool for Artist</button>
           <button class="btn" onclick="exportSalesAll()">↓ Export All</button>
+          <button class="btn" id="sb-export-sel-btn" onclick="exportSalesSelected()" style="display:none;border-color:var(--blue);color:var(--blue);">↓ Export Selected</button>
         </div>
       </div>
 
-      <div style="padding:8px 20px 0;font-family:var(--mono);font-size:10px;color:var(--muted);" id="sb-count-bar"></div>
+      <div style="padding:6px 20px 4px;display:flex;gap:12px;align-items:center;">
+        <span style="font-family:var(--mono);font-size:10px;color:var(--muted);" id="sb-count-bar"></span>
+        <span id="sb-pool-status" style="font-family:var(--mono);font-size:10px;"></span>
+      </div>
 
       <div style="overflow-x:auto;">
         <table class="data-table">
           <thead>
             <tr>
               <th style="width:28px;padding:8px 6px;"><input type="checkbox" id="sb-check-all" onchange="sbToggleAll(this.checked)"></th>
+              <th style="width:28px;"></th>
               <th>Organisation</th>
               <th>Type</th>
               <th>Country</th>
@@ -2362,14 +2414,60 @@ tbody td { padding: 10px 14px; vertical-align: middle; }
               <th>Email</th>
               <th>Phone</th>
               <th>Genre</th>
-              <th>Tags</th>
             </tr>
           </thead>
           <tbody id="sb-tbody">
-            <tr class="tbl-msg"><td colspan="10">Loading contacts...</td></tr>
+            <tr class="tbl-msg"><td colspan="10">Select an artist to build their pool.</td></tr>
           </tbody>
         </table>
       </div>
+    </div>
+
+    <!-- Tour Date Detail — slide-in panel showing artist pool for a date -->
+    <div id="tour-date-panel" style="display:none;position:fixed;top:0;right:0;width:520px;height:100vh;background:var(--surface);border-left:1px solid var(--border);z-index:300;overflow-y:auto;box-shadow:-4px 0 20px rgba(0,0,0,0.1);">
+      <div style="background:var(--accent);padding:16px 20px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:1;">
+        <div>
+          <div style="font-family:var(--mono);font-size:9px;letter-spacing:0.15em;color:rgba(255,255,255,0.5);text-transform:uppercase;">Tour Date</div>
+          <div style="font-family:var(--font-display,var(--mono));font-size:16px;color:#fff;margin-top:2px;" id="tdp-title"></div>
+        </div>
+        <button onclick="closeTourDatePanel()" style="background:none;border:none;color:rgba(255,255,255,0.6);font-size:20px;cursor:pointer;padding:4px 8px;">✕</button>
+      </div>
+
+      <!-- Date status bar -->
+      <div style="padding:12px 20px;border-bottom:1px solid var(--border);display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
+        <span id="tdp-status-badge" class="badge"></span>
+        <span style="font-family:var(--mono);font-size:10px;color:var(--muted);" id="tdp-meta"></span>
+        <button class="btn" onclick="openEditDateModal(currentTourDateId)" style="margin-left:auto;font-size:10px;padding:4px 12px;">Edit Date</button>
+      </div>
+
+      <!-- Pool section -->
+      <div style="padding:14px 20px 8px;">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
+          <div style="font-family:var(--mono);font-size:9px;letter-spacing:0.12em;text-transform:uppercase;color:var(--muted);">
+            Artist Pool — <span id="tdp-artist-name"></span>
+          </div>
+          <div style="display:flex;gap:6px;">
+            <button class="btn" id="tdp-export-sel-btn" onclick="exportPoolSelected()" style="display:none;font-size:10px;padding:4px 10px;border-color:var(--green);color:var(--green);">↓ Export Selected</button>
+            <button class="btn" onclick="exportPoolAll()" style="font-size:10px;padding:4px 10px;">↓ Export All</button>
+          </div>
+        </div>
+        <input id="tdp-search" class="tb-search" placeholder="Filter pool..." oninput="renderPoolInPanel()" style="width:100%;margin-bottom:10px;">
+      </div>
+
+      <table class="data-table" style="font-size:12px;">
+        <thead>
+          <tr>
+            <th style="width:28px;padding:6px;"><input type="checkbox" id="tdp-check-all" onchange="tdpToggleAll(this.checked)"></th>
+            <th>Organisation</th>
+            <th>Country</th>
+            <th>Contact</th>
+            <th>Email</th>
+          </tr>
+        </thead>
+        <tbody id="tdp-tbody">
+          <tr class="tbl-msg"><td colspan="5">No pool yet — build one in the Pipeline tab.</td></tr>
+        </tbody>
+      </table>
     </div>
 
 
@@ -8884,6 +8982,7 @@ function tourArtistChanged() {
   currentTourArtistId = document.getElementById('tour-artist').value || null;
   document.getElementById('tour-add-dates-btn').disabled = !currentTourArtistId;
   renderTourTable();
+  renderContactsPool();
 }
 
 function renderTourTable() {
@@ -9070,6 +9169,148 @@ function exportTours() {
   XLSX.writeFile(wb, `deepbloe_tour_${nm.toLowerCase().replace(/\s/g,'_')}.xlsx`);
   showToast('Tour exported ✓','success');
 }
+
+// ── CONTACTS POOL (below tour table) ──────────────────────────
+function renderContactsPool() {
+  const section = document.getElementById('tour-pool-section');
+  if (!section) return;
+
+  if (!currentTourArtistId) { section.style.display = 'none'; return; }
+  section.style.display = 'block';
+
+  const artist = allArtists.find(a => a.id === currentTourArtistId);
+  const lbl = document.getElementById('tour-pool-artist-label');
+  if (lbl) lbl.textContent = `Showing all contacts for ${artist?.name || ''}`;
+
+  // Populate country filter
+  const cSel = document.getElementById('pool-filter-country');
+  if (cSel) {
+    const cur = cSel.value;
+    const countries = [...new Set(allOrgs.map(o => o.country).filter(Boolean))].sort();
+    cSel.innerHTML = '<option value="">All Countries</option>' +
+      countries.map(c => `<option value="${c}"${c===cur?' selected':''}>${esc(c)}</option>`).join('');
+  }
+
+  const country = document.getElementById('pool-filter-country')?.value || '';
+  const type    = document.getElementById('pool-filter-type')?.value || '';
+  const search  = (document.getElementById('pool-search')?.value || '').toLowerCase();
+
+  let orgs = allOrgs.filter(o => {
+    if (country && o.country !== country) return false;
+    if (type && o.company_type !== type && o.type !== type) return false;
+    if (search) {
+      const name = (o.legal_name || o.name || '').toLowerCase();
+      const city = (o.city || '').toLowerCase();
+      const cons = allCons.filter(c => c.organisation_id === o.id);
+      const conMatch = cons.some(c =>
+        ([c.first_name,c.last_name].filter(Boolean).join(' ').toLowerCase()).includes(search) ||
+        (c.email||'').toLowerCase().includes(search)
+      );
+      if (!name.includes(search) && !city.includes(search) && !conMatch) return false;
+    }
+    return true;
+  });
+
+  const tbody = document.getElementById('pool-tbody');
+  if (!orgs.length) {
+    tbody.innerHTML = '<tr class="tbl-msg"><td colspan="9">No contacts found.</td></tr>';
+    poolUpdateExportBtn(); return;
+  }
+
+  tbody.innerHTML = orgs.map(o => {
+    const cons     = allCons.filter(c => c.organisation_id === o.id && c.is_active !== false);
+    const primary  = cons[0];
+    const conName  = primary ? [primary.first_name, primary.last_name].filter(Boolean).join(' ') : '—';
+    const conEmail = primary?.email || '—';
+    const conPhone = primary?.phone || '—';
+    const genre    = Array.isArray(o.genre) ? o.genre.join(', ') : (o.genre || '—');
+    const typeCls  = {promoter:'club',festival:'festival',agency:'agency',brand:'brand'}[o.company_type||o.type]||'other';
+    return `<tr>
+      <td style="padding:6px;"><input type="checkbox" class="pool-row-check" data-org-id="${o.id}" onchange="poolUpdateExportBtn()"></td>
+      <td class="td-name" style="font-weight:500;">${esc(o.legal_name||o.name||'—')}</td>
+      <td><span class="badge b-${typeCls}" style="font-size:10px;">${esc(o.company_type||o.type||'—')}</span></td>
+      <td class="td-mono" style="font-size:11px;">${esc(o.country||'—')}</td>
+      <td class="td-mono" style="font-size:11px;">${esc(o.city||'—')}</td>
+      <td class="td-trunc" style="max-width:140px;">${esc(conName)}</td>
+      <td class="td-mono" style="font-size:11px;">${esc(conEmail)}</td>
+      <td class="td-mono" style="font-size:11px;">${esc(conPhone)}</td>
+      <td style="font-size:11px;color:var(--muted);">${esc(genre)}</td>
+    </tr>`;
+  }).join('');
+
+  poolUpdateExportBtn();
+}
+
+function poolToggleAll(checked) {
+  document.querySelectorAll('.pool-row-check').forEach(cb => { cb.checked = checked; });
+  poolUpdateExportBtn();
+}
+
+function poolUpdateExportBtn() {
+  const n   = document.querySelectorAll('.pool-row-check:checked').length;
+  const btn = document.getElementById('pool-export-sel-btn');
+  const lbl = document.getElementById('pool-sel-label');
+  if (btn) btn.style.display = n > 0 ? 'inline-block' : 'none';
+  if (lbl) lbl.textContent = n > 0 ? `${n} selected` : '';
+}
+
+function exportPoolSelected() {
+  const ids  = [...document.querySelectorAll('.pool-row-check:checked')].map(cb => cb.dataset.orgId);
+  const orgs = allOrgs.filter(o => ids.includes(o.id));
+  exportPoolRows(orgs, 'deepbloe_contacts_selected.xlsx');
+}
+
+function exportPoolAll() {
+  const country = document.getElementById('pool-filter-country')?.value || '';
+  const type    = document.getElementById('pool-filter-type')?.value || '';
+  const search  = (document.getElementById('pool-search')?.value || '').toLowerCase();
+  const artist  = allArtists.find(a => a.id === currentTourArtistId);
+  let orgs = allOrgs.filter(o => {
+    if (country && o.country !== country) return false;
+    if (type && o.company_type !== type && o.type !== type) return false;
+    if (search && !(o.legal_name||o.name||'').toLowerCase().includes(search)) return false;
+    return true;
+  });
+  const filename = `deepbloe_contacts_${(artist?.name||'all').toLowerCase().replace(/\s/g,'_')}.xlsx`;
+  exportPoolRows(orgs, filename);
+}
+
+function exportPoolRows(orgs, filename) {
+  if (!orgs.length) { showToast('Nothing to export', 'error'); return; }
+  const artist = allArtists.find(a => a.id === currentTourArtistId);
+  const rows = [];
+  orgs.forEach(o => {
+    const cons  = allCons.filter(c => c.organisation_id === o.id && c.is_active !== false);
+    const genre = Array.isArray(o.genre) ? o.genre.join(', ') : (o.genre || '');
+    const base  = {
+      Artist:       artist?.name || '',
+      Organisation: o.legal_name || o.name || '',
+      Type:         o.company_type || o.type || '',
+      Country:      o.country || '',
+      City:         o.city || '',
+      Website:      o.website || '',
+      Genre:        genre,
+    };
+    if (!cons.length) {
+      rows.push({ ...base, Contact_Person: '', Email: '', Phone: '', Role: '' });
+    } else {
+      cons.forEach(c => rows.push({
+        ...base,
+        Contact_Person: [c.first_name, c.last_name].filter(Boolean).join(' '),
+        Email:  c.email || '',
+        Phone:  c.phone || '',
+        Role:   c.role  || '',
+      }));
+    }
+  });
+  const ws = XLSX.utils.json_to_sheet(rows);
+  ws['!cols'] = [{wch:12},{wch:28},{wch:12},{wch:14},{wch:14},{wch:22},{wch:20},{wch:22},{wch:28},{wch:16},{wch:14}];
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, 'Contacts Pool');
+  XLSX.writeFile(wb, filename);
+  showToast(`Exported ${rows.length} rows ✓`, 'success');
+}
+// ── END CONTACTS POOL ──────────────────────────────────────────
 // ── END TOURS ──────────────────────────────────────────────────
 
 
