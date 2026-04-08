@@ -2407,7 +2407,6 @@ tbody td { padding: 10px 14px; vertical-align: middle; }
               <th>Country</th>
               <th>Contact Person</th>
               <th>Email</th>
-              <th id="sb-artist-headers"><!-- artist columns injected by JS --></th>
             </tr>
           </thead>
           <tbody id="sb-tbody">
@@ -9376,15 +9375,15 @@ function renderSalesBoard() {
   const countBar = document.getElementById('sb-count-bar');
   if (countBar) countBar.textContent = `${orgs.length} organisation${orgs.length!==1?'s':''}`;
 
-  // Build artist header columns
+  // Build artist header columns — sort by name for consistent order
+  const sortedArtists = [...allArtists].sort((a,b) => a.name.localeCompare(b.name));
   const thead = document.querySelector('#sb-table thead tr');
   if (thead) {
-    // Remove old artist th's
     thead.querySelectorAll('.sb-artist-th').forEach(th => th.remove());
-    allArtists.forEach(a => {
+    sortedArtists.forEach(a => {
       const th = document.createElement('th');
       th.className = 'sb-artist-th';
-      th.style.cssText = 'font-size:10px;text-align:center;min-width:70px;';
+      th.style.cssText = 'font-size:10px;text-align:center;min-width:70px;white-space:nowrap;';
       th.textContent = a.name;
       thead.appendChild(th);
     });
@@ -9402,15 +9401,15 @@ function renderSalesBoard() {
     const conName = primary ? [primary.first_name, primary.last_name].filter(Boolean).join(' ') : '—';
     const typeCls = {promoter:'club',festival:'festival',agency:'agency',brand:'brand'}[o.company_type||o.type]||'other';
 
-    // Per-artist checkboxes
-    const artistCells = allArtists.map(a => {
+    // Per-artist checkboxes — same sorted order as headers
+    const artistCells = sortedArtists.map(a => {
       const inPool = allPoolLinks.some(l => l.artist_id === a.id && l.org_id === o.id);
       return `<td style="text-align:center;">
         <input type="checkbox" class="pool-artist-check"
           data-org-id="${o.id}" data-artist-id="${a.id}"
           ${inPool ? 'checked' : ''}
           onchange="poolMarkDirty()"
-          title="Add to ${esc(a.name)}'s pool">
+          title="${esc(a.name)}">
       </td>`;
     }).join('');
 
