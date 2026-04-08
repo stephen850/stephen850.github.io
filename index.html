@@ -1,164 +1,1763 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport"/>
+
 <!-- ═══════════════════════════════════════════════
-     DEEPBLOE — SHADER HERO v2
-     - hero.jpg foto blijft als achtergrond
-     - WebGL shader als semi-transparante overlay
-     - Alle headline tekst volledig wit (geen opacity-dim op PLATFORM)
-     - Drop-in vervanging voor <section class="hero"> ... </section>
+     PRIMARY SEO
 ════════════════════════════════════════════════ -->
+<title>Deepbloe | Global Electronic Music Platform</title>
+<meta name="description" content="Deepbloe is a global electronic music platform. Talent representation, festival programming, industry showcases and strategic partnerships — connecting artists, promoters and brands worldwide. Est. 2018."/>
+<meta name="keywords" content="electronic music booking agency, dj booking agency, artist representation, festival programming, talent buying, house music booking, techno booking agency, global dj agency, electronic music talent agency, festival talent buying, electronic music platform, club programming, brand partnerships music, ADE booking, WMC Miami booking, Tomorrowland artists, Jax Jones booking, Goldfish booking, Liu booking"/>
+<meta name="author" content="Deepbloe Agency B.V."/>
+<meta name="robots" content="index, follow"/>
+<link rel="sitemap" type="application/xml" href="/sitemap.xml"/>
+<link rel="canonical" href="https://www.deepbloe.com/"/>
+<link rel="alternate" hreflang="en" href="https://www.deepbloe.com/"/>
+<link rel="alternate" hreflang="x-default" href="https://www.deepbloe.com/"/>
 
-<section class="hero" style="position:relative;min-height:100vh;display:flex;flex-direction:column;justify-content:center;padding-bottom:80px;padding-top:120px;overflow:hidden;">
+<!-- ═══════════════════════════════════════════════
+     OPEN GRAPH (Facebook, LinkedIn, WhatsApp)
+════════════════════════════════════════════════ -->
+<meta property="og:type" content="website"/>
+<meta property="og:url" content="https://www.deepbloe.com/"/>
+<meta property="og:title" content="Deepbloe | Global Electronic Music Platform"/>
+<meta property="og:description" content="Connecting artists, promoters, festivals, clubs and brands worldwide. Full-service talent representation, talent buying, industry showcases and strategic partnerships."/>
+<meta property="og:image" content="https://www.deepbloe.com/assets/images/og-image.jpg"/>
+<meta property="og:image:width" content="1200"/>
+<meta property="og:image:height" content="630"/>
+<meta property="og:image:alt" content="Deepbloe – Global Electronic Music Platform"/>
+<meta property="og:site_name" content="Deepbloe"/>
+<meta property="og:locale" content="en_US"/>
 
-  <!-- 1. Hero foto (origineel, ongewijzigd) -->
-  <div class="hero-bg">
-    <img alt="Hero" src="hero.jpg" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center 25%;filter:brightness(0.8) saturate(0.95);"/>
-  </div>
+<!-- ═══════════════════════════════════════════════
+     TWITTER / X CARD
+════════════════════════════════════════════════ -->
+<meta name="twitter:card" content="summary_large_image"/>
+<meta name="twitter:site" content="@deepbloe"/>
+<meta name="twitter:title" content="Deepbloe | Global Electronic Music Platform"/>
+<meta name="twitter:description" content="Connecting artists, promoters, festivals, clubs and brands worldwide. Est. 2018."/>
+<meta name="twitter:image" content="https://www.deepbloe.com/assets/images/og-image.jpg"/>
 
-  <!-- 2. Shader canvas als overlay boven de foto -->
-  <canvas id="deepbloe-hero-canvas" style="position:absolute;inset:0;width:100%;height:100%;display:block;mix-blend-mode:screen;opacity:0.55;touch-action:none;z-index:1;"></canvas>
+<!-- ═══════════════════════════════════════════════
+     STRUCTURED DATA — Organisation (JSON-LD)
+════════════════════════════════════════════════ -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Organization",
+  "name": "Deepbloe Agency B.V.",
+  "alternateName": "Deepbloe",
+  "url": "https://www.deepbloe.com",
+  "logo": "https://www.deepbloe.com/assets/images/image_01.png",
+  "foundingDate": "2018",
+  "description": "Global electronic music platform. Talent representation, talent buying, festival programming, industry showcases and brand partnerships.",
+  "address": {
+    "@type": "PostalAddress",
+    "streetAddress": "Ambachtshof 88",
+    "addressLocality": "Nootdorp",
+    "postalCode": "2632 BB",
+    "addressCountry": "NL"
+  },
+  "contactPoint": {
+    "@type": "ContactPoint",
+    "email": "info@deepbloe.com",
+    "contactType": "General Enquiries"
+  },
+  "sameAs": [
+    "https://www.instagram.com/deepbloe/",
+    "https://www.linkedin.com/company/76724101/"
+  ]
+}
+</script>
 
-  <!-- 3. Gradient fade naar void onderaan -->
-  <div style="position:absolute;inset:0;pointer-events:none;background:linear-gradient(180deg,rgba(8,8,8,0.0) 0%,rgba(8,8,8,0.12) 55%,#080808 100%);z-index:2;"></div>
+<!-- ═══════════════════════════════════════════════
+     STRUCTURED DATA — ProfessionalService (JSON-LD)
+════════════════════════════════════════════════ -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "ProfessionalService",
+  "name": "Deepbloe Agency B.V.",
+  "url": "https://www.deepbloe.com",
+  "logo": "https://www.deepbloe.com/assets/images/image_01.png",
+  "image": "https://www.deepbloe.com/assets/images/og-image.jpg",
+  "description": "Full-service electronic music booking agency offering talent representation, talent buying, festival programming, industry showcases and brand partnerships worldwide.",
+  "priceRange": "$$$$",
+  "areaServed": "Worldwide",
+  "serviceType": [
+    "Talent Representation",
+    "Talent Buying",
+    "Festival Programming",
+    "Industry Showcases",
+    "Brand Partnerships",
+    "Artist Management Consultancy"
+  ],
+  "address": {
+    "@type": "PostalAddress",
+    "streetAddress": "Ambachtshof 88",
+    "addressLocality": "Nootdorp",
+    "postalCode": "2632 BB",
+    "addressCountry": "NL"
+  },
+  "telephone": "",
+  "email": "info@deepbloe.com",
+  "sameAs": [
+    "https://www.instagram.com/deepbloe/",
+    "https://www.linkedin.com/company/76724101/"
+  ]
+}
+</script>
 
-  <!-- 4. Hero Content -->
-  <div class="container" style="position:relative;z-index:3;">
-    <div class="hero-counter mono">EST. 2018, GLOBAL ELECTRONIC MUSIC PLATFORM</div>
-    <h1 class="hero-headline">
+<!-- ═══════════════════════════════════════════════
+     FAVICONS & THEME
+════════════════════════════════════════════════ -->
+<link rel="icon" type="image/png" href="/assets/images/favicon.png"/>
+<link rel="apple-touch-icon" href="/assets/images/apple-touch-icon.png"/>
+<meta name="theme-color" content="#080808"/>
+
+<!-- ═══════════════════════════════════════════════
+     FONTS & STYLES
+════════════════════════════════════════════════ -->
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300&family=DM+Mono:wght@300;400&display=swap" rel="stylesheet"/>
+<style>
+/* ── RESET & BASE ─────────────────────────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --void:      #080808;
+  --obsidian:  #0D0D10;
+  --midnight:  #0A0E1A;
+  --ink:       #111318;
+  --graphite:  #1C1E24;
+  --steel:     #2A2D36;
+  --iron:      #5A5F70;
+  --silver:    #C4C8D4;
+  --chrome:    #E2E4EA;
+  --ivory:     #FFFFFF;
+  --electric:  #29ABE2;
+  --electric2: #1A6E95;
+  --font-display: 'Bebas Neue', sans-serif;
+  --font-body:    'DM Sans', sans-serif;
+  --font-mono:    'DM Mono', monospace;
+}
+
+html { scroll-behavior: smooth; }
+
+body {
+  background: #080808;
+  color: var(--ivory);
+  font-family: var(--font-body);
+  font-size: 16px;
+  line-height: 1.7;
+  overflow-x: hidden;
+  
+}
+
+/* ── CUSTOM CURSOR ────────────────────────────────────────────────────────── */
+
+
+.cursor-ring {
+  width: 36px; height: 36px; border: 1px solid rgba(238,240,244,0.4);
+  border-radius: 50%; transform: translate(-50%,-50%);
+  transition: width 0.3s ease, height 0.3s ease, transform 0.15s ease;
+  margin-top: -22px; margin-left: -4px;
+}
+body:has(a:hover) .cursor-ring,
+body:has(button:hover) .cursor-ring { width: 56px; height: 56px; }
+
+/* ── GRAIN OVERLAY ────────────────────────────────────────────────────────── */
+body::before {
+  content: ''; position: fixed; inset: 0; z-index: 1000; pointer-events: none;
+  opacity: 0.035;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+  background-size: 200px 200px;
+}
+
+/* ── SCROLLBAR ────────────────────────────────────────────────────────────── */
+::-webkit-scrollbar { width: 3px; }
+::-webkit-scrollbar-track { background: #080808; }
+::-webkit-scrollbar-thumb { background: var(--steel); border-radius: 2px; }
+
+/* ── TYPOGRAPHY ───────────────────────────────────────────────────────────── */
+h1, h2, h3, h4 { font-family: var(--font-display); letter-spacing: 0.02em; line-height: 0.92; }
+.mono { font-family: var(--font-mono); }
+
+/* ── LAYOUT ───────────────────────────────────────────────────────────────── */
+.container { max-width: 1440px; margin: 0 auto; padding: 0 80px; }
+@media (max-width: 1024px) { .container { padding: 0 40px; } }
+@media (max-width: 640px)  { .container { padding: 0 24px; } }
+
+/* ── NAVIGATION ───────────────────────────────────────────────────────────── */
+nav {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+  padding: 0 80px;
+  display: flex; align-items: center; justify-content: space-between;
+  height: 72px;
+  background: linear-gradient(180deg, rgba(8,8,8,0.95) 0%, rgba(8,8,8,0.7) 100%);
+  border-bottom: 1px solid var(--steel);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  transition: border-color 0.4s, background 0.4s;
+}
+nav.scrolled {
+  background: rgba(8,8,8,0.97);
+  border-bottom-color: var(--steel);
+}
+nav::before {
+  content: ''; position: absolute; top: 0; left: 0; right: 0;
+  height: 1px; background: linear-gradient(90deg, transparent, var(--electric), transparent);
+  opacity: 0.6;
+}
+.nav-logo {
+  display: flex; align-items: center; gap: 12px;
+  text-decoration: none; color: var(--ivory);
+}
+.nav-logo img { width: 36px; height: 36px; object-fit: contain; }
+.nav-logo-text {
+  font-family: var(--font-display); font-size: 18px; letter-spacing: 0.1em;
+  color: var(--ivory);
+}
+.nav-links {
+  display: flex; gap: 40px; list-style: none;
+}
+.nav-links a {
+  font-size: 11px; font-weight: 500; letter-spacing: 0.12em;
+  text-transform: uppercase; text-decoration: none;
+  color: var(--ivory); transition: color 0.2s;
+  position: relative;
+}
+.nav-links a::after {
+  content: ''; position: absolute; bottom: -4px; left: 0;
+  width: 0; height: 1px; background: var(--electric);
+  transition: width 0.3s ease;
+}
+.nav-links a:hover { color: var(--ivory); }
+.nav-links a:hover::after { width: 100%; }
+.nav-cta {
+  font-size: 11px; font-weight: 500; letter-spacing: 0.12em; text-transform: uppercase;
+  text-decoration: none; color: var(--ivory); padding: 10px 24px;
+  border: 1px solid rgba(238,240,244,0.25); transition: border-color 0.2s, color 0.2s, background 0.2s;
+}
+.nav-cta:hover { border-color: var(--electric); color: var(--electric); }
+
+/* ── HERO ─────────────────────────────────────────────────────────────────── */
+.hero {
+  position: relative; min-height: 100vh;
+  display: flex; flex-direction: column; justify-content: center;
+  padding-bottom: 80px; padding-top: 120px; overflow: hidden;
+}
+.hero-bg {
+  position: absolute; inset: 0; overflow: hidden;
+}
+.hero-bg img {
+  position: absolute; inset: 0; width: 100%; height: 100%;
+  object-fit: cover; object-position: center 25%;
+  filter: brightness(0.8) saturate(0.95);
+}
+.hero-bg::after {
+  content: '';
+  position: absolute; inset: 0;
+  background:
+    linear-gradient(180deg, rgba(8,8,8,0.0) 0%, rgba(8,8,8,0.1) 50%, #080808 100%);
+}
+/* Simulated light beams */
+.hero-beams {
+  position: absolute; inset: 0; pointer-events: none; overflow: hidden;
+}
+.beam {
+  position: absolute; bottom: 0;
+  width: 1px; height: 65%;
+  background: linear-gradient(0deg, transparent, rgba(41,171,226,0.08), transparent);
+  transform-origin: bottom center;
+  animation: beam-sway 8s ease-in-out infinite;
+}
+.beam:nth-child(1) { left: 25%; transform: rotate(-12deg); animation-delay: 0s; }
+.beam:nth-child(2) { left: 40%; transform: rotate(-6deg); animation-delay: 1.5s; width: 2px; background: linear-gradient(0deg, transparent, rgba(41,171,226,0.05), transparent); }
+.beam:nth-child(3) { left: 55%; transform: rotate(4deg); animation-delay: 0.8s; }
+.beam:nth-child(4) { left: 68%; transform: rotate(10deg); animation-delay: 2.2s; }
+.beam:nth-child(5) { left: 78%; transform: rotate(16deg); animation-delay: 0.4s; width: 2px; background: linear-gradient(0deg, transparent, rgba(41,171,226,0.04), transparent); }
+@keyframes beam-sway {
+  0%, 100% { opacity: 0.6; }
+  50% { opacity: 1; }
+}
+
+.hero-counter {
+  font-family: var(--font-mono); font-size: 11px; color: var(--electric);
+  letter-spacing: 0.15em; margin-bottom: 32px;
+  opacity: 0; animation: fade-up 0.8s 0.3s ease forwards;
+}
+.hero-headline {
+  font-size: clamp(72px, 10vw, 160px); line-height: 0.88;
+  margin-bottom: 48px; position: relative;
+  opacity: 0; animation: fade-up 1s 0.5s ease forwards;
+}
+.hero-headline .line-2 { color: var(--chrome); opacity: 0.45; display: block; }
+.hero-headline .accent { color: var(--electric); }
+
+.hero-bottom {
+  display: flex; align-items: flex-end; justify-content: space-between;
+  opacity: 0; animation: fade-up 0.8s 0.9s ease forwards;
+}
+.hero-tagline {
+  font-size: 15px; color: var(--chrome); max-width: 360px; line-height: 1.7;
+  border-left: 1px solid var(--electric); padding-left: 20px;
+}
+.hero-scroll {
+  display: flex; flex-direction: column; align-items: center; gap: 12px;
+  font-family: var(--font-mono); font-size: 9px; letter-spacing: 0.2em;
+  color: var(--silver); text-transform: uppercase;
+}
+.hero-scroll-line {
+  width: 1px; height: 48px;
+  background: linear-gradient(180deg, var(--electric) 0%, transparent 100%);
+  animation: scroll-pulse 2s ease-in-out infinite;
+}
+@keyframes scroll-pulse { 0%,100%{opacity:0.4} 50%{opacity:1} }
+
+@keyframes fade-up {
+  from { opacity: 0; transform: translateY(24px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ── MARQUEE ──────────────────────────────────────────────────────────────── */
+.marquee-section {
+  border-top: 1px solid var(--steel); border-bottom: 1px solid var(--steel);
+  padding: 20px 0; overflow: hidden; background: var(--obsidian);
+}
+.marquee-track {
+  display: flex; gap: 64px; white-space: nowrap;
+  animation: marquee 30s linear infinite;
+}
+.marquee-track:hover { animation-play-state: paused; }
+.marquee-item {
+  display: flex; align-items: center; gap: 20px;
+  font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.15em;
+  color: var(--silver); text-transform: uppercase;
+  flex-shrink: 0;
+}
+.marquee-item span { color: var(--electric); }
+@keyframes marquee { 0%{transform:translateX(0)} 100%{transform:translateX(-50%)} }
+
+/* ── SECTION BASE ─────────────────────────────────────────────────────────── */
+section { position: relative; }
+.section-label {
+  font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.18em;
+  color: var(--electric); text-transform: uppercase; display: flex;
+  align-items: center; gap: 12px; margin-bottom: 48px;
+}
+.section-label::before {
+  content: ''; width: 24px; height: 1px; background: var(--electric);
+}
+
+/* ── ABOUT ────────────────────────────────────────────────────────────────── */
+.about { padding: 80px 0; background: #0C0C13; }
+.about-grid {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 80px; align-items: start;
+}
+.about-headline {
+  font-size: clamp(48px, 5.5vw, 80px);
+  margin-bottom: 0;
+}
+.about-headline em { font-style: normal; color: var(--chrome); opacity: 0.45; }
+.about-subtitle {
+  font-size: 16px; color: var(--silver); line-height: 1.7;
+  margin-top: 28px; padding-top: 28px;
+  border-top: 1px solid var(--steel);
+  max-width: 340px;
+}
+.about-body { padding-top: 20px; }
+.about-body p { font-size: 16px; color: var(--chrome); line-height: 1.9; margin-bottom: 24px; }
+.about-body p strong { color: var(--ivory); font-weight: 500; }
+.about-stats {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 1px;
+  background: var(--steel); margin-top: 48px; border: 1px solid var(--steel);
+}
+.stat {
+  background: #080808; padding: 28px 24px;
+}
+.stat-number {
+  font-family: var(--font-display); font-size: 52px; color: var(--ivory);
+  line-height: 1; margin-bottom: 6px;
+}
+.stat-number span { color: var(--electric); }
+.stat-label { font-size: 11px; color: var(--chrome); letter-spacing: 0.1em; text-transform: uppercase; }
+
+/* ── SERVICES ─────────────────────────────────────────────────────────────── */
+.services { padding: 0 0 140px; background: #080808; }
+.services-header {
+  display: flex; justify-content: space-between; align-items: flex-end;
+  margin-bottom: 2px;
+}
+.services-headline { font-size: clamp(40px, 5vw, 72px); color: var(--ivory); }
+.services-list { display: flex; flex-direction: column; }
+.service-item {
+  border-top: 1px solid var(--steel);
+  display: grid; grid-template-columns: 80px 1fr 1fr auto;
+  gap: 40px; align-items: center; padding: 32px 0;
+  cursor: pointer; transition: padding-left 0.3s ease;
+  position: relative; overflow: hidden;
+}
+.service-item::before {
+  content: ''; position: absolute; left: 0; top: 0; bottom: 0;
+  width: 0; background: #080808;
+  transition: width 0.4s cubic-bezier(0.16,1,0.3,1);
+  z-index: -1;
+}
+.service-item:hover::before { width: 100%; }
+.service-item:hover { padding-left: 24px; }
+.service-item:last-child { border-bottom: 1px solid var(--steel); }
+.service-num { font-family: var(--font-mono); font-size: 11px; color: var(--silver); letter-spacing: 0.1em; }
+.service-name { font-family: var(--font-display); font-size: 32px; letter-spacing: 0.05em; }
+.service-desc { font-size: 14px; color: var(--chrome); line-height: 1.7; max-width: 400px; }
+.service-arrow {
+  width: 40px; height: 40px; border: 1px solid var(--steel);
+  display: flex; align-items: center; justify-content: center;
+  color: var(--silver); font-size: 18px; transition: all 0.3s;
+  flex-shrink: 0;
+}
+.service-item:hover .service-arrow { border-color: var(--electric); color: var(--electric); transform: rotate(45deg); }
+
+/* ── ARTISTS ──────────────────────────────────────────────────────────────── */
+.artists { padding: 80px 0 0; background: #080808; width: 100%; overflow: hidden; }
+.artists-header { margin-bottom: 64px; }
+.artists-headline { font-size: clamp(40px, 5vw, 72px); margin-bottom: 16px; }
+.artists-sub { font-size: 15px; color: var(--chrome); }
+.artists-grid {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  gap: 2px;
+  width: 100%;
+}
+.artists-grid > * {
+  flex: 0 0 calc(20% - 2px);
+  width: calc(20% - 2px);
+  height: 420px;
+  min-width: 0;
+}
+
+.artist-card {
+  position: relative; overflow: hidden;
+  background: #080808; cursor: pointer; display: block;
+  height: 420px;
+}
+.artist-card-bg {
+  position: absolute; inset: 0; overflow: hidden;
+  transition: transform 0.6s cubic-bezier(0.16,1,0.3,1);
+}
+.artist-card:hover .artist-card-bg { transform: scale(1.06); }
+
+.artist-card-overlay {
+  position: absolute; inset: 0;
+  background: linear-gradient(0deg, rgba(8,8,8,0.9) 0%, rgba(8,8,8,0.2) 50%, transparent 100%);
+  transition: background 0.4s;
+}
+.artist-card:hover .artist-card-overlay {
+  background: linear-gradient(0deg, rgba(8,8,8,0.95) 0%, rgba(8,8,8,0.4) 60%, rgba(41,171,226,0.05) 100%);
+}
+.artist-card-content {
+  position: absolute; bottom: 0; left: 0; right: 0; padding: 24px 20px;
+}
+.artist-card-num {
+  font-family: var(--font-mono); font-size: 10px; color: var(--iron);
+  letter-spacing: 0.15em; margin-bottom: 8px;
+}
+.artist-card-name {
+  font-family: var(--font-display); font-size: 20px; letter-spacing: 0.05em;
+  color: var(--ivory); margin-bottom: 4px;
+}
+.artist-card-insta {
+  display: inline-block; margin-top: 8px;
+  font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.1em;
+  color: var(--electric); text-decoration: none;
+  border: 1px solid rgba(41,171,226,0.3); padding: 4px 10px;
+  transition: background 0.2s, border-color 0.2s;
+}
+.artist-card-insta:hover { background: rgba(41,171,226,0.15); border-color: var(--electric); }
+.artist-card-role { font-size: 12px; color: var(--chrome); letter-spacing: 0.08em; }
+.artist-card-tag {
+  position: absolute; top: 16px; right: 16px;
+  font-family: var(--font-mono); font-size: 9px; letter-spacing: 0.1em;
+  color: var(--electric); background: rgba(8,8,8,0.8); padding: 4px 8px;
+  border: 1px solid var(--steel); opacity: 0;
+  transform: translateY(-8px); transition: opacity 0.3s, transform 0.3s;
+}
+.artist-card:hover .artist-card-tag { opacity: 1; transform: translateY(0); }
+.artist-card-tag.management { color: var(--chrome); border-color: var(--iron); }
+.artists-cta { text-align: center; margin-top: 48px; }
+
+/* ── PLATFORM SECTION ─────────────────────────────────────────────────────── */
+.platform { position: relative; padding: 0; background: #111318; overflow: hidden; }
+.platform-photo-wrap {
+  position: absolute; inset: 0; z-index: 0;
+}
+.platform-photo-overlay {
+  position: absolute; inset: 0;
+  background:
+    linear-gradient(90deg, rgba(8,8,8,0.92) 0%, rgba(8,8,8,0.75) 50%, rgba(8,8,8,0.5) 100%),
+    linear-gradient(180deg, rgba(8,8,8,0.3) 0%, rgba(8,8,8,0.3) 100%);
+}
+.platform-photo-content { position: relative; z-index: 1; padding: 80px 0; }
+.platform-inner {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 120px; align-items: center;
+}
+.platform-headline { font-size: clamp(48px, 5.5vw, 80px); margin-bottom: 32px; }
+.platform-headline em { font-style: normal; display: block; color: var(--chrome); opacity: 0.45; }
+.platform-body { font-size: 16px; color: var(--chrome); line-height: 1.9; margin-bottom: 40px; }
+.platform-features { display: flex; flex-direction: column; gap: 0; }
+.platform-feature {
+  padding: 20px 0; border-bottom: 1px solid var(--steel);
+  display: flex; gap: 20px; align-items: flex-start;
+}
+.platform-feature:first-child { border-top: 1px solid var(--steel); }
+.platform-feature-num {
+  font-family: var(--font-mono); font-size: 10px; color: var(--electric);
+  width: 32px; flex-shrink: 0; padding-top: 2px;
+}
+.platform-feature-text h4 {
+  font-family: var(--font-body); font-size: 15px; font-weight: 600;
+  color: var(--ivory); margin-bottom: 6px; letter-spacing: 0;
+}
+.platform-feature-text p { font-size: 14px; color: var(--chrome); line-height: 1.7; }
+.platform-quote {
+  text-align: center; padding: 48px;
+  border: 1px solid var(--steel); background: rgba(8,8,8,0.25);
+  backdrop-filter: blur(8px);
+}
+.platform-quote-mark {
+  font-family: var(--font-display); font-size: 80px; color: var(--electric);
+  line-height: 0.8; margin-bottom: 16px;
+}
+.platform-quote p {
+  font-family: var(--font-display); font-size: 32px; color: var(--ivory);
+  line-height: 1.1; margin-bottom: 20px;
+}
+.platform-quote span {
+  font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.15em;
+  color: var(--silver); text-transform: uppercase;
+}
+
+/* ── SHOWCASES ────────────────────────────────────────────────────────────── */
+.showcases { padding: 80px 0; background: #0A0A10; }
+.showcases-header {
+  display: grid; grid-template-columns: 1fr 1fr;
+  gap: 80px; margin-bottom: 64px; align-items: end;
+}
+.showcases-headline { font-size: clamp(40px, 5vw, 72px); }
+.showcases-body { font-size: 15px; color: var(--chrome); line-height: 1.9; }
+.showcases-grid {
+  display: grid; grid-template-columns: 2fr 1fr 1fr; grid-template-rows: auto auto;
+  gap: 2px;
+}
+.showcase-card {
+  position: relative; overflow: hidden; cursor: pointer;
+  background: #080808;
+}
+.showcase-card:nth-child(1) { grid-row: span 2; min-height: 480px; }
+.showcase-card:nth-child(n+2) { min-height: 240px; }
+.showcase-card-bg {
+  position: absolute; inset: 0; overflow: hidden;
+  transition: transform 0.7s cubic-bezier(0.16,1,0.3,1);
+}
+.showcase-card:hover .showcase-card-bg { transform: scale(1.04); }
+.showcase-overlay {
+  position: absolute; inset: 0;
+  background: linear-gradient(0deg, rgba(8,8,8,0.9) 0%, rgba(8,8,8,0.1) 60%);
+}
+.showcase-content { position: absolute; bottom: 0; left: 0; right: 0; padding: 28px 24px; }
+.showcase-location {
+  font-family: var(--font-mono); font-size: 9px; color: var(--electric);
+  letter-spacing: 0.15em; text-transform: uppercase; margin-bottom: 8px;
+}
+.showcase-name {
+  font-family: var(--font-display); font-size: 28px; letter-spacing: 0.05em; margin-bottom: 6px;
+}
+.showcase-card:nth-child(1) .showcase-name { font-size: 48px; }
+.showcase-meta { font-size: 12px; color: var(--chrome); }
+.showcase-num {
+  position: absolute; top: 16px; right: 20px;
+  font-family: var(--font-display); font-size: 56px; color: rgba(238,240,244,0.06);
+  line-height: 1;
+}
+.showcase-card:nth-child(1) .showcase-num { font-size: 120px; top: 24px; }
+
+/* ── BRANDS SECTION ───────────────────────────────────────────────────────── */
+.brands { padding: 100px 0; background: #0D0D14; }
+.brands-headline { font-size: clamp(32px, 4vw, 56px); margin-bottom: 16px; color: var(--ivory); }
+.brands-sub { font-size: 15px; color: var(--chrome); margin-bottom: 56px; }
+.brands-logos {
+  display: grid; grid-template-columns: repeat(6, 1fr); gap: 1px;
+  background: var(--steel);
+  border: 1px solid var(--steel);
+}
+.brand-logo-cell {
+  background: #080808; padding: 32px 24px;
+  display: flex; align-items: center; justify-content: center;
+  font-family: var(--font-display); font-size: 18px; letter-spacing: 0.1em;
+  color: var(--silver); transition: color 0.3s, background 0.3s;
+  cursor: pointer;
+}
+.brand-logo-cell:hover { background: var(--ink); color: var(--ivory); }
+
+/* ── CTA BANNER ───────────────────────────────────────────────────────────── */
+.cta-banner {
+  padding: 80px 0; background: #111318;
+  text-align: center; position: relative; overflow: hidden;
+}
+.cta-banner::before {
+  content: ''; position: absolute; inset: 0;
+  background: radial-gradient(ellipse 60% 80% at 50% 50%, rgba(41,171,226,0.08) 0%, transparent 70%);
+}
+.cta-headline { font-size: clamp(48px, 7vw, 110px); margin-bottom: 24px; position: relative; }
+.cta-headline em { font-style: normal; color: var(--electric); }
+.cta-sub { font-size: 16px; color: var(--chrome); margin-bottom: 48px; max-width: 500px; margin-left: auto; margin-right: auto; }
+.btn-primary {
+  display: inline-flex; align-items: center; gap: 12px;
+  font-size: 12px; font-weight: 500; letter-spacing: 0.14em; text-transform: uppercase;
+  text-decoration: none; color: var(--void); background: var(--ivory);
+  padding: 16px 40px; transition: background 0.2s, color 0.2s;
+}
+.btn-primary:hover { background: var(--electric); }
+.btn-secondary {
+  display: inline-flex; align-items: center; gap: 12px; margin-left: 16px;
+  font-size: 12px; font-weight: 500; letter-spacing: 0.14em; text-transform: uppercase;
+  text-decoration: none; color: var(--ivory); padding: 16px 40px;
+  border: 1px solid var(--steel); transition: border-color 0.2s;
+}
+.btn-secondary:hover { border-color: var(--electric); color: var(--electric); }
+
+/* ── FOOTER ───────────────────────────────────────────────────────────────── */
+footer {
+  background: #080808; border-top: 1px solid var(--steel);
+  padding: 64px 0 40px;
+}
+.footer-top {
+  display: grid; grid-template-columns: 1.5fr 1fr 1fr 1fr;
+  gap: 60px; padding-bottom: 48px; border-bottom: 1px solid var(--steel);
+  margin-bottom: 32px;
+}
+.footer-brand { }
+.footer-logo { display: flex; align-items: center; gap: 12px; margin-bottom: 20px; }
+.footer-logo img { width: 40px; height: 40px; }
+.footer-logo-name { font-family: var(--font-display); font-size: 20px; letter-spacing: 0.1em; }
+.footer-tagline { font-size: 14px; color: var(--chrome); line-height: 1.7; max-width: 280px; }
+.footer-col h5 {
+  font-family: var(--font-mono); font-size: 9px; letter-spacing: 0.18em;
+  color: var(--electric); text-transform: uppercase; margin-bottom: 20px;
+}
+.footer-col ul { list-style: none; display: flex; flex-direction: column; gap: 12px; }
+.footer-col li a {
+  font-size: 14px; color: var(--chrome); text-decoration: none;
+  transition: color 0.2s;
+}
+.footer-col li a:hover { color: var(--ivory); }
+.footer-bottom {
+  display: flex; justify-content: space-between; align-items: center;
+}
+.footer-copy { font-size: 11px; color: var(--silver); }
+.footer-legal {
+  border-top: 1px solid var(--steel);
+  padding: 32px 0; margin-bottom: 24px;
+}
+.footer-legal-grid {
+  display: grid; grid-template-columns: repeat(4, 1fr); gap: 32px;
+}
+.footer-legal-block {
+  display: flex; flex-direction: column; gap: 8px;
+}
+.footer-legal-label {
+  font-family: var(--font-mono); font-size: 9px; letter-spacing: 0.18em;
+  color: var(--electric); text-transform: uppercase;
+}
+.footer-legal-block span {
+  font-size: 13px; color: var(--silver); line-height: 1.7;
+}
+@media (max-width: 1024px) { .footer-legal-grid { grid-template-columns: repeat(2,1fr); } }
+@media (max-width: 640px)  { .footer-legal-grid { grid-template-columns: 1fr; } }
+.footer-socials { display: flex; gap: 24px; }
+.footer-socials a {
+  font-family: var(--font-mono); font-size: 9px; letter-spacing: 0.12em;
+  color: var(--silver); text-decoration: none; text-transform: uppercase;
+  transition: color 0.2s;
+}
+.footer-socials a:hover { color: var(--electric); }
+
+/* ── ARTIST MORE LIST ─────────────────────────────────────────────────────── */
+.artists-more { border-top: 1px solid var(--steel); padding-top: 40px; }
+.artists-more-header { margin-bottom: 32px; }
+.artists-more-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 2px;
+  background: var(--steel);
+  border: 1px solid var(--steel);
+}
+.artist-row {
+  background: #080808;
+  display: flex; align-items: center; gap: 12px;
+  padding: 18px 20px;
+  text-decoration: none;
+  transition: background 0.2s;
+  position: relative;
+  overflow: hidden;
+}
+.artist-row::before {
+  content: ''; position: absolute; left: 0; top: 0; bottom: 0;
+  width: 0; background: #080808;
+  transition: width 0.3s cubic-bezier(0.16,1,0.3,1);
+}
+.artist-row:hover::before { width: 100%; }
+.artist-row:hover { background: #080808; }
+.artist-row-name {
+  font-family: var(--font-display); font-size: 17px; letter-spacing: 0.05em;
+  color: var(--ivory); flex: 1; position: relative; z-index: 1;
+  transition: color 0.2s;
+}
+.artist-row-handle {
+  font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.08em;
+  color: var(--iron); position: relative; z-index: 1;
+  transition: color 0.2s;
+}
+.artist-row:hover .artist-row-handle { color: var(--electric); }
+.artist-row-arrow {
+  font-size: 14px; color: var(--steel); position: relative; z-index: 1;
+  transition: color 0.2s, transform 0.2s;
+}
+.artist-row:hover .artist-row-arrow { color: var(--electric); transform: translate(2px, -2px); }
+
+@media (max-width: 1024px) { .artists-more-grid { grid-template-columns: repeat(2, 1fr); } }
+@media (max-width: 640px)  { .artists-more-grid { grid-template-columns: 1fr; } }
+
+/* ── TEAM ──────────────────────────────────────────────────────────────────── */
+.team-grid { display: flex; flex-direction: column; }
+.team-row {
+  display: grid; grid-template-columns: 1.4fr 1.4fr 1.6fr 120px;
+  align-items: center; gap: 24px; padding: 20px;
+  border-bottom: 1px solid var(--steel); background: #080808;
+  transition: background 0.2s;
+}
+.team-row:hover { background: #080808; }
+.team-name { font-family: var(--font-display); font-size: 20px; letter-spacing: 0.04em; color: var(--ivory); }
+.team-role { font-size: 14px; color: var(--chrome); }
+.team-email { font-size: 13px; color: var(--silver); text-decoration: none; font-family: var(--font-mono); transition: color 0.2s; }
+.team-email:hover { color: var(--electric); }
+.team-li { font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.1em; color: var(--electric); text-decoration: none; text-align: right; transition: color 0.2s; }
+.team-li:hover { color: var(--ivory); }
+@media (max-width: 768px) { .team-row { grid-template-columns: 1fr 1fr; } .team-email,.team-li { display:none; } }
+
+/* ── FADE-IN ON SCROLL ────────────────────────────────────────────────────── */
+.reveal {
+  opacity: 1; transform: none;
+  transition: opacity 0.8s cubic-bezier(0.16,1,0.3,1), transform 0.8s cubic-bezier(0.16,1,0.3,1);
+}
+.reveal.animate-hidden { opacity: 0; transform: translateY(32px); }
+.reveal.visible { opacity: 1; transform: none; }
+.reveal-delay-1 { transition-delay: 0.1s; }
+.reveal-delay-2 { transition-delay: 0.2s; }
+.reveal-delay-3 { transition-delay: 0.3s; }
+
+/* ── MOBILE ───────────────────────────────────────────────────────────────── */
+@media (max-width: 1024px) {
+  nav { padding: 0 40px; }
+  .nav-links { gap: 24px; }
+  .about-grid, .platform-inner, .showcases-header { grid-template-columns: 1fr; gap: 48px; }
+    .showcases-grid { grid-template-columns: 1fr 1fr; }
+  .showcase-card:nth-child(1) { grid-column: span 2; }
+  .brands-logos { grid-template-columns: repeat(3, 1fr); }
+  .footer-top { grid-template-columns: 1fr 1fr; }
+  .service-item { grid-template-columns: 48px 1fr auto; }
+  .service-desc { display: none; }
+}
+@media (max-width: 640px) {
+  nav { padding: 0 24px; }
+  .nav-links { display: none; }
+  .hero { padding-bottom: 60px; }
+    .showcases-grid { grid-template-columns: 1fr; }
+  .showcase-card:nth-child(1) { grid-column: span 1; }
+  .brands-logos { grid-template-columns: repeat(2, 1fr); }
+  .footer-top { grid-template-columns: 1fr; }
+  .cta-banner { padding: 80px 0; }
+  .btn-secondary { display: none; }
+}
+
+
+
+@media (max-width: 768px) {
+  nav { padding: 0 20px !important; }
+  .nav-links, .nav-cta { display: none !important; }
+  .container { padding: 0 24px !important; }
+  #contact > div > div { grid-template-columns: 1fr !important; gap: 48px !important; }
+  #contact > div { padding: 0 24px !important; }
+  #team .team-row { grid-template-columns: 1fr 1fr !important; }
+  .team-email, .team-li { display: none !important; }
+  .showcases-header { grid-template-columns: 1fr !important; }
+  .showcases-grid { grid-template-columns: 1fr !important; }
+  .about-grid { grid-template-columns: 1fr !important; }
+  .footer-grid { grid-template-columns: 1fr 1fr !important; }
+  .footer-legal-grid { grid-template-columns: 1fr 1fr !important; }
+  .artists-grid > * { flex: 0 0 calc(50% - 2px) !important; width: calc(50% - 2px) !important; }
+  #platform > div > div { grid-template-columns: 1fr !important; }
+  nav::after { content: ''; }
+}
+@media (max-width: 480px) {
+  .artists-grid > * { flex: 0 0 calc(100% - 2px) !important; width: calc(100% - 2px) !important; }
+  .footer-grid { grid-template-columns: 1fr !important; }
+  #contact > div { padding: 0 16px !important; }
+  #contact form > div:first-child { grid-template-columns: 1fr !important; }
+}
+
+
+
+@keyframes mapPulse {
+  0%   { r: 8; opacity: 0.3; }
+  50%  { r: 14; opacity: 0.08; }
+  100% { r: 8; opacity: 0.3; }
+}
+.map-dot circle.pulse {
+  animation: mapPulse 2.5s ease-in-out infinite;
+}
+.map-dot:nth-child(2n) circle.pulse { animation-delay: 0.4s; }
+.map-dot:nth-child(3n) circle.pulse { animation-delay: 0.8s; }
+.map-dot:nth-child(4n) circle.pulse { animation-delay: 1.2s; }
+.map-dot:nth-child(5n) circle.pulse { animation-delay: 1.6s; }
+
+
+
+#offer-overlay{display:none;position:fixed;inset:0;z-index:9999;background:#080808;overflow-y:auto;}
+#offer-overlay.active{display:block;}
+.offer-close-bar{position:sticky;top:0;z-index:10;background:rgba(8,8,8,0.97);border-bottom:1px solid #1C1E24;padding:0 60px;height:72px;display:flex;align-items:center;justify-content:space-between;backdrop-filter:blur(12px);}
+.offer-close-bar::before{content:"";position:absolute;top:0;left:0;right:0;height:2px;background:#29ABE2;}
+.offer-close-logo{font-family:"Bebas Neue",sans-serif;font-size:22px;letter-spacing:0.1em;color:#fff;}
+.offer-close-btn{font-family:"DM Mono",monospace;font-size:11px;letter-spacing:0.12em;text-transform:uppercase;color:#8A8F9E;background:none;border:none;cursor:pointer;transition:color 0.2s;}
+.offer-close-btn:hover{color:#fff;}
+
+/* ═══════════════════════════════════════════════
+   MOBILE — COMPREHENSIVE OVERRIDE
+═══════════════════════════════════════════════ */
+@media (max-width: 768px) {
+  html, body { overflow-x: hidden !important; }
+  body * { box-sizing: border-box !important; }
+
+  /* NAV */
+  .nav-links { display: none !important; }
+  .nav-cta { display: none !important; }
+  .hamburger { display: flex !important; }
+  nav { padding: 0 20px !important; }
+
+  /* HERO */
+  .hero-headline { font-size: clamp(44px, 12vw, 72px) !important; line-height: 0.9 !important; }
+  .hero-bottom { flex-direction: column !important; gap: 20px !important; align-items: flex-start !important; }
+  .hero-tagline { max-width: 100% !important; border-left: none !important; padding-left: 0 !important; border-top: 1px solid var(--electric) !important; padding-top: 16px !important; }
+  .hero-scroll { display: none !important; }
+  .hero { padding-bottom: 60px !important; }
+  .container { padding: 0 20px !important; }
+
+  /* ARTIST CARDS */
+  #artists { overflow: hidden !important; }
+  #artists > div:nth-child(2) {
+    display: grid !important;
+    grid-template-columns: 1fr 1fr !important;
+    gap: 3px !important;
+    padding: 0 !important;
+    width: 100% !important;
+    overflow: hidden !important;
+  }
+  #artists > div:nth-child(2) > a {
+    flex: unset !important;
+    width: 100% !important;
+    min-width: 0 !important;
+    height: 200px !important;
+  }
+  #artists > div:nth-child(2) > a img { height: 200px !important; }
+  #artists > div:first-child { padding: 36px 20px 20px !important; }
+  #artists > div:last-child { padding: 0 20px 48px !important; }
+
+  /* GRIDS → SINGLE COLUMN */
+  .about-grid { grid-template-columns: 1fr !important; gap: 32px !important; }
+  .about-subtitle { max-width: 100% !important; }
+  .about-stats { grid-template-columns: 1fr 1fr !important; }
+  .platform-inner { grid-template-columns: 1fr !important; gap: 40px !important; }
+  #platform > div > div { grid-template-columns: 1fr !important; gap: 40px !important; }
+  .showcases-header { grid-template-columns: 1fr !important; gap: 24px !important; margin-bottom: 32px !important; }
+  .showcases-grid { grid-template-columns: 1fr !important; }
+  .showcase-card:nth-child(1) { grid-column: span 1 !important; min-height: 260px !important; }
+  .showcase-card:nth-child(n+2) { min-height: 180px !important; }
+
+  /* SERVICES */
+  .service-item { grid-template-columns: 40px 1fr auto !important; gap: 12px !important; }
+  .service-desc { display: none !important; }
+  .services-headline { font-size: 40px !important; }
+
+  /* BRANDS */
+  .brands-logos { grid-template-columns: repeat(2, 1fr) !important; }
+  .brand-logo-cell { padding: 20px 12px !important; font-size: 12px !important; }
+
+  /* ALL INLINE GRID SECTIONS */
+  div[style*="grid-template-columns:1fr 1fr;gap:100px"],
+  div[style*="grid-template-columns:1fr 1fr;gap:80px"],
+  div[style*="grid-template-columns: 1fr 1fr"] {
+    grid-template-columns: 1fr !important;
+    gap: 40px !important;
+  }
+  div[style*="padding:0 80px"],
+  div[style*="padding: 0 80px"] {
+    padding: 0 20px !important;
+  }
+  div[style*="padding:80px 40px"],
+  div[style*="padding:120px 80px"],
+  div[style*="padding:56px 80px"],
+  div[style*="padding:60px 60px"] {
+    padding: 40px 20px !important;
+  }
+
+  /* CONTACT */
+  #contact { padding-top: 60px !important; padding-bottom: 60px !important; }
+  #contact > div { padding: 0 20px !important; }
+  #contact > div > div { grid-template-columns: 1fr !important; gap: 40px !important; }
+  #contact form > div:first-child { grid-template-columns: 1fr !important; }
+
+  /* TEAM */
+  .team-row { grid-template-columns: 1fr 1fr !important; padding: 14px !important; }
+  .team-email, .team-li { display: none !important; }
+  .team-name { font-size: 16px !important; }
+
+  /* FOOTER */
+  footer .container { padding: 0 20px !important; }
+  .footer-top { grid-template-columns: 1fr !important; gap: 28px !important; }
+  .footer-legal-grid { grid-template-columns: 1fr 1fr !important; }
+  .footer-bottom { flex-direction: column !important; gap: 12px !important; }
+  .footer-top[style*="grid-template-columns:1.5fr 1fr 1fr 1fr 1fr"] {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .hero-headline { font-size: clamp(38px, 11vw, 56px) !important; }
+  .stat-number { font-size: 36px !important; }
+  .footer-legal-grid { grid-template-columns: 1fr !important; }
+}
+
+</style>
+
+</head>
+<body>
+<!-- CURSOR -->
+<div class="cursor">
+</div>
+<!-- 
+  ╔══════════════════════════════════════════════════════╗
+  ║  PHOTO REPLACEMENT GUIDE                             ║
+  ║                                                      ║
+  ║  Hero:      Replace Unsplash URL in .hero-bg img     ║
+  ║  Artists:   4x artist-card-bg img src               ║
+  ║  Showcases: 5x showcase-card-bg img src             ║
+  ║  Platform:  1x platform-visual img src              ║
+  ║                                                      ║
+  ║  Recommended: 1920px hero, 600px artists/showcases   ║
+  ╚══════════════════════════════════════════════════════╝
+-->
+<!-- NAVIGATION -->
+<!-- NAV -->
+<nav style="position:fixed;top:0;left:0;right:0;z-index:1000;height:72px;display:flex;align-items:center;justify-content:space-between;padding:0 32px;background:rgba(8,8,8,0.97);border-bottom:1px solid #2A2D36;backdrop-filter:blur(16px);">
+  <!-- Logo -->
+  <a href="/" style="display:flex;align-items:center;text-decoration:none;z-index:1001;">
+    <img src="assets/images/image_01.png" alt="Deepbloe" style="height:40px;width:auto;"/>
+  </a>
+
+  <!-- Desktop links -->
+  <ul id="desktopNav" style="display:flex;gap:36px;list-style:none;margin:0;padding:0;">
+    <li><a href="#about" style="font-family:'DM Sans',sans-serif;font-size:11px;font-weight:500;letter-spacing:0.12em;text-transform:uppercase;color:#fff;text-decoration:none;">About</a></li>
+    <li><a href="#services" style="font-family:'DM Sans',sans-serif;font-size:11px;font-weight:500;letter-spacing:0.12em;text-transform:uppercase;color:#fff;text-decoration:none;">Services</a></li>
+    <li><a href="artists.html" style="font-family:'DM Sans',sans-serif;font-size:11px;font-weight:500;letter-spacing:0.12em;text-transform:uppercase;color:#fff;text-decoration:none;">Artists</a></li>
+    <li><a href="#showcases" style="font-family:'DM Sans',sans-serif;font-size:11px;font-weight:500;letter-spacing:0.12em;text-transform:uppercase;color:#fff;text-decoration:none;">Showcases</a></li>
+    <li><a href="team.html" style="font-family:'DM Sans',sans-serif;font-size:11px;font-weight:500;letter-spacing:0.12em;text-transform:uppercase;color:#fff;text-decoration:none;">Team</a></li>
+    <li><a href="/jobs.html" style="font-family:'DM Sans',sans-serif;font-size:11px;font-weight:500;letter-spacing:0.12em;text-transform:uppercase;color:#fff;text-decoration:none;">Jobs</a></li>
+    <li><a href="/artist-portal.html" style="font-family:'DM Sans',sans-serif;font-size:11px;font-weight:500;letter-spacing:0.12em;text-transform:uppercase;color:#29ABE2;text-decoration:none;border:1px solid rgba(41,171,226,0.3);padding:6px 14px;">Artist Portal</a></li>
+  </ul>
+
+  <!-- Desktop CTA -->
+  <a id="desktopCta" href="#contact" style="font-family:'DM Sans',sans-serif;font-size:11px;font-weight:500;letter-spacing:0.12em;text-transform:uppercase;color:#fff;text-decoration:none;padding:10px 24px;border:1px solid rgba(255,255,255,0.25);">Get in Touch</a>
+
+  <!-- Hamburger button -->
+  <button id="hamburgerBtn" onclick="toggleMobileMenu()" aria-label="Menu" style="display:none;flex-direction:column;gap:5px;background:none;border:none;cursor:pointer;padding:8px;z-index:1001;margin-left:auto;">
+    <span id="hLine1" style="display:block;width:24px;height:2px;background:#fff;transition:all 0.3s;"></span>
+    <span id="hLine2" style="display:block;width:24px;height:2px;background:#fff;transition:all 0.3s;"></span>
+    <span id="hLine3" style="display:block;width:24px;height:2px;background:#fff;transition:all 0.3s;"></span>
+  </button>
+</nav>
+
+<!-- MOBILE MENU OVERLAY -->
+<div id="mobileMenuOverlay" style="display:none;position:fixed;top:72px;left:0;right:0;bottom:0;background:rgba(8,8,8,0.99);z-index:999;flex-direction:column;padding:32px 24px;overflow-y:auto;">
+  <a href="#about" onclick="closeMobileMenu()" style="font-family:'Bebas Neue',sans-serif;font-size:40px;letter-spacing:0.05em;color:#fff;text-decoration:none;padding:16px 0;border-bottom:1px solid #1C1E24;display:block;">About</a>
+  <a href="#services" onclick="closeMobileMenu()" style="font-family:'Bebas Neue',sans-serif;font-size:40px;letter-spacing:0.05em;color:#fff;text-decoration:none;padding:16px 0;border-bottom:1px solid #1C1E24;display:block;">Services</a>
+  <a href="artists.html" onclick="closeMobileMenu()" style="font-family:'Bebas Neue',sans-serif;font-size:40px;letter-spacing:0.05em;color:#fff;text-decoration:none;padding:16px 0;border-bottom:1px solid #1C1E24;display:block;">Artists</a>
+  <a href="#showcases" onclick="closeMobileMenu()" style="font-family:'Bebas Neue',sans-serif;font-size:40px;letter-spacing:0.05em;color:#fff;text-decoration:none;padding:16px 0;border-bottom:1px solid #1C1E24;display:block;">Showcases</a>
+  <a href="team.html" onclick="closeMobileMenu()" style="font-family:'Bebas Neue',sans-serif;font-size:40px;letter-spacing:0.05em;color:#fff;text-decoration:none;padding:16px 0;border-bottom:1px solid #1C1E24;display:block;">Team</a>
+<a href="/jobs.html" onclick="closeMobileMenu()" style="font-family:'Bebas Neue',sans-serif;font-size:40px;color:#fff;text-decoration:none;padding:16px 0;border-bottom:1px solid #1C1E24;display:block;">Jobs</a>
+  <a href="/artist-portal.html" onclick="closeMobileMenu()" style="font-family:'Bebas Neue',sans-serif;font-size:40px;color:#29ABE2;text-decoration:none;padding:16px 0;border-bottom:1px solid #1C1E24;display:block;">Artist Portal</a>
+  <a href="#contact" onclick="closeMobileMenu()" style="display:block;text-align:center;margin-top:28px;background:#fff;color:#080808;font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:0.1em;padding:18px 32px;text-decoration:none;">Get in Touch</a>
+</div>
+
+<!-- HERO -->
+<section class="hero">
+<div class="hero-bg">
+<img alt="Hero" src="hero.jpg" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center 25%;"/>
+</div>
+<!-- Shader canvas — blended over photo -->
+<canvas id="deepbloe-hero-canvas" style="position:absolute;inset:0;width:100%;height:100%;display:block;mix-blend-mode:screen;opacity:0.52;touch-action:none;z-index:1;pointer-events:none;"></canvas>
+<div class="hero-beams">
+<div class="beam"></div><div class="beam"></div><div class="beam"></div>
+<div class="beam"></div><div class="beam"></div>
+</div>
+<div class="container" style="position:relative;z-index:2;">
+<div class="hero-counter mono">EST. 2018, GLOBAL ELECTRONIC MUSIC PLATFORM</div>
+<h1 class="hero-headline">
       GLOBAL<br/>
       ELECTRO<span class="accent">NIC</span><br/>
-      <span style="color:#FFFFFF;opacity:1;display:block;">PLATFORM</span>
-    </h1>
-    <div class="hero-bottom">
-      <p class="hero-tagline">
+<span style="color:#FFFFFF;display:block;">PLATFORM</span>
+</h1>
+<div class="hero-bottom">
+<p class="hero-tagline">
         One platform. Built for the artists, brands and partners shaping electronic music worldwide.
       </p>
-      <div class="hero-scroll">
-        <div class="hero-scroll-line"></div>
-        <span>Scroll</span>
-      </div>
-    </div>
-  </div>
-
+<div class="hero-scroll">
+<div class="hero-scroll-line"></div>
+<span>Scroll</span>
+</div>
+</div>
+</div>
 </section>
-
 <script data-cfasync="false">
 (function(){
-  var canvas = document.getElementById('deepbloe-hero-canvas');
-  if (!canvas) return;
-
-  var gl = canvas.getContext('webgl2');
-  if (!gl) return;
-
-  var vertSrc = [
-    '#version 300 es',
-    'precision highp float;',
-    'in vec4 position;',
-    'void main(){gl_Position=position;}'
-  ].join('\n');
-
-  var fragSrc = [
-    '#version 300 es',
-    'precision highp float;',
-    'out vec4 O;',
-    'uniform vec2 resolution;',
-    'uniform float time;',
-    'uniform vec2 touch;',
-    '#define FC gl_FragCoord.xy',
-    '#define T time',
-    '#define R resolution',
-    '#define MN min(R.x,R.y)',
-
+  var canvas=document.getElementById('deepbloe-hero-canvas');
+  if(!canvas)return;
+  var gl=canvas.getContext('webgl2');
+  if(!gl)return;
+  var vSrc='#version 300 es\nprecision highp float;\nin vec4 position;\nvoid main(){gl_Position=position;}';
+  var fSrc=[
+    '#version 300 es','precision highp float;','out vec4 O;',
+    'uniform vec2 resolution;','uniform float time;',
+    '#define FC gl_FragCoord.xy','#define T time','#define R resolution','#define MN min(R.x,R.y)',
     'float rnd(vec2 p){p=fract(p*vec2(12.9898,78.233));p+=dot(p,p+34.56);return fract(p.x*p.y);}',
     'float noise(in vec2 p){vec2 i=floor(p),f=fract(p),u=f*f*(3.-2.*f);float a=rnd(i),b=rnd(i+vec2(1,0)),c=rnd(i+vec2(0,1)),d=rnd(i+1.);return mix(mix(a,b,u.x),mix(c,d,u.x),u.y);}',
     'float fbm(vec2 p){float t=.0,a=1.;mat2 m=mat2(1.,-.5,.2,1.2);for(int i=0;i<5;i++){t+=a*noise(p);p*=2.*m;a*=.5;}return t;}',
     'float clouds(vec2 p){float d=1.,t=.0;for(float i=.0;i<3.;i++){float a=d*fbm(i*10.+p.x*.2+.2*(1.+i)*p.y+d+i*i+p);t=mix(t,d,a);d=a;p*=2./(i+1.);}return t;}',
-
     'void main(void){',
-    '  vec2 uv=(FC-.5*R)/MN, st=uv*vec2(2.,1.);',
-
-    '  vec3 electric = vec3(0.161,0.671,0.886);',
-    '  vec3 midnight = vec3(0.039,0.055,0.102);',
-    '  vec3 cyan     = vec3(0.04,0.82,0.96);',
-    '  vec3 marine   = vec3(0.008,0.220,0.420);',
-
-    '  float bg = clouds(vec2(st.x+T*.35,-st.y));',
-    '  uv *= 1.-.25*(sin(T*.18)*.5+.5);',
-
-    '  vec3 col = vec3(0.0);',
-
+    '  vec2 uv=(FC-.5*R)/MN,st=uv*vec2(2.,1.);',
+    '  vec3 electric=vec3(0.161,0.671,0.886);vec3 midnight=vec3(0.039,0.055,0.102);',
+    '  vec3 cyan=vec3(0.04,0.82,0.96);vec3 marine=vec3(0.008,0.220,0.420);',
+    '  float bg=clouds(vec2(st.x+T*.35,-st.y));',
+    '  uv*=1.-.25*(sin(T*.18)*.5+.5);',
+    '  vec3 col=vec3(0.0);',
     '  for(float i=1.;i<12.;i++){',
-    '    uv += .09*cos(i*vec2(.08+.008*i,.75)+i*i+T*.42+.08*uv.x);',
-    '    vec2 p = uv;',
-    '    float d = length(p);',
-    '    float hue = fract(i*.13+T*.04);',
-    '    vec3 filament = mix(mix(electric,cyan,hue),mix(marine,midnight,hue),smoothstep(.0,.8,d));',
-    '    col += .0015/d*filament;',
-    '    float b = noise(i+p+bg*1.731);',
-    '    col += .0025*b/length(max(p,vec2(b*p.x*.02,p.y)))*electric;',
-    '    col = mix(col, midnight*bg*.5+marine*bg*.12, d*.3);',
+    '    uv+=.09*cos(i*vec2(.08+.008*i,.75)+i*i+T*.42+.08*uv.x);',
+    '    vec2 p=uv;float d=length(p);',
+    '    float hue=fract(i*.13+T*.04);',
+    '    vec3 fil=mix(mix(electric,cyan,hue),mix(marine,midnight,hue),smoothstep(.0,.8,d));',
+    '    col+=.0015/d*fil;',
+    '    float b=noise(i+p+bg*1.731);',
+    '    col+=.0025*b/length(max(p,vec2(b*p.x*.02,p.y)))*electric;',
+    '    col=mix(col,midnight*bg*.5+marine*bg*.12,d*.3);',
     '  }',
-
-    '  float centre = 1.0-smoothstep(.0,.5,length(uv));',
-    '  col += centre*electric*.05;',
-
-    /* Geen zwarte achtergrond -- transparant zodat foto doorschijnt via mix-blend-mode:screen */
-    '  O = vec4(col, 1.0);',
-    '}'
-  ].join('\n');
-
-  function mkS(type, src) {
-    var s = gl.createShader(type);
-    gl.shaderSource(s, src);
-    gl.compileShader(s);
-    if (!gl.getShaderParameter(s, gl.COMPILE_STATUS)) {
-      console.warn('Shader:', gl.getShaderInfoLog(s));
-    }
-    return s;
-  }
-
-  var vs = mkS(gl.VERTEX_SHADER, vertSrc);
-  var fs = mkS(gl.FRAGMENT_SHADER, fragSrc);
-  var prog = gl.createProgram();
-  gl.attachShader(prog, vs);
-  gl.attachShader(prog, fs);
-  gl.linkProgram(prog);
-
-  var buf = gl.createBuffer();
-  gl.bindBuffer(gl.ARRAY_BUFFER, buf);
-  gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1,1,-1,-1,1,1,1,-1]), gl.STATIC_DRAW);
-  var posLoc = gl.getAttribLocation(prog, 'position');
-  gl.enableVertexAttribArray(posLoc);
-  gl.vertexAttribPointer(posLoc, 2, gl.FLOAT, false, 0, 0);
-
-  var uRes   = gl.getUniformLocation(prog, 'resolution');
-  var uTime  = gl.getUniformLocation(prog, 'time');
-  var uTouch = gl.getUniformLocation(prog, 'touch');
-  var mouse  = [0, 0];
-
-  function resize() {
-    var dpr = Math.max(1, 0.5 * window.devicePixelRatio);
-    canvas.width  = window.innerWidth  * dpr;
-    canvas.height = window.innerHeight * dpr;
-    gl.viewport(0, 0, canvas.width, canvas.height);
-  }
-
-  canvas.addEventListener('pointermove', function(e) {
-    mouse = [e.clientX, canvas.height - e.clientY];
-  });
-
-  function loop(now) {
-    gl.useProgram(prog);
-    gl.uniform2f(uRes,   canvas.width, canvas.height);
-    gl.uniform1f(uTime,  now * 1e-3);
-    gl.uniform2f(uTouch, mouse[0], mouse[1]);
-    gl.clearColor(0, 0, 0, 0);
-    gl.clear(gl.COLOR_BUFFER_BIT);
-    gl.bindBuffer(gl.ARRAY_BUFFER, buf);
-    gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
+    '  float centre=1.0-smoothstep(.0,.5,length(uv));',
+    '  col+=centre*electric*.05;',
+    '  O=vec4(col,1.0);}'].join('\n');
+  function mkS(t,s){var sh=gl.createShader(t);gl.shaderSource(sh,s);gl.compileShader(sh);return sh;}
+  var vs=mkS(gl.VERTEX_SHADER,vSrc),fs=mkS(gl.FRAGMENT_SHADER,fSrc);
+  var prog=gl.createProgram();gl.attachShader(prog,vs);gl.attachShader(prog,fs);gl.linkProgram(prog);
+  var buf=gl.createBuffer();gl.bindBuffer(gl.ARRAY_BUFFER,buf);
+  gl.bufferData(gl.ARRAY_BUFFER,new Float32Array([-1,1,-1,-1,1,1,1,-1]),gl.STATIC_DRAW);
+  var pos=gl.getAttribLocation(prog,'position');gl.enableVertexAttribArray(pos);gl.vertexAttribPointer(pos,2,gl.FLOAT,false,0,0);
+  var uR=gl.getUniformLocation(prog,'resolution'),uT=gl.getUniformLocation(prog,'time');
+  function resize(){var dpr=Math.max(1,0.5*window.devicePixelRatio);canvas.width=window.innerWidth*dpr;canvas.height=window.innerHeight*dpr;gl.viewport(0,0,canvas.width,canvas.height);}
+  function loop(now){
+    gl.useProgram(prog);gl.uniform2f(uR,canvas.width,canvas.height);gl.uniform1f(uT,now*1e-3);
+    gl.clearColor(0,0,0,0);gl.clear(gl.COLOR_BUFFER_BIT);
+    gl.bindBuffer(gl.ARRAY_BUFFER,buf);gl.drawArrays(gl.TRIANGLE_STRIP,0,4);
     requestAnimationFrame(loop);
   }
-
-  resize();
-  window.addEventListener('resize', resize);
-  loop(0);
+  resize();window.addEventListener('resize',resize);loop(0);
 })();
 </script>
+<!-- MARQUEE -->
+<div class="marquee-section">
+<div class="marquee-track" id="marqueeTrack">
+<div class="marquee-item"><span>Tomorrowland</span> Belgium</div>
+<div class="marquee-item"><span>Ushuaïa</span> Ibiza</div>
+<div class="marquee-item"><span>Bootshaus</span> Germany</div>
+<div class="marquee-item"><span>Marquee</span> Singapore</div>
+<div class="marquee-item"><span>Ministry of Sound</span> London</div>
+<div class="marquee-item"><span>Wave</span> Taipei</div>
+<div class="marquee-item"><span>S2O</span> Thailand</div>
+<div class="marquee-item"><span>Fabric</span> London</div>
+<div class="marquee-item"><span>Hï</span> Ibiza</div>
+<div class="marquee-item"><span>Onyx</span> Bangkok</div>
+<div class="marquee-item"><span>Dance Valley</span> Netherlands</div>
+<div class="marquee-item"><span>Boomerang</span> Hong Kong</div>
+<div class="marquee-item"><span>ADE</span> Amsterdam</div>
+<div class="marquee-item"><span>WMC</span> Miami</div>
+<!-- Duplicate for infinite loop -->
+<div class="marquee-item"><span>Tomorrowland</span> Belgium</div>
+<div class="marquee-item"><span>Ushuaïa</span> Ibiza</div>
+<div class="marquee-item"><span>Bootshaus</span> Germany</div>
+<div class="marquee-item"><span>Marquee</span> Singapore</div>
+<div class="marquee-item"><span>Ministry of Sound</span> London</div>
+<div class="marquee-item"><span>Wave</span> Taipei</div>
+<div class="marquee-item"><span>S2O</span> Thailand</div>
+<div class="marquee-item"><span>Fabric</span> London</div>
+<div class="marquee-item"><span>Hï</span> Ibiza</div>
+<div class="marquee-item"><span>Onyx</span> Bangkok</div>
+<div class="marquee-item"><span>Dance Valley</span> Netherlands</div>
+<div class="marquee-item"><span>Boomerang</span> Hong Kong</div>
+<div class="marquee-item"><span>ADE</span> Amsterdam</div>
+<div class="marquee-item"><span>WMC</span> Miami</div>
+</div>
+</div>
+<!-- ABOUT -->
+<section class="about" id="about" style="background:#0D0D12;">
+<div class="container">
+<div class="about-grid">
+<div>
+<div class="section-label reveal">About</div>
+<h2 class="about-headline reveal reveal-delay-1">
+          WHERE<br/>MUSIC<br/><em>MEETS BUSINESS.</em>
+</h2>
+<p class="about-subtitle reveal reveal-delay-2">
+          A global electronic music talent, programming<br/>and industry platform. Connecting artists, promoters,<br/>festivals, clubs and brands worldwide.
+        </p>
+</div>
+<div class="about-body reveal">
+<p>
+<strong>Deepbloe is a global electronic music platform.</strong> We represent artists,
+          buy and programme talent for festivals and clubs, build industry showcases and
+          create strategic brand partnerships — all under one roof, worldwide.
+        </p>
+<p>
+          We are not a traditional booking agency. We are a boutique partner built for
+          the long game — with deep industry expertise, a global network, and the kind
+          of direct attention that serious careers actually require.
+        </p>
+<p>
+          From Tomorrowland to S2O Thailand, from Berlin club residencies to landmark
+          festival stages — we place our artists, clients and partners exactly where
+          they need to be.
+        </p>
+<p style="font-family:var(--font-mono);font-size:11px;letter-spacing:0.12em;color:var(--electric);text-transform:uppercase;margin-top:8px;margin-bottom:0;">
+          Operating across Europe · Middle East · Asia · and beyond
+        </p>
+<div class="about-stats reveal reveal-delay-2">
+<div class="stat">
+<div class="stat-number"><span>200+</span></div>
+<div class="stat-label">Bookings annually</div>
+</div>
+<div class="stat">
+<div class="stat-number"><span>40+</span></div>
+<div class="stat-label">Countries reached</div>
+</div>
+<div class="stat">
+<div class="stat-number"><span>500+</span></div>
+<div class="stat-label">Industry connections</div>
+</div>
+<div class="stat">
+<div class="stat-number"><span>8</span></div>
+<div class="stat-label">Years operating</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- SERVICES -->
+<section class="services" id="services">
+<div class="container">
+<div class="services-header reveal">
+<div class="section-label">What we do</div>
+</div>
+<h2 class="services-headline reveal">SERVICES</h2>
+<div class="services-list" style="margin-top: 48px;">
+<div class="service-item reveal">
+<span class="service-num mono">01</span>
+<span class="service-name">TALENT REPRESENTATION</span>
+<span class="service-desc">Your career, our obsession. We handle bookings, negotiations, routing and career strategy — so artists can focus on the music. Every artist we represent is a partnership, not a transaction.</span>
+<div class="service-arrow">↗</div>
+</div>
+<div class="service-item reveal reveal-delay-1">
+<span class="service-num mono">02</span>
+<span class="service-name">STRATEGIC PARTNERSHIPS</span>
+<span class="service-desc">The right brand partnership changes everything. We find the fit, structure the deal and own the delivery — from initial concept to final execution.</span>
+<div class="service-arrow">↗</div>
+</div>
+<div class="service-item reveal reveal-delay-2">
+<span class="service-num mono">03</span>
+<span class="service-name">INDUSTRY SHOWCASES</span>
+<span class="service-desc">Visibility is earned, not bought. Our showcases at ADE, WMC and key industry moments put artists in the room where decisions are made — and keep them there.</span>
+<div class="service-arrow">↗</div>
+</div>
+<div class="service-item reveal reveal-delay-3">
+<span class="service-num mono">04</span>
+<span class="service-name">TALENT BUYING &amp; PROGRAMMING</span>
+<span class="service-desc">From Tomorrowland mainstages to Bangkok clubs — we know what works, for whom, and why. Full line-up curation, individual placement and direct market knowledge across Europe, Asia, the Middle East and beyond.</span>
+<div class="service-arrow">↗</div>
+</div>
+<div class="service-item reveal">
+<span class="service-num mono">05</span>
+<span class="service-name">MANAGEMENT &amp; CONSULTANCY</span>
+<span class="service-desc">When the strategy isn't working, we tell you the truth. Then we fix it. Our consultancy draws on direct experience across talent, touring, brand partnerships and market development.</span>
+<div class="service-arrow">↗</div>
+</div>
+</div>
+</div>
+</section>
+<!-- PLATFORM -->
+
+<section id="platform" style="position:relative;overflow:hidden;background:#080808;">
+<div class="container" style="position:relative;z-index:1;padding-top:80px;padding-bottom:80px;">
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:100px;align-items:center;">
+<!-- Left: text -->
+<div>
+<div class="section-label reveal">Network</div>
+<h2 class="reveal" style="font-family:var(--font-display);font-size:clamp(48px,5.5vw,80px);line-height:0.92;color:var(--ivory);margin-bottom:28px;">
+          BUILT ON REAL<br/>
+<span style="color:var(--chrome);opacity:0.45;">RELATIONSHIPS.</span>
+</h2>
+<p class="reveal" style="font-size:15px;color:var(--chrome);line-height:1.9;margin-bottom:40px;max-width:480px;">
+          Deepbloe is built on real relationships, with artists, promoters,
+          festival directors, club bookers and brands worldwide. We connect
+          the right people at the right moment.
+        </p>
+<div class="reveal" style="display:flex;flex-direction:column;gap:0;">
+<div style="padding:18px 0;border-bottom:1px solid var(--steel);display:flex;gap:20px;">
+<span style="font-family:var(--font-mono);font-size:10px;color:var(--electric);width:32px;flex-shrink:0;padding-top:3px;">01</span>
+<div><strong style="font-size:14px;color:var(--ivory);display:block;margin-bottom:4px;">Global Network</strong>
+<span style="font-size:13px;color:var(--chrome);">Direct relationships with 500+ promoters, festivals and clubs across 40 countries.</span></div>
+</div>
+<div style="padding:18px 0;border-bottom:1px solid var(--steel);display:flex;gap:20px;">
+<span style="font-family:var(--font-mono);font-size:10px;color:var(--electric);width:32px;flex-shrink:0;padding-top:3px;">02</span>
+<div><strong style="font-size:14px;color:var(--ivory);display:block;margin-bottom:4px;">Advancing &amp; Logistics</strong>
+<span style="font-size:13px;color:var(--chrome);">Complete show advancing, rider management and on-the-ground support worldwide.</span></div>
+</div>
+<div style="padding:18px 0;border-bottom:1px solid var(--steel);display:flex;gap:20px;">
+<span style="font-family:var(--font-mono);font-size:10px;color:var(--electric);width:32px;flex-shrink:0;padding-top:3px;">03</span>
+<div><strong style="font-size:14px;color:var(--ivory);display:block;margin-bottom:4px;">Industry Intelligence</strong>
+<span style="font-size:13px;color:var(--chrome);">Market insights, trend analysis and strategic positioning for artists and brands.</span></div>
+</div>
+<div style="padding:18px 0;display:flex;gap:20px;">
+<span style="font-family:var(--font-mono);font-size:10px;color:var(--electric);width:32px;flex-shrink:0;padding-top:3px;">04</span>
+<div><strong style="font-size:14px;color:var(--ivory);display:block;margin-bottom:4px;">Private Access</strong>
+<span style="font-size:13px;color:var(--chrome);">Exclusive connections, private showcases and curated introductions.</span></div>
+</div>
+</div>
+</div>
+<!-- Right: quote -->
+<div class="reveal" style="display:flex;align-items:center;justify-content:center;">
+<div style="text-align:center;padding:48px;border:1px solid var(--steel);background:rgba(8,8,8,0.25);backdrop-filter:blur(12px);">
+<div style="font-family:var(--font-display);font-size:72px;color:var(--electric);line-height:0.8;margin-bottom:20px;">"</div>
+<p style="font-family:var(--font-display);font-size:30px;color:var(--ivory);line-height:1.1;margin-bottom:20px;">We don't just<br/>book shows.<br/>We build careers.</p>
+<span style="font-family:var(--font-mono);font-size:10px;letter-spacing:0.15em;color:var(--silver);text-transform:uppercase;">Deepbloe — Est. 2018</span>
+</div>
+</div>
+</div>
+</div>
+</section>
+
+<!-- SHOWCASES -->
+<section class="showcases" id="showcases" style="background:#0A0A0F;">
+<div class="container">
+<div class="showcases-header">
+<div>
+<div class="section-label reveal">Global Presence</div>
+<h2 class="showcases-headline reveal">SHOWCASES</h2>
+</div>
+<p class="showcases-body reveal">
+        From club residencies to Tomorrowland mainstages, Deepbloe creates and
+        programmes showcases that open doors — for artists, partners and the platform.
+      </p>
+</div>
+<div class="showcases-grid reveal">
+<div class="showcase-card">
+<div class="showcase-card-bg s-bg-1" style="background:#080808;"><img src="assets/images/image_08.png" style="width:100%;height:100%;object-fit:cover;object-position:center 30%;filter:brightness(0.6) saturate(0.75);"/></div>
+<div class="showcase-overlay"></div>
+<div class="showcase-num">01</div>
+<div class="showcase-content">
+<div class="showcase-location mono">Belgium, Festival</div>
+<div class="showcase-name">TOMORROWLAND</div>
+<div class="showcase-meta">Mainstage · Side stage programming</div>
+</div>
+</div>
+<div class="showcase-card">
+<div class="showcase-card-bg s-bg-2" style="background:#080808;"><img src="assets/images/image_09.png" style="width:100%;height:100%;object-fit:cover;object-position:center 40%;filter:brightness(0.6) saturate(0.8);"/></div>
+<div class="showcase-overlay"></div>
+<div class="showcase-num">02</div>
+<div class="showcase-content">
+<div class="showcase-location mono">Thailand, Festival</div>
+<div class="showcase-name">S2O SONGKRAN</div>
+<div class="showcase-meta">Full stage programming</div>
+</div>
+</div>
+<div class="showcase-card">
+<div class="showcase-card-bg s-bg-3" style="background:#080808;"><img src="assets/images/image_10.png" style="width:100%;height:100%;object-fit:cover;object-position:center;filter:brightness(0.55) saturate(0.75);"/></div>
+<div class="showcase-overlay"></div>
+<div class="showcase-num">03</div>
+<div class="showcase-content">
+<div class="showcase-location mono">Germany, Club</div>
+<div class="showcase-name">BOOTSHAUS</div>
+<div class="showcase-meta">Club residencies · Deepbloe nights</div>
+</div>
+</div>
+<div class="showcase-card">
+<div class="showcase-card-bg s-bg-4" style="background:#080808;"><img src="assets/images/image_11.png" style="width:100%;height:100%;object-fit:cover;object-position:center;filter:brightness(0.55) saturate(0.75);"/></div>
+<div class="showcase-overlay"></div>
+<div class="showcase-num">04</div>
+<div class="showcase-content">
+<div class="showcase-location mono">Singapore, Club</div>
+<div class="showcase-name">MARQUEE</div>
+<div class="showcase-meta">Southeast Asia programming</div>
+</div>
+</div>
+<div class="showcase-card">
+<div class="showcase-card-bg s-bg-5" style="background:#080808;"><img src="assets/images/image_12.png" style="width:100%;height:100%;object-fit:cover;object-position:center 30%;filter:brightness(0.6) saturate(0.75);"/></div>
+<div class="showcase-overlay"></div>
+<div class="showcase-num">05</div>
+<div class="showcase-content">
+<div class="showcase-location mono">Netherlands, Industry</div>
+<div class="showcase-name">ADE SHOWCASE</div>
+<div class="showcase-meta">Deepbloe ADE showcase</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+
+<!-- MEET ME AT THE HOTEL -->
+<section style="padding:80px 0;background:#080808;border-top:1px solid #1C1E24;">
+<div style="max-width:1400px;margin:0 auto;padding:0 80px;">
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:100px;align-items:center;">
+<div>
+<div style="font-family:monospace;font-size:10px;letter-spacing:0.15em;color:#29ABE2;text-transform:uppercase;margin-bottom:16px;">Deepbloe Platform</div>
+<h2 style="font-family:'Bebas Neue',sans-serif;font-size:clamp(48px,5vw,80px);color:#fff;line-height:0.92;margin-bottom:16px;">MEET ME<br/>AT THE HOTEL.</h2>
+<p style="font-family:'DM Sans',sans-serif;font-size:13px;letter-spacing:0.08em;color:#5A5F70;text-transform:uppercase;margin-bottom:24px;">A Deepbloe industry gathering format.</p>
+<p style="font-size:16px;color:#E0E2E8;line-height:1.8;margin-bottom:24px;">An exclusive industry gathering format created by Deepbloe. Designed to bring together artists, managers, promoters and tastemakers in an intimate, high-level setting — away from the noise of the main floor.</p>
+<p style="font-size:15px;color:#8A8F9E;line-height:1.8;margin-bottom:40px;">Not a conference. Not a showcase. A room where real conversations happen and real deals get made.</p>
+<div style="font-family:monospace;font-size:9px;color:#5A5F70;letter-spacing:0.15em;text-transform:uppercase;margin-bottom:12px;">Editions</div>
+<div style="display:flex;gap:16px;flex-wrap:wrap;">
+<div style="padding:12px 24px;border:1px solid #29ABE2;font-family:monospace;font-size:10px;color:#29ABE2;letter-spacing:0.12em;">ADE AMSTERDAM</div>
+<div style="padding:12px 24px;border:1px solid #29ABE2;font-family:monospace;font-size:10px;color:#29ABE2;letter-spacing:0.12em;">WMC MIAMI</div>
+<div style="padding:12px 24px;border:1px solid #29ABE2;font-family:monospace;font-size:10px;color:#29ABE2;letter-spacing:0.12em;">SÃO PAULO</div>
+</div>
+</div>
+<div style="border:1px solid #1C1E24;padding:48px;display:flex;flex-direction:column;gap:32px;">
+<div>
+<div style="font-family:monospace;font-size:9px;color:#29ABE2;letter-spacing:0.15em;text-transform:uppercase;margin-bottom:8px;">Format</div>
+<p style="font-size:14px;color:#E0E2E8;line-height:1.7;">Private invite-only gatherings at key industry moments. Limited to 30-50 decision makers per edition.</p>
+</div>
+<div style="height:1px;background:#1C1E24;"></div>
+<div>
+<div style="font-family:monospace;font-size:9px;color:#29ABE2;letter-spacing:0.15em;text-transform:uppercase;margin-bottom:8px;">Who attends</div>
+<p style="font-size:14px;color:#E0E2E8;line-height:1.7;">Festival directors, club bookers, label A&amp;R, brand managers, artist managers and selected artists.</p>
+</div>
+<div style="height:1px;background:#1C1E24;"></div>
+<div>
+<div style="font-family:monospace;font-size:9px;color:#29ABE2;letter-spacing:0.15em;text-transform:uppercase;margin-bottom:8px;">Partner opportunities</div>
+<p style="font-size:14px;color:#E0E2E8;line-height:1.7;">Sponsorship, co-hosting and brand integration available for selected partners.</p>
+</div>
+<a href="#contact" onclick="document.getElementById('enquiry-type').value='mmah';return true;" style="display:block;background:transparent;color:#fff;font-family:'Bebas Neue',sans-serif;font-size:14px;letter-spacing:0.12em;padding:14px 32px;border:1px solid #fff;text-decoration:none;text-align:center;">REQUEST INVITE</a>
+</div>
+</div>
+</div>
+</section>
+
+<!-- BRANDS -->
+<section class="brands">
+<div class="container">
+<div class="section-label reveal">Our Network</div>
+<h2 class="brands-headline reveal">WHERE WE WORK</h2>
+<p class="brands-sub reveal">Festivals, clubs and brands we programme, partner and collaborate with globally.</p>
+<div class="brands-logos reveal">
+<div class="brand-logo-cell">TOMORROWLAND</div>
+<div class="brand-logo-cell">USHUAÏA IBIZA</div>
+<div class="brand-logo-cell">BOOTSHAUS</div>
+<div class="brand-logo-cell">HÏ IBIZA</div>
+<div class="brand-logo-cell">MARQUEE SG</div>
+<div class="brand-logo-cell">MINISTRY OF SOUND</div>
+<div class="brand-logo-cell">FABRIC LDN</div>
+<div class="brand-logo-cell">WAVE TAIPEI</div>
+<div class="brand-logo-cell">S2O FESTIVAL</div>
+<div class="brand-logo-cell">DANCE VALLEY</div>
+<div class="brand-logo-cell">ONYX BANGKOK</div>
+<div class="brand-logo-cell">DREAMFIELDS</div>
+<div class="brand-logo-cell">BOOMERANG HK</div>
+<div class="brand-logo-cell">MUIN BANGKOK</div>
+<div class="brand-logo-cell">ADE</div>
+<div class="brand-logo-cell">WMC MIAMI</div>
+<div class="brand-logo-cell">SPACE PLUS</div>
+<div class="brand-logo-cell">1001TL</div>
+</div>
+</div>
+</section>
+
+<!-- CONTACT -->
+<section id="contact" style="background:#0A0A0F;" style="padding:120px 0;background:#080808;border-top:1px solid #1C1E24;">
+<div style="max-width:1400px;margin:0 auto;padding:0 80px;">
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:100px;align-items:start;">
+<!-- Left: text -->
+<div>
+<div style="font-family:monospace;font-size:10px;letter-spacing:0.15em;color:#29ABE2;text-transform:uppercase;margin-bottom:16px;">Contact</div>
+<h2 style="font-family:'Bebas Neue',sans-serif;font-size:clamp(48px,6vw,88px);color:#fff;line-height:0.92;margin-bottom:32px;">LET'S TALK<br/><span style="color:#5A5F70;">BUSINESS.</span></h2>
+<p style="font-size:16px;color:#E0E2E8;line-height:1.8;margin-bottom:40px;">Artist, promoter, festival, club or brand — if you're serious about electronic music, this is where the conversation starts.</p>
+<div style="display:flex;flex-direction:column;gap:16px;">
+<div style="display:flex;align-items:center;gap:16px;">
+<span style="font-family:monospace;font-size:10px;color:#29ABE2;letter-spacing:0.1em;">EMAIL</span>
+<a href="/cdn-cgi/l/email-protection#4e272028210e2a2b2b3e2c22212b602d2123" style="color:#E0E2E8;text-decoration:none;font-size:15px;"><span class="__cf_email__" data-cfemail="8be2e5ede4cbefeeeefbe9e7e4eea5e8e4e6">[email&#160;protected]</span></a>
+</div>
+<div style="display:flex;align-items:center;gap:16px;">
+<span style="font-family:monospace;font-size:10px;color:#29ABE2;letter-spacing:0.1em;">INSTAGRAM</span>
+<a href="https://www.instagram.com/deepbloe/" style="color:#E0E2E8;text-decoration:none;font-size:15px;" target="_blank">@deepbloe</a>
+</div>
+<div style="display:flex;align-items:center;gap:16px;">
+<span style="font-family:monospace;font-size:10px;color:#29ABE2;letter-spacing:0.1em;">LINKEDIN</span>
+<a href="https://www.linkedin.com/company/76724101/" style="color:#E0E2E8;text-decoration:none;font-size:15px;" target="_blank">Deepbloe Agency</a>
+</div>
+</div>
+</div>
+<!-- Right: form -->
+<div>
+<form id="contact-form" onsubmit="handleSubmit(event)" style="display:flex;flex-direction:column;gap:16px;">
+
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+<div style="display:flex;flex-direction:column;gap:6px;">
+<label style="font-family:monospace;font-size:9px;letter-spacing:0.15em;color:#29ABE2;text-transform:uppercase;">Name</label>
+<input name="name" onblur="this.style.borderColor='#2A2D36'" onfocus="this.style.borderColor='#29ABE2'" placeholder="Your name" required="" style="background:#111;border:1px solid #2A2D36;color:#fff;padding:14px 16px;font-size:14px;font-family:inherit;outline:none;transition:border-color 0.2s;" type="text"/>
+</div>
+<div style="display:flex;flex-direction:column;gap:6px;">
+<label style="font-family:monospace;font-size:9px;letter-spacing:0.15em;color:#29ABE2;text-transform:uppercase;">Email</label>
+<input name="email" onblur="this.style.borderColor='#2A2D36'" onfocus="this.style.borderColor='#29ABE2'" placeholder="your@email.com" required="" style="background:#111;border:1px solid #2A2D36;color:#fff;padding:14px 16px;font-size:14px;font-family:inherit;outline:none;transition:border-color 0.2s;" type="email"/>
+</div>
+</div>
+<div style="display:flex;flex-direction:column;gap:6px;">
+<label style="font-family:monospace;font-size:9px;letter-spacing:0.15em;color:#29ABE2;text-transform:uppercase;">I am a</label>
+<select id="enquiry-type" name="type" onblur="this.style.borderColor='#2A2D36'" onfocus="this.style.borderColor='#29ABE2'" style="background:#111;border:1px solid #2A2D36;color:#fff;padding:14px 16px;font-size:14px;font-family:inherit;outline:none;appearance:none;cursor:pointer;">
+<option value="">Select...</option>
+<option value="artist">Artist or Manager — representation</option>
+<option value="promoter">Promoter or Festival — talent buying</option>
+<option value="programming">Club or Venue — programming</option>
+<option value="brand">Brand — partnership or sponsorship</option>
+<option value="mmah">Meet Me at the Hotel — invite or partnership</option>
+<option value="demo">New talent — submit demo</option>
+</select>
+</div>
+<div style="display:flex;flex-direction:column;gap:6px;">
+<label style="font-family:monospace;font-size:9px;letter-spacing:0.15em;color:#29ABE2;text-transform:uppercase;">Message</label>
+<textarea name="message" onblur="this.style.borderColor='#2A2D36'" onfocus="this.style.borderColor='#29ABE2'" placeholder="Tell us what you're looking for..." required="" rows="5" style="background:#111;border:1px solid #2A2D36;color:#fff;padding:14px 16px;font-size:14px;font-family:inherit;outline:none;resize:vertical;transition:border-color 0.2s;"></textarea>
+</div>
+<div style="display:flex;align-items:center;gap:12px;margin-top:4px;">
+<input id="privacy-check" required="" style="width:16px;height:16px;accent-color:#29ABE2;cursor:pointer;" type="checkbox"/>
+<label for="privacy-check" style="font-size:12px;color:#8A8F9E;cursor:pointer;">I agree to the <a href="#privacy" onclick="showPrivacy()" style="color:#29ABE2;">privacy policy</a></label>
+</div>
+<button style="background:#fff;color:#080808;font-family:'Bebas Neue',sans-serif;font-size:16px;letter-spacing:0.12em;padding:16px 40px;border:none;cursor:pointer;transition:background 0.2s;margin-top:8px;text-transform:uppercase;" type="submit">
+            Send Message
+          </button>
+</form>
+</div>
+</div>
+</div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+<div class="container">
+<div class="footer-top" style="grid-template-columns:1.5fr 1fr 1fr 1fr 1fr;">
+<div class="footer-brand">
+<div class="footer-logo">
+<img alt="Deepbloe" onerror="this.style.display='none'" src="assets/images/image_01.png"/>
+<span class="footer-logo-name">DEEPBLOE</span>
+</div>
+<p class="footer-tagline">
+          Global electronic music platform. Talent representation, programming and industry connections — built for the long game. Est. 2018.
+        </p>
+</div>
+<div class="footer-col">
+<h5>Services</h5>
+<ul>
+<li><a href="#services">Talent Representation</a></li>
+<li><a href="#services">Talent Buying</a></li>
+<li><a href="#services">Programming</a></li>
+<li><a href="#showcases">Showcases</a></li>
+<li><a href="#services">Partnerships</a></li>
+</ul>
+</div>
+<div class="footer-col">
+<h5>Platform</h5>
+<ul>
+<li><a href="christian-liu-booking.html">Liu</a></li>
+<li><a href="goldfish-booking.html">Goldfish</a></li>
+<li><a href="jax-jones-booking.html">Jax Jones</a></li>
+<li><a href="artists.html">Full Roster</a></li>
+</ul>
+</div>
+<div class="footer-col">
+<h5>Platform</h5>
+<ul>
+<li><a href="#platform">Promoters</a></li>
+<li><a href="/jobs.html" style="font-family:'DM Sans',sans-serif;font-size:11px;font-weight:500;letter-spacing:0.12em;text-transform:uppercase;color:#fff;text-decoration:none;">Jobs</a></li>
+</ul>
+</div>
+<div class="footer-col">
+<h5>Explore</h5>
+<ul>
+<li><a href="book-dj.html">Book a DJ</a></li>
+<li><a href="book-dj-europe.html">Book a DJ in Europe</a></li>
+<li><a href="hire-dj-for-festival.html">Festival Booking</a></li>
+<li><a href="house-dj-booking.html">House DJ Booking</a></li>
+<li><a href="techno-dj-booking.html">Techno DJ Booking</a></li>
+<li><a href="dj-booking-agency.html">DJ Booking Agency</a></li>
+<li><a href="dj-agent-europe.html">DJ Agent Europe</a></li>
+<li><a href="how-to-get-bookings-as-dj.html">Get Bookings as DJ</a></li>
+</ul>
+</div>
+<div class="footer-col">
+<h5>Contact</h5>
+<ul>
+<li><a href="/cdn-cgi/l/email-protection#01686f676e4165646471636d6e642f626e6c"><span class="__cf_email__" data-cfemail="2f464149406f4b4a4a5f4d43404a014c4042">[email&#160;protected]</span></a></li>
+<li><a href="#contact">Get in Touch</a></li>
+</ul>
+</div>
+</div>
+<!-- Company details strip -->
+<div class="footer-legal">
+<div class="footer-legal-grid">
+<div class="footer-legal-block">
+<span class="footer-legal-label">Address</span>
+<span>Deepbloe Agency B.V.<br/>Ambachtshof 88<br/>2632 BB Nootdorp<br/>The Netherlands</span>
+</div>
+<div class="footer-legal-block">
+<span class="footer-legal-label">Banking</span>
+<span>IBAN: NL84RABO0190352701<br/>BIC: RABONL2U</span>
+</div>
+<div class="footer-legal-block">
+<span class="footer-legal-label">Registration</span>
+<span>KvK: 86099477<br/>VAT: NL863860734B01</span>
+</div>
+<div class="footer-legal-block">
+<span class="footer-legal-label">Contact</span>
+<span><a href="/cdn-cgi/l/email-protection#3b52555d547b5f5e5e4b5957545e15585456" style="color:var(--chrome);text-decoration:none;"><span class="__cf_email__" data-cfemail="127b7c747d5276777762707e7d773c717d7f">[email&#160;protected]</span></a><br/>deepbloe.com</span>
+</div>
+</div>
+</div>
+<div class="footer-bottom">
+<span class="footer-copy">© 2026 Deepbloe Agency B.V. All rights reserved.</span>
+<div class="footer-socials">
+<a href="https://www.instagram.com/deepbloe/" target="_blank">Instagram</a>
+<a href="https://www.linkedin.com/company/76724101/" target="_blank">LinkedIn</a>
+</div>
+</div>
+</div>
+</footer>
+
+<!-- OFFER OVERLAY -->
+<div id="offer-overlay">
+<div style="min-height:100vh;background:#080808;">
+
+<!-- TOP BAR -->
+<div class="offer-close-bar">
+  <span class="offer-close-logo">DEEPBLOE</span>
+  <button class="offer-close-btn" onclick="closeOffer()">← Back</button>
+</div>
+
+<!-- HEADER -->
+<div style="padding:100px 80px 48px;max-width:900px;margin:0 auto;border-bottom:1px solid #1C1E24;">
+  <div style="font-family:'DM Mono',monospace;font-size:10px;letter-spacing:0.18em;color:#29ABE2;text-transform:uppercase;margin-bottom:20px;display:flex;align-items:center;gap:10px;">
+    <span style="display:block;width:32px;height:1px;background:#29ABE2;"></span>Booking
+  </div>
+  <h1 style="font-family:'Bebas Neue',sans-serif;font-size:clamp(48px,7vw,88px);color:#fff;line-height:0.9;margin-bottom:16px;">BOOK AN<br/><span style="color:#5A5F70;">ARTIST</span></h1>
+  <p style="font-size:14px;color:#8A8F9E;line-height:1.8;">Submit your booking request and we'll get back to you within 48 hours.</p>
+</div>
+
+<!-- FORM -->
+<div style="max-width:900px;margin:0 auto;padding:56px 80px 120px;">
+  <form id="offer-form" onsubmit="submitOffer(event)" style="display:flex;flex-direction:column;gap:20px;">
+
+    <!-- Artist -->
+    <div style="display:flex;flex-direction:column;gap:7px;">
+      <label style="font-family:'DM Mono',monospace;font-size:9px;letter-spacing:0.16em;color:#29ABE2;text-transform:uppercase;">Artist *</label>
+      <input name="artist" required placeholder="e.g. Liu, Jax Jones" type="text"
+        style="background:#0D0D10;border:1px solid #2A2D36;color:#fff;padding:14px 16px;font-size:14px;font-family:'DM Sans',sans-serif;outline:none;transition:border-color 0.2s;"
+        onfocus="this.style.borderColor='#29ABE2'" onblur="this.style.borderColor='#2A2D36'"/>
+    </div>
+
+    <!-- Name -->
+    <div style="display:flex;flex-direction:column;gap:7px;">
+      <label style="font-family:'DM Mono',monospace;font-size:9px;letter-spacing:0.16em;color:#29ABE2;text-transform:uppercase;">Your Name *</label>
+      <input name="name" required placeholder="First & Last name" type="text"
+        style="background:#0D0D10;border:1px solid #2A2D36;color:#fff;padding:14px 16px;font-size:14px;font-family:'DM Sans',sans-serif;outline:none;transition:border-color 0.2s;"
+        onfocus="this.style.borderColor='#29ABE2'" onblur="this.style.borderColor='#2A2D36'"/>
+    </div>
+
+    <!-- Phone + Email side by side -->
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;">
+      <div style="display:flex;flex-direction:column;gap:7px;">
+        <label style="font-family:'DM Mono',monospace;font-size:9px;letter-spacing:0.16em;color:#29ABE2;text-transform:uppercase;">Phone *</label>
+        <input name="phone" required placeholder="+31 6 00 000000" type="tel"
+          style="background:#0D0D10;border:1px solid #2A2D36;color:#fff;padding:14px 16px;font-size:14px;font-family:'DM Sans',sans-serif;outline:none;transition:border-color 0.2s;"
+          onfocus="this.style.borderColor='#29ABE2'" onblur="this.style.borderColor='#2A2D36'"/>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:7px;">
+        <label style="font-family:'DM Mono',monospace;font-size:9px;letter-spacing:0.16em;color:#29ABE2;text-transform:uppercase;">Email *</label>
+        <input name="email" required placeholder="you@company.com" type="email"
+          style="background:#0D0D10;border:1px solid #2A2D36;color:#fff;padding:14px 16px;font-size:14px;font-family:'DM Sans',sans-serif;outline:none;transition:border-color 0.2s;"
+          onfocus="this.style.borderColor='#29ABE2'" onblur="this.style.borderColor='#2A2D36'"/>
+      </div>
+    </div>
+
+    <!-- Date -->
+    <div style="display:flex;flex-direction:column;gap:7px;">
+      <label style="font-family:'DM Mono',monospace;font-size:9px;letter-spacing:0.16em;color:#29ABE2;text-transform:uppercase;">Date *</label>
+      <input name="date" required placeholder="e.g. 15 June 2025" type="text"
+        style="background:#0D0D10;border:1px solid #2A2D36;color:#fff;padding:14px 16px;font-size:14px;font-family:'DM Sans',sans-serif;outline:none;transition:border-color 0.2s;"
+        onfocus="this.style.borderColor='#29ABE2'" onblur="this.style.borderColor='#2A2D36'"/>
+    </div>
+
+    <!-- Event -->
+    <div style="display:flex;flex-direction:column;gap:7px;">
+      <label style="font-family:'DM Mono',monospace;font-size:9px;letter-spacing:0.16em;color:#29ABE2;text-transform:uppercase;">Event / Venue *</label>
+      <input name="event" required placeholder="Event name & venue" type="text"
+        style="background:#0D0D10;border:1px solid #2A2D36;color:#fff;padding:14px 16px;font-size:14px;font-family:'DM Sans',sans-serif;outline:none;transition:border-color 0.2s;"
+        onfocus="this.style.borderColor='#29ABE2'" onblur="this.style.borderColor='#2A2D36'"/>
+    </div>
+
+    <!-- Other -->
+    <div style="display:flex;flex-direction:column;gap:7px;">
+      <label style="font-family:'DM Mono',monospace;font-size:9px;letter-spacing:0.16em;color:#29ABE2;text-transform:uppercase;">Other</label>
+      <textarea name="other" rows="4" placeholder="Anything else we should know — budget, line-up, special requirements..."
+        style="background:#0D0D10;border:1px solid #2A2D36;color:#fff;padding:14px 16px;font-size:14px;font-family:'DM Sans',sans-serif;outline:none;resize:vertical;transition:border-color 0.2s;"
+        onfocus="this.style.borderColor='#29ABE2'" onblur="this.style.borderColor='#2A2D36'"></textarea>
+    </div>
+
+    <!-- Submit -->
+    <button type="submit"
+      style="background:#fff;color:#080808;font-family:'Bebas Neue',sans-serif;font-size:16px;letter-spacing:0.14em;padding:18px 48px;border:none;cursor:pointer;transition:background 0.2s;margin-top:8px;text-transform:uppercase;align-self:flex-start;">
+      Submit Request
+    </button>
+
+  </form>
+</div>
+
+</div>
+</div>
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
+function openOffer(){document.getElementById("offer-overlay").classList.add("active");document.body.style.overflow="hidden";document.getElementById("offer-overlay").scrollTop=0;}
+function closeOffer(){document.getElementById("offer-overlay").classList.remove("active");document.body.style.overflow="";}
+
+function submitOffer(e){
+  e.preventDefault();
+  var form=document.getElementById("offer-form");
+  var btn=form.querySelector("button[type=submit]");
+  btn.disabled=true;
+  btn.textContent="Sending...";
+  fetch("https://formspree.io/f/xjgpkbaz",{
+    method:"POST",
+    body:new FormData(form),
+    headers:{Accept:"application/json"}
+  }).then(function(r){
+    if(r.ok){window.location.href="thank-you.html";}
+    else{btn.disabled=false;btn.textContent="Submit Request";alert("Something went wrong. Please try again.");}
+  }).catch(function(){
+    btn.disabled=false;btn.textContent="Submit Request";alert("Something went wrong. Please try again.");
+  });
+}
+
+function handleSubmit(e){
+  e.preventDefault();
+  var form=document.getElementById("contact-form");
+  var btn=form.querySelector("button[type=submit]");
+  btn.disabled=true;
+  btn.textContent="Sending...";
+  fetch("https://formspree.io/f/xjgpkbaz",{
+    method:"POST",
+    body:new FormData(form),
+    headers:{Accept:"application/json"}
+  }).then(function(r){
+    if(r.ok){window.location.href="thank-you.html";}
+    else{btn.disabled=false;btn.textContent="Send Message";alert("Something went wrong. Please try again.");}
+  }).catch(function(){
+    btn.disabled=false;btn.textContent="Send Message";alert("Something went wrong. Please try again.");
+  });
+}
+
+function acceptCookies(){try{localStorage.setItem("cookies","accepted");}catch(e){}document.getElementById("cookie-banner").style.display="none";}
+function rejectCookies(){try{localStorage.setItem("cookies","rejected");}catch(e){}document.getElementById("cookie-banner").style.display="none";}
+function showPrivacy(){document.getElementById("privacy-modal").style.display="block";}
+try{if(localStorage.getItem("cookies"))document.getElementById("cookie-banner").style.display="none";}catch(e){}
+
+// Nav scroll
+window.addEventListener("scroll",function(){
+  var nav=document.querySelector("nav");
+  if(nav) nav.classList.toggle("scrolled",window.scrollY>50);
+});
+
+// Reveal on scroll
+(function(){
+  var revealEls=document.querySelectorAll(".reveal");
+  revealEls.forEach(function(el){el.classList.add("animate-hidden");});
+  var ro=new IntersectionObserver(function(entries){
+    entries.forEach(function(entry){
+      if(entry.isIntersecting){entry.target.classList.remove("animate-hidden");entry.target.classList.add("visible");ro.unobserve(entry.target);}
+    });
+  },{threshold:0.1,rootMargin:"0px 0px -40px 0px"});
+  revealEls.forEach(function(el){ro.observe(el);});
+})();
+
+// Accordion
+document.querySelectorAll(".service-row").forEach(function(row){
+  row.addEventListener("click",function(){
+    var isOpen=row.classList.contains("open");
+    document.querySelectorAll(".service-row").forEach(function(r){r.classList.remove("open");});
+    if(!isOpen)row.classList.add("open");
+  });
+});
+
+// Mobile menu
+var mobileMenuOpen = false;
+function toggleMobileMenu() {
+  mobileMenuOpen = !mobileMenuOpen;
+  var overlay = document.getElementById('mobileMenuOverlay');
+  var btn = document.getElementById('hamburgerBtn');
+  var l1 = document.getElementById('hLine1');
+  var l2 = document.getElementById('hLine2');
+  var l3 = document.getElementById('hLine3');
+  if (mobileMenuOpen) {
+    overlay.style.display = 'flex';
+    document.body.style.overflow = 'hidden';
+    l1.style.transform = 'rotate(45deg) translate(5px,5px)';
+    l2.style.opacity = '0';
+    l3.style.transform = 'rotate(-45deg) translate(5px,-5px)';
+  } else {
+    closeMobileMenu();
+  }
+}
+function closeMobileMenu() {
+  mobileMenuOpen = false;
+  var overlay = document.getElementById('mobileMenuOverlay');
+  if (overlay) overlay.style.display = 'none';
+  document.body.style.overflow = '';
+  var l1 = document.getElementById('hLine1');
+  var l2 = document.getElementById('hLine2');
+  var l3 = document.getElementById('hLine3');
+  if (l1) { l1.style.transform='none'; l2.style.opacity='1'; l3.style.transform='none'; }
+}
+
+
+// Responsive nav show/hide
+function handleNavResize() {
+  var w = window.innerWidth;
+  var desktop = document.getElementById('desktopNav');
+  var cta = document.getElementById('desktopCta');
+  var ham = document.getElementById('hamburgerBtn');
+  if (!desktop || !ham) return;
+  if (w <= 768) {
+    desktop.style.display = 'none';
+    cta.style.display = 'none';
+    ham.style.display = 'flex';
