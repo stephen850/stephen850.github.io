@@ -9439,53 +9439,46 @@ async function savePool() {
   const btn = document.getElementById('sb-save-pool-btn');
   btn.disabled = true; btn.textContent = 'Saving...';
 
-  // Collect ALL checked combos currently rendered
-  const checkedNow = [...document.querySelectorAll('.pool-artist-check:checked')]
-    .map(cb => ({ artist_id: cb.dataset.artistId, org_id: cb.dataset.orgId }));
-
-  // Collect ALL unchecked combos currently rendered
-  const uncheckedNow = [...document.querySelectorAll('.pool-artist-check:not(:checked)')]
-    .map(cb => ({ artist_id: cb.dataset.artistId, org_id: cb.dataset.orgId }));
+  // Collect all checked combos per artist
+  const checkedByArtist = {};
+  allArtists.forEach(a => { checkedByArtist[a.id] = []; });
+  document.querySelectorAll('.pool-artist-check:checked').forEach(cb => {
+    const aid = cb.dataset.artistId;
+    const oid = cb.dataset.orgId;
+    if (aid && oid) {
+      if (!checkedByArtist[aid]) checkedByArtist[aid] = [];
+      checkedByArtist[aid].push(oid);
+    }
+  });
 
   let hasError = false;
 
-  // Delete unchecked ones (only those explicitly unchecked on screen)
-  for (const link of uncheckedNow) {
-    const { error } = await db.from('artist_contact_pool')
-      .delete()
-      .eq('artist_id', link.artist_id)
-      .eq('org_id', link.org_id);
-    if (error && error.code !== 'PGRST116') { // PGRST116 = not found, that's fine
-      console.warn('delete error', error);
-      hasError = true;
+  // For each artist: delete all their current pool links, then insert new ones
+  for (const artistId of Object.keys(checkedByArtist)) {
+    // Delete existing links for this artist
+    const { error: delErr } = await db.from('artist_contact_pool')
+      .delete().eq('artist_id', artistId);
+    if (delErr) { console.warn('delete error for artist', artistId, delErr.message); hasError = true; continue; }
+
+    // Insert new checked links
+    const orgIds = checkedByArtist[artistId];
+    if (orgIds.length > 0) {
+      const rows = orgIds.map(oid => ({ artist_id: artistId, org_id: oid }));
+      const { error: insErr } = await db.from('artist_contact_pool').insert(rows);
+      if (insErr) { console.warn('insert error for artist', artistId, insErr.message); hasError = true; }
     }
   }
 
-  // Upsert checked ones
-  if (checkedNow.length > 0) {
-    console.log('Upserting pool links:', checkedNow);
-    const { error } = await db.from('artist_contact_pool')
-      .upsert(checkedNow, { onConflict: 'artist_id,org_id', ignoreDuplicates: true });
-    if (error) {
-      showToast('Error saving: ' + error.message, 'error');
-      btn.disabled = false; btn.textContent = '✓ Save Pool';
-      return;
-    }
-  }
+  btn.disabled = false; btn.textContent = '✓ Save Pool';
+  document.getElementById('sb-unsaved-label').style.display = 'none';
 
   if (hasError) {
-    showToast('Saved with some warnings — check console', 'info');
+    showToast('Saved with some errors — check console', 'info');
   } else {
     showToast('Pool saved ✓', 'success');
   }
 
-  // Reload from DB to get fresh state
   await loadPoolLinks();
-  poolDirty = false;
-  btn.disabled = false; btn.textContent = '✓ Save Pool';
-  document.getElementById('sb-unsaved-label').style.display = 'none';
-
-  // Refresh tour pool if visible
   if (currentTourArtistId) renderContactsPool();
 }
 
