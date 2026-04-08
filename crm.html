@@ -9184,9 +9184,12 @@ async function renderContactsPool() {
     .map(l => l.org_id);
 
   console.log('currentTourArtistId:', currentTourArtistId);
-  console.log('allPoolLinks:', JSON.stringify(allPoolLinks));
-  console.log('poolOrgIds for this artist:', poolOrgIds);
-  console.log('sample allOrgs IDs:', allOrgs.slice(0,3).map(o=>o.id));
+  console.log('poolOrgIds:', poolOrgIds);
+  // Check if these org_ids exist in allOrgs
+  poolOrgIds.forEach(oid => {
+    const found = allOrgs.find(o => o.id === oid);
+    console.log('org_id', oid, '->', found ? found.legal_name || found.name : 'NOT FOUND IN allOrgs');
+  });
 
   // Country filter
   const cSel = document.getElementById('pool-filter-country');
