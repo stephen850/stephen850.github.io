@@ -2386,7 +2386,7 @@ tbody td { padding: 10px 14px; vertical-align: middle; }
         </div>
         <div style="display:flex;gap:8px;align-items:center;">
           <span id="sb-unsaved-label" style="font-family:var(--mono);font-size:10px;color:var(--amber);display:none;">Unsaved changes</span>
-          <button class="btn" id="sb-save-pool-btn" onclick="savePool()" style="display:none;border-color:var(--green);color:var(--green);">✓ Save Pool</button>
+          <button class="btn" id="sb-save-pool-btn" onclick="savePool()" style="border-color:var(--green);color:var(--green);">✓ Save Pool</button>
           <button class="btn" onclick="exportSalesAll()">↓ Export All</button>
           <button class="btn" id="sb-export-sel-btn" onclick="exportSalesSelected()" style="display:none;border-color:var(--blue);color:var(--blue);">↓ Export Selected</button>
         </div>
@@ -9426,26 +9426,52 @@ async function savePool() {
   const btn = document.getElementById('sb-save-pool-btn');
   btn.disabled = true; btn.textContent = 'Saving...';
 
-  // Collect all checked combos
-  const checked = [...document.querySelectorAll('.pool-artist-check:checked')]
+  // Collect ALL checked combos currently rendered
+  const checkedNow = [...document.querySelectorAll('.pool-artist-check:checked')]
     .map(cb => ({ artist_id: cb.dataset.artistId, org_id: cb.dataset.orgId }));
 
-  // Delete all existing and re-insert
-  const { error: delErr } = await db.from('artist_contact_pool').delete().neq('artist_id', '00000000-0000-0000-0000-000000000000');
-  if (delErr) { showToast('Error saving: ' + delErr.message, 'error'); btn.disabled=false; btn.textContent='✓ Save Pool'; return; }
+  // Collect ALL unchecked combos currently rendered
+  const uncheckedNow = [...document.querySelectorAll('.pool-artist-check:not(:checked)')]
+    .map(cb => ({ artist_id: cb.dataset.artistId, org_id: cb.dataset.orgId }));
 
-  if (checked.length > 0) {
-    const { error: insErr } = await db.from('artist_contact_pool').insert(checked);
-    if (insErr) { showToast('Error saving: ' + insErr.message, 'error'); btn.disabled=false; btn.textContent='✓ Save Pool'; return; }
+  let hasError = false;
+
+  // Delete unchecked ones (only those explicitly unchecked on screen)
+  for (const link of uncheckedNow) {
+    const { error } = await db.from('artist_contact_pool')
+      .delete()
+      .eq('artist_id', link.artist_id)
+      .eq('org_id', link.org_id);
+    if (error && error.code !== 'PGRST116') { // PGRST116 = not found, that's fine
+      console.warn('delete error', error);
+      hasError = true;
+    }
   }
 
-  allPoolLinks = checked;
-  poolDirty = false;
-  btn.disabled = false; btn.textContent = '✓ Save Pool'; btn.style.display = 'none';
-  document.getElementById('sb-unsaved-label').style.display = 'none';
-  showToast('Pool saved ✓', 'success');
+  // Upsert checked ones
+  if (checkedNow.length > 0) {
+    const { error } = await db.from('artist_contact_pool')
+      .upsert(checkedNow, { onConflict: 'artist_id,org_id', ignoreDuplicates: true });
+    if (error) {
+      showToast('Error saving: ' + error.message, 'error');
+      btn.disabled = false; btn.textContent = '✓ Save Pool';
+      return;
+    }
+  }
 
-  // Refresh tour pool section if visible
+  if (hasError) {
+    showToast('Saved with some warnings — check console', 'info');
+  } else {
+    showToast('Pool saved ✓', 'success');
+  }
+
+  // Reload from DB to get fresh state
+  await loadPoolLinks();
+  poolDirty = false;
+  btn.disabled = false; btn.textContent = '✓ Save Pool';
+  document.getElementById('sb-unsaved-label').style.display = 'none';
+
+  // Refresh tour pool if visible
   if (currentTourArtistId) renderContactsPool();
 }
 
