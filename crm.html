@@ -9183,6 +9183,11 @@ async function renderContactsPool() {
     .filter(l => l.artist_id === currentTourArtistId)
     .map(l => l.org_id);
 
+  console.log('currentTourArtistId:', currentTourArtistId);
+  console.log('allPoolLinks:', JSON.stringify(allPoolLinks));
+  console.log('poolOrgIds for this artist:', poolOrgIds);
+  console.log('sample allOrgs IDs:', allOrgs.slice(0,3).map(o=>o.id));
+
   // Country filter
   const cSel = document.getElementById('pool-filter-country');
   if (cSel) {
