@@ -2183,13 +2183,13 @@ tbody td { padding: 10px 14px; vertical-align: middle; }
     </div>
 
     <!-- Tours Modal -->
-    <div class="modal" id="tour-modal">
-      <div class="modal-box" style="max-width:600px;">
+    <div class="overlay" id="tour-modal">
+      <div class="modal" style="width:600px;">
         <div class="modal-hdr">
           <span id="tour-modal-title">Add Tour Slot</span>
           <button class="modal-close" onclick="closeModal('tour-modal')">✕</button>
         </div>
-        <div class="modal-body" style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
           <input type="hidden" id="tm-id">
           <div class="fg">
             <label>Artist *</label>
@@ -2242,7 +2242,7 @@ tbody td { padding: 10px 14px; vertical-align: middle; }
             <textarea id="tm-notes" placeholder="Ideas, routing notes, requirements..." style="min-height:64px;resize:vertical;"></textarea>
           </div>
         </div>
-        <div class="modal-footer" style="display:flex;justify-content:space-between;">
+        <div style="display:flex;justify-content:space-between;margin-top:24px;">
           <button class="btn danger" id="tour-del-btn" onclick="deleteTourSlot()" style="display:none;">Delete</button>
           <div style="display:flex;gap:8px;margin-left:auto;">
             <button class="btn" onclick="closeModal('tour-modal')">Cancel</button>
@@ -2312,15 +2312,14 @@ tbody td { padding: 10px 14px; vertical-align: middle; }
     </div>
 
     <!-- Pipeline Modal -->
-    <div class="modal" id="pipeline-modal">
-      <div class="modal-box" style="max-width:640px;">
+    <div class="overlay" id="pipeline-modal">
+      <div class="modal" style="width:640px;">
         <div class="modal-hdr">
           <span id="pl-modal-title">Add Pipeline Lead</span>
           <button class="modal-close" onclick="closeModal('pipeline-modal')">✕</button>
         </div>
-        <div class="modal-body" style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
           <input type="hidden" id="plm-id">
-
           <div class="fg">
             <label>Artist *</label>
             <select id="plm-artist">
@@ -2341,21 +2340,18 @@ tbody td { padding: 10px 14px; vertical-align: middle; }
               <option value="lost">Lost</option>
             </select>
           </div>
-
           <div class="fg" style="grid-column:span 2;">
             <label>Promoter / Venue (from CRM)</label>
             <select id="plm-org" onchange="plmOrgChanged()">
               <option value="">Select organisation...</option>
             </select>
           </div>
-
           <div class="fg" style="grid-column:span 2;">
             <label>Contact Person (from CRM)</label>
             <select id="plm-contact" onchange="plmContactChanged()">
               <option value="">Select contact...</option>
             </select>
           </div>
-
           <div class="fg">
             <label>Email (auto-filled)</label>
             <input id="plm-email" placeholder="Email address" type="email">
@@ -2393,7 +2389,7 @@ tbody td { padding: 10px 14px; vertical-align: middle; }
             <textarea id="plm-notes" placeholder="Details, context, last communication..." style="min-height:72px;resize:vertical;"></textarea>
           </div>
         </div>
-        <div class="modal-footer" style="display:flex;justify-content:space-between;">
+        <div style="display:flex;justify-content:space-between;margin-top:24px;">
           <button class="btn danger" id="pl-del-btn" onclick="deletePipelineLead()" style="display:none;">Delete</button>
           <div style="display:flex;gap:8px;margin-left:auto;">
             <button class="btn" onclick="closeModal('pipeline-modal')">Cancel</button>
