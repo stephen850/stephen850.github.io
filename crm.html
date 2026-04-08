@@ -8977,7 +8977,7 @@ function tourArtistChanged() {
   currentTourArtistId = document.getElementById('tour-artist').value || null;
   document.getElementById('tour-add-dates-btn').disabled = !currentTourArtistId;
   renderTourTable();
-  renderContactsPool();
+  renderContactsPool(); // async, fire and forget is fine
 }
 
 function renderTourTable() {
@@ -9166,11 +9166,14 @@ function exportTours() {
 }
 
 // ── CONTACTS POOL (below tour table) ──────────────────────────
-function renderContactsPool() {
+async function renderContactsPool() {
   const section = document.getElementById('tour-pool-section');
   if (!section) return;
   if (!currentTourArtistId) { section.style.display = 'none'; return; }
   section.style.display = 'block';
+
+  // Always reload fresh from Supabase
+  await loadPoolLinks();
 
   const artist = allArtists.find(a => a.id === currentTourArtistId);
   const lbl = document.getElementById('tour-pool-artist-label');
@@ -9324,7 +9327,13 @@ let poolDirty    = false; // unsaved changes flag
 
 async function loadPoolLinks() {
   const { data, error } = await db.from('artist_contact_pool').select('artist_id, org_id');
-  allPoolLinks = error ? [] : (data || []);
+  if (error) {
+    console.warn('loadPoolLinks error:', error.message, error.code);
+    allPoolLinks = [];
+  } else {
+    allPoolLinks = data || [];
+    console.log('loadPoolLinks:', allPoolLinks.length, 'links loaded');
+  }
 }
 
 function renderPipeline() { renderSalesBoard(); }
@@ -9450,6 +9459,7 @@ async function savePool() {
 
   // Upsert checked ones
   if (checkedNow.length > 0) {
+    console.log('Upserting pool links:', checkedNow);
     const { error } = await db.from('artist_contact_pool')
       .upsert(checkedNow, { onConflict: 'artist_id,org_id', ignoreDuplicates: true });
     if (error) {
