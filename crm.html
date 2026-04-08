@@ -8848,13 +8848,13 @@ async function wizSave() {
 // ══════════════════════════════════════════════════════════════
 let allTourSlots = [];
 let currentTourArtistId = null;
-let calYear = new Date().getFullYear();
-let calMonth = new Date().getMonth();
-let calSelected = new Set();
+let tourCalYear = new Date().getFullYear();
+let tourCalMonth = new Date().getMonth();
+let tourCalSelected = new Set();
 let editingTourId = null;
 
-const DAYS = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
-const MONTHS = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+const TOUR_DAYS = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
+const TOUR_MONTHS = ['January','February','March','April','May','June','July','August','September','October','November','December'];
 
 const TOUR_STATUS_STYLE = {
   available: 'background:#e8f5e9;color:#1a6b3c;border:1px solid #b2dfdb;',
@@ -8900,7 +8900,7 @@ function renderTourTable() {
   }
   tbody.innerHTML = slots.map(s => {
     const dt  = new Date(s.date + 'T00:00:00');
-    const day = DAYS[(dt.getDay() + 6) % 7];
+    const day = TOUR_DAYS[(dt.getDay() + 6) % 7];
     const stl = TOUR_STATUS_STYLE[s.status] || '';
     const rowBg = s.status === 'confirmed' ? 'background:#f0fdf4;' : s.status === 'cancelled' ? 'opacity:0.55;' : '';
     return `<tr style="${rowBg}cursor:pointer;" onclick="openEditDateModal('${s.id}')">
@@ -8922,28 +8922,28 @@ function openAddDatesModal() {
   if (!currentTourArtistId) return;
   const artist = allArtists.find(a => a.id === currentTourArtistId);
   document.getElementById('adm-artist-name').textContent = artist?.name || '';
-  calSelected.clear();
-  calYear = new Date().getFullYear();
-  calMonth = new Date().getMonth();
+  tourCalSelected.clear();
+  tourCalYear = new Date().getFullYear();
+  tourCalMonth = new Date().getMonth();
   renderCalGrid();
   updateCalCount();
   document.getElementById('add-dates-modal').classList.add('open');
 }
 
 function renderCalGrid() {
-  document.getElementById('cal-month-label').textContent = `${MONTHS[calMonth]} ${calYear}`;
+  document.getElementById('cal-month-label').textContent = `${TOUR_MONTHS[tourCalMonth]} ${tourCalYear}`;
   const grid = document.getElementById('cal-grid');
-  let html = DAYS.map(d => `<div style="font-family:var(--mono);font-size:9px;text-align:center;color:var(--muted);padding:4px 0;">${d}</div>`).join('');
-  const first = new Date(calYear, calMonth, 1);
+  let html = TOUR_DAYS.map(d => `<div style="font-family:var(--mono);font-size:9px;text-align:center;color:var(--muted);padding:4px 0;">${d}</div>`).join('');
+  const first = new Date(tourCalYear, tourCalMonth, 1);
   const startOffset = (first.getDay() + 6) % 7;
   for (let i = 0; i < startOffset; i++) html += `<div></div>`;
-  const daysInMonth = new Date(calYear, calMonth + 1, 0).getDate();
+  const daysInMonth = new Date(tourCalYear, tourCalMonth + 1, 0).getDate();
   const existingDates = new Set(allTourSlots.filter(s => s.artist_id === currentTourArtistId).map(s => s.date));
   for (let d = 1; d <= daysInMonth; d++) {
-    const iso  = `${calYear}-${String(calMonth+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+    const iso  = `${tourCalYear}-${String(tourCalMonth+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
     const dt   = new Date(iso + 'T00:00:00');
     const dow  = (dt.getDay() + 6) % 7;
-    const isSel      = calSelected.has(iso);
+    const isSel      = tourCalSelected.has(iso);
     const isExisting = existingDates.has(iso);
     const isWeekend  = dow >= 4;
     let bg, border, color, cursor;
@@ -8955,7 +8955,7 @@ function renderCalGrid() {
     const title   = isExisting ? ' title="Already in tour"' : '';
     html += `<div ${onclick}${title} style="border:1px solid ${border};background:${bg};color:${color};border-radius:3px;padding:6px 4px;text-align:center;font-family:var(--mono);font-size:12px;cursor:${cursor};user-select:none;${isExisting?'opacity:0.6;':''}">
       <div style="font-weight:${isWeekend?'600':'400'}">${d}</div>
-      <div style="font-size:8px;opacity:0.7;">${DAYS[dow]}</div>
+      <div style="font-size:8px;opacity:0.7;">${TOUR_DAYS[dow]}</div>
       ${isExisting?'<div style="font-size:7px;margin-top:1px;">✓</div>':''}
     </div>`;
   }
@@ -8963,19 +8963,19 @@ function renderCalGrid() {
 }
 
 function calToggleDate(iso) {
-  if (calSelected.has(iso)) calSelected.delete(iso); else calSelected.add(iso);
+  if (tourCalSelected.has(iso)) tourCalSelected.delete(iso); else tourCalSelected.add(iso);
   renderCalGrid(); updateCalCount();
 }
 function updateCalCount() {
   const el = document.getElementById('cal-selected-count');
-  if (el) el.textContent = `${calSelected.size} date${calSelected.size!==1?'s':''} selected`;
+  if (el) el.textContent = `${tourCalSelected.size} date${tourCalSelected.size!==1?'s':''} selected`;
 }
-function calClearSelection() { calSelected.clear(); renderCalGrid(); updateCalCount(); }
-function calPrevMonth() { calMonth--; if(calMonth<0){calMonth=11;calYear--;} renderCalGrid(); }
-function calNextMonth() { calMonth++; if(calMonth>11){calMonth=0;calYear++;} renderCalGrid(); }
+function calClearSelection() { tourCalSelected.clear(); renderCalGrid(); updateCalCount(); }
+function calPrevMonth() { tourCalMonth--; if(tourCalMonth<0){tourCalMonth=11;tourCalYear--;} renderCalGrid(); }
+function calNextMonth() { tourCalMonth++; if(tourCalMonth>11){tourCalMonth=0;tourCalYear++;} renderCalGrid(); }
 
 async function saveSelectedDates() {
-  if (!calSelected.size) { showToast('Select at least one date','error'); return; }
+  if (!tourCalSelected.size) { showToast('Select at least one date','error'); return; }
   if (!currentTourArtistId) return;
   const status   = document.getElementById('adm-status').value || 'available';
   const country  = document.getElementById('adm-country').value.trim() || null;
@@ -8984,7 +8984,7 @@ async function saveSelectedDates() {
   const fee      = document.getElementById('adm-fee').value.trim() || null;
   const assigned = document.getElementById('adm-assigned').value.trim() || null;
   const notes    = document.getElementById('adm-notes').value.trim() || null;
-  const rows = [...calSelected].sort().map(date => ({
+  const rows = [...tourCalSelected].sort().map(date => ({
     artist_id: currentTourArtistId, date, status, country, city, venue,
     fee_ballpark: fee, assigned_to: assigned, notes,
     created_at: new Date().toISOString(), updated_at: new Date().toISOString(),
@@ -9005,7 +9005,7 @@ function openEditDateModal(id) {
   const s = allTourSlots.find(x => x.id === id);
   if (!s) return;
   const dt  = new Date(s.date + 'T00:00:00');
-  const day = DAYS[(dt.getDay()+6)%7];
+  const day = TOUR_DAYS[(dt.getDay()+6)%7];
   document.getElementById('edm-title').textContent   = `${day} ${fmtDate(s.date)}`;
   document.getElementById('edm-id').value            = s.id;
   document.getElementById('edm-date').value          = s.date;
@@ -9059,7 +9059,7 @@ function exportTours() {
   if (filterStatus) slots = slots.filter(s => s.status === filterStatus);
   if (!slots.length) { showToast('No data to export','error'); return; }
   const rows = slots.map(s => {
-    const day = DAYS[(new Date(s.date+'T00:00:00').getDay()+6)%7];
+    const day = TOUR_DAYS[(new Date(s.date+'T00:00:00').getDay()+6)%7];
     return { Artist: s.artists?.name||'', Day: day, Date: s.date, Venue: s.venue||'', City: s.city||'', Country: s.country||'', Status: s.status||'', Fee_Ballpark: s.fee_ballpark||'', Assigned_To: s.assigned_to||'', Notes: s.notes||'' };
   });
   const ws = XLSX.utils.json_to_sheet(rows);
