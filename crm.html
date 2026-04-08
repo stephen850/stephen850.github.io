@@ -8965,6 +8965,7 @@ async function loadTourSlots() {
 function renderTours() {
   const sel = document.getElementById('tour-artist');
   if (!sel) return;
+  console.log('allArtists in renderTours:', allArtists.map(a => a.id + ' = ' + a.name));
   const cur = sel.value;
   sel.innerHTML = '<option value="">Select artist...</option>' +
     allArtists.map(a => `<option value="${a.id}"${a.id===cur?' selected':''}>${esc(a.name)}</option>`).join('');
