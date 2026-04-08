@@ -2372,9 +2372,6 @@ tbody td { padding: 10px 14px; vertical-align: middle; }
     <div class="panel" id="panel-pipeline">
       <div class="tb-bar" style="flex-wrap:wrap;gap:10px;">
         <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
-          <select id="sb-artist" class="tb-select" onchange="sbArtistChanged()" style="min-width:160px;">
-            <option value="">Select artist...</option>
-          </select>
           <select id="sb-country" class="tb-select" onchange="renderSalesBoard()" style="min-width:130px;">
             <option value="">All Countries</option>
           </select>
@@ -2388,36 +2385,33 @@ tbody td { padding: 10px 14px; vertical-align: middle; }
           <input id="sb-search" class="tb-search" placeholder="Search name, contact, city..." oninput="renderSalesBoard()" style="min-width:180px;">
         </div>
         <div style="display:flex;gap:8px;align-items:center;">
-          <span id="sb-pool-label" style="font-family:var(--mono);font-size:10px;color:var(--muted);"></span>
-          <button class="btn success" id="sb-save-pool-btn" onclick="savePoolForArtist()" style="display:none;border-color:var(--green);color:var(--green);">✓ Save Pool for Artist</button>
+          <span id="sb-unsaved-label" style="font-family:var(--mono);font-size:10px;color:var(--amber);display:none;">Unsaved changes</span>
+          <button class="btn" id="sb-save-pool-btn" onclick="savePool()" style="display:none;border-color:var(--green);color:var(--green);">✓ Save Pool</button>
           <button class="btn" onclick="exportSalesAll()">↓ Export All</button>
           <button class="btn" id="sb-export-sel-btn" onclick="exportSalesSelected()" style="display:none;border-color:var(--blue);color:var(--blue);">↓ Export Selected</button>
         </div>
       </div>
 
-      <div style="padding:6px 20px 4px;display:flex;gap:12px;align-items:center;">
+      <div style="padding:6px 20px 4px;display:flex;gap:16px;align-items:center;">
         <span style="font-family:var(--mono);font-size:10px;color:var(--muted);" id="sb-count-bar"></span>
-        <span id="sb-pool-status" style="font-family:var(--mono);font-size:10px;"></span>
+        <span style="font-family:var(--mono);font-size:9px;color:var(--muted);">Check the artist columns to add a contact to that artist's tour pool. Click Save Pool to store.</span>
       </div>
 
       <div style="overflow-x:auto;">
-        <table class="data-table">
+        <table class="data-table" id="sb-table">
           <thead>
             <tr>
               <th style="width:28px;padding:8px 6px;"><input type="checkbox" id="sb-check-all" onchange="sbToggleAll(this.checked)"></th>
-              <th style="width:28px;"></th>
               <th>Organisation</th>
               <th>Type</th>
               <th>Country</th>
-              <th>City</th>
               <th>Contact Person</th>
               <th>Email</th>
-              <th>Phone</th>
-              <th>Genre</th>
+              <th id="sb-artist-headers"><!-- artist columns injected by JS --></th>
             </tr>
           </thead>
           <tbody id="sb-tbody">
-            <tr class="tbl-msg"><td colspan="10">Select an artist to build their pool.</td></tr>
+            <tr class="tbl-msg"><td colspan="10">Loading...</td></tr>
           </tbody>
         </table>
       </div>
@@ -3962,6 +3956,7 @@ async function startApp() {
   loadTags();
   loadTourSlots();
   loadPipelineLeads();
+  loadPoolLinks();
   setTimeout(() => {
     renderDashboard();
     // Handle URL params — e.g. from show.html links
@@ -9174,19 +9169,24 @@ function exportTours() {
 function renderContactsPool() {
   const section = document.getElementById('tour-pool-section');
   if (!section) return;
-
   if (!currentTourArtistId) { section.style.display = 'none'; return; }
   section.style.display = 'block';
 
   const artist = allArtists.find(a => a.id === currentTourArtistId);
   const lbl = document.getElementById('tour-pool-artist-label');
-  if (lbl) lbl.textContent = `Showing all contacts for ${artist?.name || ''}`;
+  if (lbl) lbl.textContent = `Pool for ${artist?.name || ''}`;
 
-  // Populate country filter
+  // Get org IDs in this artist's pool
+  const poolOrgIds = allPoolLinks
+    .filter(l => l.artist_id === currentTourArtistId)
+    .map(l => l.org_id);
+
+  // Country filter
   const cSel = document.getElementById('pool-filter-country');
   if (cSel) {
     const cur = cSel.value;
-    const countries = [...new Set(allOrgs.map(o => o.country).filter(Boolean))].sort();
+    const poolOrgs = allOrgs.filter(o => poolOrgIds.includes(o.id));
+    const countries = [...new Set(poolOrgs.map(o => o.country).filter(Boolean))].sort();
     cSel.innerHTML = '<option value="">All Countries</option>' +
       countries.map(c => `<option value="${c}"${c===cur?' selected':''}>${esc(c)}</option>`).join('');
   }
@@ -9196,24 +9196,27 @@ function renderContactsPool() {
   const search  = (document.getElementById('pool-search')?.value || '').toLowerCase();
 
   let orgs = allOrgs.filter(o => {
+    if (!poolOrgIds.includes(o.id)) return false;
     if (country && o.country !== country) return false;
     if (type && o.company_type !== type && o.type !== type) return false;
     if (search) {
       const name = (o.legal_name || o.name || '').toLowerCase();
-      const city = (o.city || '').toLowerCase();
       const cons = allCons.filter(c => c.organisation_id === o.id);
       const conMatch = cons.some(c =>
         ([c.first_name,c.last_name].filter(Boolean).join(' ').toLowerCase()).includes(search) ||
         (c.email||'').toLowerCase().includes(search)
       );
-      if (!name.includes(search) && !city.includes(search) && !conMatch) return false;
+      if (!name.includes(search) && !conMatch) return false;
     }
     return true;
   });
 
   const tbody = document.getElementById('pool-tbody');
   if (!orgs.length) {
-    tbody.innerHTML = '<tr class="tbl-msg"><td colspan="9">No contacts found.</td></tr>';
+    const msg = poolOrgIds.length === 0
+      ? `No contacts in ${artist?.name}'s pool yet — go to Pipeline tab to add contacts.`
+      : 'No contacts match the current filter.';
+    tbody.innerHTML = `<tr class="tbl-msg"><td colspan="9">${msg}</td></tr>`;
     poolUpdateExportBtn(); return;
   }
 
@@ -9221,8 +9224,6 @@ function renderContactsPool() {
     const cons     = allCons.filter(c => c.organisation_id === o.id && c.is_active !== false);
     const primary  = cons[0];
     const conName  = primary ? [primary.first_name, primary.last_name].filter(Boolean).join(' ') : '—';
-    const conEmail = primary?.email || '—';
-    const conPhone = primary?.phone || '—';
     const genre    = Array.isArray(o.genre) ? o.genre.join(', ') : (o.genre || '—');
     const typeCls  = {promoter:'club',festival:'festival',agency:'agency',brand:'brand'}[o.company_type||o.type]||'other';
     return `<tr>
@@ -9232,8 +9233,8 @@ function renderContactsPool() {
       <td class="td-mono" style="font-size:11px;">${esc(o.country||'—')}</td>
       <td class="td-mono" style="font-size:11px;">${esc(o.city||'—')}</td>
       <td class="td-trunc" style="max-width:140px;">${esc(conName)}</td>
-      <td class="td-mono" style="font-size:11px;">${esc(conEmail)}</td>
-      <td class="td-mono" style="font-size:11px;">${esc(conPhone)}</td>
+      <td class="td-mono" style="font-size:11px;">${esc(primary?.email||'—')}</td>
+      <td class="td-mono" style="font-size:11px;">${esc(primary?.phone||'—')}</td>
       <td style="font-size:11px;color:var(--muted);">${esc(genre)}</td>
     </tr>`;
   }).join('');
@@ -9315,113 +9316,207 @@ function exportPoolRows(orgs, filename) {
 
 
 // ══════════════════════════════════════════════════════════════
-// SALES BOARD — vaste klantenpoel uit bestaande CRM data
-// Geen nieuwe tabel — trekt uit allOrgs + allCons
+// PIPELINE — contacts pool with per-artist checkboxes
+// Supabase table: artist_contact_pool (artist_id, org_id)
 // ══════════════════════════════════════════════════════════════
+let allPoolLinks = [];    // {artist_id, org_id} from Supabase
+let poolDirty    = false; // unsaved changes flag
+
+async function loadPoolLinks() {
+  const { data, error } = await db.from('artist_contact_pool').select('artist_id, org_id');
+  allPoolLinks = error ? [] : (data || []);
+}
+
 function renderPipeline() { renderSalesBoard(); }
 
 function renderSalesBoard() {
-  const aSel = document.getElementById('sb-artist');
-  if (aSel && aSel.options.length <= 1) {
-    aSel.innerHTML = '<option value="">All Artists</option>' +
-      allArtists.map(a => `<option value="${a.id}">${esc(a.name)}</option>`).join('');
-  }
+  // Country filter
   const cSel = document.getElementById('sb-country');
   if (cSel) {
     const cur = cSel.value;
-    const countries = [...new Set(allOrgs.map(o=>o.country).filter(Boolean))].sort();
+    const countries = [...new Set(allOrgs.map(o => o.country).filter(Boolean))].sort();
     cSel.innerHTML = '<option value="">All Countries</option>' +
-      countries.map(c=>`<option value="${c}"${c===cur?' selected':''}>${esc(c)}</option>`).join('');
+      countries.map(c => `<option value="${c}"${c===cur?' selected':''}>${esc(c)}</option>`).join('');
   }
+
+  const country = document.getElementById('sb-country')?.value || '';
+  const type    = document.getElementById('sb-type')?.value || '';
+  const search  = (document.getElementById('sb-search')?.value || '').toLowerCase();
+
+  let orgs = allOrgs.filter(o => {
+    if (country && o.country !== country) return false;
+    if (type && o.company_type !== type && o.type !== type) return false;
+    if (search) {
+      const name = (o.legal_name || o.name || '').toLowerCase();
+      const city = (o.city || '').toLowerCase();
+      const cons = allCons.filter(c => c.organisation_id === o.id);
+      const conMatch = cons.some(c =>
+        ([c.first_name,c.last_name].filter(Boolean).join(' ').toLowerCase()).includes(search) ||
+        (c.email||'').toLowerCase().includes(search)
+      );
+      if (!name.includes(search) && !city.includes(search) && !conMatch) return false;
+    }
+    return true;
+  });
+
+  const countBar = document.getElementById('sb-count-bar');
+  if (countBar) countBar.textContent = `${orgs.length} organisation${orgs.length!==1?'s':''}`;
+
+  // Build artist header columns
+  const thead = document.querySelector('#sb-table thead tr');
+  if (thead) {
+    // Remove old artist th's
+    thead.querySelectorAll('.sb-artist-th').forEach(th => th.remove());
+    allArtists.forEach(a => {
+      const th = document.createElement('th');
+      th.className = 'sb-artist-th';
+      th.style.cssText = 'font-size:10px;text-align:center;min-width:70px;';
+      th.textContent = a.name;
+      thead.appendChild(th);
+    });
+  }
+
+  const tbody = document.getElementById('sb-tbody');
+  if (!orgs.length) {
+    tbody.innerHTML = `<tr class="tbl-msg"><td colspan="${6 + allArtists.length}">No organisations found.</td></tr>`;
+    return;
+  }
+
+  tbody.innerHTML = orgs.map(o => {
+    const cons    = allCons.filter(c => c.organisation_id === o.id && c.is_active !== false);
+    const primary = cons[0];
+    const conName = primary ? [primary.first_name, primary.last_name].filter(Boolean).join(' ') : '—';
+    const typeCls = {promoter:'club',festival:'festival',agency:'agency',brand:'brand'}[o.company_type||o.type]||'other';
+
+    // Per-artist checkboxes
+    const artistCells = allArtists.map(a => {
+      const inPool = allPoolLinks.some(l => l.artist_id === a.id && l.org_id === o.id);
+      return `<td style="text-align:center;">
+        <input type="checkbox" class="pool-artist-check"
+          data-org-id="${o.id}" data-artist-id="${a.id}"
+          ${inPool ? 'checked' : ''}
+          onchange="poolMarkDirty()"
+          title="Add to ${esc(a.name)}'s pool">
+      </td>`;
+    }).join('');
+
+    return `<tr>
+      <td style="padding:6px;"><input type="checkbox" class="sb-row-check" data-org-id="${o.id}" onchange="sbUpdateExportBtn()"></td>
+      <td class="td-name" style="font-weight:500;">${esc(o.legal_name||o.name||'—')}</td>
+      <td><span class="badge b-${typeCls}" style="font-size:10px;">${esc(o.company_type||o.type||'—')}</span></td>
+      <td class="td-mono" style="font-size:11px;">${esc(o.country||'—')}</td>
+      <td class="td-trunc" style="max-width:140px;">${esc(conName)}</td>
+      <td class="td-mono" style="font-size:11px;">${esc(primary?.email||'—')}</td>
+      ${artistCells}
+    </tr>`;
+  }).join('');
+
+  sbUpdateExportBtn();
+}
+
+function poolMarkDirty() {
+  poolDirty = true;
+  const lbl = document.getElementById('sb-unsaved-label');
+  const btn = document.getElementById('sb-save-pool-btn');
+  if (lbl) lbl.style.display = 'inline';
+  if (btn) btn.style.display = 'inline-block';
+}
+
+async function savePool() {
+  const btn = document.getElementById('sb-save-pool-btn');
+  btn.disabled = true; btn.textContent = 'Saving...';
+
+  // Collect all checked combos
+  const checked = [...document.querySelectorAll('.pool-artist-check:checked')]
+    .map(cb => ({ artist_id: cb.dataset.artistId, org_id: cb.dataset.orgId }));
+
+  // Delete all existing and re-insert
+  const { error: delErr } = await db.from('artist_contact_pool').delete().neq('artist_id', '00000000-0000-0000-0000-000000000000');
+  if (delErr) { showToast('Error saving: ' + delErr.message, 'error'); btn.disabled=false; btn.textContent='✓ Save Pool'; return; }
+
+  if (checked.length > 0) {
+    const { error: insErr } = await db.from('artist_contact_pool').insert(checked);
+    if (insErr) { showToast('Error saving: ' + insErr.message, 'error'); btn.disabled=false; btn.textContent='✓ Save Pool'; return; }
+  }
+
+  allPoolLinks = checked;
+  poolDirty = false;
+  btn.disabled = false; btn.textContent = '✓ Save Pool'; btn.style.display = 'none';
+  document.getElementById('sb-unsaved-label').style.display = 'none';
+  showToast('Pool saved ✓', 'success');
+
+  // Refresh tour pool section if visible
+  if (currentTourArtistId) renderContactsPool();
+}
+
+function sbToggleAll(checked) {
+  document.querySelectorAll('.sb-row-check').forEach(cb => { cb.checked = checked; });
+  sbUpdateExportBtn();
+}
+
+function sbUpdateExportBtn() {
+  const n   = document.querySelectorAll('.sb-row-check:checked').length;
+  const btn = document.getElementById('sb-export-sel-btn');
+  if (btn) btn.style.display = n > 0 ? 'inline-block' : 'none';
+}
+
+function exportSalesSelected() {
+  const ids  = [...document.querySelectorAll('.sb-row-check:checked')].map(cb => cb.dataset.orgId);
+  exportSalesRows(allOrgs.filter(o => ids.includes(o.id)), 'deepbloe_contacts_selected.xlsx');
+}
+
+function exportSalesAll() {
   const country = document.getElementById('sb-country')?.value || '';
   const type    = document.getElementById('sb-type')?.value || '';
   const search  = (document.getElementById('sb-search')?.value || '').toLowerCase();
   let orgs = allOrgs.filter(o => {
     if (country && o.country !== country) return false;
     if (type && o.company_type !== type && o.type !== type) return false;
-    if (search) {
-      const name = (o.legal_name||o.name||'').toLowerCase();
-      const city = (o.city||'').toLowerCase();
-      const cons = allCons.filter(c=>c.organisation_id===o.id);
-      const conMatch = cons.some(c=>([c.first_name,c.last_name].filter(Boolean).join(' ').toLowerCase()).includes(search)||(c.email||'').toLowerCase().includes(search));
-      if (!name.includes(search) && !city.includes(search) && !conMatch) return false;
-    }
+    if (search && !(o.legal_name||o.name||'').toLowerCase().includes(search)) return false;
     return true;
   });
-  const tbody    = document.getElementById('sb-tbody');
-  const countBar = document.getElementById('sb-count-bar');
-  if (countBar) countBar.textContent = `${orgs.length} organisation${orgs.length!==1?'s':''}`;
-  if (!orgs.length) { tbody.innerHTML='<tr class="tbl-msg"><td colspan="10">No organisations found — adjust filters.</td></tr>'; return; }
-  tbody.innerHTML = orgs.map(o => {
-    const cons     = allCons.filter(c=>c.organisation_id===o.id&&c.is_active!==false);
-    const primary  = cons[0];
-    const conName  = primary ? [primary.first_name,primary.last_name].filter(Boolean).join(' ') : '—';
-    const conEmail = primary?.email || '—';
-    const conPhone = primary?.phone || '—';
-    const genre    = Array.isArray(o.genre) ? o.genre.join(', ') : (o.genre||'—');
-    const typeCls  = {promoter:'club',festival:'festival',agency:'agency',brand:'brand'}[o.company_type||o.type]||'other';
-    return `<tr>
-      <td style="padding:6px;"><input type="checkbox" class="sb-row-check" data-org-id="${o.id}" onchange="sbUpdateExportBtn()"></td>
-      <td class="td-name" style="font-weight:500;">${esc(o.legal_name||o.name||'—')}</td>
-      <td><span class="badge b-${typeCls}" style="font-size:10px;">${esc(o.company_type||o.type||'—')}</span></td>
-      <td class="td-mono" style="font-size:11px;">${esc(o.country||'—')}</td>
-      <td class="td-mono" style="font-size:11px;">${esc(o.city||'—')}</td>
-      <td class="td-trunc" style="max-width:140px;">${esc(conName)}</td>
-      <td class="td-mono" style="font-size:11px;">${esc(conEmail)}</td>
-      <td class="td-mono" style="font-size:11px;">${esc(conPhone)}</td>
-      <td style="font-size:11px;color:var(--muted);">${esc(genre)}</td>
-      <td style="font-size:11px;color:var(--muted);">${esc((o.tags||[]).join(', ')||'—')}</td>
-    </tr>`;
-  }).join('');
-  sbUpdateExportBtn();
+  exportSalesRows(orgs, 'deepbloe_contacts_pool.xlsx');
 }
 
-function sbToggleAll(checked) { document.querySelectorAll('.sb-row-check').forEach(cb=>{cb.checked=checked;}); sbUpdateExportBtn(); }
-function sbUpdateExportBtn() {
-  const n = document.querySelectorAll('.sb-row-check:checked').length;
-  const btn = document.getElementById('sb-export-sel-btn');
-  const lbl = document.getElementById('sb-sel-label');
-  if (btn) btn.style.display = n>0?'inline-block':'none';
-  if (lbl) lbl.textContent = n>0?`${n} selected`:'';
-}
-function exportSalesSelected() {
-  const ids = [...document.querySelectorAll('.sb-row-check:checked')].map(cb=>cb.dataset.orgId);
-  exportSalesRows(allOrgs.filter(o=>ids.includes(o.id)), 'deepbloe_sales_selected.xlsx');
-}
-function exportSalesAll() {
-  const country = document.getElementById('sb-country')?.value||'';
-  const type    = document.getElementById('sb-type')?.value||'';
-  const search  = (document.getElementById('sb-search')?.value||'').toLowerCase();
-  let orgs = allOrgs.filter(o=>{
-    if(country&&o.country!==country)return false;
-    if(type&&o.company_type!==type&&o.type!==type)return false;
-    if(search&&!(o.legal_name||o.name||'').toLowerCase().includes(search))return false;
-    return true;
-  });
-  exportSalesRows(orgs,'deepbloe_sales_board.xlsx');
-}
 function exportSalesRows(orgs, filename) {
-  if(!orgs.length){showToast('Nothing to export','error');return;}
-  const rows=[];
-  orgs.forEach(o=>{
-    const cons=allCons.filter(c=>c.organisation_id===o.id&&c.is_active!==false);
-    const genre=Array.isArray(o.genre)?o.genre.join(', '):(o.genre||'');
-    if(!cons.length){
-      rows.push({Organisation:o.legal_name||o.name||'',Type:o.company_type||o.type||'',Country:o.country||'',City:o.city||'',Website:o.website||'',Genre:genre,Contact_Person:'',Email:'',Phone:'',Role:''});
+  if (!orgs.length) { showToast('Nothing to export', 'error'); return; }
+  const rows = [];
+  orgs.forEach(o => {
+    const cons  = allCons.filter(c => c.organisation_id === o.id && c.is_active !== false);
+    const genre = Array.isArray(o.genre) ? o.genre.join(', ') : (o.genre || '');
+    // Which artist pools is this org in?
+    const inPools = allArtists
+      .filter(a => allPoolLinks.some(l => l.artist_id === a.id && l.org_id === o.id))
+      .map(a => a.name).join(', ');
+    const base = {
+      Organisation: o.legal_name || o.name || '',
+      Type:         o.company_type || o.type || '',
+      Country:      o.country || '',
+      City:         o.city || '',
+      Website:      o.website || '',
+      Genre:        genre,
+      In_Pool_For:  inPools,
+    };
+    if (!cons.length) {
+      rows.push({ ...base, Contact_Person: '', Email: '', Phone: '', Role: '' });
     } else {
-      cons.forEach(c=>{
-        rows.push({Organisation:o.legal_name||o.name||'',Type:o.company_type||o.type||'',Country:o.country||'',City:o.city||'',Website:o.website||'',Genre:genre,Contact_Person:[c.first_name,c.last_name].filter(Boolean).join(' '),Email:c.email||'',Phone:c.phone||'',Role:c.role||''});
-      });
+      cons.forEach(c => rows.push({
+        ...base,
+        Contact_Person: [c.first_name, c.last_name].filter(Boolean).join(' '),
+        Email:  c.email || '',
+        Phone:  c.phone || '',
+        Role:   c.role  || '',
+      }));
     }
   });
-  const ws=XLSX.utils.json_to_sheet(rows);
-  ws['!cols']=[{wch:28},{wch:12},{wch:14},{wch:14},{wch:22},{wch:20},{wch:22},{wch:28},{wch:16},{wch:16}];
-  const wb=XLSX.utils.book_new();
-  XLSX.utils.book_append_sheet(wb,ws,'Sales Board');
-  XLSX.writeFile(wb,filename);
-  showToast(`Exported ${rows.length} rows ✓`,'success');
+  const ws = XLSX.utils.json_to_sheet(rows);
+  ws['!cols'] = [{wch:28},{wch:12},{wch:14},{wch:14},{wch:22},{wch:20},{wch:22},{wch:22},{wch:28},{wch:16},{wch:14}];
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, 'Contacts');
+  XLSX.writeFile(wb, filename);
+  showToast(`Exported ${rows.length} rows ✓`, 'success');
 }
-// ── END SALES BOARD ────────────────────────────────────────────
+// ── END PIPELINE ───────────────────────────────────────────────
 
 // ── AUDIT LOG ──────────────────────────────────────────────────
 async function logEvent(bookingId, eventType, description, metadata = null) {
