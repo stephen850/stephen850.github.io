@@ -67,28 +67,29 @@ body { background: var(--bg); color: var(--text); font-family: var(--sans);
 
 /* header */
 header {
-  background: var(--accent); color: #fff; padding: 0 28px;
-  display: flex; align-items: center; height: 48px; gap: 32px;
-  position: sticky; top: 0; z-index: 50;
+  background: var(--accent); color: #fff; padding: 0 16px;
+  display: flex; align-items: center; height: 48px; gap: 0;
+  position: sticky; top: 0; z-index: 50; overflow: hidden;
 }
 .h-brand { font-family: var(--mono); font-size: 11px; letter-spacing: 0.3em;
-           text-transform: uppercase; color: rgba(255,255,255,0.5); }
+           text-transform: uppercase; color: rgba(255,255,255,0.5); white-space: nowrap; flex-shrink: 0; margin-right: 8px; }
 .h-brand strong { color: #fff; }
-.h-nav { display: flex; gap: 0; flex: 1; }
+.h-nav { display: flex; gap: 0; flex: 1; overflow-x: auto; scrollbar-width: none; min-width: 0; }
 .h-tab {
-  padding: 0 16px; height: 48px; display: flex; align-items: center;
-  font-family: var(--mono); font-size: 10px; letter-spacing: 0.1em;
+  padding: 0 10px; height: 48px; display: flex; align-items: center;
+  font-family: var(--mono); font-size: 9px; letter-spacing: 0.08em;
   text-transform: uppercase; color: rgba(255,255,255,0.4); cursor: pointer;
   border-bottom: 2px solid transparent; transition: all 0.15s;
+  white-space: nowrap; flex-shrink: 0;
 }
 .h-tab:hover { color: rgba(255,255,255,0.8); }
 .h-tab.active { color: #fff; border-bottom-color: var(--red); }
-.h-right { display: flex; align-items: center; gap: 12px; margin-left: auto; }
-.h-user { font-family: var(--mono); font-size: 10px; color: rgba(255,255,255,0.4); }
+.h-right { display: flex; align-items: center; gap: 10px; margin-left: 8px; flex-shrink: 0; }
+.h-user { font-family: var(--mono); font-size: 10px; color: rgba(255,255,255,0.4); white-space: nowrap; max-width: 160px; overflow: hidden; text-overflow: ellipsis; }
 .h-logout {
   background: none; border: 1px solid rgba(255,255,255,0.2); color: rgba(255,255,255,0.5);
   padding: 5px 10px; font-family: var(--mono); font-size: 10px; letter-spacing: 0.08em;
-  text-transform: uppercase; cursor: pointer; transition: all 0.15s;
+  text-transform: uppercase; cursor: pointer; transition: all 0.15s; white-space: nowrap; flex-shrink: 0;
 }
 .h-logout:hover { border-color: rgba(255,255,255,0.5); color: #fff; }
 
@@ -4108,6 +4109,7 @@ function renderBookingList() {
         <button class="ra confirm" onclick="openContractEditor('${b.id}')">Contract</button>
         <button class="ra" style="border-color:var(--amber);color:var(--amber)" onclick="openInvoiceEditor('${b.id}')">Invoice</button>
         <button class="ra" style="border-color:var(--blue);color:var(--blue)" onclick="openAdvancingEditor('${b.id}')">Advance</button>
+        <button class="ra" style="border-color:var(--green);color:var(--green)" onclick="openSettlement('${b.id}')">Settlement</button>
         <button class="ra" onclick="editBooking('${b.id}')">Edit</button>
         <button class="ra del" onclick="confirmDeleteBooking('${b.id}','${esc(b.reference||'')}')">Del</button>
       </div></td>

@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Show Dashboard — Deepbloe CRM</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@300;400;500&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script data-cfasync="false" src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
 :root {
   --bg: #f7f5f0; --surface: #ffffff; --border: #e2ddd6; --border-dark: #c8c2b8;
@@ -283,6 +283,7 @@ body { background: var(--bg); color: var(--text); font-family: var(--sans); font
         <div class="sd-card-actions">
           <button class="sd-btn" onclick="openCRM('bookings')">Edit Booking</button>
           <button class="sd-btn blue" onclick="openSettlement()">Settlement</button>
+          <button class="sd-btn green" onclick="printSettlement()">⎙ Print Settlement</button>
         </div>
       </div>
 
@@ -430,6 +431,10 @@ function showToast(msg, type='info') {
 function openCRM(tab) { window.location.href = 'crm.html'; }
 
 // ── MAIN LOAD ─────────────────────────────────────────────────
+let _currentBooking = null;
+let _currentAdvancing = null;
+let _currentSettlement = null;
+
 async function loadShow(bookingId) {
   // Load all data in parallel
   const [
@@ -445,6 +450,10 @@ async function loadShow(bookingId) {
     db.from('advancing_cases').select('*').eq('booking_id', bookingId).maybeSingle(),
     db.from('settlements').select('*, payouts(*)').eq('booking_id', bookingId).maybeSingle(),
   ]);
+
+  _currentBooking    = booking;
+  _currentAdvancing  = advancing;
+  _currentSettlement = settlement;
 
   // Load venue separately
   let venue = null;
@@ -760,7 +769,8 @@ function renderAdvancing(b, adv) {
 
   document.getElementById('sd-advancing-actions').innerHTML =
     `<button class="sd-btn" onclick="openAdvancing()">Open Advancing</button>
-     <button class="sd-btn blue" onclick="openCRM()">Promoter Portal</button>`;
+     <button class="sd-btn blue" onclick="openCRM()">Promoter Portal</button>
+     <button class="sd-btn green" onclick="printItinerary()">⎙ Print Itinerary</button>`;
 }
 
 // ── VENUE / COMPANY / CONTACT ─────────────────────────────────
@@ -947,6 +957,223 @@ function openAdvancing() {
   const params = new URLSearchParams(window.location.search);
   const bookingId = params.get('id');
   window.location.href = `crm.html?open=advancing&booking=${bookingId}`;
+}
+
+// ── PRINT SETTLEMENT ──────────────────────────────────────────
+function printSettlement() {
+  const b = _currentBooking;
+  const s = _currentSettlement;
+  if (!b) { alert('Booking not loaded yet'); return; }
+
+  const sym = { EUR:'€', USD:'$', GBP:'£', SGD:'S$', AED:'د.إ', THB:'฿', IDR:'Rp' };
+  const currency = s?.currency || b.fee_currency || 'EUR';
+  const cs = sym[currency] || currency;
+  const gross    = s?.gross_fee    ?? b.fee_amount ?? 0;
+  const commRate = s?.commission_rate ?? b.commission_rate ?? 15;
+  const whRate   = s?.withholding_rate ?? b.withholding_rate ?? 0;
+  const netFee   = gross * (1 - whRate/100);
+  const commAmt  = gross * (commRate/100);
+  const payout   = netFee - commAmt;
+  const fmt = n => cs + Number(n).toLocaleString('nl-NL', { minimumFractionDigits: 2 });
+  const fmtD = d => d ? new Date(d+'T00:00:00').toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'}) : '—';
+  const artist   = b.artists?.name || '—';
+  const venue    = [b.venue_name, b.venue_city, b.venue_country].filter(Boolean).join(', ') || '—';
+  const promoter = b.organisations?.legal_name || b.organisations?.name || '—';
+  const paid     = s?.payouts?.[0]?.status === 'paid';
+
+  const win = window.open('', '_blank');
+  win.document.write(`<!DOCTYPE html><html><head>
+    <meta charset="UTF-8">
+    <title>Settlement — ${artist} — ${fmtD(b.show_date)}</title>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@300;400;500&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+    <style>
+      *{box-sizing:border-box;margin:0;padding:0;}
+      body{font-family:'DM Sans',sans-serif;font-size:13px;color:#1a1a1a;background:#fff;padding:40px;}
+      .doc-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:32px;padding-bottom:20px;border-bottom:2px solid #1a1a1a;}
+      .doc-brand{font-family:'DM Mono',monospace;font-size:18px;letter-spacing:0.2em;text-transform:uppercase;}
+      .doc-sub{font-family:'DM Mono',monospace;font-size:10px;color:#8a8278;letter-spacing:0.1em;text-transform:uppercase;margin-top:4px;}
+      .doc-title{font-size:11px;font-family:'DM Mono',monospace;letter-spacing:0.15em;text-transform:uppercase;color:#8a8278;text-align:right;}
+      .doc-ref{font-size:20px;font-weight:400;text-align:right;margin-top:4px;}
+      .show-box{background:#f7f5f0;padding:16px 20px;margin-bottom:28px;display:grid;grid-template-columns:repeat(4,1fr);gap:12px;}
+      .show-item-label{font-family:'DM Mono',monospace;font-size:9px;letter-spacing:0.1em;text-transform:uppercase;color:#8a8278;margin-bottom:4px;}
+      .show-item-val{font-family:'DM Mono',monospace;font-size:12px;font-weight:500;}
+      .section-title{font-family:'DM Mono',monospace;font-size:9px;letter-spacing:0.15em;text-transform:uppercase;color:#8a8278;margin-bottom:12px;padding-bottom:6px;border-bottom:1px solid #e2ddd6;}
+      table{width:100%;border-collapse:collapse;margin-bottom:28px;}
+      td{padding:10px 0;border-bottom:1px solid #e2ddd6;font-size:13px;}
+      td:last-child{text-align:right;font-family:'DM Mono',monospace;}
+      .total-row td{font-weight:600;font-size:15px;border-bottom:2px solid #1a1a1a;padding:14px 0;}
+      .payout-status{margin-top:20px;padding:12px 16px;font-family:'DM Mono',monospace;font-size:11px;letter-spacing:0.1em;text-transform:uppercase;border:1px solid;}
+      .paid{background:#e8f5e9;color:#1a6b3c;border-color:#81c784;}
+      .unpaid{background:#fff8e1;color:#8b5e00;border-color:#ffe082;}
+      .footer{margin-top:40px;padding-top:16px;border-top:1px solid #e2ddd6;font-family:'DM Mono',monospace;font-size:9px;color:#8a8278;text-align:center;}
+      @media print{body{padding:20px;}@page{margin:15mm;}}
+    </style>
+  </head><body>
+    <div class="doc-header">
+      <div>
+        <div class="doc-brand">Deepbloe</div>
+        <div class="doc-sub">Agency B.V. · Settlement Statement</div>
+      </div>
+      <div>
+        <div class="doc-title">Settlement</div>
+        <div class="doc-ref">${b.reference || '—'}</div>
+      </div>
+    </div>
+
+    <div class="show-box">
+      <div><div class="show-item-label">Artist</div><div class="show-item-val">${artist}</div></div>
+      <div><div class="show-item-label">Show Date</div><div class="show-item-val">${fmtD(b.show_date)}</div></div>
+      <div><div class="show-item-label">Venue</div><div class="show-item-val">${b.venue_name || '—'}</div></div>
+      <div><div class="show-item-label">Promoter</div><div class="show-item-val">${promoter}</div></div>
+    </div>
+
+    <div class="section-title">Financial Settlement</div>
+    <table>
+      <tr><td>Gross Performance Fee</td><td>${fmt(gross)} ${currency}</td></tr>
+      ${whRate > 0 ? `<tr><td>Tax Withholding (${whRate}%)</td><td style="color:#c0392b">− ${fmt(gross * whRate/100)} ${currency}</td></tr>
+      <tr><td>Net Fee (after withholding)</td><td>${fmt(netFee)} ${currency}</td></tr>` : ''}
+      <tr><td>Agency Commission (${commRate}%)</td><td style="color:#c0392b">− ${fmt(commAmt)} ${currency}</td></tr>
+      <tr class="total-row"><td>Net Payout to Artist</td><td>${fmt(payout)} ${currency}</td></tr>
+    </table>
+
+    <div class="payout-status ${paid ? 'paid' : 'unpaid'}">
+      Payout status: ${paid ? '✓ Paid to artist' : '⏳ Pending payment'}
+      ${s?.payouts?.[0]?.paid_at ? ' · ' + fmtD(s.payouts[0].paid_at) : ''}
+    </div>
+
+    ${s?.notes ? `<div style="margin-top:20px;font-size:12px;color:#8a8278;font-style:italic">${s.notes}</div>` : ''}
+
+    <div class="footer">Deepbloe Agency B.V. · deepbloe.com · Generated ${new Date().toLocaleDateString('en-GB')}</div>
+    <script>window.onload=()=>window.print()<\/script>
+  </body></html>`);
+  win.document.close();
+}
+
+// ── PRINT ITINERARY ───────────────────────────────────────────
+function printItinerary() {
+  const b = _currentBooking;
+  const adv = _currentAdvancing;
+  if (!b) { alert('Booking not loaded yet'); return; }
+
+  const fmtD  = d => d ? new Date(d+'T00:00:00').toLocaleDateString('en-GB',{weekday:'long',day:'2-digit',month:'long',year:'numeric'}) : '—';
+  const fmtDT = d => d ? new Date(d).toLocaleString('en-GB',{day:'2-digit',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'}) : '—';
+  const artist = b.artists?.name || '—';
+  const ref    = b.reference || '—';
+
+  const row = (label, val) => val ? `<tr><td class="it-label">${label}</td><td class="it-val">${val}</td></tr>` : '';
+
+  const win = window.open('', '_blank');
+  win.document.write(`<!DOCTYPE html><html><head>
+    <meta charset="UTF-8">
+    <title>Itinerary — ${artist} — ${fmtD(b.show_date)}</title>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@300;400;500&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+    <style>
+      *{box-sizing:border-box;margin:0;padding:0;}
+      body{font-family:'DM Sans',sans-serif;font-size:13px;color:#1a1a1a;background:#fff;padding:40px;}
+      .doc-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:28px;padding-bottom:16px;border-bottom:2px solid #1a1a1a;}
+      .doc-brand{font-family:'DM Mono',monospace;font-size:18px;letter-spacing:0.2em;text-transform:uppercase;}
+      .doc-sub{font-family:'DM Mono',monospace;font-size:10px;color:#8a8278;margin-top:4px;letter-spacing:0.1em;text-transform:uppercase;}
+      .it-section{margin-bottom:24px;}
+      .it-section-title{font-family:'DM Mono',monospace;font-size:9px;letter-spacing:0.15em;text-transform:uppercase;color:#8a8278;padding:8px 12px;background:#f7f5f0;border-left:3px solid #1a1a1a;margin-bottom:0;}
+      table{width:100%;border-collapse:collapse;}
+      td{padding:8px 12px;border-bottom:1px solid #e2ddd6;font-size:13px;vertical-align:top;}
+      .it-label{font-family:'DM Mono',monospace;font-size:10px;color:#8a8278;width:180px;text-transform:uppercase;letter-spacing:0.08em;}
+      .it-val{font-weight:400;}
+      .hero-box{background:#1a1a1a;color:#fff;padding:20px 24px;margin-bottom:28px;display:grid;grid-template-columns:repeat(3,1fr);gap:16px;}
+      .hero-item-label{font-family:'DM Mono',monospace;font-size:9px;letter-spacing:0.1em;text-transform:uppercase;color:rgba(255,255,255,0.4);margin-bottom:4px;}
+      .hero-item-val{font-family:'DM Mono',monospace;font-size:13px;color:#fff;}
+      .footer{margin-top:40px;padding-top:16px;border-top:1px solid #e2ddd6;font-family:'DM Mono',monospace;font-size:9px;color:#8a8278;text-align:center;}
+      @media print{body{padding:20px;}@page{margin:15mm;}}
+    </style>
+  </head><body>
+    <div class="doc-header">
+      <div>
+        <div class="doc-brand">Deepbloe</div>
+        <div class="doc-sub">Agency B.V. · Show Itinerary</div>
+      </div>
+      <div style="text-align:right;font-family:'DM Mono',monospace;">
+        <div style="font-size:10px;color:#8a8278;letter-spacing:0.1em;text-transform:uppercase;">Reference</div>
+        <div style="font-size:18px;margin-top:4px;">${ref}</div>
+      </div>
+    </div>
+
+    <div class="hero-box">
+      <div><div class="hero-item-label">Artist</div><div class="hero-item-val">${artist}</div></div>
+      <div><div class="hero-item-label">Show Date</div><div class="hero-item-val">${fmtD(b.show_date)}</div></div>
+      <div><div class="hero-item-label">Set Time</div><div class="hero-item-val">${adv?.set_time || b.set_time || '—'}</div></div>
+      <div><div class="hero-item-label">Venue</div><div class="hero-item-val">${b.venue_name || '—'}</div></div>
+      <div><div class="hero-item-label">City</div><div class="hero-item-val">${b.venue_city || '—'}, ${b.venue_country || '—'}</div></div>
+      <div><div class="hero-item-label">Capacity</div><div class="hero-item-val">${b.venue_capacity ? b.venue_capacity.toLocaleString() : '—'}</div></div>
+    </div>
+
+    <div class="it-section">
+      <div class="it-section-title">✈ Inbound Flight</div>
+      <table>
+        ${row('Airline', adv?.airline_in)}
+        ${row('Flight Number', adv?.flight_number_in)}
+        ${row('Route', adv?.departure_in && adv?.arrival_in ? adv.departure_in + ' → ' + adv.arrival_in : null)}
+        ${row('Departure', adv?.departure_time_in ? fmtDT(adv.departure_time_in) : null)}
+        ${row('Arrival', adv?.arrival_time_in ? fmtDT(adv.arrival_time_in) : null)}
+        ${row('Seat', adv?.seat_in)}
+        ${row('Booking Ref', adv?.flight_ref_in)}
+      </table>
+    </div>
+
+    <div class="it-section">
+      <div class="it-section-title">🏨 Hotel</div>
+      <table>
+        ${row('Hotel', adv?.hotel_name)}
+        ${row('Address', adv?.hotel_address)}
+        ${row('Check-in', adv?.hotel_checkin ? fmtD(adv.hotel_checkin) : null)}
+        ${row('Check-out', adv?.hotel_checkout ? fmtD(adv.hotel_checkout) : null)}
+        ${row('Room Type', adv?.hotel_room)}
+        ${row('Confirmation #', adv?.hotel_confirmation)}
+      </table>
+    </div>
+
+    <div class="it-section">
+      <div class="it-section-title">🚗 Ground Transport</div>
+      <table>
+        ${row('Driver', adv?.driver_name)}
+        ${row('Phone', adv?.driver_phone)}
+        ${row('Vehicle', adv?.vehicle_type)}
+        ${row('Pickup Location', adv?.pickup_location)}
+        ${row('Notes', adv?.transport_notes)}
+      </table>
+    </div>
+
+    <div class="it-section">
+      <div class="it-section-title">🎵 Show Details</div>
+      <table>
+        ${row('Venue', b.venue_name)}
+        ${row('Address', b.venue_city && b.venue_country ? b.venue_city+', '+b.venue_country : null)}
+        ${row('Set Time', adv?.set_time || b.set_time)}
+        ${row('Set Length', b.set_length_minutes ? b.set_length_minutes + ' min' : null)}
+        ${row('Load-in Time', adv?.load_in_time)}
+        ${row('Soundcheck', adv?.soundcheck_time)}
+        ${row('Curfew', adv?.curfew)}
+        ${row('Venue Contact', adv?.venue_contact)}
+        ${row('Guestlist Spots', adv?.guestlist_spots)}
+      </table>
+    </div>
+
+    <div class="it-section">
+      <div class="it-section-title">✈ Return Flight</div>
+      <table>
+        ${row('Airline', adv?.airline_out)}
+        ${row('Flight Number', adv?.flight_number_out)}
+        ${row('Route', adv?.departure_out && adv?.arrival_out ? adv.departure_out + ' → ' + adv.arrival_out : null)}
+        ${row('Departure', adv?.departure_time_out ? fmtDT(adv.departure_time_out) : null)}
+        ${row('Arrival', adv?.arrival_time_out ? fmtDT(adv.arrival_time_out) : null)}
+        ${row('Seat', adv?.seat_out)}
+        ${row('Booking Ref', adv?.flight_ref_out)}
+      </table>
+    </div>
+
+    <div class="footer">Deepbloe Agency B.V. · deepbloe.com · Generated ${new Date().toLocaleDateString('en-GB')} · Confidential</div>
+    <script>window.onload=()=>window.print()<\/script>
+  </body></html>`);
+  win.document.close();
 }
 
 function getStatusWarnings(booking, contracts, invoices, advancing, settlement) {
