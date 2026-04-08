@@ -1035,6 +1035,25 @@ tbody td { padding: 10px 14px; vertical-align: middle; }
                padding:12px 28px;display:flex;justify-content:flex-end;gap:8px; }
 /* ── COMPANY DETAIL END ──────────────────────────────── */
 
+/* ── TOUR STATUS BADGES ─────────────────────────────────────── */
+.ts-available{background:#e8f5e9;color:#1a6b3c;border:1px solid #b2dfdb;}
+.ts-hold{background:#fff8e1;color:#8b5e00;border:1px solid #ffe082;}
+.ts-option{background:#e3f2fd;color:#1a3a6b;border:1px solid #90caf9;}
+.ts-confirmed{background:#e8f5e9;color:#1a6b3c;border:1px solid #81c784;font-weight:600;}
+.ts-cancelled{background:#f5f5f5;color:#9e9e9e;border:1px solid #e0e0e0;text-decoration:line-through;}
+.ps-new{background:#f3e5f5;color:#6a1b9a;border:1px solid #ce93d8;}
+.ps-contacted{background:#e3f2fd;color:#1a3a6b;border:1px solid #90caf9;}
+.ps-talking{background:#e8f5e9;color:#1a6b3c;border:1px solid #81c784;}
+.ps-option{background:#fff8e1;color:#8b5e00;border:1px solid #ffe082;}
+.ps-hold{background:#fff3e0;color:#7c4700;border:1px solid #ffcc80;}
+.ps-confirmed{background:#e8f5e9;color:#1a6b3c;border:1px solid #4caf50;font-weight:600;}
+.ps-urgent{background:#ffebee;color:#c0392b;border:1px solid #ef9a9a;font-weight:600;}
+.ps-closed{background:#f5f5f5;color:#555;border:1px solid #ccc;}
+.ps-lost{background:#f5f5f5;color:#9e9e9e;border:1px solid #e0e0e0;text-decoration:line-through;}
+.tour-gap-row td{background:#fffde7;color:#8b5e00;font-family:var(--mono);font-size:11px;font-style:italic;}
+#pl-export-sel-btn{border-color:var(--green);color:var(--green);}
+/* ── END TOURS/PIPELINE CSS ─────────────────────────────────── */
+
 /* ── SETUP WIZARD ─────────────────────────────────────── */
 #setup-wizard-overlay {
   position:fixed;inset:0;background:rgba(26,26,26,0.75);
@@ -1142,6 +1161,8 @@ tbody td { padding: 10px 14px; vertical-align: middle; }
       <div class="h-tab" onclick="showPanel('finance', this);renderFinance()">Finance</div>
       <div class="h-tab" onclick="showPanel('calendar', this);renderCalendar()">Calendar</div>
       <div class="h-tab" onclick="showPanel('reminders', this);renderReminders()">Reminders</div>
+      <div class="h-tab" onclick="showPanel('tours', this);renderTours()">Tours</div>
+      <div class="h-tab" onclick="showPanel('pipeline', this);renderPipeline()">Pipeline</div>
       <div class="h-tab" onclick="showPanel('import', this)">Import</div>
     </nav>
     <div class="h-right">
@@ -2109,6 +2130,279 @@ tbody td { padding: 10px 14px; vertical-align: middle; }
     </div>
 
     <!-- ── IMPORT PANEL ── -->
+    <!-- ══════════════════════════════════════════════
+         TOURS PANEL
+    ═══════════════════════════════════════════════ -->
+    <div class="panel" id="panel-tours">
+      <div class="tb-bar">
+        <div style="display:flex;gap:8px;align-items:center;flex:1;flex-wrap:wrap;">
+          <select id="tour-filter-artist" class="tb-select" onchange="filterTours()" style="min-width:140px;">
+            <option value="">All Artists</option>
+          </select>
+          <select id="tour-filter-status" class="tb-select" onchange="filterTours()">
+            <option value="">All Statuses</option>
+            <option value="available">Available</option>
+            <option value="hold">Hold</option>
+            <option value="option">Option</option>
+            <option value="confirmed">Confirmed</option>
+            <option value="cancelled">Cancelled</option>
+          </select>
+          <input type="date" id="tour-filter-from" class="tb-search" style="width:130px;" onchange="filterTours()" placeholder="From">
+          <input type="date" id="tour-filter-to" class="tb-search" style="width:130px;" onchange="filterTours()" placeholder="To">
+        </div>
+        <div style="display:flex;gap:8px;">
+          <button class="btn" onclick="exportTours()">↓ Export</button>
+          <button class="btn primary" onclick="openTourModal()">+ Add Slot</button>
+        </div>
+      </div>
+
+      <div style="padding:16px 20px 4px;display:flex;gap:16px;flex-wrap:wrap;" id="tour-stats-bar"></div>
+
+      <div style="overflow-x:auto;">
+        <table class="data-table" id="tour-table">
+          <thead>
+            <tr>
+              <th style="width:32px;padding:8px 6px;"><input type="checkbox" id="tour-check-all" onchange="tourToggleAll(this.checked)"></th>
+              <th>Date</th>
+              <th>Artist</th>
+              <th>Venue / Location</th>
+              <th>City</th>
+              <th>Country</th>
+              <th>Status</th>
+              <th>Fee (ballpark)</th>
+              <th>Assigned</th>
+              <th>Notes</th>
+              <th style="width:100px;">Actions</th>
+            </tr>
+          </thead>
+          <tbody id="tour-tbody">
+            <tr class="tbl-msg"><td colspan="11">Loading...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Tours Modal -->
+    <div class="modal" id="tour-modal">
+      <div class="modal-box" style="max-width:600px;">
+        <div class="modal-hdr">
+          <span id="tour-modal-title">Add Tour Slot</span>
+          <button class="modal-close" onclick="closeModal('tour-modal')">✕</button>
+        </div>
+        <div class="modal-body" style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+          <input type="hidden" id="tm-id">
+          <div class="fg">
+            <label>Artist *</label>
+            <select id="tm-artist">
+              <option value="">Select artist...</option>
+            </select>
+          </div>
+          <div class="fg">
+            <label>Date *</label>
+            <input type="date" id="tm-date">
+          </div>
+          <div class="fg" style="grid-column:span 2;">
+            <label>Venue / Location</label>
+            <input id="tm-venue" placeholder="e.g. Bootshaus, Cologne">
+          </div>
+          <div class="fg">
+            <label>City</label>
+            <input id="tm-city" placeholder="City">
+          </div>
+          <div class="fg">
+            <label>Country</label>
+            <input id="tm-country" placeholder="Country">
+          </div>
+          <div class="fg">
+            <label>Status</label>
+            <select id="tm-status">
+              <option value="available">Available</option>
+              <option value="hold">Hold</option>
+              <option value="option">Option</option>
+              <option value="confirmed">Confirmed</option>
+              <option value="cancelled">Cancelled</option>
+            </select>
+          </div>
+          <div class="fg">
+            <label>Ballpark Fee</label>
+            <input id="tm-fee" placeholder="e.g. 10k EUR">
+          </div>
+          <div class="fg">
+            <label>Assigned To</label>
+            <input id="tm-assigned" placeholder="e.g. Stephen">
+          </div>
+          <div class="fg">
+            <label>Linked Booking</label>
+            <select id="tm-booking">
+              <option value="">None (not yet a booking)</option>
+            </select>
+          </div>
+          <div class="fg" style="grid-column:span 2;">
+            <label>Notes / Ideas</label>
+            <textarea id="tm-notes" placeholder="Ideas, routing notes, requirements..." style="min-height:64px;resize:vertical;"></textarea>
+          </div>
+        </div>
+        <div class="modal-footer" style="display:flex;justify-content:space-between;">
+          <button class="btn danger" id="tour-del-btn" onclick="deleteTourSlot()" style="display:none;">Delete</button>
+          <div style="display:flex;gap:8px;margin-left:auto;">
+            <button class="btn" onclick="closeModal('tour-modal')">Cancel</button>
+            <button class="btn primary" onclick="saveTourSlot()" id="tour-save-btn">Save Slot</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══════════════════════════════════════════════
+         PIPELINE PANEL
+    ═══════════════════════════════════════════════ -->
+    <div class="panel" id="panel-pipeline">
+      <div class="tb-bar">
+        <div style="display:flex;gap:8px;align-items:center;flex:1;flex-wrap:wrap;">
+          <select id="pl-filter-artist" class="tb-select" onchange="filterPipeline()" style="min-width:130px;">
+            <option value="">All Artists</option>
+          </select>
+          <select id="pl-filter-status" class="tb-select" onchange="filterPipeline()">
+            <option value="">All Statuses</option>
+            <option value="new">New</option>
+            <option value="contacted">Contacted</option>
+            <option value="talking">Talking</option>
+            <option value="option">Option</option>
+            <option value="hold">Hold</option>
+            <option value="confirmed">Confirmed</option>
+            <option value="urgent">Urgent</option>
+            <option value="closed">Closed</option>
+            <option value="lost">Lost</option>
+          </select>
+          <select id="pl-filter-assigned" class="tb-select" onchange="filterPipeline()">
+            <option value="">All Team</option>
+          </select>
+          <input id="pl-search" class="tb-search" placeholder="Search promoter, contact, country..." oninput="filterPipeline()" style="min-width:200px;">
+        </div>
+        <div style="display:flex;gap:8px;">
+          <button class="btn" id="pl-export-sel-btn" onclick="exportPipelineSelected()" style="display:none;">↓ Export Selected (<span id="pl-sel-count">0</span>)</button>
+          <button class="btn" onclick="exportPipelineAll()">↓ Export All</button>
+          <button class="btn primary" onclick="openPipelineModal()">+ Add Lead</button>
+        </div>
+      </div>
+
+      <div style="padding:12px 20px 0;display:flex;gap:12px;flex-wrap:wrap;" id="pl-stats-bar"></div>
+
+      <div style="overflow-x:auto;">
+        <table class="data-table" id="pipeline-table">
+          <thead>
+            <tr>
+              <th style="width:32px;padding:8px 6px;"><input type="checkbox" id="pl-check-all" onchange="plToggleAll(this.checked)"></th>
+              <th>Artist</th>
+              <th>Promoter / Venue</th>
+              <th>Contact</th>
+              <th>Country</th>
+              <th>Status</th>
+              <th>Deadline</th>
+              <th>Assigned</th>
+              <th>Action Type</th>
+              <th>Notes</th>
+              <th style="width:80px;">Actions</th>
+            </tr>
+          </thead>
+          <tbody id="pipeline-tbody">
+            <tr class="tbl-msg"><td colspan="11">Loading...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Pipeline Modal -->
+    <div class="modal" id="pipeline-modal">
+      <div class="modal-box" style="max-width:640px;">
+        <div class="modal-hdr">
+          <span id="pl-modal-title">Add Pipeline Lead</span>
+          <button class="modal-close" onclick="closeModal('pipeline-modal')">✕</button>
+        </div>
+        <div class="modal-body" style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+          <input type="hidden" id="plm-id">
+
+          <div class="fg">
+            <label>Artist *</label>
+            <select id="plm-artist">
+              <option value="">Select artist...</option>
+            </select>
+          </div>
+          <div class="fg">
+            <label>Status</label>
+            <select id="plm-status">
+              <option value="new">New</option>
+              <option value="contacted">Contacted</option>
+              <option value="talking">Talking</option>
+              <option value="option">Option</option>
+              <option value="hold">Hold</option>
+              <option value="confirmed">Confirmed</option>
+              <option value="urgent">Urgent</option>
+              <option value="closed">Closed</option>
+              <option value="lost">Lost</option>
+            </select>
+          </div>
+
+          <div class="fg" style="grid-column:span 2;">
+            <label>Promoter / Venue (from CRM)</label>
+            <select id="plm-org" onchange="plmOrgChanged()">
+              <option value="">Select organisation...</option>
+            </select>
+          </div>
+
+          <div class="fg" style="grid-column:span 2;">
+            <label>Contact Person (from CRM)</label>
+            <select id="plm-contact" onchange="plmContactChanged()">
+              <option value="">Select contact...</option>
+            </select>
+          </div>
+
+          <div class="fg">
+            <label>Email (auto-filled)</label>
+            <input id="plm-email" placeholder="Email address" type="email">
+          </div>
+          <div class="fg">
+            <label>Country</label>
+            <input id="plm-country" placeholder="Country">
+          </div>
+          <div class="fg">
+            <label>Deadline</label>
+            <input type="date" id="plm-deadline">
+          </div>
+          <div class="fg">
+            <label>Assigned To</label>
+            <input id="plm-assigned" placeholder="e.g. Stephen">
+          </div>
+          <div class="fg">
+            <label>Action Type</label>
+            <select id="plm-action">
+              <option value="">—</option>
+              <option value="introduction">Introduction</option>
+              <option value="follow_up">Follow-up</option>
+              <option value="offer_sent">Offer Sent</option>
+              <option value="negotiating">Negotiating</option>
+              <option value="waiting">Waiting for reply</option>
+              <option value="call_scheduled">Call Scheduled</option>
+            </select>
+          </div>
+          <div class="fg">
+            <label>Convert to Booking</label>
+            <button class="btn" id="plm-convert-btn" onclick="convertLeadToBooking()" style="margin-top:2px;width:100%;">→ Create Booking</button>
+          </div>
+          <div class="fg" style="grid-column:span 2;">
+            <label>Notes</label>
+            <textarea id="plm-notes" placeholder="Details, context, last communication..." style="min-height:72px;resize:vertical;"></textarea>
+          </div>
+        </div>
+        <div class="modal-footer" style="display:flex;justify-content:space-between;">
+          <button class="btn danger" id="pl-del-btn" onclick="deletePipelineLead()" style="display:none;">Delete</button>
+          <div style="display:flex;gap:8px;margin-left:auto;">
+            <button class="btn" onclick="closeModal('pipeline-modal')">Cancel</button>
+            <button class="btn primary" onclick="savePipelineLead()" id="pl-save-btn">Save Lead</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <div class="panel" id="panel-import">
       <div class="import-actions">
         <button class="btn primary" onclick="downloadTemplate()">↓ Download Template</button>
@@ -3598,6 +3892,8 @@ async function startApp() {
   loadExpenses();
   loadVenues();
   loadTags();
+  loadTourSlots();
+  loadPipelineLeads();
   setTimeout(() => {
     renderDashboard();
     // Handle URL params — e.g. from show.html links
@@ -8575,6 +8871,578 @@ async function wizSave() {
   btn.disabled = false; btn.textContent = '✓ Save All & Use';
 }
 // ── END SETUP WIZARD ───────────────────────────────────────────
+
+// ══════════════════════════════════════════════════════════════
+// TOURS MODULE
+// Table: tour_slots
+// Fields: id, artist_id, date, venue, city, country, status,
+//         fee_ballpark, assigned_to, notes, booking_id,
+//         created_at, updated_at
+// ══════════════════════════════════════════════════════════════
+let allTourSlots = [], filtTourSlots = [];
+let editTourId = null;
+const TOUR_STATUSES = ['available','hold','option','confirmed','cancelled'];
+
+async function loadTourSlots() {
+  const { data, error } = await db.from('tour_slots')
+    .select('*, artists(name), bookings(reference, status)')
+    .order('date', { ascending: true });
+  if (error) { console.warn('tour_slots load error:', error.message); allTourSlots = []; }
+  else allTourSlots = data || [];
+}
+
+function renderTours() {
+  populateTourDropdowns();
+  filterTours();
+}
+
+function populateTourDropdowns() {
+  const sel = document.getElementById('tour-filter-artist');
+  if (!sel) return;
+  const cur = sel.value;
+  sel.innerHTML = '<option value="">All Artists</option>' +
+    allArtists.map(a => `<option value="${a.id}"${a.id===cur?' selected':''}>${esc(a.name)}</option>`).join('');
+
+  const tmSel = document.getElementById('tm-artist');
+  if (tmSel) tmSel.innerHTML = '<option value="">Select artist...</option>' +
+    allArtists.map(a => `<option value="${a.id}">${esc(a.name)}</option>`).join('');
+
+  const tmBk = document.getElementById('tm-booking');
+  if (tmBk) tmBk.innerHTML = '<option value="">None</option>' +
+    allBookings.filter(b => ['hold','confirmed','negotiating'].includes(b.status))
+      .map(b => `<option value="${b.id}">${esc(b.artists?.name||'')} — ${b.show_date||''} — ${b.venue_name||''}</option>`).join('');
+}
+
+function filterTours() {
+  const artist   = document.getElementById('tour-filter-artist')?.value || '';
+  const status   = document.getElementById('tour-filter-status')?.value || '';
+  const fromDate = document.getElementById('tour-filter-from')?.value || '';
+  const toDate   = document.getElementById('tour-filter-to')?.value || '';
+
+  filtTourSlots = allTourSlots.filter(s => {
+    if (artist && s.artist_id !== artist) return false;
+    if (status && s.status !== status) return false;
+    if (fromDate && s.date < fromDate) return false;
+    if (toDate && s.date > toDate) return false;
+    return true;
+  });
+
+  renderTourTable();
+  renderTourStats();
+}
+
+function renderTourStats() {
+  const bar = document.getElementById('tour-stats-bar');
+  if (!bar) return;
+  const counts = {};
+  TOUR_STATUSES.forEach(s => counts[s] = 0);
+  filtTourSlots.forEach(s => { if (counts[s.status] !== undefined) counts[s.status]++; });
+  bar.innerHTML = Object.entries(counts).map(([s, n]) =>
+    `<span class="badge ts-${s}" style="font-size:11px;padding:3px 10px;">${s}: ${n}</span>`
+  ).join('');
+}
+
+function tourStatusBadge(s) {
+  return `<span class="badge ts-${s||'available'}" style="font-size:10px;">${s||'available'}</span>`;
+}
+
+function renderTourTable() {
+  const tbody = document.getElementById('tour-tbody');
+  if (!tbody) return;
+  if (!filtTourSlots.length) {
+    tbody.innerHTML = '<tr class="tbl-msg"><td colspan="11">No slots found — adjust filters or add a slot.</td></tr>';
+    return;
+  }
+
+  // Sort by date, insert gap rows between artist tour breaks
+  let rows = '';
+  let prevArtist = null, prevDate = null;
+
+  filtTourSlots.forEach(s => {
+    // Show gap indicator if same artist and gap > 3 days between consecutive slots
+    if (prevArtist && prevArtist === s.artist_id && prevDate) {
+      const gap = (new Date(s.date) - new Date(prevDate)) / (1000*60*60*24);
+      if (gap > 3 && s.status === 'available') {
+        rows += `<tr class="tour-gap-row">
+          <td colspan="11">↳ ${Math.round(gap)} day gap — ${fmtDate(prevDate)} to ${fmtDate(s.date)}</td>
+        </tr>`;
+      }
+    }
+    prevArtist = s.artist_id;
+    prevDate = s.date;
+
+    const bkLink = s.booking_id
+      ? `<button class="ra" onclick="editBooking('${s.booking_id}')">→ Booking</button>`
+      : '';
+    const isConfirmed = s.status === 'confirmed';
+    rows += `<tr style="${isConfirmed ? 'background:#f0fdf4;' : ''}">
+      <td style="padding:6px;"><input type="checkbox" class="tour-row-check" data-id="${s.id}"></td>
+      <td class="td-mono" style="font-size:11px;white-space:nowrap;">${fmtDate(s.date)}</td>
+      <td class="td-name">${esc(s.artists?.name || '—')}</td>
+      <td class="td-trunc">${esc(s.venue || '—')}</td>
+      <td class="td-mono" style="font-size:11px;">${esc(s.city || '—')}</td>
+      <td class="td-mono" style="font-size:11px;">${esc(s.country || '—')}</td>
+      <td>${tourStatusBadge(s.status)}</td>
+      <td class="td-mono" style="font-size:11px;">${esc(s.fee_ballpark || '—')}</td>
+      <td class="td-mono" style="font-size:11px;">${esc(s.assigned_to || '—')}</td>
+      <td class="td-trunc" style="font-size:11px;color:var(--muted);max-width:160px;">${esc(s.notes || '')}</td>
+      <td><div class="row-actions">
+        <button class="ra" onclick="openTourModal('${s.id}')">Edit</button>
+        ${bkLink}
+      </div></td>
+    </tr>`;
+  });
+
+  tbody.innerHTML = rows;
+}
+
+function openTourModal(id) {
+  editTourId = id || null;
+  populateTourDropdowns();
+  document.getElementById('tour-modal-title').textContent = id ? 'Edit Tour Slot' : 'Add Tour Slot';
+  document.getElementById('tour-del-btn').style.display = id ? 'block' : 'none';
+
+  if (id) {
+    const s = allTourSlots.find(x => x.id === id);
+    if (!s) return;
+    document.getElementById('tm-artist').value  = s.artist_id || '';
+    document.getElementById('tm-date').value    = s.date || '';
+    document.getElementById('tm-venue').value   = s.venue || '';
+    document.getElementById('tm-city').value    = s.city || '';
+    document.getElementById('tm-country').value = s.country || '';
+    document.getElementById('tm-status').value  = s.status || 'available';
+    document.getElementById('tm-fee').value     = s.fee_ballpark || '';
+    document.getElementById('tm-assigned').value = s.assigned_to || '';
+    document.getElementById('tm-notes').value   = s.notes || '';
+    document.getElementById('tm-booking').value = s.booking_id || '';
+  } else {
+    document.getElementById('tm-artist').value   = '';
+    document.getElementById('tm-date').value     = '';
+    document.getElementById('tm-venue').value    = '';
+    document.getElementById('tm-city').value     = '';
+    document.getElementById('tm-country').value  = '';
+    document.getElementById('tm-status').value   = 'available';
+    document.getElementById('tm-fee').value      = '';
+    document.getElementById('tm-assigned').value = '';
+    document.getElementById('tm-notes').value    = '';
+    document.getElementById('tm-booking').value  = '';
+  }
+  document.getElementById('tour-modal').classList.add('open');
+}
+
+async function saveTourSlot() {
+  const artistId = document.getElementById('tm-artist').value;
+  const date     = document.getElementById('tm-date').value;
+  if (!artistId) { showToast('Artist is required', 'error'); return; }
+  if (!date)     { showToast('Date is required', 'error'); return; }
+
+  const payload = {
+    artist_id:    artistId,
+    date,
+    venue:        document.getElementById('tm-venue').value.trim() || null,
+    city:         document.getElementById('tm-city').value.trim() || null,
+    country:      document.getElementById('tm-country').value.trim() || null,
+    status:       document.getElementById('tm-status').value || 'available',
+    fee_ballpark: document.getElementById('tm-fee').value.trim() || null,
+    assigned_to:  document.getElementById('tm-assigned').value.trim() || null,
+    notes:        document.getElementById('tm-notes').value.trim() || null,
+    booking_id:   document.getElementById('tm-booking').value || null,
+    updated_at:   new Date().toISOString(),
+  };
+
+  const btn = document.getElementById('tour-save-btn');
+  btn.disabled = true; btn.textContent = 'Saving...';
+
+  let error;
+  if (editTourId) {
+    ({ error } = await db.from('tour_slots').update(payload).eq('id', editTourId));
+  } else {
+    ({ error } = await db.from('tour_slots').insert({ ...payload, created_at: new Date().toISOString() }));
+  }
+
+  btn.disabled = false; btn.textContent = 'Save Slot';
+  if (error) { showToast('Error: ' + error.message, 'error'); return; }
+  showToast(editTourId ? 'Slot updated ✓' : 'Slot added ✓', 'success');
+  closeModal('tour-modal');
+  await loadTourSlots();
+  filterTours();
+}
+
+async function deleteTourSlot() {
+  if (!editTourId) return;
+  if (!confirm('Delete this tour slot?')) return;
+  const { error } = await db.from('tour_slots').delete().eq('id', editTourId);
+  if (error) { showToast('Error deleting', 'error'); return; }
+  showToast('Slot deleted', 'success');
+  closeModal('tour-modal');
+  await loadTourSlots();
+  filterTours();
+}
+
+function tourToggleAll(checked) {
+  document.querySelectorAll('.tour-row-check').forEach(cb => cb.checked = checked);
+}
+
+function exportTours() {
+  const selected = [...document.querySelectorAll('.tour-row-check:checked')].map(cb => cb.dataset.id);
+  const source = selected.length > 0
+    ? filtTourSlots.filter(s => selected.includes(s.id))
+    : filtTourSlots;
+
+  const rows = source.map(s => ({
+    Artist:      s.artists?.name || '',
+    Date:        s.date || '',
+    Venue:       s.venue || '',
+    City:        s.city || '',
+    Country:     s.country || '',
+    Status:      s.status || '',
+    Fee_Ballpark: s.fee_ballpark || '',
+    Assigned_To: s.assigned_to || '',
+    Notes:       s.notes || '',
+    Booking_Ref: s.bookings?.reference || '',
+  }));
+
+  const ws = XLSX.utils.json_to_sheet(rows);
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, 'Tours');
+  XLSX.writeFile(wb, 'deepbloe_tours.xlsx');
+  showToast('Tours exported', 'success');
+}
+// ── END TOURS ─────────────────────────────────────────────────
+
+
+// ══════════════════════════════════════════════════════════════
+// PIPELINE MODULE
+// Table: pipeline_leads
+// Fields: id, artist_id, org_id, contact_id, email, country,
+//         status, deadline, assigned_to, action_type, notes,
+//         booking_id, created_at, updated_at
+// ══════════════════════════════════════════════════════════════
+let allPipelineLeads = [], filtPipelineLeads = [];
+let editPipelineId = null;
+const PL_STATUSES = ['new','contacted','talking','option','hold','confirmed','urgent','closed','lost'];
+
+async function loadPipelineLeads() {
+  const { data, error } = await db.from('pipeline_leads')
+    .select('*, artists(name), organisations(name, legal_name, country), contacts(first_name, last_name, email)')
+    .order('created_at', { ascending: false });
+  if (error) { console.warn('pipeline_leads load error:', error.message); allPipelineLeads = []; }
+  else allPipelineLeads = data || [];
+}
+
+function renderPipeline() {
+  populatePipelineDropdowns();
+  filterPipeline();
+}
+
+function populatePipelineDropdowns() {
+  // Artist filter
+  const aFilt = document.getElementById('pl-filter-artist');
+  if (aFilt) {
+    const cur = aFilt.value;
+    aFilt.innerHTML = '<option value="">All Artists</option>' +
+      allArtists.map(a => `<option value="${a.id}"${a.id===cur?' selected':''}>${esc(a.name)}</option>`).join('');
+  }
+
+  // Artist modal
+  const plmA = document.getElementById('plm-artist');
+  if (plmA) plmA.innerHTML = '<option value="">Select artist...</option>' +
+    allArtists.map(a => `<option value="${a.id}">${esc(a.name)}</option>`).join('');
+
+  // Org modal
+  const plmO = document.getElementById('plm-org');
+  if (plmO) plmO.innerHTML = '<option value="">Select organisation...</option>' +
+    allOrgs.map(o => `<option value="${o.id}">${esc(o.legal_name||o.name)}${o.country?' — '+o.country:''}</option>`).join('');
+
+  // Assigned filter — derive from existing leads
+  const assignedSet = new Set(allPipelineLeads.map(l => l.assigned_to).filter(Boolean));
+  const asSel = document.getElementById('pl-filter-assigned');
+  if (asSel) {
+    const curAs = asSel.value;
+    asSel.innerHTML = '<option value="">All Team</option>' +
+      [...assignedSet].sort().map(a => `<option value="${a}"${a===curAs?' selected':''}>${esc(a)}</option>`).join('');
+  }
+}
+
+function plmOrgChanged() {
+  const orgId = document.getElementById('plm-org').value;
+  const conSel = document.getElementById('plm-contact');
+  if (!orgId) {
+    conSel.innerHTML = '<option value="">Select contact...</option>';
+    return;
+  }
+  // Auto-fill country from org
+  const org = allOrgs.find(o => o.id === orgId);
+  if (org?.country) document.getElementById('plm-country').value = org.country;
+
+  const orgCons = allCons.filter(c => c.organisation_id === orgId && c.is_active !== false);
+  conSel.innerHTML = '<option value="">Select contact...</option>' +
+    orgCons.map(c => {
+      const name = [c.first_name, c.last_name].filter(Boolean).join(' ') || c.email || '—';
+      return `<option value="${c.id}">${esc(name)}${c.email?' — '+c.email:''}</option>`;
+    }).join('');
+}
+
+function plmContactChanged() {
+  const conId = document.getElementById('plm-contact').value;
+  if (!conId) return;
+  const con = allCons.find(c => c.id === conId);
+  if (con?.email) document.getElementById('plm-email').value = con.email;
+}
+
+function filterPipeline() {
+  const artist   = document.getElementById('pl-filter-artist')?.value || '';
+  const status   = document.getElementById('pl-filter-status')?.value || '';
+  const assigned = document.getElementById('pl-filter-assigned')?.value || '';
+  const search   = (document.getElementById('pl-search')?.value || '').toLowerCase();
+
+  filtPipelineLeads = allPipelineLeads.filter(l => {
+    if (artist && l.artist_id !== artist) return false;
+    if (status && l.status !== status) return false;
+    if (assigned && l.assigned_to !== assigned) return false;
+    if (search) {
+      const orgName  = (l.organisations?.legal_name || l.organisations?.name || '').toLowerCase();
+      const conName  = ([l.contacts?.first_name, l.contacts?.last_name].filter(Boolean).join(' ')).toLowerCase();
+      const country  = (l.country || '').toLowerCase();
+      const notes    = (l.notes || '').toLowerCase();
+      if (!orgName.includes(search) && !conName.includes(search) && !country.includes(search) && !notes.includes(search)) return false;
+    }
+    return true;
+  });
+
+  renderPipelineTable();
+  renderPipelineStats();
+  updatePlExportBtn();
+}
+
+function renderPipelineStats() {
+  const bar = document.getElementById('pl-stats-bar');
+  if (!bar) return;
+  const counts = {};
+  PL_STATUSES.forEach(s => counts[s] = 0);
+  filtPipelineLeads.forEach(l => { if (counts[l.status] !== undefined) counts[l.status]++; });
+  // Only show statuses that have entries or are key statuses
+  const show = ['talking','option','confirmed','urgent'];
+  bar.innerHTML = PL_STATUSES.filter(s => counts[s] > 0 || show.includes(s)).map(s =>
+    `<span class="badge ps-${s}" style="font-size:11px;padding:3px 10px;">${s}: ${counts[s]}</span>`
+  ).join('');
+}
+
+function plStatusBadge(s) {
+  return `<span class="badge ps-${s||'new'}" style="font-size:10px;">${s||'new'}</span>`;
+}
+
+function renderPipelineTable() {
+  const tbody = document.getElementById('pipeline-tbody');
+  if (!tbody) return;
+  if (!filtPipelineLeads.length) {
+    tbody.innerHTML = '<tr class="tbl-msg"><td colspan="11">No leads found — adjust filters or add a lead.</td></tr>';
+    return;
+  }
+
+  const today = new Date().toISOString().slice(0,10);
+  tbody.innerHTML = filtPipelineLeads.map(l => {
+    const orgName  = l.organisations?.legal_name || l.organisations?.name || '—';
+    const conName  = [l.contacts?.first_name, l.contacts?.last_name].filter(Boolean).join(' ') || '—';
+    const deadline = l.deadline || '';
+    const isOverdue = deadline && deadline < today && !['confirmed','closed','lost'].includes(l.status);
+    const deadlineTxt = deadline
+      ? `<span style="${isOverdue?'color:var(--red);font-weight:600;':''}">${fmtDate(deadline)}${isOverdue?' ⚠':''}</span>`
+      : '—';
+    const actionMap = {
+      introduction:'Intro', follow_up:'Follow-up', offer_sent:'Offer sent',
+      negotiating:'Negotiating', waiting:'Waiting', call_scheduled:'Call scheduled',
+    };
+    const actionTxt = actionMap[l.action_type] || l.action_type || '—';
+
+    return `<tr style="${l.status==='urgent'?'background:#fff5f5;':''}${l.status==='confirmed'?'background:#f0fdf4;':''}">
+      <td style="padding:6px;"><input type="checkbox" class="pl-row-check" data-id="${l.id}" onchange="updatePlExportBtn()"></td>
+      <td class="td-name">${esc(l.artists?.name || '—')}</td>
+      <td class="td-trunc" style="max-width:160px;">${esc(orgName)}</td>
+      <td class="td-trunc" style="max-width:140px;">${esc(conName)}</td>
+      <td class="td-mono" style="font-size:11px;">${esc(l.country || '—')}</td>
+      <td>${plStatusBadge(l.status)}</td>
+      <td class="td-mono" style="font-size:11px;">${deadlineTxt}</td>
+      <td class="td-mono" style="font-size:11px;">${esc(l.assigned_to || '—')}</td>
+      <td style="font-size:11px;color:var(--muted);">${esc(actionTxt)}</td>
+      <td class="td-trunc" style="font-size:11px;color:var(--muted);max-width:180px;">${esc(l.notes || '')}</td>
+      <td><div class="row-actions">
+        <button class="ra" onclick="openPipelineModal('${l.id}')">Edit</button>
+      </div></td>
+    </tr>`;
+  }).join('');
+}
+
+function openPipelineModal(id) {
+  editPipelineId = id || null;
+  populatePipelineDropdowns();
+  document.getElementById('pl-modal-title').textContent = id ? 'Edit Pipeline Lead' : 'Add Pipeline Lead';
+  document.getElementById('pl-del-btn').style.display = id ? 'block' : 'none';
+  document.getElementById('plm-convert-btn').style.display = id ? 'block' : 'none';
+
+  if (id) {
+    const l = allPipelineLeads.find(x => x.id === id);
+    if (!l) return;
+    document.getElementById('plm-artist').value   = l.artist_id || '';
+    document.getElementById('plm-status').value   = l.status || 'new';
+    document.getElementById('plm-org').value      = l.org_id || '';
+    plmOrgChanged();
+    setTimeout(() => {
+      document.getElementById('plm-contact').value  = l.contact_id || '';
+      document.getElementById('plm-email').value    = l.email || (l.contacts?.email || '');
+    }, 50);
+    document.getElementById('plm-country').value  = l.country || '';
+    document.getElementById('plm-deadline').value = l.deadline || '';
+    document.getElementById('plm-assigned').value = l.assigned_to || '';
+    document.getElementById('plm-action').value   = l.action_type || '';
+    document.getElementById('plm-notes').value    = l.notes || '';
+  } else {
+    document.getElementById('plm-artist').value   = '';
+    document.getElementById('plm-status').value   = 'new';
+    document.getElementById('plm-org').value      = '';
+    document.getElementById('plm-contact').value  = '';
+    document.getElementById('plm-email').value    = '';
+    document.getElementById('plm-country').value  = '';
+    document.getElementById('plm-deadline').value = '';
+    document.getElementById('plm-assigned').value = '';
+    document.getElementById('plm-action').value   = '';
+    document.getElementById('plm-notes').value    = '';
+  }
+  document.getElementById('pipeline-modal').classList.add('open');
+}
+
+async function savePipelineLead() {
+  const artistId = document.getElementById('plm-artist').value;
+  if (!artistId) { showToast('Artist is required', 'error'); return; }
+
+  const orgId    = document.getElementById('plm-org').value || null;
+  const conId    = document.getElementById('plm-contact').value || null;
+
+  // If org/contact not in CRM yet — just save what we have
+  const payload = {
+    artist_id:   artistId,
+    org_id:      orgId,
+    contact_id:  conId,
+    email:       document.getElementById('plm-email').value.trim() || null,
+    country:     document.getElementById('plm-country').value.trim() || null,
+    status:      document.getElementById('plm-status').value || 'new',
+    deadline:    document.getElementById('plm-deadline').value || null,
+    assigned_to: document.getElementById('plm-assigned').value.trim() || null,
+    action_type: document.getElementById('plm-action').value || null,
+    notes:       document.getElementById('plm-notes').value.trim() || null,
+    updated_at:  new Date().toISOString(),
+  };
+
+  const btn = document.getElementById('pl-save-btn');
+  btn.disabled = true; btn.textContent = 'Saving...';
+
+  let error;
+  if (editPipelineId) {
+    ({ error } = await db.from('pipeline_leads').update(payload).eq('id', editPipelineId));
+  } else {
+    ({ error } = await db.from('pipeline_leads').insert({ ...payload, created_at: new Date().toISOString() }));
+  }
+
+  btn.disabled = false; btn.textContent = 'Save Lead';
+  if (error) { showToast('Error: ' + error.message, 'error'); return; }
+  showToast(editPipelineId ? 'Lead updated ✓' : 'Lead added ✓', 'success');
+  closeModal('pipeline-modal');
+  await loadPipelineLeads();
+  filterPipeline();
+}
+
+async function deletePipelineLead() {
+  if (!editPipelineId) return;
+  if (!confirm('Delete this pipeline lead?')) return;
+  const { error } = await db.from('pipeline_leads').delete().eq('id', editPipelineId);
+  if (error) { showToast('Error deleting', 'error'); return; }
+  showToast('Lead deleted', 'success');
+  closeModal('pipeline-modal');
+  await loadPipelineLeads();
+  filterPipeline();
+}
+
+// Convert confirmed pipeline lead → new booking, pre-filling all known fields
+async function convertLeadToBooking() {
+  if (!editPipelineId) return;
+  const l = allPipelineLeads.find(x => x.id === editPipelineId);
+  if (!l) return;
+  closeModal('pipeline-modal');
+  // Mark lead as confirmed
+  await db.from('pipeline_leads').update({ status: 'confirmed' }).eq('id', editPipelineId);
+  // Open booking modal with pre-filled data
+  openBookingModal();
+  setTimeout(() => {
+    if (l.artist_id) document.getElementById('bm-artist').value = l.artist_id;
+    if (l.org_id) {
+      document.getElementById('bm-org').value = l.org_id;
+      bookingStep1();
+      setTimeout(() => {
+        if (l.contact_id) {
+          document.getElementById('bm-contact').value = l.contact_id;
+          bookingStep2();
+        }
+      }, 80);
+    }
+    if (l.country) document.getElementById('bm-country').value = l.country;
+  }, 150);
+  showToast('Lead → Booking opened. Fill in show details.', 'info');
+}
+
+function plToggleAll(checked) {
+  document.querySelectorAll('.pl-row-check').forEach(cb => { cb.checked = checked; });
+  updatePlExportBtn();
+}
+
+function updatePlExportBtn() {
+  const selected = document.querySelectorAll('.pl-row-check:checked');
+  const btn = document.getElementById('pl-export-sel-btn');
+  const cnt = document.getElementById('pl-sel-count');
+  if (!btn) return;
+  if (selected.length > 0) {
+    btn.style.display = 'inline-block';
+    if (cnt) cnt.textContent = selected.length;
+  } else {
+    btn.style.display = 'none';
+  }
+}
+
+function exportPipelineSelected() {
+  const selected = [...document.querySelectorAll('.pl-row-check:checked')].map(cb => cb.dataset.id);
+  const source = filtPipelineLeads.filter(l => selected.includes(l.id));
+  exportPipelineRows(source, 'deepbloe_pipeline_selected.xlsx');
+}
+
+function exportPipelineAll() {
+  exportPipelineRows(filtPipelineLeads, 'deepbloe_pipeline.xlsx');
+}
+
+function exportPipelineRows(source, filename) {
+  if (!source.length) { showToast('Nothing to export', 'error'); return; }
+  const rows = source.map(l => ({
+    Artist:        l.artists?.name || '',
+    Promoter_Venue: l.organisations?.legal_name || l.organisations?.name || '',
+    Contact_Person: [l.contacts?.first_name, l.contacts?.last_name].filter(Boolean).join(' ') || '',
+    Email:         l.email || l.contacts?.email || '',
+    Country:       l.country || '',
+    Status:        l.status || '',
+    Deadline:      l.deadline || '',
+    Assigned_To:   l.assigned_to || '',
+    Action_Type:   l.action_type || '',
+    Notes:         l.notes || '',
+  }));
+  const ws = XLSX.utils.json_to_sheet(rows);
+  // Set column widths
+  ws['!cols'] = [
+    {wch:12},{wch:24},{wch:22},{wch:28},{wch:14},{wch:12},
+    {wch:14},{wch:14},{wch:16},{wch:40}
+  ];
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, 'Pipeline');
+  XLSX.writeFile(wb, filename);
+  showToast(`Exported ${rows.length} leads ✓`, 'success');
+}
+// ── END PIPELINE ───────────────────────────────────────────────
 
 // ── AUDIT LOG ──────────────────────────────────────────────────
 async function logEvent(bookingId, eventType, description, metadata = null) {
