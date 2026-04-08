@@ -248,7 +248,7 @@ nav::before {
 .hero {
   position: relative; min-height: 100vh;
   display: flex; flex-direction: column; justify-content: center;
-  padding-bottom: 80px; padding-top: 120px; overflow: hidden;
+  padding-bottom: 80px; padding-top: 72px; overflow: hidden;
 }
 .hero-bg {
   position: absolute; inset: 0; overflow: hidden;
@@ -1761,3 +1761,16 @@ function handleNavResize() {
     desktop.style.display = 'none';
     cta.style.display = 'none';
     ham.style.display = 'flex';
+  } else {
+    desktop.style.display = 'flex';
+    cta.style.display = 'block';
+    ham.style.display = 'none';
+    closeMobileMenu();
+  }
+}
+handleNavResize();
+window.addEventListener('resize', handleNavResize);
+
+</script>
+</body>
+</html>
