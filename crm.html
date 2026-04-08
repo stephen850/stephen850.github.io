@@ -2163,7 +2163,7 @@ tbody td { padding: 10px 14px; vertical-align: middle; }
       <div style="padding:10px 20px 0;display:flex;gap:8px;flex-wrap:wrap;" id="tour-legend">
         <span class="badge ts-available">Available</span>
         <span class="badge ts-option">Option</span>
-        <span class="badge ts-hold">ts-hold" style="background:#fff3e0;color:#7c4700;border:1px solid #ffcc80;">Hold</span>
+        <span class="badge ts-hold">Hold</span>
         <span class="badge ts-confirmed">Confirmed</span>
         <span class="badge ts-cancelled">Cancelled</span>
       </div>
@@ -2203,14 +2203,14 @@ tbody td { padding: 10px 14px; vertical-align: middle; }
         <!-- Month navigator + calendar -->
         <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px;">
           <button class="btn" onclick="calPrevMonth()" style="padding:4px 12px;">‹</button>
-          <span style="font-family:var(--mono);font-size:13px;font-weight:500;min-width:130px;text-align:center;" id="cal-month-label"></span>
+          <span style="font-family:var(--mono);font-size:13px;font-weight:500;min-width:130px;text-align:center;" id="tour-cal-month-label"></span>
           <button class="btn" onclick="calNextMonth()" style="padding:4px 12px;">›</button>
           <span style="font-family:var(--mono);font-size:10px;color:var(--muted);margin-left:8px;" id="cal-selected-count">0 dates selected</span>
           <button class="btn" onclick="calClearSelection()" style="padding:3px 10px;font-size:10px;margin-left:auto;">Clear</button>
         </div>
 
         <!-- Calendar grid -->
-        <div id="cal-grid" style="display:grid;grid-template-columns:repeat(7,1fr);gap:4px;margin-bottom:20px;"></div>
+        <div id="tour-cal-grid" style="display:grid;grid-template-columns:repeat(7,1fr);gap:4px;margin-bottom:20px;"></div>
 
         <!-- Fields for selected dates -->
         <div style="border-top:1px solid var(--border);padding-top:16px;margin-bottom:16px;">
@@ -7471,7 +7471,7 @@ Please do not hesitate to reach out with any questions.
 
 Kind regards,
 Deepbloe Agency B.V.
-finance@deepbloe.com`;
+${'finance' + '@' + 'deepbloe.com'}`;
 
   } else if (type === 'contract') {
     const ct  = allContracts.find(c => c.id === id);
@@ -7500,7 +7500,7 @@ Please review, sign and return at your earliest convenience. If you have any que
 
 Kind regards,
 Deepbloe Agency B.V.
-stephen@deepbloe.com`;
+${'stephen' + '@' + 'deepbloe.com'}`;
   }
 }
 
@@ -8931,8 +8931,8 @@ function openAddDatesModal() {
 }
 
 function renderCalGrid() {
-  document.getElementById('cal-month-label').textContent = `${TOUR_MONTHS[tourCalMonth]} ${tourCalYear}`;
-  const grid = document.getElementById('cal-grid');
+  document.getElementById('tour-cal-month-label').textContent = `${TOUR_MONTHS[tourCalMonth]} ${tourCalYear}`;
+  const grid = document.getElementById('tour-cal-grid');
   let html = TOUR_DAYS.map(d => `<div style="font-family:var(--mono);font-size:9px;text-align:center;color:var(--muted);padding:4px 0;">${d}</div>`).join('');
   const first = new Date(tourCalYear, tourCalMonth, 1);
   const startOffset = (first.getDay() + 6) % 7;
