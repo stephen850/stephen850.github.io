@@ -1745,6 +1745,7 @@ tbody td { padding: 10px 14px; vertical-align: middle; }
         <div style="flex:1"></div>
         <button class="btn success" onclick="saveExpenses()">✓ Save Expenses</button>
         <button class="btn" onclick="exportFinance()">↓ Export P&L</button>
+        <button class="btn" onclick="exportPLPerArtist()" style="border-color:var(--blue);color:var(--blue);">↓ P&L per Artiest</button>
       </div>
 
       <!-- Top KPI cards -->
@@ -1820,8 +1821,9 @@ tbody td { padding: 10px 14px; vertical-align: middle; }
 
       <!-- Per artist breakdown -->
       <div class="tbl-wrap">
-        <div style="background:var(--accent);padding:10px 14px;font-family:var(--mono);font-size:9px;letter-spacing:0.15em;text-transform:uppercase;color:rgba(255,255,255,0.7)">
-          Revenue by Artist — <span id="fin-artist-year">2026</span>
+        <div style="background:var(--accent);padding:10px 14px;display:flex;justify-content:space-between;align-items:center;">
+          <span style="font-family:var(--mono);font-size:9px;letter-spacing:0.15em;text-transform:uppercase;color:rgba(255,255,255,0.7)">Revenue by Artist — <span id="fin-artist-year">2026</span></span>
+          <button class="btn" onclick="exportPLPerArtist()" style="padding:4px 12px;font-size:9px;border-color:rgba(255,255,255,0.3);color:rgba(255,255,255,0.7)">↓ Export</button>
         </div>
         <table>
           <thead>
@@ -1833,6 +1835,14 @@ tbody td { padding: 10px 14px; vertical-align: middle; }
         </table>
       </div>
 
+      <!-- P&L per artiest uitgebreid -->
+      <div class="tbl-wrap" style="margin-top:12px;" id="fin-pl-artist-wrap">
+        <div style="background:var(--accent);padding:10px 14px;font-family:var(--mono);font-size:9px;letter-spacing:0.15em;text-transform:uppercase;color:rgba(255,255,255,0.7)">
+          P&L per Artiest — Maandoverzicht — <span id="fin-pl-artist-year">2026</span>
+        </div>
+        <div id="fin-pl-artist-body" style="overflow-x:auto;"></div>
+      </div>
+
       <!-- BTW / VAT Report -->
       <div style="margin-top:20px">
         <div class="tbl-wrap">
@@ -1841,6 +1851,7 @@ tbody td { padding: 10px 14px; vertical-align: middle; }
               BTW / VAT Rapportage — <span id="fin-vat-year">2026</span>
             </span>
             <button class="btn" onclick="exportVAT()" style="padding:4px 12px;font-size:9px;border-color:rgba(255,255,255,0.3);color:rgba(255,255,255,0.7)">↓ Export voor boekhouder</button>
+            <button class="btn" onclick="exportOBAangifte()" style="padding:4px 12px;font-size:9px;border-color:rgba(255,165,0,0.6);color:rgba(255,165,0,0.9)">↓ OB-Aangifte Rubrieken</button>
           </div>
           <table>
             <thead>
@@ -6891,6 +6902,7 @@ async function renderFinance() {
 
   // ── VAT REPORT ──
   renderVATReport(year);
+  renderPLPerArtist(year);
 
   // ── CASHFLOW ──
   renderCashflow(year);
@@ -7198,6 +7210,269 @@ function exportVAT() {
   XLSX.writeFile(wb, `deepbloe_btw_rapport_${year}.xlsx`);
   showToast(`BTW rapport ${year} geëxporteerd`, 'success');
 }
+
+// ── OB-AANGIFTE RUBRIEKEN ──────────────────────────────────────
+// Rubriek 1a: NL leveringen/diensten belast met 21%
+// Rubriek 3a: Diensten naar EU ondernemer (reverse charge)
+// Rubriek 3b: Diensten buiten EU (niet belast)
+// Rubriek 4a: Prestaties buiten Nederland — overige
+// Rubriek 5b: Totaal BTW afdracht
+function exportOBAangifte() {
+  const year = finYear;
+  const quarters = [
+    { label: 'Q1', months: [1,2,3] },
+    { label: 'Q2', months: [4,5,6] },
+    { label: 'Q3', months: [7,8,9] },
+    { label: 'Q4', months: [10,11,12] },
+  ];
+
+  const yearInvoices = allInvoices.filter(i => {
+    const d = i.issued_at || i.created_at;
+    return d && new Date(d).getFullYear() === year && i.status !== 'cancelled';
+  });
+
+  const rows = [];
+
+  // Header row explaining rubrieken
+  rows.push({
+    Kwartaal: `OB-Aangifte ${year}`,
+    '1a_Grondslag_NL21': 'Rubriek 1a: Omzet NL 21% BTW',
+    '1a_BTW_21pct': 'BTW bedrag 21%',
+    '3a_EU_Reverse_Charge': 'Rubriek 3a: EU diensten (verlegd)',
+    '3b_Buiten_EU': 'Rubriek 3b: Diensten buiten EU',
+    '4a_Overige_buiten_NL': 'Rubriek 4a: Overige prestaties buiten NL',
+    '5b_BTW_Afdracht': 'Rubriek 5b: Totaal BTW afdracht',
+    Toelichting: '',
+  });
+
+  let totaal_1a_grondslag = 0, totaal_1a_btw = 0;
+  let totaal_3a = 0, totaal_3b = 0, totaal_4a = 0, totaal_5b = 0;
+
+  quarters.forEach(q => {
+    const qInvs = yearInvoices.filter(i => {
+      const m = new Date(i.issued_at || i.created_at).getMonth() + 1;
+      return q.months.includes(m);
+    });
+
+    // 1a: NL 21% BTW diensten
+    const nl21 = qInvs.filter(i => i.vat_rate === 21);
+    const r1a_grondslag = nl21.reduce((s,i) => s + (i.subtotal||0), 0);
+    const r1a_btw      = nl21.reduce((s,i) => s + (i.vat_amount||0), 0);
+
+    // 3a: EU Reverse Charge (diensten aan EU-ondernemers)
+    const rc   = qInvs.filter(i => i.vat_reverse_charge);
+    const r3a  = rc.reduce((s,i) => s + (i.subtotal||0), 0);
+
+    // 3b + 4a: Buiten EU / vrijgesteld (niet-NL, niet-EU)
+    const exempt = qInvs.filter(i => i.vat_exempt && !i.vat_reverse_charge);
+    const r3b    = exempt.reduce((s,i) => s + (i.subtotal||0), 0);
+
+    // 4a: overige buiten NL (0% zonder reverse charge, niet vrijgesteld)
+    const other = qInvs.filter(i => i.vat_rate === 0 && !i.vat_reverse_charge && !i.vat_exempt);
+    const r4a   = other.reduce((s,i) => s + (i.subtotal||0), 0);
+
+    // 5b: BTW afdracht = alleen 1a BTW (RC en buiten-EU = 0 afdracht)
+    const r5b = r1a_btw;
+
+    totaal_1a_grondslag += r1a_grondslag;
+    totaal_1a_btw       += r1a_btw;
+    totaal_3a           += r3a;
+    totaal_3b           += r3b;
+    totaal_4a           += r4a;
+    totaal_5b           += r5b;
+
+    rows.push({
+      Kwartaal: q.label,
+      '1a_Grondslag_NL21': Math.round(r1a_grondslag),
+      '1a_BTW_21pct':      Math.round(r1a_btw),
+      '3a_EU_Reverse_Charge': Math.round(r3a),
+      '3b_Buiten_EU':      Math.round(r3b),
+      '4a_Overige_buiten_NL': Math.round(r4a),
+      '5b_BTW_Afdracht':   Math.round(r5b),
+      Toelichting: `${qInvs.length} facturen`,
+    });
+  });
+
+  // Totaalregel
+  rows.push({
+    Kwartaal: `TOTAAL ${year}`,
+    '1a_Grondslag_NL21': Math.round(totaal_1a_grondslag),
+    '1a_BTW_21pct':      Math.round(totaal_1a_btw),
+    '3a_EU_Reverse_Charge': Math.round(totaal_3a),
+    '3b_Buiten_EU':      Math.round(totaal_3b),
+    '4a_Overige_buiten_NL': Math.round(totaal_4a),
+    '5b_BTW_Afdracht':   Math.round(totaal_5b),
+    Toelichting: 'Totaal jaar',
+  });
+
+  const ws = XLSX.utils.json_to_sheet(rows);
+  ws['!cols'] = [{wch:12},{wch:22},{wch:16},{wch:24},{wch:16},{wch:22},{wch:18},{wch:20}];
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, `OB-Aangifte ${year}`);
+  XLSX.writeFile(wb, `deepbloe_ob_aangifte_${year}.xlsx`);
+  showToast(`OB-aangifte rubrieken ${year} geëxporteerd`, 'success');
+}
+// ── END OB-AANGIFTE ────────────────────────────────────────────
+
+// ── P&L PER ARTIEST ────────────────────────────────────────────
+function renderPLPerArtist(year) {
+  document.getElementById('fin-pl-artist-year').textContent = year;
+  const fmt = n => '€ ' + Math.round(n).toLocaleString('nl-NL');
+
+  const confirmedBks = allBookings.filter(b =>
+    ['confirmed','advancing','completed'].includes(b.status) &&
+    b.show_date && new Date(b.show_date).getFullYear() === year &&
+    b.fee_currency === 'EUR'
+  );
+
+  const container = document.getElementById('fin-pl-artist-body');
+  if (!allArtists.length) { container.innerHTML = ''; return; }
+
+  let html = `<table class="data-table" style="min-width:900px;">
+    <thead><tr>
+      <th>Artiest</th>
+      <th style="text-align:right;">Shows</th>
+      <th style="text-align:right;">Totaal Fee</th>
+      <th style="text-align:right;">Commissie</th>
+      <th style="text-align:right;">Gefactureerd</th>
+      <th style="text-align:right;">Ontvangen</th>
+      <th style="text-align:right;">Openstaand</th>
+      <th style="text-align:right;">Marge %</th>
+    </tr></thead><tbody>`;
+
+  let grandFee = 0, grandComm = 0, grandInv = 0, grandPaid = 0;
+
+  allArtists.forEach(a => {
+    const bks = confirmedBks.filter(b => b.artist_id === a.id);
+    if (!bks.length) return;
+
+    const totalFee   = bks.reduce((s,b) => s + (b.fee_amount||0), 0);
+    const commission = bks.reduce((s,b) => s + ((b.fee_amount||0)*(b.commission_rate||15)/100), 0);
+    const bkIds      = bks.map(b => b.id);
+    const invoiced   = allInvoices.filter(i => bkIds.includes(i.booking_id) && i.currency==='EUR' && i.status!=='cancelled').reduce((s,i) => s+(i.total_amount||0), 0);
+    const paid       = allInvoices.filter(i => bkIds.includes(i.booking_id) && i.currency==='EUR' && i.status==='paid').reduce((s,i) => s+(i.total_amount||0), 0);
+    const outstanding = invoiced - paid;
+    const margin     = totalFee > 0 ? (commission / totalFee * 100) : 0;
+
+    grandFee  += totalFee;
+    grandComm += commission;
+    grandInv  += invoiced;
+    grandPaid += paid;
+
+    html += `<tr>
+      <td class="td-name" style="font-weight:500;">${esc(a.name)}</td>
+      <td class="td-mono" style="text-align:right;">${bks.length}</td>
+      <td class="td-mono" style="text-align:right;">${fmt(totalFee)}</td>
+      <td class="td-mono" style="text-align:right;color:var(--green);">${fmt(commission)}</td>
+      <td class="td-mono" style="text-align:right;">${invoiced > 0 ? fmt(invoiced) : '—'}</td>
+      <td class="td-mono" style="text-align:right;color:var(--green);">${paid > 0 ? fmt(paid) : '—'}</td>
+      <td class="td-mono" style="text-align:right;${outstanding>0?'color:var(--amber);':''}">${outstanding > 0 ? fmt(outstanding) : '—'}</td>
+      <td class="td-mono" style="text-align:right;">${Math.round(margin)}%</td>
+    </tr>`;
+
+    // Monthly breakdown per artiest
+    const monthRow = MONTHS.map((m, i) => {
+      const mBks  = bks.filter(b => new Date(b.show_date).getMonth() === i);
+      const mComm = mBks.reduce((s,b) => s + ((b.fee_amount||0)*(b.commission_rate||15)/100), 0);
+      return `<td class="td-mono" style="text-align:right;font-size:10px;color:var(--muted);">${mComm > 0 ? '€'+Math.round(mComm/1000)+'k' : ''}</td>`;
+    }).join('');
+    html += `<tr style="background:var(--bg);">
+      <td class="td-mono" style="font-size:9px;color:var(--muted);padding-left:28px;">Commissie/maand</td>
+      ${monthRow}
+    </tr>`;
+  });
+
+  // Totaalregel
+  const grandOutstanding = grandInv - grandPaid;
+  html += `<tr style="background:var(--bg);border-top:2px solid var(--border);font-weight:600;">
+    <td class="td-mono" style="font-size:10px;letter-spacing:0.1em;text-transform:uppercase;">TOTAAL</td>
+    <td class="td-mono" style="text-align:right;">${confirmedBks.length}</td>
+    <td class="td-mono" style="text-align:right;">${fmt(grandFee)}</td>
+    <td class="td-mono" style="text-align:right;color:var(--green);">${fmt(grandComm)}</td>
+    <td class="td-mono" style="text-align:right;">${fmt(grandInv)}</td>
+    <td class="td-mono" style="text-align:right;color:var(--green);">${fmt(grandPaid)}</td>
+    <td class="td-mono" style="text-align:right;${grandOutstanding>0?'color:var(--amber);':''}">${grandOutstanding > 0 ? fmt(grandOutstanding) : '—'}</td>
+    <td class="td-mono" style="text-align:right;">${grandFee > 0 ? Math.round(grandComm/grandFee*100)+'%' : '—'}</td>
+  </tr>`;
+
+  html += `</tbody></table>`;
+  container.innerHTML = html;
+}
+
+function exportPLPerArtist() {
+  const year = finYear;
+  const fmt2 = n => Math.round(n);
+  const confirmedBks = allBookings.filter(b =>
+    ['confirmed','advancing','completed'].includes(b.status) &&
+    b.show_date && new Date(b.show_date).getFullYear() === year &&
+    b.fee_currency === 'EUR'
+  );
+
+  const rows = [];
+
+  allArtists.forEach(a => {
+    const bks = confirmedBks.filter(b => b.artist_id === a.id);
+    if (!bks.length) return;
+
+    const totalFee   = bks.reduce((s,b) => s + (b.fee_amount||0), 0);
+    const commission = bks.reduce((s,b) => s + ((b.fee_amount||0)*(b.commission_rate||15)/100), 0);
+    const bkIds      = bks.map(b => b.id);
+    const invoiced   = allInvoices.filter(i => bkIds.includes(i.booking_id) && i.currency==='EUR' && i.status!=='cancelled').reduce((s,i) => s+(i.total_amount||0), 0);
+    const paid       = allInvoices.filter(i => bkIds.includes(i.booking_id) && i.currency==='EUR' && i.status==='paid').reduce((s,i) => s+(i.total_amount||0), 0);
+    const outstanding = invoiced - paid;
+    const margin     = totalFee > 0 ? Math.round(commission / totalFee * 100) : 0;
+
+    // One row per artiest
+    const baseRow = {
+      Artiest: a.name,
+      Jaar: year,
+      Shows: bks.length,
+      Totaal_Fee_EUR: fmt2(totalFee),
+      Commissie_EUR: fmt2(commission),
+      Marge_Pct: margin + '%',
+      Gefactureerd_EUR: fmt2(invoiced),
+      Ontvangen_EUR: fmt2(paid),
+      Openstaand_EUR: fmt2(outstanding),
+    };
+
+    // Monthly commission
+    MONTHS.forEach((m, i) => {
+      const mBks = bks.filter(b => new Date(b.show_date).getMonth() === i);
+      baseRow['Commissie_' + m] = fmt2(mBks.reduce((s,b) => s + ((b.fee_amount||0)*(b.commission_rate||15)/100), 0));
+    });
+
+    rows.push(baseRow);
+
+    // Individual shows
+    bks.forEach(b => {
+      rows.push({
+        Artiest: '  > ' + a.name,
+        Jaar: year,
+        Shows: '',
+        Totaal_Fee_EUR: fmt2(b.fee_amount||0),
+        Commissie_EUR: fmt2((b.fee_amount||0)*(b.commission_rate||15)/100),
+        Marge_Pct: (b.commission_rate||15) + '%',
+        Gefactureerd_EUR: '',
+        Ontvangen_EUR: '',
+        Openstaand_EUR: '',
+        _Datum: b.show_date || '',
+        _Venue: [b.venue_name, b.venue_city, b.venue_country].filter(Boolean).join(', '),
+        _Status: b.status,
+        _Ref: b.reference || '',
+      });
+    });
+  });
+
+  if (!rows.length) { showToast('Geen data voor dit jaar', 'error'); return; }
+
+  const ws = XLSX.utils.json_to_sheet(rows);
+  ws['!cols'] = [{wch:16},{wch:6},{wch:6},{wch:16},{wch:16},{wch:10},{wch:16},{wch:16},{wch:16}];
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, `P&L Artists ${year}`);
+  XLSX.writeFile(wb, `deepbloe_pl_per_artiest_${year}.xlsx`);
+  showToast(`P&L per artiest ${year} geëxporteerd`, 'success');
+}
+// ── END P&L PER ARTIEST ────────────────────────────────────────
 
 function renderCashflow(year) {
   document.getElementById('fin-cf-year').textContent = year;
