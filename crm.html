@@ -1314,12 +1314,6 @@ tbody td { padding: 10px 14px; vertical-align: middle; }
             <option>Belgium</option><option>Germany</option><option>Spain</option>
             <option>Italy</option><option>France</option><option>United Kingdom</option><option>Other</option>
           </select>
-          <select class="tb-select" id="org-genre" onchange="filterOrgs()">
-            <option value="">All genres</option>
-            <option>Afro House</option><option>Melodic House</option><option>Tech House</option>
-            <option>Deep House</option><option>House</option><option>Techno</option>
-            <option>EDM</option><option>Melodic Techno</option><option>Progressive</option><option>Disco</option>
-          </select>
           <div class="tb-right">
             <button class="btn" onclick="exportOrgs()">↓ Export</button>
             <button class="btn success" onclick="openWizard()" style="border-color:var(--green);color:var(--green)">+ New Setup</button>
@@ -1329,7 +1323,7 @@ tbody td { padding: 10px 14px; vertical-align: middle; }
         <div class="tbl-wrap">
           <table>
             <thead>
-              <tr><th>Company</th><th>Type</th><th>Country</th><th>City</th><th>Genre</th><th>Contact</th><th>Email</th><th>Actions</th></tr>
+              <tr><th>Company</th><th>Type</th><th>Country</th><th>City</th><th>Contact</th><th>Email</th><th>Actions</th></tr>
             </thead>
             <tbody id="org-tbody"><tr class="tbl-msg"><td colspan="8">Loading...</td></tr></tbody>
           </table>
@@ -4637,12 +4631,10 @@ function filterOrgs() {
   const q  = document.getElementById('org-search').value.toLowerCase();
   const ty = document.getElementById('org-type').value;
   const co = document.getElementById('org-country').value;
-  const ge = document.getElementById('org-genre').value;
   filtOrgs = allOrgs.filter(o => {
     if (q  && !`${o.name}${o.city}`.toLowerCase().includes(q)) return false;
     if (ty && o.type    !== ty) return false;
     if (co && o.country !== co) return false;
-    if (ge && !(o.genre || []).includes(ge)) return false;
     return true;
   });
   orgPageN = 0;
@@ -4653,7 +4645,7 @@ function renderOrgs() {
   const tbody = document.getElementById('org-tbody');
   const slice = filtOrgs.slice(orgPageN * PG, (orgPageN + 1) * PG);
   if (!slice.length) {
-    tbody.innerHTML = '<tr class="tbl-msg"><td colspan="8">No organisations found</td></tr>';
+    tbody.innerHTML = '<tr class="tbl-msg"><td colspan="7">No organisations found</td></tr>';
     document.getElementById('org-pinfo').textContent = '';
     document.getElementById('org-prev').disabled = true;
     document.getElementById('org-next').disabled = true;
@@ -4677,7 +4669,6 @@ function renderOrgs() {
       <td>${typeBadge(o.type)}</td>
       <td>${esc(o.country||'—')}</td>
       <td class="td-trunc">${esc(o.city||'—')}</td>
-      <td>${genres || '<span style="color:var(--muted)">—</span>'}</td>
       <td>${conName}${extraLabel}</td>
       <td class="td-trunc">${conEmail}</td>
       <td><div class="row-actions">
