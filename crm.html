@@ -5035,7 +5035,6 @@ async function saveContact() {
     email,
     phone:             document.getElementById('cm-phone').value.trim() || null,
     role:              document.getElementById('cm-role').value          || null,
-    marketing_enabled: document.getElementById('cm-mc').checked         || false,
   };
   if (!editConId && _pendingOrgId) data.organisation_id = _pendingOrgId;
   if (!editConId) data.source = 'Manual';
