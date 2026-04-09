@@ -4829,7 +4829,6 @@ function omConRemove(idx) {
 }
 
 async function saveOrg() {
-  alert('saveOrg called, editOrgId=' + editOrgId + ', oc1-email=' + document.getElementById('oc1-email')?.value);
   const legalName = document.getElementById('om-legal-name').value.trim();
   if (!legalName) { showToast('Legal name is required', 'error'); return; }
 
@@ -4865,13 +4864,11 @@ async function saveOrg() {
         { first: 'oc3-first', last: 'oc3-last', email: 'oc3-email', phone: 'oc3-phone', role: 'oc3-role', mc: 'oc3-mc' },
       ];
       let savedCount = 0;
-      let debugMsg = '';
       for (const s of contactSlots) {
         const emailEl = document.getElementById(s.email);
         const email = emailEl?.value?.trim();
-        debugMsg += `${s.email}: "${email}" (el exists: ${!!emailEl})\n`;
         if (!email) continue;
-        const { error: conErr } = await db.from('contacts').insert({
+        const conData = {
           organisation_id:   orgId,
           first_name:        document.getElementById(s.first)?.value?.trim() || null,
           last_name:         document.getElementById(s.last)?.value?.trim()  || null,
@@ -4881,11 +4878,22 @@ async function saveOrg() {
           marketing_enabled: document.getElementById(s.mc)?.checked          || false,
           source:            'Manual',
           is_active:         true,
-        });
-        if (conErr) showToast(`Contact error: ${conErr.message}`, 'info');
-        else savedCount++;
+        };
+        // Try insert first, if duplicate email update the existing contact
+        const { error: insErr } = await db.from('contacts').insert(conData);
+        if (insErr && insErr.code === '23505') {
+          // Duplicate email -- update existing contact with new org link
+          const { error: updErr } = await db.from('contacts')
+            .update({ organisation_id: orgId, role: conData.role, marketing_enabled: conData.marketing_enabled })
+            .eq('email', email);
+          if (updErr) showToast(`Contact error: ${updErr.message}`, 'info');
+          else savedCount++;
+        } else if (insErr) {
+          showToast(`Contact error: ${insErr.message}`, 'info');
+        } else {
+          savedCount++;
+        }
       }
-      alert('DEBUG:\n' + debugMsg + '\nSaved: ' + savedCount);
       if (savedCount > 0) showToast(`Company + ${savedCount} contact${savedCount !== 1 ? 's' : ''} added ✓`, 'success');
       else showToast('Company added ✓', 'success');
     }
@@ -4911,7 +4919,9 @@ async function deleteOrg(id, name) {
 // ── CONTACTS ──────────────────────────────────────────────────
 async function loadContacts() {
   const { data, error } = await db.from('contacts')
-    .select('*, organisations(name, type, country)').order('created_at', { ascending: false });
+    .select('*, organisations(name, type, country)')
+    .or('is_active.is.null,is_active.eq.true')
+    .order('created_at', { ascending: false });
   if (error) { showToast('Error loading contacts', 'error'); return; }
   allCons = data;
   updateConStats();
@@ -5122,9 +5132,8 @@ async function syncAllToMailchimp() {
 
 async function deleteContact(id, email) {
   if (!confirm(`Delete contact "${email}"?`)) return;
-  // Soft delete
-  const { error } = await db.from('contacts').update({ is_active: false }).eq('id', id);
-  if (error) { showToast('Error deleting', 'error'); return; }
+  const { error } = await db.from('contacts').delete().eq('id', id);
+  if (error) { showToast('Error deleting: ' + error.message, 'error'); return; }
   showToast('Contact deleted', 'success');
   loadContacts();
 }
