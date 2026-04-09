@@ -4672,9 +4672,10 @@ function openOrgModal(id=null) {
 
   // Reset contact rows
   omConIdx = 0;
+  omConData = [];
   const list = document.getElementById('om-contacts-list');
   if (list) list.innerHTML = '';
-  if (!id) omAddContactRow(); // start with one empty row
+  if (!id) omAddContactRow();
 
   if (id) {
     const o = allOrgs.find(x => x.id === id) || {};
@@ -4700,22 +4701,29 @@ function openOrgModal(id=null) {
 }
 
 let omConIdx = 0;
+let omConData = []; // store contact data in JS, not DOM
+
 function omAddContactRow() {
   const idx = omConIdx++;
+  omConData.push({ idx, first_name:'', last_name:'', email:'', phone:'', role:'', marketing_enabled: false });
+
   const list = document.getElementById('om-contacts-list');
   const div = document.createElement('div');
-  div.className = 'om-con-row';
-  div.dataset.idx = idx;
-  div.style.cssText = 'border:1px solid var(--border);padding:14px;margin-bottom:10px;position:relative;';
+  div.id = `om-con-row-${idx}`;
+  div.style.cssText = 'border:1px solid var(--border);padding:14px;margin-bottom:10px;position:relative;background:var(--surface);';
   div.innerHTML = `
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
-      <div class="fg"><label>First Name</label><input class="om-con-first" placeholder="James"></div>
-      <div class="fg"><label>Last Name</label><input class="om-con-last" placeholder="Wilson"></div>
-      <div class="fg"><label>Email</label><input class="om-con-email" type="email" placeholder="james@venue.com"></div>
-      <div class="fg"><label>Phone</label><input class="om-con-phone" placeholder="+66 8..."></div>
+      <div class="fg"><label>First Name</label>
+        <input placeholder="James" oninput="omConSet(${idx},'first_name',this.value)"></div>
+      <div class="fg"><label>Last Name</label>
+        <input placeholder="Wilson" oninput="omConSet(${idx},'last_name',this.value)"></div>
+      <div class="fg"><label>Email</label>
+        <input type="email" placeholder="james@venue.com" oninput="omConSet(${idx},'email',this.value)"></div>
+      <div class="fg"><label>Phone</label>
+        <input placeholder="+66 8..." oninput="omConSet(${idx},'phone',this.value)"></div>
       <div class="fg" style="grid-column:span 2;">
-        <label>Role / Type of Contact</label>
-        <select class="om-con-role">
+        <label>Role</label>
+        <select onchange="omConSet(${idx},'role',this.value)">
           <option value="">Select role...</option>
           <option>Owner</option><option>General Manager</option><option>Music Director</option>
           <option>Booking Contact</option><option>Admin Team</option><option>Legal Team</option>
@@ -4724,15 +4732,27 @@ function omAddContactRow() {
       </div>
       <div class="fg" style="grid-column:span 2;display:flex;align-items:center;gap:10px;margin-top:4px;">
         <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-family:var(--mono);font-size:10px;letter-spacing:0.1em;text-transform:uppercase;">
-          <input type="checkbox" class="om-con-mc" style="width:16px;height:16px;cursor:pointer;accent-color:var(--green);">
+          <input type="checkbox" onchange="omConSet(${idx},'marketing_enabled',this.checked)"
+            style="width:16px;height:16px;cursor:pointer;accent-color:var(--green);">
           Sync to Mailchimp
         </label>
-        <span style="font-family:var(--mono);font-size:9px;color:var(--muted);">This email will be synced to your Mailchimp audience</span>
       </div>
     </div>
-    ${idx > 0 ? `<button type="button" onclick="this.closest('.om-con-row').remove()" style="position:absolute;top:8px;right:10px;background:none;border:none;cursor:pointer;font-size:18px;color:var(--muted);">×</button>` : ''}
+    ${idx > 0 ? `<button type="button" onclick="omConRemove(${idx})"
+      style="position:absolute;top:8px;right:10px;background:none;border:none;cursor:pointer;font-size:18px;color:var(--muted);">×</button>` : ''}
   `;
   list.appendChild(div);
+}
+
+function omConSet(idx, field, value) {
+  const row = omConData.find(r => r.idx === idx);
+  if (row) row[field] = value;
+}
+
+function omConRemove(idx) {
+  omConData = omConData.filter(r => r.idx !== idx);
+  const el = document.getElementById(`om-con-row-${idx}`);
+  if (el) el.remove();
 }
 
 async function saveOrg() {
@@ -4763,30 +4783,24 @@ async function saveOrg() {
     error = err;
     orgId = inserted?.[0]?.id;
 
-    // Save all contact rows
+    // Save contacts from JS array
     if (!error && orgId) {
-      const rows = document.querySelectorAll('.om-con-row');
-      console.log('Contact rows found:', rows.length);
+      const toSave = omConData.filter(c => c.email && c.email.trim());
       let savedCount = 0;
-      for (const row of rows) {
-        const email = row.querySelector('.om-con-email')?.value.trim();
-        const firstName = row.querySelector('.om-con-first')?.value.trim();
-        console.log('Row:', firstName, email);
-        if (!email) { console.log('Skipping - no email'); continue; }
-        const conData = {
-          organisation_id:    orgId,
-          first_name:         firstName || null,
-          last_name:          row.querySelector('.om-con-last')?.value.trim() || null,
-          email,
-          phone:              row.querySelector('.om-con-phone')?.value.trim() || null,
-          role:               row.querySelector('.om-con-role')?.value || null,
-          marketing_enabled:  row.querySelector('.om-con-mc')?.checked || false,
-          source:             'Manual',
-          is_active:          true,
-        };
-        const { error: conErr } = await db.from('contacts').insert(conData);
-        if (conErr) { console.error('Contact insert error:', conErr); showToast(`Contact error: ${conErr.message}`, 'info'); }
-        else { console.log('Saved:', email); savedCount++; }
+      for (const c of toSave) {
+        const { error: conErr } = await db.from('contacts').insert({
+          organisation_id:   orgId,
+          first_name:        c.first_name || null,
+          last_name:         c.last_name  || null,
+          email:             c.email.trim(),
+          phone:             c.phone      || null,
+          role:              c.role       || null,
+          marketing_enabled: c.marketing_enabled || false,
+          source:            'Manual',
+          is_active:         true,
+        });
+        if (conErr) showToast(`Contact error: ${conErr.message}`, 'info');
+        else savedCount++;
       }
       showToast(`Company + ${savedCount} contact${savedCount !== 1 ? 's' : ''} added ✓`, 'success');
     }
