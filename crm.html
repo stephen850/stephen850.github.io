@@ -2578,38 +2578,10 @@ tbody td { padding: 10px 14px; vertical-align: middle; }
       </div>
     </div>
 
-    <div class="form-section" id="om-contact-section">Primary Contact</div>
-    <div class="form-grid" id="om-contact-fields">
-      <div class="fg">
-        <label>First Name</label>
-        <input id="om-con-first" placeholder="e.g. James">
-      </div>
-      <div class="fg">
-        <label>Last Name</label>
-        <input id="om-con-last" placeholder="e.g. Wilson">
-      </div>
-      <div class="fg">
-        <label>Email *</label>
-        <input id="om-con-email" type="email" placeholder="james@venue.com">
-      </div>
-      <div class="fg">
-        <label>Phone</label>
-        <input id="om-con-phone" placeholder="+66 8...">
-      </div>
-      <div class="fg" style="grid-column:span 2;">
-        <label>Role / Type of Contact</label>
-        <select id="om-con-role">
-          <option value="">Select role...</option>
-          <option value="Owner">Owner</option>
-          <option value="General Manager">General Manager</option>
-          <option value="Music Director">Music Director</option>
-          <option value="Booking Contact">Booking Contact</option>
-          <option value="Admin Team">Admin Team</option>
-          <option value="Legal Team">Legal Team</option>
-          <option value="Finance">Finance</option>
-          <option value="Other">Other</option>
-        </select>
-      </div>
+    <div class="form-section" id="om-contact-section">Primary Contacts</div>
+    <div id="om-contacts-list"></div>
+    <div id="om-contact-fields" style="display:none;">
+      <button type="button" onclick="omAddContactRow()" style="margin:8px 0 16px;background:none;border:1px solid var(--border-dark);padding:6px 16px;font-family:var(--mono);font-size:10px;letter-spacing:0.1em;text-transform:uppercase;cursor:pointer;">+ Add Contact</button>
     </div>
 
     <div class="modal-ftr">
@@ -4696,7 +4668,12 @@ function openOrgModal(id=null) {
   const contactSection = document.getElementById('om-contact-section');
   const contactFields  = document.getElementById('om-contact-fields');
   if (contactSection) contactSection.style.display = id ? 'none' : 'block';
-  if (contactFields)  contactFields.style.display  = id ? 'none' : 'grid';
+  if (contactFields)  contactFields.style.display  = id ? 'none' : 'block';
+
+  // Reset contact rows
+  const list = document.getElementById('om-contacts-list');
+  if (list) list.innerHTML = '';
+  if (!id) omAddContactRow(); // start with one empty row
 
   if (id) {
     const o = allOrgs.find(x => x.id === id) || {};
@@ -4712,15 +4689,48 @@ function openOrgModal(id=null) {
     document.getElementById('om-kvk').value          = o.kvk_number || '';
     document.getElementById('om-iban').value         = o.iban || '';
   } else {
-    ['om-id','om-legal-name','om-trading-name','om-phone','om-country','om-city',
-     'om-website','om-vat','om-kvk','om-iban',
-     'om-con-first','om-con-last','om-con-email','om-con-phone'].forEach(f => {
+    ['om-id','om-legal-name','om-trading-name','om-country','om-city',
+     'om-website','om-vat','om-kvk','om-iban'].forEach(f => {
       const el = document.getElementById(f); if (el) el.value = '';
     });
-    document.getElementById('om-type').value    = '';
-    document.getElementById('om-con-role').value = '';
+    document.getElementById('om-type').value = '';
   }
   document.getElementById('org-modal').classList.add('open');
+}
+
+let omConIdx = 0;
+function omAddContactRow() {
+  const idx = omConIdx++;
+  const list = document.getElementById('om-contacts-list');
+  const div = document.createElement('div');
+  div.id = `om-con-row-${idx}`;
+  div.style.cssText = 'border:1px solid var(--border);padding:14px;margin-bottom:10px;position:relative;';
+  div.innerHTML = `
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+      <div class="fg"><label>First Name</label><input id="om-con-first-${idx}" placeholder="James"></div>
+      <div class="fg"><label>Last Name</label><input id="om-con-last-${idx}" placeholder="Wilson"></div>
+      <div class="fg"><label>Email</label><input id="om-con-email-${idx}" type="email" placeholder="james@venue.com"></div>
+      <div class="fg"><label>Phone</label><input id="om-con-phone-${idx}" placeholder="+66 8..."></div>
+      <div class="fg" style="grid-column:span 2;">
+        <label>Role / Type of Contact</label>
+        <select id="om-con-role-${idx}">
+          <option value="">Select role...</option>
+          <option>Owner</option><option>General Manager</option><option>Music Director</option>
+          <option>Booking Contact</option><option>Admin Team</option><option>Legal Team</option>
+          <option>Finance</option><option>Other</option>
+        </select>
+      </div>
+      <div class="fg" style="grid-column:span 2;display:flex;align-items:center;gap:10px;margin-top:4px;">
+        <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-family:var(--mono);font-size:10px;letter-spacing:0.1em;text-transform:uppercase;">
+          <input type="checkbox" id="om-con-mc-${idx}" style="width:16px;height:16px;cursor:pointer;accent-color:var(--green);">
+          Sync to Mailchimp
+        </label>
+        <span style="font-family:var(--mono);font-size:9px;color:var(--muted);">This email address will be synced to your Mailchimp audience</span>
+      </div>
+    </div>
+    ${idx > 0 ? `<button type="button" onclick="document.getElementById('om-con-row-${idx}').remove()" style="position:absolute;top:8px;right:10px;background:none;border:none;cursor:pointer;font-size:16px;color:var(--muted);">×</button>` : ''}
+  `;
+  list.appendChild(div);
 }
 
 async function saveOrg() {
@@ -4732,7 +4742,6 @@ async function saveOrg() {
     trading_name:  document.getElementById('om-trading-name').value.trim() || null,
     name:          legalName,
     company_type:  document.getElementById('om-type').value || null,
-    phone:         document.getElementById('om-phone').value.trim() || null,
     country:       document.getElementById('om-country').value.trim() || null,
     city:          document.getElementById('om-city').value.trim() || null,
     website:       document.getElementById('om-website').value.trim() || null,
@@ -4752,26 +4761,33 @@ async function saveOrg() {
     error = err;
     orgId = inserted?.[0]?.id;
 
-    // Also create primary contact if email is provided
+    // Save all contact rows
     if (!error && orgId) {
-      const conEmail = document.getElementById('om-con-email')?.value.trim();
-      if (conEmail) {
+      const rows = document.querySelectorAll('[id^="om-con-row-"]');
+      let savedCount = 0;
+      for (const row of rows) {
+        const idxMatch = row.id.match(/om-con-row-(\d+)/);
+        if (!idxMatch) continue;
+        const i = idxMatch[1];
+        const email = document.getElementById(`om-con-email-${i}`)?.value.trim();
+        if (!email) continue; // skip rows without email
+        const mcSync = document.getElementById(`om-con-mc-${i}`)?.checked || false;
         const conData = {
-          organisation_id: orgId,
-          first_name: document.getElementById('om-con-first')?.value.trim() || null,
-          last_name:  document.getElementById('om-con-last')?.value.trim() || null,
-          email:      conEmail,
-          phone:      document.getElementById('om-con-phone')?.value.trim() || null,
-          role:       document.getElementById('om-con-role')?.value || null,
-          source:     'Manual',
-          is_active:  true,
+          organisation_id:    orgId,
+          first_name:         document.getElementById(`om-con-first-${i}`)?.value.trim() || null,
+          last_name:          document.getElementById(`om-con-last-${i}`)?.value.trim() || null,
+          email,
+          phone:              document.getElementById(`om-con-phone-${i}`)?.value.trim() || null,
+          role:               document.getElementById(`om-con-role-${i}`)?.value || null,
+          marketing_enabled:  mcSync,
+          source:             'Manual',
+          is_active:          true,
         };
         const { error: conErr } = await db.from('contacts').insert(conData);
-        if (conErr) showToast('Company saved, but contact error: ' + conErr.message, 'info');
-        else showToast('Company + contact added ✓', 'success');
-      } else {
-        showToast('Company added ✓', 'success');
+        if (conErr) showToast(`Contact error: ${conErr.message}`, 'info');
+        else savedCount++;
       }
+      showToast(`Company + ${savedCount} contact${savedCount !== 1 ? 's' : ''} added ✓`, 'success');
     }
   }
 
