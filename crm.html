@@ -4864,8 +4864,11 @@ async function saveOrg() {
         { first: 'oc3-first', last: 'oc3-last', email: 'oc3-email', phone: 'oc3-phone', role: 'oc3-role', mc: 'oc3-mc' },
       ];
       let savedCount = 0;
+      let debugMsg = '';
       for (const s of contactSlots) {
-        const email = document.getElementById(s.email)?.value?.trim();
+        const emailEl = document.getElementById(s.email);
+        const email = emailEl?.value?.trim();
+        debugMsg += `${s.email}: "${email}" (el exists: ${!!emailEl})\n`;
         if (!email) continue;
         const { error: conErr } = await db.from('contacts').insert({
           organisation_id:   orgId,
@@ -4881,6 +4884,7 @@ async function saveOrg() {
         if (conErr) showToast(`Contact error: ${conErr.message}`, 'info');
         else savedCount++;
       }
+      alert('DEBUG:\n' + debugMsg + '\nSaved: ' + savedCount);
       if (savedCount > 0) showToast(`Company + ${savedCount} contact${savedCount !== 1 ? 's' : ''} added ✓`, 'success');
       else showToast('Company added ✓', 'success');
     }
