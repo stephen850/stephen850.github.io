@@ -6277,11 +6277,15 @@ async function saveInvoice() {
   };
   const btn = document.querySelector('#invoice-editor-overlay .ie-btn.success');
   btn.disabled=true; btn.textContent='Saving...';
-  let error;
+  let error, newId;
   if (editInvoiceId) {
     ({error}=await db.from('invoices').update(payload).eq('id',editInvoiceId));
   } else {
-    ({error}=await db.from('invoices').insert({...payload,status:'draft'}));
+    const { data: inserted, error: insErr } = await db.from('invoices').insert({...payload,status:'draft'}).select('id');
+    error = insErr;
+    if (!error && inserted?.[0]?.id) {
+      editInvoiceId = inserted[0].id;
+    }
   }
   btn.disabled=false; btn.textContent='✓ Save Invoice';
   if (error) { showToast('Error: '+error.message,'error'); return; }
@@ -6289,6 +6293,7 @@ async function saveInvoice() {
     editInvoiceId ? `Invoice updated (${payload.invoice_number||''})` : `Invoice created: ${payload.invoice_number||''} — ${payload.type||''} — ${payload.total_amount||0} ${payload.currency||'EUR'}`,
     { invoice_number: payload.invoice_number, type: payload.type, amount: payload.total_amount });
   showToast(editInvoiceId?'Invoice updated':'Invoice saved as draft','success');
+  if (editInvoiceId) loadInvoiceComments(editInvoiceId);
   loadInvoices();
 }
 
