@@ -2240,11 +2240,10 @@ tbody td { padding: 10px 14px; vertical-align: middle; }
                 <th>Contact Person</th>
                 <th>Email</th>
                 <th>Phone</th>
-                <th>Genre</th>
               </tr>
             </thead>
             <tbody id="pool-tbody">
-              <tr class="tbl-msg"><td colspan="9">No contacts found.</td></tr>
+              <tr class="tbl-msg"><td colspan="8">No contacts found.</td></tr>
             </tbody>
           </table>
         </div>
@@ -2583,6 +2582,40 @@ tbody td { padding: 10px 14px; vertical-align: middle; }
       <div class="fg">
         <label>IBAN</label>
         <input id="om-iban" placeholder="NL00 BANK 0000 0000 00">
+      </div>
+    </div>
+
+    <div class="form-section" id="om-contact-section">Primary Contact</div>
+    <div class="form-grid" id="om-contact-fields">
+      <div class="fg">
+        <label>First Name</label>
+        <input id="om-con-first" placeholder="e.g. James">
+      </div>
+      <div class="fg">
+        <label>Last Name</label>
+        <input id="om-con-last" placeholder="e.g. Wilson">
+      </div>
+      <div class="fg">
+        <label>Email *</label>
+        <input id="om-con-email" type="email" placeholder="james@venue.com">
+      </div>
+      <div class="fg">
+        <label>Phone</label>
+        <input id="om-con-phone" placeholder="+66 8...">
+      </div>
+      <div class="fg" style="grid-column:span 2;">
+        <label>Role / Type of Contact</label>
+        <select id="om-con-role">
+          <option value="">Select role...</option>
+          <option value="Owner">Owner</option>
+          <option value="General Manager">General Manager</option>
+          <option value="Music Director">Music Director</option>
+          <option value="Booking Contact">Booking Contact</option>
+          <option value="Admin Team">Admin Team</option>
+          <option value="Legal Team">Legal Team</option>
+          <option value="Finance">Finance</option>
+          <option value="Other">Other</option>
+        </select>
       </div>
     </div>
 
@@ -4669,31 +4702,33 @@ function openOrgModal(id=null) {
   editOrgId = id;
   document.getElementById('org-modal-title').textContent = id ? 'Edit Company' : 'Add Company';
   document.getElementById('om-delete-btn').style.display = id ? 'inline-block' : 'none';
-  document.getElementById('om-legal-name').value  = '';
-  document.getElementById('om-trading-name').value = '';
-  document.getElementById('om-type').value         = '';
-  document.getElementById('om-phone').value        = '';
-  document.getElementById('om-country').value      = '';
-  document.getElementById('om-city').value         = '';
-  document.getElementById('om-website').value      = '';
-  document.getElementById('om-vat').value          = '';
-  document.getElementById('om-kvk').value          = '';
-  document.getElementById('om-iban').value         = '';
+  // Only show contact section for new companies
+  const contactSection = document.getElementById('om-contact-section');
+  const contactFields  = document.getElementById('om-contact-fields');
+  if (contactSection) contactSection.style.display = id ? 'none' : 'block';
+  if (contactFields)  contactFields.style.display  = id ? 'none' : 'grid';
 
   if (id) {
-    const o = allOrgs.find(x => x.id === id);
-    if (o) {
-      document.getElementById('om-legal-name').value  = o.legal_name || o.name || '';
-      document.getElementById('om-trading-name').value = o.trading_name || '';
-      document.getElementById('om-type').value         = o.company_type || '';
-      document.getElementById('om-phone').value        = o.phone || '';
-      document.getElementById('om-country').value      = o.country || '';
-      document.getElementById('om-city').value         = o.city || '';
-      document.getElementById('om-website').value      = o.website || '';
-      document.getElementById('om-vat').value          = o.vat_number || '';
-      document.getElementById('om-kvk').value          = o.kvk_number || '';
-      document.getElementById('om-iban').value         = o.iban || '';
-    }
+    const o = allOrgs.find(x => x.id === id) || {};
+    document.getElementById('om-id').value           = id;
+    document.getElementById('om-legal-name').value   = o.legal_name || o.name || '';
+    document.getElementById('om-trading-name').value = o.trading_name || '';
+    document.getElementById('om-type').value         = o.company_type || o.type || '';
+    document.getElementById('om-phone').value        = o.phone || '';
+    document.getElementById('om-country').value      = o.country || '';
+    document.getElementById('om-city').value         = o.city || '';
+    document.getElementById('om-website').value      = o.website || '';
+    document.getElementById('om-vat').value          = o.vat_number || '';
+    document.getElementById('om-kvk').value          = o.kvk_number || '';
+    document.getElementById('om-iban').value         = o.iban || '';
+  } else {
+    ['om-id','om-legal-name','om-trading-name','om-phone','om-country','om-city',
+     'om-website','om-vat','om-kvk','om-iban',
+     'om-con-first','om-con-last','om-con-email','om-con-phone'].forEach(f => {
+      const el = document.getElementById(f); if (el) el.value = '';
+    });
+    document.getElementById('om-type').value    = '';
+    document.getElementById('om-con-role').value = '';
   }
   document.getElementById('org-modal').classList.add('open');
 }
@@ -4705,7 +4740,7 @@ async function saveOrg() {
   const data = {
     legal_name:    legalName,
     trading_name:  document.getElementById('om-trading-name').value.trim() || null,
-    name:          legalName, // keep name in sync
+    name:          legalName,
     company_type:  document.getElementById('om-type').value || null,
     phone:         document.getElementById('om-phone').value.trim() || null,
     country:       document.getElementById('om-country').value.trim() || null,
@@ -4726,12 +4761,34 @@ async function saveOrg() {
     const { data: inserted, error: err } = await db.from('organisations').insert(data).select('id');
     error = err;
     orgId = inserted?.[0]?.id;
-    if (!error) showToast('Company added ✓', 'success');
+
+    // Also create primary contact if email is provided
+    if (!error && orgId) {
+      const conEmail = document.getElementById('om-con-email')?.value.trim();
+      if (conEmail) {
+        const conData = {
+          organisation_id: orgId,
+          first_name: document.getElementById('om-con-first')?.value.trim() || null,
+          last_name:  document.getElementById('om-con-last')?.value.trim() || null,
+          email:      conEmail,
+          phone:      document.getElementById('om-con-phone')?.value.trim() || null,
+          role:       document.getElementById('om-con-role')?.value || null,
+          source:     'Manual',
+          is_active:  true,
+        };
+        const { error: conErr } = await db.from('contacts').insert(conData);
+        if (conErr) showToast('Company saved, but contact error: ' + conErr.message, 'info');
+        else showToast('Company + contact added ✓', 'success');
+      } else {
+        showToast('Company added ✓', 'success');
+      }
+    }
   }
 
   if (error) { showToast('Error saving: ' + error.message, 'error'); return; }
   closeModal('org-modal');
   await loadOrgs();
+  await loadContacts();
 }
 
 async function deleteOrg(id, name) {
@@ -9508,7 +9565,7 @@ async function renderContactsPool() {
     const msg = poolOrgIds.length === 0
       ? `No contacts in ${artist?.name}'s pool yet — go to Pipeline tab to add contacts.`
       : 'No contacts match the current filter.';
-    tbody.innerHTML = `<tr class="tbl-msg"><td colspan="9">${msg}</td></tr>`;
+    tbody.innerHTML = `<tr class="tbl-msg"><td colspan="8">${msg}</td></tr>`;
     poolUpdateExportBtn(); return;
   }
 
@@ -9516,7 +9573,6 @@ async function renderContactsPool() {
     const cons     = allCons.filter(c => c.organisation_id === o.id && c.is_active !== false);
     const primary  = cons[0];
     const conName  = primary ? [primary.first_name, primary.last_name].filter(Boolean).join(' ') : '—';
-    const genre    = Array.isArray(o.genre) ? o.genre.join(', ') : (o.genre || '—');
     const typeCls  = {promoter:'club',festival:'festival',agency:'agency',brand:'brand'}[o.company_type||o.type]||'other';
     return `<tr>
       <td style="padding:6px;"><input type="checkbox" class="pool-row-check" data-org-id="${o.id}" onchange="poolUpdateExportBtn()"></td>
@@ -9527,7 +9583,6 @@ async function renderContactsPool() {
       <td class="td-trunc" style="max-width:140px;">${esc(conName)}</td>
       <td class="td-mono" style="font-size:11px;">${esc(primary?.email||'—')}</td>
       <td class="td-mono" style="font-size:11px;">${esc(primary?.phone||'—')}</td>
-      <td style="font-size:11px;color:var(--muted);">${esc(genre)}</td>
     </tr>`;
   }).join('');
 
