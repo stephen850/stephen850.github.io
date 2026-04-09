@@ -2578,10 +2578,75 @@ tbody td { padding: 10px 14px; vertical-align: middle; }
       </div>
     </div>
 
-    <div class="form-section" id="om-contact-section">Primary Contacts</div>
-    <div id="om-contacts-list"></div>
-    <div id="om-contact-fields" style="display:none;">
-      <button type="button" onclick="omAddContactRow()" style="margin:8px 0 16px;background:none;border:1px solid var(--border-dark);padding:6px 16px;font-family:var(--mono);font-size:10px;letter-spacing:0.1em;text-transform:uppercase;cursor:pointer;">+ Add Contact</button>
+    <div class="form-section" id="om-contact-section">Contacts <span style="font-weight:400;text-transform:none;letter-spacing:0;font-size:10px;color:var(--muted)">(vul in wat je hebt)</span></div>
+    <div id="om-contact-fields">
+
+      <!-- Contact 1 -->
+      <div style="border:1px solid var(--border);padding:14px;margin-bottom:10px;background:var(--bg);">
+        <div style="font-family:var(--mono);font-size:9px;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);margin-bottom:10px;">Contact 1</div>
+        <div class="form-grid">
+          <div class="fg"><label>First Name</label><input id="oc1-first" placeholder="James"></div>
+          <div class="fg"><label>Last Name</label><input id="oc1-last" placeholder="Wilson"></div>
+          <div class="fg"><label>Email</label><input id="oc1-email" type="email" placeholder="james@venue.com"></div>
+          <div class="fg"><label>Phone</label><input id="oc1-phone" placeholder="+66 8..."></div>
+          <div class="fg" style="grid-column:span 2"><label>Role</label>
+            <select id="oc1-role"><option value="">Select role...</option>
+              <option>Owner</option><option>General Manager</option><option>Music Director</option>
+              <option>Booking Contact</option><option>Admin Team</option><option>Legal Team</option>
+              <option>Finance</option><option>Other</option>
+            </select>
+          </div>
+          <div class="fg" style="grid-column:span 2;display:flex;align-items:center;gap:8px;">
+            <input id="oc1-mc" type="checkbox" style="width:15px;height:15px;accent-color:var(--green);">
+            <label for="oc1-mc" style="font-family:var(--mono);font-size:10px;letter-spacing:0.1em;text-transform:uppercase;cursor:pointer;">Sync to Mailchimp</label>
+          </div>
+        </div>
+      </div>
+
+      <!-- Contact 2 -->
+      <div style="border:1px solid var(--border);padding:14px;margin-bottom:10px;background:var(--bg);">
+        <div style="font-family:var(--mono);font-size:9px;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);margin-bottom:10px;">Contact 2 <span style="opacity:0.5">(optioneel)</span></div>
+        <div class="form-grid">
+          <div class="fg"><label>First Name</label><input id="oc2-first" placeholder="Sarah"></div>
+          <div class="fg"><label>Last Name</label><input id="oc2-last" placeholder="Johnson"></div>
+          <div class="fg"><label>Email</label><input id="oc2-email" type="email" placeholder="sarah@venue.com"></div>
+          <div class="fg"><label>Phone</label><input id="oc2-phone" placeholder="+66 8..."></div>
+          <div class="fg" style="grid-column:span 2"><label>Role</label>
+            <select id="oc2-role"><option value="">Select role...</option>
+              <option>Owner</option><option>General Manager</option><option>Music Director</option>
+              <option>Booking Contact</option><option>Admin Team</option><option>Legal Team</option>
+              <option>Finance</option><option>Other</option>
+            </select>
+          </div>
+          <div class="fg" style="grid-column:span 2;display:flex;align-items:center;gap:8px;">
+            <input id="oc2-mc" type="checkbox" style="width:15px;height:15px;accent-color:var(--green);">
+            <label for="oc2-mc" style="font-family:var(--mono);font-size:10px;letter-spacing:0.1em;text-transform:uppercase;cursor:pointer;">Sync to Mailchimp</label>
+          </div>
+        </div>
+      </div>
+
+      <!-- Contact 3 -->
+      <div style="border:1px solid var(--border);padding:14px;margin-bottom:10px;background:var(--bg);">
+        <div style="font-family:var(--mono);font-size:9px;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);margin-bottom:10px;">Contact 3 <span style="opacity:0.5">(optioneel)</span></div>
+        <div class="form-grid">
+          <div class="fg"><label>First Name</label><input id="oc3-first" placeholder="Tom"></div>
+          <div class="fg"><label>Last Name</label><input id="oc3-last" placeholder="Chen"></div>
+          <div class="fg"><label>Email</label><input id="oc3-email" type="email" placeholder="tom@venue.com"></div>
+          <div class="fg"><label>Phone</label><input id="oc3-phone" placeholder="+66 8..."></div>
+          <div class="fg" style="grid-column:span 2"><label>Role</label>
+            <select id="oc3-role"><option value="">Select role...</option>
+              <option>Owner</option><option>General Manager</option><option>Music Director</option>
+              <option>Booking Contact</option><option>Admin Team</option><option>Legal Team</option>
+              <option>Finance</option><option>Other</option>
+            </select>
+          </div>
+          <div class="fg" style="grid-column:span 2;display:flex;align-items:center;gap:8px;">
+            <input id="oc3-mc" type="checkbox" style="width:15px;height:15px;accent-color:var(--green);">
+            <label for="oc3-mc" style="font-family:var(--mono);font-size:10px;letter-spacing:0.1em;text-transform:uppercase;cursor:pointer;">Sync to Mailchimp</label>
+          </div>
+        </div>
+      </div>
+
     </div>
 
     <div class="modal-ftr">
@@ -4664,18 +4729,26 @@ function openOrgModal(id=null) {
   editOrgId = id;
   document.getElementById('org-modal-title').textContent = id ? 'Edit Company' : 'Add Company';
   document.getElementById('om-delete-btn').style.display = id ? 'inline-block' : 'none';
-  // Only show contact section for new companies
+  // Show/hide contact section
   const contactSection = document.getElementById('om-contact-section');
   const contactFields  = document.getElementById('om-contact-fields');
   if (contactSection) contactSection.style.display = id ? 'none' : 'block';
   if (contactFields)  contactFields.style.display  = id ? 'none' : 'block';
 
-  // Reset contact rows
-  omConIdx = 0;
-  omConData = [];
-  const list = document.getElementById('om-contacts-list');
-  if (list) list.innerHTML = '';
-  if (!id) omAddContactRow();
+  // Clear contact fields
+  if (!id) {
+    ['oc1-first','oc1-last','oc1-email','oc1-phone',
+     'oc2-first','oc2-last','oc2-email','oc2-phone',
+     'oc3-first','oc3-last','oc3-email','oc3-phone'].forEach(f => {
+      const el = document.getElementById(f); if (el) el.value = '';
+    });
+    ['oc1-role','oc2-role','oc3-role'].forEach(f => {
+      const el = document.getElementById(f); if (el) el.value = '';
+    });
+    ['oc1-mc','oc2-mc','oc3-mc'].forEach(f => {
+      const el = document.getElementById(f); if (el) el.checked = false;
+    });
+  }
 
   if (id) {
     const o = allOrgs.find(x => x.id === id) || {};
@@ -4714,16 +4787,16 @@ function omAddContactRow() {
   div.innerHTML = `
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
       <div class="fg"><label>First Name</label>
-        <input placeholder="James" oninput="omConSet(${idx},'first_name',this.value)"></div>
+        <input data-field="first_name" placeholder="James"></div>
       <div class="fg"><label>Last Name</label>
-        <input placeholder="Wilson" oninput="omConSet(${idx},'last_name',this.value)"></div>
+        <input data-field="last_name" placeholder="Wilson"></div>
       <div class="fg"><label>Email</label>
-        <input type="email" placeholder="james@venue.com" oninput="omConSet(${idx},'email',this.value)"></div>
+        <input data-field="email" type="email" placeholder="james@venue.com"></div>
       <div class="fg"><label>Phone</label>
-        <input placeholder="+66 8..." oninput="omConSet(${idx},'phone',this.value)"></div>
+        <input data-field="phone" placeholder="+66 8..."></div>
       <div class="fg" style="grid-column:span 2;">
         <label>Role</label>
-        <select onchange="omConSet(${idx},'role',this.value)">
+        <select data-field="role">
           <option value="">Select role...</option>
           <option>Owner</option><option>General Manager</option><option>Music Director</option>
           <option>Booking Contact</option><option>Admin Team</option><option>Legal Team</option>
@@ -4732,7 +4805,7 @@ function omAddContactRow() {
       </div>
       <div class="fg" style="grid-column:span 2;display:flex;align-items:center;gap:10px;margin-top:4px;">
         <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-family:var(--mono);font-size:10px;letter-spacing:0.1em;text-transform:uppercase;">
-          <input type="checkbox" onchange="omConSet(${idx},'marketing_enabled',this.checked)"
+          <input data-field="marketing_enabled" type="checkbox"
             style="width:16px;height:16px;cursor:pointer;accent-color:var(--green);">
           Sync to Mailchimp
         </label>
@@ -4783,26 +4856,33 @@ async function saveOrg() {
     error = err;
     orgId = inserted?.[0]?.id;
 
-    // Save contacts from JS array
+    // Save contacts using static IDs
     if (!error && orgId) {
-      const toSave = omConData.filter(c => c.email && c.email.trim());
+      const contactSlots = [
+        { first: 'oc1-first', last: 'oc1-last', email: 'oc1-email', phone: 'oc1-phone', role: 'oc1-role', mc: 'oc1-mc' },
+        { first: 'oc2-first', last: 'oc2-last', email: 'oc2-email', phone: 'oc2-phone', role: 'oc2-role', mc: 'oc2-mc' },
+        { first: 'oc3-first', last: 'oc3-last', email: 'oc3-email', phone: 'oc3-phone', role: 'oc3-role', mc: 'oc3-mc' },
+      ];
       let savedCount = 0;
-      for (const c of toSave) {
+      for (const s of contactSlots) {
+        const email = document.getElementById(s.email)?.value?.trim();
+        if (!email) continue;
         const { error: conErr } = await db.from('contacts').insert({
           organisation_id:   orgId,
-          first_name:        c.first_name || null,
-          last_name:         c.last_name  || null,
-          email:             c.email.trim(),
-          phone:             c.phone      || null,
-          role:              c.role       || null,
-          marketing_enabled: c.marketing_enabled || false,
+          first_name:        document.getElementById(s.first)?.value?.trim() || null,
+          last_name:         document.getElementById(s.last)?.value?.trim()  || null,
+          email,
+          phone:             document.getElementById(s.phone)?.value?.trim() || null,
+          role:              document.getElementById(s.role)?.value           || null,
+          marketing_enabled: document.getElementById(s.mc)?.checked          || false,
           source:            'Manual',
           is_active:         true,
         });
         if (conErr) showToast(`Contact error: ${conErr.message}`, 'info');
         else savedCount++;
       }
-      showToast(`Company + ${savedCount} contact${savedCount !== 1 ? 's' : ''} added ✓`, 'success');
+      if (savedCount > 0) showToast(`Company + ${savedCount} contact${savedCount !== 1 ? 's' : ''} added ✓`, 'success');
+      else showToast('Company added ✓', 'success');
     }
   }
 
