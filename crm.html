@@ -3702,11 +3702,16 @@ The Netherlands</textarea>
     </div>
     <input type="hidden" id="vm-id">
     <div class="form-grid">
-      <div class="fg"><label>Venue Name *</label><input id="vm-name" placeholder="Muin"></div>
+      <div class="fg"><label>Project Name *</label><input id="vm-name" placeholder="Muin"></div>
       <div class="fg"><label>Type *</label>
         <select id="vm-type">
           <option value="club">Club</option>
           <option value="festival">Festival</option>
+          <option value="promoter">Promoter</option>
+          <option value="agency">Agency</option>
+          <option value="brand">Brand</option>
+          <option value="company">Company</option>
+          <option value="other">Other</option>
         </select>
       </div>
       <div class="fg"><label>City</label><input id="vm-city" placeholder="Amsterdam"></div>
@@ -3720,7 +3725,7 @@ The Netherlands</textarea>
           <option value="">Select organisation...</option>
         </select>
       </div>
-      <div class="fg full"><label>Primary Contact</label>
+      <div class="fg full"><label>Marketing Contact <span style="font-family:var(--mono);font-size:9px;color:var(--muted)">(receives newsletter · Mailchimp sync)</span></label>
         <select id="vm-contact">
           <option value="">— select organisation first —</option>
         </select>
@@ -3740,7 +3745,7 @@ The Netherlands</textarea>
     <div class="modal-ftr">
       <button class="btn danger" id="vm-delete-btn" style="display:none;margin-right:auto" onclick="deleteVenue()">Delete</button>
       <button class="btn" onclick="closeModal('venue-modal')">Cancel</button>
-      <button class="btn primary" onclick="saveVenue()">Save Venue</button>
+      <button class="btn primary" onclick="saveVenue()">Save Project</button>
     </div>
   </div>
 </div>
@@ -4752,7 +4757,6 @@ function openOrgModal(id=null) {
     const o = allOrgs.find(x => x.id === id) || {};
     document.getElementById('om-id').value           = id;
     document.getElementById('om-legal-name').value   = o.legal_name || o.name || '';
-    document.getElementById('om-trading-name').value = o.trading_name || '';
     document.getElementById('om-type').value         = o.company_type || o.type || '';
     document.getElementById('om-phone').value        = o.phone || '';
     document.getElementById('om-country').value      = o.country || '';
@@ -4762,7 +4766,7 @@ function openOrgModal(id=null) {
     document.getElementById('om-kvk').value          = o.kvk_number || '';
     document.getElementById('om-iban').value         = o.iban || '';
   } else {
-    ['om-id','om-legal-name','om-trading-name','om-country','om-city',
+    ['om-id','om-legal-name','om-country','om-city',
      'om-website','om-vat','om-kvk','om-iban'].forEach(f => {
       const el = document.getElementById(f); if (el) el.value = '';
     });
@@ -4832,7 +4836,6 @@ async function saveOrg() {
 
   const data = {
     legal_name:    legalName,
-    trading_name:  document.getElementById('om-trading-name').value.trim() || null,
     name:          legalName,
     company_type:  document.getElementById('om-type').value || null,
     country:       document.getElementById('om-country').value.trim() || null,
