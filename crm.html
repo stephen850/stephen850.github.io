@@ -4671,6 +4671,7 @@ function openOrgModal(id=null) {
   if (contactFields)  contactFields.style.display  = id ? 'none' : 'block';
 
   // Reset contact rows
+  omConIdx = 0;
   const list = document.getElementById('om-contacts-list');
   if (list) list.innerHTML = '';
   if (!id) omAddContactRow(); // start with one empty row
@@ -4703,17 +4704,18 @@ function omAddContactRow() {
   const idx = omConIdx++;
   const list = document.getElementById('om-contacts-list');
   const div = document.createElement('div');
-  div.id = `om-con-row-${idx}`;
+  div.className = 'om-con-row';
+  div.dataset.idx = idx;
   div.style.cssText = 'border:1px solid var(--border);padding:14px;margin-bottom:10px;position:relative;';
   div.innerHTML = `
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
-      <div class="fg"><label>First Name</label><input id="om-con-first-${idx}" placeholder="James"></div>
-      <div class="fg"><label>Last Name</label><input id="om-con-last-${idx}" placeholder="Wilson"></div>
-      <div class="fg"><label>Email</label><input id="om-con-email-${idx}" type="email" placeholder="james@venue.com"></div>
-      <div class="fg"><label>Phone</label><input id="om-con-phone-${idx}" placeholder="+66 8..."></div>
+      <div class="fg"><label>First Name</label><input class="om-con-first" placeholder="James"></div>
+      <div class="fg"><label>Last Name</label><input class="om-con-last" placeholder="Wilson"></div>
+      <div class="fg"><label>Email</label><input class="om-con-email" type="email" placeholder="james@venue.com"></div>
+      <div class="fg"><label>Phone</label><input class="om-con-phone" placeholder="+66 8..."></div>
       <div class="fg" style="grid-column:span 2;">
         <label>Role / Type of Contact</label>
-        <select id="om-con-role-${idx}">
+        <select class="om-con-role">
           <option value="">Select role...</option>
           <option>Owner</option><option>General Manager</option><option>Music Director</option>
           <option>Booking Contact</option><option>Admin Team</option><option>Legal Team</option>
@@ -4722,13 +4724,13 @@ function omAddContactRow() {
       </div>
       <div class="fg" style="grid-column:span 2;display:flex;align-items:center;gap:10px;margin-top:4px;">
         <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-family:var(--mono);font-size:10px;letter-spacing:0.1em;text-transform:uppercase;">
-          <input type="checkbox" id="om-con-mc-${idx}" style="width:16px;height:16px;cursor:pointer;accent-color:var(--green);">
+          <input type="checkbox" class="om-con-mc" style="width:16px;height:16px;cursor:pointer;accent-color:var(--green);">
           Sync to Mailchimp
         </label>
-        <span style="font-family:var(--mono);font-size:9px;color:var(--muted);">This email address will be synced to your Mailchimp audience</span>
+        <span style="font-family:var(--mono);font-size:9px;color:var(--muted);">This email will be synced to your Mailchimp audience</span>
       </div>
     </div>
-    ${idx > 0 ? `<button type="button" onclick="document.getElementById('om-con-row-${idx}').remove()" style="position:absolute;top:8px;right:10px;background:none;border:none;cursor:pointer;font-size:16px;color:var(--muted);">×</button>` : ''}
+    ${idx > 0 ? `<button type="button" onclick="this.closest('.om-con-row').remove()" style="position:absolute;top:8px;right:10px;background:none;border:none;cursor:pointer;font-size:18px;color:var(--muted);">×</button>` : ''}
   `;
   list.appendChild(div);
 }
@@ -4763,23 +4765,19 @@ async function saveOrg() {
 
     // Save all contact rows
     if (!error && orgId) {
-      const rows = document.querySelectorAll('[id^="om-con-row-"]');
+      const rows = document.querySelectorAll('.om-con-row');
       let savedCount = 0;
       for (const row of rows) {
-        const idxMatch = row.id.match(/om-con-row-(\d+)/);
-        if (!idxMatch) continue;
-        const i = idxMatch[1];
-        const email = document.getElementById(`om-con-email-${i}`)?.value.trim();
-        if (!email) continue; // skip rows without email
-        const mcSync = document.getElementById(`om-con-mc-${i}`)?.checked || false;
+        const email = row.querySelector('.om-con-email')?.value.trim();
+        if (!email) continue;
         const conData = {
           organisation_id:    orgId,
-          first_name:         document.getElementById(`om-con-first-${i}`)?.value.trim() || null,
-          last_name:          document.getElementById(`om-con-last-${i}`)?.value.trim() || null,
+          first_name:         row.querySelector('.om-con-first')?.value.trim() || null,
+          last_name:          row.querySelector('.om-con-last')?.value.trim() || null,
           email,
-          phone:              document.getElementById(`om-con-phone-${i}`)?.value.trim() || null,
-          role:               document.getElementById(`om-con-role-${i}`)?.value || null,
-          marketing_enabled:  mcSync,
+          phone:              row.querySelector('.om-con-phone')?.value.trim() || null,
+          role:               row.querySelector('.om-con-role')?.value || null,
+          marketing_enabled:  row.querySelector('.om-con-mc')?.checked || false,
           source:             'Manual',
           is_active:          true,
         };
