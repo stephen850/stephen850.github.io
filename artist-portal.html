@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Deepbloe · Artist Portal</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@300;400;500&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script data-cfasync="false" src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
 :root {
   --bg: #0d0d0d;
@@ -312,6 +312,8 @@ const db = createClient(SUPABASE_URL, SUPABASE_KEY);
 let artistData = null;
 let allBookings = [];
 let allAdvancing = [];
+let _currentShowBooking = null;
+let _currentShowAdv = null;
 
 // ── AUTH ──────────────────────────────────────────────────────
 async function doLogin() {
@@ -471,6 +473,8 @@ function openShowDetail(bookingId) {
   const b   = allBookings.find(x => x.id === bookingId);
   const adv = allAdvancing.find(a => a.booking_id === bookingId);
   if (!b) return;
+  _currentShowBooking = b;
+  _currentShowAdv = adv || null;
 
   // Hero
   document.getElementById('detail-hero').innerHTML = `
@@ -510,10 +514,12 @@ function openShowDetail(bookingId) {
 
   // Advancing tab
   if (adv) {
-    const d = adv.advancing_data || {};
-    const total = 27; // rough field count
-    const filled = Object.values(d).filter(v => v && !Array.isArray(v) && String(v).trim()).length;
-    const pct = Math.round(filled / total * 100);
+    const d = adv; // fields are direct columns, not nested in advancing_data
+    const fields = [
+      d.venue_contact_name, d.venue_contact_phone, d.load_in_time,
+      d.pa_system, d.set_time, d.hotel_name, d.airline_in, d.airline_out
+    ].filter(Boolean);
+    const pct = Math.min(100, Math.round(fields.length / 8 * 100));
 
     document.getElementById('detail-advancing').innerHTML = `
       <div class="adv-section" style="margin-bottom:16px">
@@ -524,6 +530,9 @@ function openShowDetail(bookingId) {
             <span class="prog-pct">${pct}%</span>
           </div>
         </div>
+      </div>
+      <div style="margin-bottom:12px;display:flex;justify-content:flex-end;">
+        <button onclick="printItinerary()" style="background:none;border:1px solid #444;color:#888;padding:7px 16px;font-family:var(--mono);font-size:10px;letter-spacing:0.1em;text-transform:uppercase;cursor:pointer;">⎙ Print Itinerary</button>
       </div>
       ${advSection('Venue & Contact', [
         ['Contact', d.venue_contact_name],
@@ -553,9 +562,10 @@ function openShowDetail(bookingId) {
         ['Check-in', d.hotel_checkin ? fmtDate(d.hotel_checkin) : null],
         ['Check-out', d.hotel_checkout ? fmtDate(d.hotel_checkout) : null],
         ['Confirmation', d.hotel_confirmation],
+        ['Room Type', d.hotel_room],
         ['Dressing Room', d.dressing_room],
         ['Catering', d.catering],
-        ['Guestlist Spots', d.guestlist_spots],
+        ['Guestlist Spots', d.guestlist_spots ? String(d.guestlist_spots) : null],
       ])}
     `;
   } else {
@@ -569,29 +579,32 @@ function openShowDetail(bookingId) {
 
   // Travel tab
   if (adv) {
-    const d = adv.advancing_data || {};
+    const d = adv; // direct columns
     document.getElementById('detail-travel').innerHTML = `
+      <div style="margin-bottom:12px;display:flex;justify-content:flex-end;">
+        <button onclick="printItinerary()" style="background:none;border:1px solid #444;color:#888;padding:7px 16px;font-family:var(--mono);font-size:10px;letter-spacing:0.1em;text-transform:uppercase;cursor:pointer;">⎙ Print Itinerary</button>
+      </div>
       ${advSection('Inbound Flight', [
-        ['Airline / Flight', d.airline_in && d.flight_in ? `${d.airline_in} ${d.flight_in}` : null],
-        ['Route', d.dep_in && d.arr_in ? `${d.dep_in} → ${d.arr_in}` : null],
-        ['Departure', d.dep_time_in],
-        ['Arrival', d.arr_time_in],
+        ['Airline / Flight', d.airline_in && d.flight_number_in ? `${d.airline_in} ${d.flight_number_in}` : (d.airline_in || null)],
+        ['Route', d.departure_in && d.arrival_in ? `${d.departure_in} → ${d.arrival_in}` : null],
+        ['Departure', d.departure_time_in ? new Date(d.departure_time_in).toLocaleString('en-GB',{day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'}) : null],
+        ['Arrival', d.arrival_time_in ? new Date(d.arrival_time_in).toLocaleString('en-GB',{day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'}) : null],
         ['Seat', d.seat_in],
         ['Booking Ref', d.flight_ref_in],
       ])}
       ${advSection('Return Flight', [
-        ['Airline / Flight', d.airline_out && d.flight_out ? `${d.airline_out} ${d.flight_out}` : null],
-        ['Route', d.dep_out && d.arr_out ? `${d.dep_out} → ${d.arr_out}` : null],
-        ['Departure', d.dep_time_out],
-        ['Arrival', d.arr_time_out],
+        ['Airline / Flight', d.airline_out && d.flight_number_out ? `${d.airline_out} ${d.flight_number_out}` : (d.airline_out || null)],
+        ['Route', d.departure_out && d.arrival_out ? `${d.departure_out} → ${d.arrival_out}` : null],
+        ['Departure', d.departure_time_out ? new Date(d.departure_time_out).toLocaleString('en-GB',{day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'}) : null],
+        ['Arrival', d.arrival_time_out ? new Date(d.arrival_time_out).toLocaleString('en-GB',{day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'}) : null],
         ['Seat', d.seat_out],
         ['Booking Ref', d.flight_ref_out],
       ])}
       ${advSection('Ground Transport', [
         ['Driver', d.driver_name],
         ['Phone', d.driver_phone],
-        ['Vehicle', d.vehicle],
-        ['Pickup', d.pickup],
+        ['Vehicle', d.vehicle_type],
+        ['Pickup', d.pickup_location],
         ['Notes', d.transport_notes],
       ])}
     `;
@@ -628,6 +641,108 @@ function dr(label, val) {
     <span class="detail-label">${esc(label)}</span>
     <span class="detail-val">${esc(String(val))}</span>
   </div>`;
+}
+
+// ── PRINT ITINERARY ───────────────────────────────────────────
+function printItinerary() {
+  const b   = _currentShowBooking;
+  const adv = _currentShowAdv;
+  if (!b) { alert('No show selected'); return; }
+
+  const fmtD  = d => d ? new Date(d+'T00:00:00').toLocaleDateString('en-GB',{weekday:'long',day:'2-digit',month:'long',year:'numeric'}) : '—';
+  const fmtDT = d => d ? new Date(d).toLocaleString('en-GB',{day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'}) : '—';
+  const row = (label, val) => val ? `<tr><td style="font-family:'DM Mono',monospace;font-size:10px;color:#8a8278;width:180px;padding:8px 12px;border-bottom:1px solid #e2ddd6;text-transform:uppercase;letter-spacing:0.08em;">${label}</td><td style="padding:8px 12px;border-bottom:1px solid #e2ddd6;">${val}</td></tr>` : '';
+  const section = (title, rows) => {
+    const filled = rows.filter(r => r[1]);
+    if (!filled.length) return '';
+    return `<div style="margin-bottom:24px;">
+      <div style="font-family:'DM Mono',monospace;font-size:9px;letter-spacing:0.15em;text-transform:uppercase;color:#8a8278;padding:8px 12px;background:#f7f5f0;border-left:3px solid #1a1a1a;margin-bottom:0;">${title}</div>
+      <table style="width:100%;border-collapse:collapse;">${filled.map(r => row(r[0], r[1])).join('')}</table>
+    </div>`;
+  };
+
+  const win = window.open('', '_blank');
+  win.document.write(`<!DOCTYPE html><html><head>
+    <meta charset="UTF-8">
+    <title>Itinerary — ${artistData?.name||''} — ${b.show_date||''}</title>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@300;400;500&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+    <style>*{box-sizing:border-box;margin:0;padding:0;}body{font-family:'DM Sans',sans-serif;font-size:13px;color:#1a1a1a;background:#fff;padding:40px;}@media print{body{padding:20px;}@page{margin:15mm;}}</style>
+  </head><body>
+    <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:28px;padding-bottom:16px;border-bottom:2px solid #1a1a1a;">
+      <div>
+        <div style="font-family:'DM Mono',monospace;font-size:18px;letter-spacing:0.2em;text-transform:uppercase;">Deepbloe</div>
+        <div style="font-family:'DM Mono',monospace;font-size:10px;color:#8a8278;margin-top:4px;letter-spacing:0.1em;text-transform:uppercase;">Artist Itinerary · Confidential</div>
+      </div>
+      <div style="text-align:right;font-family:'DM Mono',monospace;">
+        <div style="font-size:10px;color:#8a8278;letter-spacing:0.1em;text-transform:uppercase;">Reference</div>
+        <div style="font-size:16px;margin-top:4px;">${b.reference||'—'}</div>
+      </div>
+    </div>
+
+    <div style="background:#1a1a1a;color:#fff;padding:20px 24px;margin-bottom:28px;display:grid;grid-template-columns:repeat(3,1fr);gap:16px;">
+      <div><div style="font-family:'DM Mono',monospace;font-size:9px;letter-spacing:0.1em;text-transform:uppercase;color:rgba(255,255,255,0.4);margin-bottom:4px;">Artist</div><div style="font-family:'DM Mono',monospace;font-size:13px;">${artistData?.name||'—'}</div></div>
+      <div><div style="font-family:'DM Mono',monospace;font-size:9px;letter-spacing:0.1em;text-transform:uppercase;color:rgba(255,255,255,0.4);margin-bottom:4px;">Show Date</div><div style="font-family:'DM Mono',monospace;font-size:13px;">${fmtD(b.show_date)}</div></div>
+      <div><div style="font-family:'DM Mono',monospace;font-size:9px;letter-spacing:0.1em;text-transform:uppercase;color:rgba(255,255,255,0.4);margin-bottom:4px;">Set Time</div><div style="font-family:'DM Mono',monospace;font-size:13px;">${adv?.set_time||b.set_time||'—'}</div></div>
+      <div><div style="font-family:'DM Mono',monospace;font-size:9px;letter-spacing:0.1em;text-transform:uppercase;color:rgba(255,255,255,0.4);margin-bottom:4px;">Venue</div><div style="font-family:'DM Mono',monospace;font-size:13px;">${b.venue_name||'—'}</div></div>
+      <div><div style="font-family:'DM Mono',monospace;font-size:9px;letter-spacing:0.1em;text-transform:uppercase;color:rgba(255,255,255,0.4);margin-bottom:4px;">City</div><div style="font-family:'DM Mono',monospace;font-size:13px;">${b.venue_city||'—'}, ${b.venue_country||'—'}</div></div>
+      <div><div style="font-family:'DM Mono',monospace;font-size:9px;letter-spacing:0.1em;text-transform:uppercase;color:rgba(255,255,255,0.4);margin-bottom:4px;">Curfew</div><div style="font-family:'DM Mono',monospace;font-size:13px;">${adv?.curfew||'—'}</div></div>
+    </div>
+
+    ${section('✈ Inbound Flight', [
+      ['Airline / Flight', adv?.airline_in && adv?.flight_number_in ? adv.airline_in+' '+adv.flight_number_in : adv?.airline_in||null],
+      ['Route', adv?.departure_in && adv?.arrival_in ? adv.departure_in+' → '+adv.arrival_in : null],
+      ['Departure', adv?.departure_time_in ? fmtDT(adv.departure_time_in) : null],
+      ['Arrival', adv?.arrival_time_in ? fmtDT(adv.arrival_time_in) : null],
+      ['Seat', adv?.seat_in],
+      ['Booking Ref', adv?.flight_ref_in],
+    ])}
+
+    ${section('🏨 Hotel', [
+      ['Hotel', adv?.hotel_name],
+      ['Address', adv?.hotel_address],
+      ['Check-in', adv?.hotel_checkin ? fmtD(adv.hotel_checkin) : null],
+      ['Check-out', adv?.hotel_checkout ? fmtD(adv.hotel_checkout) : null],
+      ['Room Type', adv?.hotel_room],
+      ['Confirmation', adv?.hotel_confirmation],
+    ])}
+
+    ${section('🎵 Show Details', [
+      ['Venue', b.venue_name],
+      ['Address', adv?.load_in_address],
+      ['Load-in Time', adv?.load_in_time],
+      ['Doors', adv?.doors],
+      ['Set Time', adv?.set_time||b.set_time],
+      ['Set Length', b.set_length_minutes ? b.set_length_minutes+' min' : null],
+      ['Curfew', adv?.curfew],
+      ['Dressing Room', adv?.dressing_room],
+      ['Guestlist', adv?.guestlist_spots ? String(adv.guestlist_spots)+' spots' : null],
+      ['Venue Contact', adv?.venue_contact_name],
+      ['Contact Phone', adv?.venue_contact_phone],
+    ])}
+
+    ${section('🚗 Ground Transport', [
+      ['Driver', adv?.driver_name],
+      ['Phone', adv?.driver_phone],
+      ['Vehicle', adv?.vehicle_type],
+      ['Pickup', adv?.pickup_location],
+      ['Notes', adv?.transport_notes],
+    ])}
+
+    ${section('✈ Return Flight', [
+      ['Airline / Flight', adv?.airline_out && adv?.flight_number_out ? adv.airline_out+' '+adv.flight_number_out : adv?.airline_out||null],
+      ['Route', adv?.departure_out && adv?.arrival_out ? adv.departure_out+' → '+adv.arrival_out : null],
+      ['Departure', adv?.departure_time_out ? fmtDT(adv.departure_time_out) : null],
+      ['Arrival', adv?.arrival_time_out ? fmtDT(adv.arrival_time_out) : null],
+      ['Seat', adv?.seat_out],
+      ['Booking Ref', adv?.flight_ref_out],
+    ])}
+
+    <div style="margin-top:40px;padding-top:16px;border-top:1px solid #e2ddd6;font-family:'DM Mono',monospace;font-size:9px;color:#8a8278;text-align:center;">
+      Deepbloe Agency B.V. · deepbloe.com · Generated ${new Date().toLocaleDateString('en-GB')} · Confidential
+    </div>
+    <script>window.onload=()=>window.print()<\/script>
+  </body></html>`);
+  win.document.close();
 }
 
 // ── NAVIGATION ────────────────────────────────────────────────
