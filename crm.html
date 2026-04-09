@@ -2681,8 +2681,22 @@ tbody td { padding: 10px 14px; vertical-align: middle; }
         <input id="cm-phone" placeholder="+31 6 ...">
       </div>
       <div class="fg full">
-        <label>Tags (comma separated)</label>
-        <input id="cm-tags" placeholder="booking, main contact, vip">
+        <label>Role</label>
+        <select id="cm-role">
+          <option value="">Select role...</option>
+          <option>Owner</option>
+          <option>General Manager</option>
+          <option>Music Director</option>
+          <option>Booking Contact</option>
+          <option>Admin Team</option>
+          <option>Legal Team</option>
+          <option>Finance</option>
+          <option>Other</option>
+        </select>
+      </div>
+      <div class="fg full" style="display:flex;align-items:center;gap:8px;margin-top:4px;">
+        <input id="cm-mc" type="checkbox" style="width:15px;height:15px;accent-color:var(--green);">
+        <label for="cm-mc" style="font-family:var(--mono);font-size:10px;letter-spacing:0.1em;text-transform:uppercase;cursor:pointer;">Sync to Mailchimp</label>
       </div>
     </div>
     <div class="modal-ftr">
@@ -4994,7 +5008,7 @@ function addContactToOrg(orgId, orgName) {
   editConId = null;
   _pendingOrgId = orgId;
   document.getElementById('con-modal-title').textContent = `Add Contact — ${orgName}`;
-  ['cm-fname','cm-lname','cm-email','cm-phone','cm-tags'].forEach(f => document.getElementById(f).value = '');
+  ['cm-fname','cm-lname','cm-email','cm-phone'].forEach(f => document.getElementById(f).value = ''); document.getElementById('cm-role').value = ''; document.getElementById('cm-mc').checked = false;;
   document.getElementById('con-modal').classList.add('open');
 }
 
@@ -5002,35 +5016,40 @@ function openConModal(id=null) {
   editConId = id;
   _pendingOrgId = null;
   document.getElementById('con-modal-title').textContent = id ? 'Edit Contact' : 'Add Contact';
-  if (!id) ['cm-fname','cm-lname','cm-email','cm-phone','cm-tags'].forEach(f => document.getElementById(f).value = '');
+  if (!id) ['cm-fname','cm-lname','cm-email','cm-phone'].forEach(f => document.getElementById(f).value = ''); document.getElementById('cm-role').value = ''; document.getElementById('cm-mc').checked = false;;
   document.getElementById('con-modal').classList.add('open');
 }
 
-function editContact(id) {
-  const c = allCons.find(x => x.id === id);
+async function editContact(id) {
+  let c = allCons.find(x => x.id === id);
+  if (!c) {
+    // Not in allCons yet -- fetch directly
+    const { data } = await db.from('contacts').select('*').eq('id', id).single();
+    c = data;
+  }
   if (!c) return;
   editConId = id;
   _pendingOrgId = null;
   document.getElementById('con-modal-title').textContent = 'Edit Contact';
-  document.getElementById('cm-fname').value = c.first_name || '';
-  document.getElementById('cm-lname').value = c.last_name  || '';
-  document.getElementById('cm-email').value = c.email      || '';
-  document.getElementById('cm-phone').value = c.phone      || '';
-  document.getElementById('cm-tags').value  = (c.tags || []).join(', ');
+  document.getElementById('cm-fname').value  = c.first_name || '';
+  document.getElementById('cm-lname').value  = c.last_name  || '';
+  document.getElementById('cm-email').value  = c.email      || '';
+  document.getElementById('cm-phone').value  = c.phone      || '';
+  document.getElementById('cm-role').value   = c.role       || '';
+  document.getElementById('cm-mc').checked   = c.marketing_enabled || false;
   document.getElementById('con-modal').classList.add('open');
 }
 
 async function saveContact() {
   const email = document.getElementById('cm-email').value.trim();
   if (!email) { showToast('Email is required', 'error'); return; }
-  const tagsRaw = document.getElementById('cm-tags').value;
-  const tags = tagsRaw.split(',').map(t => t.trim()).filter(Boolean);
   const data = {
-    first_name: document.getElementById('cm-fname').value.trim() || null,
-    last_name:  document.getElementById('cm-lname').value.trim() || null,
+    first_name:        document.getElementById('cm-fname').value.trim() || null,
+    last_name:         document.getElementById('cm-lname').value.trim() || null,
     email,
-    phone:      document.getElementById('cm-phone').value.trim() || null,
-    tags:       tags.length ? tags : null,
+    phone:             document.getElementById('cm-phone').value.trim() || null,
+    role:              document.getElementById('cm-role').value          || null,
+    marketing_enabled: document.getElementById('cm-mc').checked         || false,
   };
   if (!editConId && _pendingOrgId) data.organisation_id = _pendingOrgId;
   if (!editConId) data.source = 'Manual';
@@ -8806,7 +8825,7 @@ function openConModalForOrg() {
 }
 
 function editConFromDetail(conId) {
-  editCon(conId);
+  editContact(conId);
 }
 
 async function deleteConFromDetail(conId, orgId) {
