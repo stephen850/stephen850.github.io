@@ -1414,7 +1414,7 @@ tbody td { padding: 10px 14px; vertical-align: middle; }
       <div class="tbl-wrap">
         <table>
           <thead>
-            <tr><th>Venue</th><th>Type</th><th>City</th><th>Country</th><th>Organisation</th><th>Primary Contact</th><th>Tags</th><th>Actions</th></tr>
+            <tr><th>Venue</th><th>Type</th><th>City</th><th>Country</th><th>Organisation</th><th>Primary Contact</th><th>Email</th><th>Tags</th><th>Actions</th></tr>
           </thead>
           <tbody id="venue-tbody"><tr class="tbl-msg"><td colspan="8">Loading...</td></tr></tbody>
         </table>
@@ -8703,6 +8703,7 @@ function renderVenues() {
     const org     = v.organisations;
     const con     = v.contacts;
     const conName = con ? [con.first_name, con.last_name].filter(Boolean).join(' ') : '—';
+    const conEmail = con?.email || '—';
     const tags    = (v.venue_tags||[]).map(vt => `<span class="genre-pill">${esc(vt.tags?.name||'')}</span>`).join('');
     return `<tr style="cursor:pointer" onclick="openVenueModal('${v.id}')">
       <td class="td-name">${esc(v.name)}</td>
@@ -8711,6 +8712,7 @@ function renderVenues() {
       <td>${esc(v.country||'—')}</td>
       <td class="td-trunc">${esc(org?.legal_name||org?.name||'—')}</td>
       <td class="td-trunc">${esc(conName)}</td>
+      <td class="td-mono" style="font-size:11px;">${esc(conEmail)}</td>
       <td>${tags||'—'}</td>
       <td><div class="row-actions">
         <button class="ra" onclick="event.stopPropagation();openVenueModal('${v.id}')">Edit</button>
@@ -8864,9 +8866,12 @@ function exportVenues() {
     Name: v.name, Type: v.venue_type, City: v.city, Country: v.country,
     Organisation: v.organisations?.legal_name || '',
     Contact: v.contacts ? [v.contacts.first_name, v.contacts.last_name].filter(Boolean).join(' ') : '',
+    Email: v.contacts?.email || '',
+    Phone: v.contacts?.phone || '',
     Tags: (v.venue_tags||[]).map(vt=>vt.tags?.name).join(', '),
   }));
   const ws = XLSX.utils.json_to_sheet(rows);
+  ws['!cols'] = [{wch:24},{wch:10},{wch:14},{wch:14},{wch:24},{wch:20},{wch:28},{wch:16},{wch:30}];
   const wb = XLSX.utils.book_new();
   XLSX.utils.book_append_sheet(wb, ws, 'Venues');
   XLSX.writeFile(wb, 'deepbloe_venues.xlsx');
