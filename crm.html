@@ -4829,6 +4829,7 @@ function omConRemove(idx) {
 }
 
 async function saveOrg() {
+  alert('saveOrg called, editOrgId=' + editOrgId + ', oc1-email=' + document.getElementById('oc1-email')?.value);
   const legalName = document.getElementById('om-legal-name').value.trim();
   if (!legalName) { showToast('Legal name is required', 'error'); return; }
 
