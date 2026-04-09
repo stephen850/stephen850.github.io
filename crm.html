@@ -1153,8 +1153,8 @@ tbody td { padding: 10px 14px; vertical-align: middle; }
     <div class="h-brand"><strong>DEEPBLOE</strong> · CRM</div>
     <nav class="h-nav">
       <div class="h-tab active" onclick="showPanel('dashboard', this);renderDashboard()">Dashboard</div>
-      <div class="h-tab" onclick="showPanel('contacts', this);showContactsView('companies')">Contacts</div>
-      <div class="h-tab" onclick="showPanel('venues', this);renderVenues()">Venues</div>
+      <div class="h-tab" onclick="showPanel('contacts', this);showContactsView('companies')">Companies</div>
+      <div class="h-tab" onclick="showPanel('venues', this);renderVenues()">Projects</div>
       <div class="h-tab" onclick="showPanel('bookings', this)">Bookings</div>
       <div class="h-tab" onclick="showPanel('contracts', this)">Contracts</div>
       <div class="h-tab" onclick="showPanel('invoices', this)">Invoices</div>
@@ -1216,7 +1216,7 @@ tbody td { padding: 10px 14px; vertical-align: middle; }
           </div>
           <table>
             <thead>
-              <tr><th>Date</th><th>Artist</th><th>Venue</th><th>Status</th><th>Fee</th></tr>
+              <tr><th>Date</th><th>Artist</th><th>Project</th><th>Status</th><th>Fee</th></tr>
             </thead>
             <tbody id="db-upcoming-tbody">
               <tr class="tbl-msg"><td colspan="5">Loading...</td></tr>
@@ -1287,7 +1287,7 @@ tbody td { padding: 10px 14px; vertical-align: middle; }
         </button>
         <button id="cv-btn-people" onclick="showContactsView('people')"
           style="padding:8px 20px;font-family:var(--mono);font-size:10px;letter-spacing:0.1em;text-transform:uppercase;border:none;cursor:pointer;background:var(--surface);color:var(--muted)">
-          People
+          Contacts
         </button>
       </div>
 
@@ -1356,7 +1356,7 @@ tbody td { padding: 10px 14px; vertical-align: middle; }
           </select>
           <div class="tb-right">
             <button class="btn" onclick="exportContacts()">↓ Export</button>
-            <button class="btn" id="sync-btn" onclick="syncAllToMailchimp()" style="border-color:#1a6b3c;color:#1a6b3c">⟳ Sync Venues to Mailchimp</button>
+            <button class="btn" id="sync-btn" onclick="syncAllToMailchimp()" style="border-color:#1a6b3c;color:#1a6b3c">⟳ Sync to Mailchimp</button>
             <button class="btn primary" onclick="openConModal()">+ Add Contact</button>
           </div>
         </div>
@@ -1380,13 +1380,13 @@ tbody td { padding: 10px 14px; vertical-align: middle; }
     <!-- ── VENUES PANEL ── -->
     <div class="panel" id="panel-venues">
       <div class="stats">
-        <div class="stat red"><div class="stat-lbl">Total Venues</div><div class="stat-val" id="sv-total">—</div></div>
+        <div class="stat red"><div class="stat-lbl">Total Projects</div><div class="stat-val" id="sv-total">—</div></div>
         <div class="stat blue"><div class="stat-lbl">Clubs</div><div class="stat-val" id="sv-clubs">—</div></div>
         <div class="stat green"><div class="stat-lbl">Festivals</div><div class="stat-val" id="sv-fests">—</div></div>
         <div class="stat"><div class="stat-lbl">Countries</div><div class="stat-val" id="sv-countries">—</div></div>
       </div>
       <div class="toolbar">
-        <input class="tb-search" type="text" id="venue-search" placeholder="Search venue, city..." oninput="filterVenues()">
+        <input class="tb-search" type="text" id="venue-search" placeholder="Search project, city..." oninput="filterVenues()">
         <select class="tb-select" id="venue-type" onchange="filterVenues()">
           <option value="">All types</option>
           <option value="club">Club</option>
@@ -1401,13 +1401,13 @@ tbody td { padding: 10px 14px; vertical-align: middle; }
         </select>
         <div class="tb-right">
           <button class="btn" onclick="exportVenues()">↓ Export</button>
-          <button class="btn primary" onclick="openVenueModal()">+ Add Venue</button>
+          <button class="btn primary" onclick="openVenueModal()">+ Add Project</button>
         </div>
       </div>
       <div class="tbl-wrap">
         <table>
           <thead>
-            <tr><th>Venue</th><th>Type</th><th>City</th><th>Country</th><th>Organisation</th><th>Primary Contact</th><th>Email</th><th>Tags</th><th>Actions</th></tr>
+            <tr><th>Project</th><th>Type</th><th>City</th><th>Country</th><th>Organisation</th><th>Primary Contact</th><th>Email</th><th>Tags</th><th>Actions</th></tr>
           </thead>
           <tbody id="venue-tbody"><tr class="tbl-msg"><td colspan="8">Loading...</td></tr></tbody>
         </table>
@@ -1710,7 +1710,7 @@ tbody td { padding: 10px 14px; vertical-align: middle; }
         <table>
           <thead>
             <tr>
-              <th>Booking</th><th>Artist</th><th>Show Date</th><th>Venue</th>
+              <th>Booking</th><th>Artist</th><th>Show Date</th><th>Project</th>
               <th>Status</th><th>Production</th><th>Hospitality</th><th>Travel</th>
               <th>Shared</th><th>Actions</th>
             </tr>
@@ -1948,7 +1948,7 @@ tbody td { padding: 10px 14px; vertical-align: middle; }
           </div>
           <table>
             <thead>
-              <tr><th>Show</th><th>Artist</th><th>Venue</th><th>Gross Fee</th><th>Commission</th><th>Expenses</th><th>Net Payout</th><th>Status</th><th></th></tr>
+              <tr><th>Show</th><th>Artist</th><th>Project</th><th>Gross Fee</th><th>Commission</th><th>Expenses</th><th>Net Payout</th><th>Status</th><th></th></tr>
             </thead>
             <tbody id="fin-payouts-tbody">
               <tr class="tbl-msg"><td colspan="9">Loading...</td></tr>
@@ -1984,7 +1984,7 @@ tbody td { padding: 10px 14px; vertical-align: middle; }
           </div>
           <table>
             <thead>
-              <tr><th>Date</th><th>Artist</th><th>Venue</th><th>Gross</th><th>Withholding</th><th>Net Fee</th><th>Commission</th><th>Expenses</th><th>Net Payout</th><th>Status</th></tr>
+              <tr><th>Date</th><th>Artist</th><th>Project</th><th>Gross</th><th>Withholding</th><th>Net Fee</th><th>Commission</th><th>Expenses</th><th>Net Payout</th><th>Status</th></tr>
             </thead>
             <tbody id="fin-stmt-tbody">
               <tr class="tbl-msg"><td colspan="10">Click Generate to load statement</td></tr>
@@ -3679,7 +3679,7 @@ The Netherlands</textarea>
       <div class="tbl-wrap">
         <table>
           <thead>
-            <tr><th>Date</th><th>Artist</th><th>Venue</th><th>Status</th><th>Fee</th><th>Actions</th></tr>
+            <tr><th>Date</th><th>Artist</th><th>Project</th><th>Status</th><th>Fee</th><th>Actions</th></tr>
           </thead>
           <tbody id="cd-bookings-tbody">
             <tr class="tbl-msg"><td colspan="6">Loading...</td></tr>
@@ -3696,7 +3696,7 @@ The Netherlands</textarea>
   <div class="modal" style="width:640px">
     <div class="modal-hdr">
       <div>
-        <div class="modal-title" id="venue-modal-title">New Venue</div>
+        <div class="modal-title" id="venue-modal-title">New Project</div>
       </div>
       <button class="modal-close" onclick="closeModal('venue-modal')">×</button>
     </div>
@@ -5084,7 +5084,7 @@ async function syncAllToMailchimp() {
 
     if (!syncable.length) {
       showToast('No venues with marketing-enabled contacts to sync', 'info');
-      btn.disabled = false; btn.textContent = '⟳ Sync Venues to Mailchimp';
+      btn.disabled = false; btn.textContent = '⟳ Sync to Mailchimp';
       return;
     }
 
@@ -5125,7 +5125,7 @@ async function syncAllToMailchimp() {
     showToast('Sync error: ' + e.message, 'error');
   }
 
-  btn.disabled = false; btn.textContent = '⟳ Sync Venues to Mailchimp';
+  btn.disabled = false; btn.textContent = '⟳ Sync to Mailchimp';
 }
 
 async function deleteContact(id, email) {
@@ -8905,7 +8905,7 @@ let selectedVenueTags = new Set();
 
 async function openVenueModal(id = null) {
   editVenueId = id;
-  document.getElementById('venue-modal-title').textContent = id ? 'Edit Venue' : 'New Venue';
+  document.getElementById('venue-modal-title').textContent = id ? 'Edit Project' : 'New Project';
   document.getElementById('vm-delete-btn').style.display = id ? 'inline-block' : 'none';
 
   // Populate org dropdown
@@ -9045,7 +9045,7 @@ function exportVenues() {
   const wb = XLSX.utils.book_new();
   XLSX.utils.book_append_sheet(wb, ws, 'Venues');
   XLSX.writeFile(wb, 'deepbloe_venues.xlsx');
-  showToast('Venues exported', 'success');
+  showToast('Projects exported', 'success');
 }
 // ── END VENUES ─────────────────────────────────────────────────
 
