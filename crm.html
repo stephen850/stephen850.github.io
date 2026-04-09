@@ -5052,16 +5052,10 @@ async function saveContact() {
   } else {
     showToast(editConId ? 'Contact updated' : 'Contact added', 'success');
     closeModal('con-modal');
-    const savedEmail = email;
     loadOrgs();
-    loadContacts().then(async () => {
-      const c = allCons.find(x => x.email === savedEmail);
-      if (c) {
-        await syncContactToMailchimp(c.id);
-        showToast('Synced to Mailchimp ✓', 'success');
-        loadContacts();
-      }
-    });
+    loadContacts();
+    // Refresh company detail if open
+    if (currentOrgId) loadCdContacts(currentOrgId);
     _pendingOrgId = null;
   }
 }
@@ -8797,15 +8791,12 @@ async function loadCdBookings(orgId) {
 }
 
 function openConModalForOrg() {
-  closeCompanyDetail();
-  setTimeout(() => {
-    openConModal();
-    // Pre-select the org
-    setTimeout(() => {
-      const sel = document.getElementById('cm-org');
-      if (sel && currentOrgId) sel.value = currentOrgId;
-    }, 100);
-  }, 100);
+  editConId = null;
+  _pendingOrgId = currentOrgId;
+  ['cm-fname','cm-lname','cm-email','cm-phone'].forEach(f => document.getElementById(f).value = '');
+  document.getElementById('cm-role').value = '';
+  document.getElementById('con-modal-title').textContent = 'Add Contact';
+  document.getElementById('con-modal').classList.add('open');
 }
 
 function editConFromDetail(conId) {
