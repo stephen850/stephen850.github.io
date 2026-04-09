@@ -4766,13 +4766,16 @@ async function saveOrg() {
     // Save all contact rows
     if (!error && orgId) {
       const rows = document.querySelectorAll('.om-con-row');
+      console.log('Contact rows found:', rows.length);
       let savedCount = 0;
       for (const row of rows) {
         const email = row.querySelector('.om-con-email')?.value.trim();
-        if (!email) continue;
+        const firstName = row.querySelector('.om-con-first')?.value.trim();
+        console.log('Row:', firstName, email);
+        if (!email) { console.log('Skipping - no email'); continue; }
         const conData = {
           organisation_id:    orgId,
-          first_name:         row.querySelector('.om-con-first')?.value.trim() || null,
+          first_name:         firstName || null,
           last_name:          row.querySelector('.om-con-last')?.value.trim() || null,
           email,
           phone:              row.querySelector('.om-con-phone')?.value.trim() || null,
@@ -4782,8 +4785,8 @@ async function saveOrg() {
           is_active:          true,
         };
         const { error: conErr } = await db.from('contacts').insert(conData);
-        if (conErr) showToast(`Contact error: ${conErr.message}`, 'info');
-        else savedCount++;
+        if (conErr) { console.error('Contact insert error:', conErr); showToast(`Contact error: ${conErr.message}`, 'info'); }
+        else { console.log('Saved:', email); savedCount++; }
       }
       showToast(`Company + ${savedCount} contact${savedCount !== 1 ? 's' : ''} added ✓`, 'success');
     }
