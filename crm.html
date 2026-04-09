@@ -1155,6 +1155,7 @@ tbody td { padding: 10px 14px; vertical-align: middle; }
       <div class="h-tab active" onclick="showPanel('dashboard', this);renderDashboard()">Dashboard</div>
       <div class="h-tab" onclick="showPanel('contacts', this);showContactsView('companies')">Companies</div>
       <div class="h-tab" onclick="showPanel('venues', this);renderVenues()">Projects</div>
+      <div class="h-tab" onclick="showPanel('artists', this);renderArtists()">Artists</div>
       <div class="h-tab" onclick="showPanel('bookings', this)">Bookings</div>
       <div class="h-tab" onclick="showPanel('contracts', this)">Contracts</div>
       <div class="h-tab" onclick="showPanel('invoices', this)">Invoices</div>
@@ -1420,7 +1421,28 @@ tbody td { padding: 10px 14px; vertical-align: middle; }
     </div>
 
     <!-- ── BOOKINGS PANEL ── -->
-    <div class="panel" id="panel-bookings">
+    <!-- ── ARTISTS PANEL ── -->
+    <div class="panel" id="panel-artists">
+      <div class="stats">
+        <div class="stat red"><div class="stat-lbl">Total Artists</div><div class="stat-val" id="sa-total">—</div></div>
+      </div>
+      <div class="toolbar">
+        <input class="tb-search" type="text" id="artist-search" placeholder="Search artist..." oninput="renderArtists()">
+        <div class="tb-right">
+          <button class="btn primary" onclick="openArtistModal()">+ Add Artist</button>
+        </div>
+      </div>
+      <div class="tbl-wrap">
+        <table>
+          <thead>
+            <tr><th>Name</th><th>Slug</th><th>Genre</th><th>Home Country</th><th>Actions</th></tr>
+          </thead>
+          <tbody id="artist-tbody"><tr class="tbl-msg"><td colspan="5">Loading...</td></tr></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ── BOOKINGS PANEL ── -->
       <div class="stats">
         <div class="stat red">
           <div class="stat-lbl">Total Bookings</div>
@@ -2639,6 +2661,41 @@ tbody td { padding: 10px 14px; vertical-align: middle; }
       <button class="btn danger" id="om-delete-btn" style="display:none;margin-right:auto" onclick="deleteOrg(editOrgId, document.getElementById('om-legal-name').value)">Delete</button>
       <button class="btn" onclick="closeModal('org-modal')">Cancel</button>
       <button class="btn primary" onclick="saveOrg()">Save Company</button>
+    </div>
+  </div>
+</div>
+
+<!-- ARTIST MODAL -->
+<div class="overlay" id="artist-modal">
+  <div class="modal" style="width:560px">
+    <div class="modal-hdr">
+      <div class="modal-title" id="artist-modal-title">Add Artist</div>
+      <button class="modal-close" onclick="closeModal('artist-modal')">×</button>
+    </div>
+    <input type="hidden" id="am-id">
+    <div class="form-section">Artist Info</div>
+    <div class="form-grid">
+      <div class="fg" style="grid-column:span 2">
+        <label>Name *</label>
+        <input id="am-name" placeholder="e.g. Goldfish">
+      </div>
+      <div class="fg">
+        <label>Slug <span style="font-family:var(--mono);font-size:9px;color:var(--muted)">(URL-friendly)</span></label>
+        <input id="am-slug" placeholder="e.g. goldfish">
+      </div>
+      <div class="fg">
+        <label>Home Country</label>
+        <input id="am-country" placeholder="e.g. South Africa">
+      </div>
+      <div class="fg" style="grid-column:span 2">
+        <label>Genre</label>
+        <input id="am-genre" placeholder="e.g. House, Deep House">
+      </div>
+    </div>
+    <div class="modal-ftr">
+      <button class="btn danger" id="am-delete-btn" style="display:none;margin-right:auto" onclick="deleteArtist()">Delete</button>
+      <button class="btn" onclick="closeModal('artist-modal')">Cancel</button>
+      <button class="btn primary" onclick="saveArtist()">Save Artist</button>
     </div>
   </div>
 </div>
@@ -4083,10 +4140,89 @@ function goToContact(email) {
 
 // ── ARTISTS ───────────────────────────────────────────────────
 async function loadArtists() {
-  const { data, error } = await db.from('artists').select('id, name, slug').order('name');
+  const { data, error } = await db.from('artists').select('id, name, slug, genre, home_country').order('name');
   if (error) return;
   allArtists = data || [];
   populateArtistDropdowns();
+  if (document.getElementById('sa-total')) renderArtists();
+}
+
+function renderArtists() {
+  const q = (document.getElementById('artist-search')?.value || '').toLowerCase();
+  const tbody = document.getElementById('artist-tbody');
+  if (!tbody) return;
+  document.getElementById('sa-total').textContent = allArtists.length;
+  const filtered = allArtists.filter(a => !q || a.name.toLowerCase().includes(q));
+  if (!filtered.length) {
+    tbody.innerHTML = '<tr class="tbl-msg"><td colspan="5">No artists found</td></tr>';
+    return;
+  }
+  tbody.innerHTML = filtered.map(a => `<tr>
+    <td class="td-name" style="font-weight:500">${esc(a.name)}</td>
+    <td class="td-mono" style="font-size:11px">${esc(a.slug||'—')}</td>
+    <td style="font-size:11px">${esc(Array.isArray(a.genre)?a.genre.join(', '):(a.genre||'—'))}</td>
+    <td style="font-size:11px">${esc(a.home_country||'—')}</td>
+    <td><div class="row-actions">
+      <button class="ra" onclick="openArtistModal('${a.id}')">Edit</button>
+      <button class="ra del" onclick="deleteArtistById('${a.id}','${esc(a.name)}')">Del</button>
+    </div></td>
+  </tr>`).join('');
+}
+
+let editArtistId = null;
+function openArtistModal(id=null) {
+  editArtistId = id;
+  document.getElementById('artist-modal-title').textContent = id ? 'Edit Artist' : 'Add Artist';
+  document.getElementById('am-delete-btn').style.display = id ? 'inline-block' : 'none';
+  if (id) {
+    const a = allArtists.find(x => x.id === id) || {};
+    document.getElementById('am-id').value      = id;
+    document.getElementById('am-name').value    = a.name || '';
+    document.getElementById('am-slug').value    = a.slug || '';
+    document.getElementById('am-country').value = a.home_country || '';
+    document.getElementById('am-genre').value   = Array.isArray(a.genre) ? a.genre.join(', ') : (a.genre || '');
+  } else {
+    ['am-id','am-name','am-slug','am-country','am-genre'].forEach(f => {
+      const el = document.getElementById(f); if (el) el.value = '';
+    });
+  }
+  document.getElementById('artist-modal').classList.add('open');
+}
+
+async function saveArtist() {
+  const name = document.getElementById('am-name').value.trim();
+  if (!name) { showToast('Name is required', 'error'); return; }
+  const slug = document.getElementById('am-slug').value.trim() ||
+    name.toLowerCase().replace(/[^a-z0-9]+/g, '-');
+  const genreRaw = document.getElementById('am-genre').value.trim();
+  const genre = genreRaw ? genreRaw.split(',').map(g => g.trim()).filter(Boolean) : null;
+  const data = {
+    name, slug,
+    home_country: document.getElementById('am-country').value.trim() || null,
+    genre,
+  };
+  let error;
+  if (editArtistId) {
+    ({ error } = await db.from('artists').update(data).eq('id', editArtistId));
+  } else {
+    ({ error } = await db.from('artists').insert(data));
+  }
+  if (error) { showToast('Error: ' + error.message, 'error'); return; }
+  showToast(editArtistId ? 'Artist updated ✓' : 'Artist added ✓', 'success');
+  closeModal('artist-modal');
+  await loadArtists();
+}
+
+async function deleteArtistById(id, name) {
+  if (!confirm(`Delete artist "${name}"? This cannot be undone.`)) return;
+  const { error } = await db.from('artists').delete().eq('id', id);
+  if (error) { showToast('Error: ' + error.message, 'error'); return; }
+  showToast('Artist deleted', 'success');
+  await loadArtists();
+}
+
+function deleteArtist() {
+  if (editArtistId) deleteArtistById(editArtistId, document.getElementById('am-name').value);
 }
 
 function populateArtistDropdowns() {
