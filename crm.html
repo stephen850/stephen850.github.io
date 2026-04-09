@@ -2520,18 +2520,16 @@ tbody td { padding: 10px 14px; vertical-align: middle; }
 
     <div class="form-section">Company Info</div>
     <div class="form-grid">
-      <div class="fg">
+      <div class="fg" style="grid-column:span 2;">
         <label>Legal Name * <span style="font-family:var(--mono);font-size:9px;color:var(--muted)">(for contracts & invoices)</span></label>
         <input id="om-legal-name" placeholder="ACME Events B.V.">
-      </div>
-      <div class="fg">
-        <label>Trading Name <span style="font-family:var(--mono);font-size:9px;color:var(--muted)">(brand / venue name)</span></label>
-        <input id="om-trading-name" placeholder="Muin Club">
       </div>
       <div class="fg">
         <label>Company Type *</label>
         <select id="om-type">
           <option value="">Select type</option>
+          <option value="club">Club</option>
+          <option value="festival">Festival</option>
           <option value="promoter">Promoter</option>
           <option value="agency">Agency</option>
           <option value="company">Company</option>
