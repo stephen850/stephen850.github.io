@@ -4375,6 +4375,7 @@ function renderSignatories() {
 }
 
 function addSignatoryRow() {
+  readSignatoriesFromUI(); // preserve any unsaved edits first
   AGENCY_SIGNATORIES.push({
     id: null,
     name: '',
@@ -4382,7 +4383,6 @@ function addSignatoryRow() {
     signature_url: null,
     sort_order: AGENCY_SIGNATORIES.length
   });
-  readSignatoriesFromUI(); // preserve any unsaved edits first
   renderSignatories();
 }
 
@@ -4395,9 +4395,13 @@ function removeSignatory(localId) {
   renderSignatories();
 }
 
-// Read all rows from the DOM back into AGENCY_SIGNATORIES
+// Read all rows from the DOM back into AGENCY_SIGNATORIES.
+// Only overwrites the state if rows actually exist in DOM — otherwise
+// the in-memory AGENCY_SIGNATORIES list stays untouched (e.g. when the
+// Settings panel hasn't been rendered yet).
 function readSignatoriesFromUI() {
   const rows = document.querySelectorAll('#sig-list .sig-row');
+  if (!rows.length) return; // nothing rendered yet — keep existing state
   const updated = [];
   rows.forEach((row, idx) => {
     const localId = row.dataset.sigId;
