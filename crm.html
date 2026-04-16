@@ -1125,6 +1125,83 @@ tbody td { padding: 10px 14px; vertical-align: middle; }
 #toast.error   { border-color: var(--red);   color: var(--red); }
 #toast.info    { border-color: var(--blue);  color: var(--blue); }
 #toast.warning { border-color: #d49c3d; color: #8a5d00; }
+
+/* ── RBAC / TEAM MANAGEMENT ──────────────────────────── */
+.rbac-section { margin-top: 40px; padding-top: 28px; border-top: 1px solid var(--border); }
+.rbac-section-title {
+  font-family: var(--mono); font-size: 13px; letter-spacing: 0.15em;
+  text-transform: uppercase; margin-bottom: 4px;
+}
+.rbac-section-sub {
+  font-family: var(--mono); font-size: 11px; color: var(--muted);
+  line-height: 1.6; margin-bottom: 20px;
+}
+.team-card {
+  background: var(--surface); border: 1px solid var(--border); padding: 16px 20px;
+  margin-bottom: 8px; display: flex; align-items: center; gap: 16px;
+  transition: border-color 0.15s;
+}
+.team-card:hover { border-color: var(--border-dark); }
+.team-card .tc-avatar {
+  width: 36px; height: 36px; border-radius: 50%; background: var(--accent);
+  color: #fff; display: flex; align-items: center; justify-content: center;
+  font-family: var(--mono); font-size: 12px; font-weight: 500; flex-shrink: 0;
+  text-transform: uppercase;
+}
+.team-card .tc-info { flex: 1; min-width: 0; }
+.team-card .tc-name { font-weight: 500; font-size: 13px; }
+.team-card .tc-email { font-family: var(--mono); font-size: 10px; color: var(--muted); }
+.team-card .tc-role {
+  font-family: var(--mono); font-size: 10px; letter-spacing: 0.08em;
+  text-transform: uppercase; padding: 3px 8px; border: 1px solid var(--border);
+  background: var(--bg);
+}
+.team-card .tc-role.role-owner { border-color: var(--red); color: var(--red); background: #fdf0ee; }
+.team-card .tc-role.role-manager { border-color: var(--blue); color: var(--blue); background: #eef2f8; }
+.team-card .tc-role.role-agent { border-color: var(--green); color: var(--green); background: #eef5f0; }
+.team-card .tc-role.role-finance { border-color: var(--amber); color: var(--amber); background: #fdf8ee; }
+.team-card .tc-actions { display: flex; gap: 6px; }
+.perm-grid {
+  display: grid; grid-template-columns: 180px repeat(2, 80px); gap: 0;
+  font-size: 12px; border: 1px solid var(--border); margin-bottom: 16px;
+}
+.perm-grid .pg-hdr {
+  font-family: var(--mono); font-size: 9px; letter-spacing: 0.1em;
+  text-transform: uppercase; color: var(--muted); padding: 8px 12px;
+  background: var(--bg); border-bottom: 1px solid var(--border);
+  font-weight: 500;
+}
+.perm-grid .pg-cell {
+  padding: 6px 12px; border-bottom: 1px solid var(--border);
+  display: flex; align-items: center;
+}
+.perm-grid .pg-cell:nth-child(3n+1) { font-family: var(--mono); font-size: 11px; text-transform: capitalize; }
+.perm-grid .pg-cell input[type="checkbox"] { accent-color: var(--accent); }
+.artist-chip {
+  display: inline-flex; align-items: center; gap: 4px;
+  padding: 3px 8px 3px 10px; font-size: 11px; font-family: var(--mono);
+  background: var(--bg); border: 1px solid var(--border); margin: 2px;
+}
+.artist-chip .ac-x {
+  cursor: pointer; font-size: 13px; color: var(--muted); line-height: 1;
+  margin-left: 2px;
+}
+.artist-chip .ac-x:hover { color: var(--red); }
+.h-tab.rbac-hidden { display: none !important; }
+.rbac-no-edit .btn.primary,
+.rbac-no-edit .ra,
+.rbac-no-edit button[onclick*="save"],
+.rbac-no-edit button[onclick*="Save"],
+.rbac-no-edit button[onclick*="add"],
+.rbac-no-edit button[onclick*="Add"],
+.rbac-no-edit button[onclick*="delete"],
+.rbac-no-edit button[onclick*="Delete"],
+.rbac-no-edit button[onclick*="Del"] { opacity: 0.3; pointer-events: none; }
+.rbac-badge {
+  font-family: var(--mono); font-size: 9px; letter-spacing: 0.08em;
+  text-transform: uppercase; padding: 2px 6px; border-radius: 2px;
+  margin-left: 8px;
+}
 </style>
 </head>
 <body>
@@ -2637,6 +2714,40 @@ tbody td { padding: 10px 14px; vertical-align: middle; }
           <button class="btn" onclick="loadAgencySettings()">↺ Reload</button>
           <span id="as-status" style="font-family:var(--mono);font-size:10px;color:var(--muted)"></span>
         </div>
+
+        <!-- ═══ RBAC: TEAM MANAGEMENT ═══ -->
+        <div class="rbac-section" id="rbac-team-section">
+          <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:4px">
+            <div class="rbac-section-title">Team Members</div>
+            <span style="font-family:var(--mono);font-size:10px;color:var(--muted)" id="rbac-team-count"></span>
+          </div>
+          <p class="rbac-section-sub">
+            Manage who has access to this CRM and what they can do.
+            New users must first sign up via Supabase Auth, then be added here.
+          </p>
+          <div id="rbac-team-list"></div>
+          <button class="btn" onclick="openTeamMemberModal()" id="rbac-add-btn" style="margin-top:8px">+ Add Team Member</button>
+        </div>
+
+        <!-- ═══ RBAC: ROLE PERMISSIONS ═══ -->
+        <div class="rbac-section" id="rbac-perms-section">
+          <div class="rbac-section-title">Role Permissions</div>
+          <p class="rbac-section-sub">
+            Configure which panels each role can access and edit.
+            Changes apply immediately to all team members with that role.
+          </p>
+          <div style="margin-bottom:12px">
+            <label style="font-family:var(--mono);font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted)">
+              Editing role:
+            </label>
+            <select id="rbac-role-select" onchange="renderRolePermissions()" style="margin-left:8px;font-family:var(--sans);font-size:12px;padding:4px 8px;border:1px solid var(--border-dark)">
+            </select>
+          </div>
+          <div id="rbac-perm-grid"></div>
+          <button class="btn primary" onclick="saveRolePermissions()" style="margin-top:8px">✓ Save Permissions</button>
+          <span id="rbac-perm-status" style="font-family:var(--mono);font-size:10px;color:var(--muted);margin-left:10px"></span>
+        </div>
+
       </div>
     </div>
 
@@ -4129,6 +4240,54 @@ tbody td { padding: 10px 14px; vertical-align: middle; }
   </div>
 </div>
 
+<!-- TEAM MEMBER MODAL -->
+<div class="overlay" id="team-modal">
+  <div class="modal" style="width:560px">
+    <div class="modal-hdr">
+      <div class="modal-title" id="team-modal-title">Add Team Member</div>
+      <div class="modal-close" onclick="document.getElementById('team-modal').classList.remove('open')">&times;</div>
+    </div>
+    <div class="modal-body">
+      <div class="form-grid">
+        <div class="fg" style="grid-column:span 2">
+          <label>Email (must match their Supabase Auth account) *</label>
+          <input id="tm-email" placeholder="agent@deepbloe.com">
+        </div>
+        <div class="fg" style="grid-column:span 2">
+          <label>Full Name</label>
+          <input id="tm-name" placeholder="John Doe">
+        </div>
+        <div class="fg" style="grid-column:span 2">
+          <label>Role *</label>
+          <select id="tm-role" onchange="toggleArtistAssignment()">
+            <option value="">Select role...</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Artist assignment (visible for agent role) -->
+      <div id="tm-artist-section" style="display:none;margin-top:16px">
+        <div class="form-section">Assigned Artists</div>
+        <p style="font-family:var(--mono);font-size:10px;color:var(--muted);margin-bottom:10px">
+          Agents can only manage bookings, contracts and advancing for their assigned artists.
+        </p>
+        <div id="tm-artist-chips" style="margin-bottom:8px;min-height:28px"></div>
+        <div style="display:flex;gap:6px">
+          <select id="tm-artist-select" style="flex:1;font-family:var(--sans);font-size:12px;padding:6px 8px;border:1px solid var(--border-dark)">
+            <option value="">Add artist...</option>
+          </select>
+          <button class="btn" onclick="addArtistChip()">+ Add</button>
+        </div>
+      </div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn" onclick="document.getElementById('team-modal').classList.remove('open')">Cancel</button>
+      <button class="btn del" id="tm-delete-btn" onclick="deleteTeamMember()" style="display:none">Remove from Team</button>
+      <button class="btn primary" onclick="saveTeamMember()">Save Member</button>
+    </div>
+  </div>
+</div>
+
 <div id="toast"></div>
 
 <script data-cfasync="false">
@@ -4160,6 +4319,23 @@ let editOrgId = null, editConId = null, editBkId = null, _pendingOrgId = null;
 let importRows = [];
 let bkView = 'list';
 const PG = 30;
+
+// ── RBAC STATE ───────────────────────────────────────────────
+let RBAC = {
+  currentUser: null,       // { id, user_id, email, full_name, role_id, is_active }
+  currentRole: null,       // { id, name, label, description, is_system }
+  permissions: {},         // { panel_name: { can_view, can_edit } }
+  allRoles: [],            // all roles from DB
+  allMembers: [],          // all team_members from DB
+  allAssignments: [],      // all artist_assignments from DB
+  assignedArtistIds: [],   // artist IDs this user manages (agents only)
+  isOwner: false,
+  isManager: false,
+  isAgent: false,
+  loaded: false
+};
+let editMemberId = null;
+let tmArtistIds = [];  // temp artist IDs being assigned in modal
 
 // ── AGENCY (Single Source of Truth) ───────────────────────────
 // Loaded from Supabase on startApp(). Defaults are fallbacks only
@@ -4285,6 +4461,11 @@ function loadAgencySettings() {
   renderSignatories();
   document.getElementById('as-status').textContent = 'Loaded';
   setTimeout(() => { document.getElementById('as-status').textContent = ''; }, 2000);
+  // RBAC: render team management if owner
+  if (RBAC.isOwner) {
+    loadTeamData();
+    renderRoleSelect();
+  }
 }
 
 // Save the Settings panel form to Supabase + update in-memory AGENCY
@@ -4502,7 +4683,22 @@ async function startApp() {
   document.getElementById('login-screen').style.display = 'none';
   document.getElementById('app').style.display = 'block';
   document.getElementById('h-user').textContent = user.email;
-  await loadAgencyOnStartup();  // ← Load agency settings first so all later renders use correct data
+
+  // ── RBAC: Load roles, team, permissions ──
+  await loadRBAC();
+
+  // If user was pre-registered by email with a placeholder user_id, update it now
+  if (RBAC.loaded && !RBAC.currentUser) {
+    // Check if there's a member row matching this email but with wrong user_id
+    const match = RBAC.allMembers.find(m => m.email.toLowerCase() === user.email.toLowerCase() && m.user_id !== user.id);
+    if (match) {
+      await db.from('team_members').update({ user_id: user.id }).eq('id', match.id);
+      // Reload RBAC with corrected user_id
+      await loadRBAC();
+    }
+  }
+
+  await loadAgencyOnStartup();  // Load agency settings first so all later renders use correct data
   loadOrgs();
   loadContacts();
   loadArtists();
@@ -4517,12 +4713,13 @@ async function startApp() {
   loadPoolLinks();
   setTimeout(() => {
     renderDashboard();
-    // Handle URL params — e.g. from show.html links
+    // Re-apply RBAC after all data is loaded (artists needed for team rendering)
+    if (RBAC.loaded) applyRBACToUI();
+    // Handle URL params
     const params = new URLSearchParams(window.location.search);
     const open = params.get('open');
     const bookingId = params.get('booking');
     if (open === 'settlement' && bookingId) {
-      // Navigate to bookings tab and open settlement
       const bkTab = document.querySelector('.h-tab[onclick*="bookings"]');
       showPanel('bookings', bkTab);
       setTimeout(() => openSettlement(bookingId), 500);
@@ -4545,12 +4742,466 @@ db.auth.getSession().then(({ data: { session } }) => {
   if (session) startApp();
 });
 
+// ── RBAC ENGINE ──────────────────────────────────────────────
+
+// All CRM panel IDs (must match h-tab onclick and panel-* IDs)
+const ALL_PANELS = ['dashboard','contacts','venues','artists','bookings','contracts','invoices','advancing','finance','calendar','reminders','tours','pipeline','import','settings'];
+
+// Map panel IDs to their h-tab index (0-based, matching nav order)
+const PANEL_TAB_INDEX = {};
+ALL_PANELS.forEach((p, i) => PANEL_TAB_INDEX[p] = i);
+
+async function loadRBAC() {
+  try {
+    const { data: { user } } = await db.auth.getUser();
+    if (!user) return;
+
+    // Load roles
+    const { data: roles } = await db.from('roles').select('*').order('sort_order');
+    RBAC.allRoles = roles || [];
+
+    // Load all team members
+    const { data: members } = await db.from('team_members').select('*').order('created_at');
+    RBAC.allMembers = members || [];
+
+    // Load artist assignments
+    const { data: assignments } = await db.from('artist_assignments').select('*');
+    RBAC.allAssignments = assignments || [];
+
+    // Find current user's team record
+    RBAC.currentUser = RBAC.allMembers.find(m => m.user_id === user.id) || null;
+
+    if (!RBAC.currentUser) {
+      // First-ever user with no team_members rows: auto-register as owner
+      if (RBAC.allMembers.length === 0) {
+        const ownerRole = RBAC.allRoles.find(r => r.name === 'owner');
+        if (ownerRole) {
+          const { data: newMember, error } = await db.from('team_members').insert({
+            user_id: user.id,
+            email: user.email,
+            full_name: user.email.split('@')[0],
+            role_id: ownerRole.id,
+            is_active: true
+          }).select().single();
+          if (!error && newMember) {
+            RBAC.currentUser = newMember;
+            RBAC.allMembers.push(newMember);
+            showToast('You have been registered as Owner', 'success');
+          }
+        }
+      } else {
+        // User exists in auth but not in team_members -> no access
+        showToast('Your account is not registered in this CRM team. Contact the owner.', 'error');
+        await db.auth.signOut();
+        location.reload();
+        return;
+      }
+    }
+
+    if (!RBAC.currentUser.is_active) {
+      showToast('Your account has been deactivated. Contact the owner.', 'error');
+      await db.auth.signOut();
+      location.reload();
+      return;
+    }
+
+    // Resolve role
+    RBAC.currentRole = RBAC.allRoles.find(r => r.id === RBAC.currentUser.role_id) || null;
+    RBAC.isOwner = RBAC.currentRole?.name === 'owner';
+    RBAC.isManager = RBAC.currentRole?.name === 'manager';
+    RBAC.isAgent = RBAC.currentRole?.name === 'agent';
+
+    // Load permissions for this role
+    const { data: perms } = await db.from('role_permissions').select('*').eq('role_id', RBAC.currentUser.role_id);
+    RBAC.permissions = {};
+    (perms || []).forEach(p => {
+      RBAC.permissions[p.panel] = { can_view: p.can_view, can_edit: p.can_edit };
+    });
+
+    // For agents: resolve assigned artist IDs
+    if (RBAC.isAgent) {
+      RBAC.assignedArtistIds = RBAC.allAssignments
+        .filter(a => a.member_id === RBAC.currentUser.id)
+        .map(a => a.artist_id);
+    } else {
+      RBAC.assignedArtistIds = [];
+    }
+
+    RBAC.loaded = true;
+    applyRBACToUI();
+  } catch (err) {
+    console.error('RBAC load error:', err);
+    // Graceful fallback: grant full access if RBAC tables don't exist yet
+    RBAC.loaded = false;
+    RBAC.isOwner = true;
+    RBAC.permissions = {};
+    ALL_PANELS.forEach(p => { RBAC.permissions[p] = { can_view: true, can_edit: true }; });
+  }
+}
+
+function canView(panel) {
+  if (!RBAC.loaded || RBAC.isOwner) return true;
+  return RBAC.permissions[panel]?.can_view === true;
+}
+
+function canEdit(panel) {
+  if (!RBAC.loaded || RBAC.isOwner) return true;
+  return RBAC.permissions[panel]?.can_edit === true;
+}
+
+function applyRBACToUI() {
+  // 1) Show/hide tabs based on can_view
+  const tabs = document.querySelectorAll('.h-nav .h-tab');
+  tabs.forEach((tab, i) => {
+    const panel = ALL_PANELS[i];
+    if (!panel) return;
+    if (canView(panel)) {
+      tab.classList.remove('rbac-hidden');
+    } else {
+      tab.classList.add('rbac-hidden');
+    }
+  });
+
+  // 2) Apply read-only class to panels where can_edit is false
+  ALL_PANELS.forEach(panel => {
+    const el = document.getElementById('panel-' + panel);
+    if (!el) return;
+    if (canView(panel) && !canEdit(panel)) {
+      el.classList.add('rbac-no-edit');
+    } else {
+      el.classList.remove('rbac-no-edit');
+    }
+  });
+
+  // 3) Show role badge next to username
+  const userEl = document.getElementById('h-user');
+  if (userEl && RBAC.currentRole) {
+    const existing = document.getElementById('h-role-badge');
+    if (existing) existing.remove();
+    const badge = document.createElement('span');
+    badge.id = 'h-role-badge';
+    badge.className = 'rbac-badge';
+    badge.style.cssText = `color:rgba(255,255,255,0.5);border:1px solid rgba(255,255,255,0.2);`;
+    badge.textContent = RBAC.currentRole.label;
+    userEl.parentNode.insertBefore(badge, userEl.nextSibling);
+  }
+
+  // 4) Hide RBAC sections in settings for non-owners
+  const teamSection = document.getElementById('rbac-team-section');
+  const permsSection = document.getElementById('rbac-perms-section');
+  if (teamSection) teamSection.style.display = RBAC.isOwner ? 'block' : 'none';
+  if (permsSection) permsSection.style.display = RBAC.isOwner ? 'block' : 'none';
+
+  // 5) If current panel is now hidden, redirect to first visible
+  const activePanel = document.querySelector('.panel.active');
+  if (activePanel) {
+    const panelId = activePanel.id.replace('panel-', '');
+    if (!canView(panelId)) {
+      const firstVisible = ALL_PANELS.find(p => canView(p)) || 'dashboard';
+      const idx = PANEL_TAB_INDEX[firstVisible];
+      const tab = document.querySelectorAll('.h-nav .h-tab')[idx];
+      showPanel(firstVisible, tab);
+    }
+  }
+}
+
+// ── RBAC: TEAM MANAGEMENT UI ─────────────────────────────────
+
+async function loadTeamData() {
+  if (!RBAC.isOwner) return;
+  // Refresh members + assignments
+  const { data: members } = await db.from('team_members').select('*').order('created_at');
+  RBAC.allMembers = members || [];
+  const { data: assignments } = await db.from('artist_assignments').select('*');
+  RBAC.allAssignments = assignments || [];
+  renderTeamList();
+}
+
+function renderTeamList() {
+  const container = document.getElementById('rbac-team-list');
+  if (!container) return;
+  const countEl = document.getElementById('rbac-team-count');
+  if (countEl) countEl.textContent = RBAC.allMembers.length + ' member' + (RBAC.allMembers.length !== 1 ? 's' : '');
+
+  if (!RBAC.allMembers.length) {
+    container.innerHTML = '<div style="font-family:var(--mono);font-size:11px;color:var(--muted);padding:16px">No team members yet.</div>';
+    return;
+  }
+
+  container.innerHTML = RBAC.allMembers.map(m => {
+    const role = RBAC.allRoles.find(r => r.id === m.role_id);
+    const roleName = role?.name || 'unknown';
+    const roleLabel = role?.label || 'Unknown';
+    const initials = (m.full_name || m.email).split(/[\s@]/).filter(Boolean).slice(0, 2).map(w => w[0]).join('').toUpperCase();
+    const assignedArtists = RBAC.allAssignments.filter(a => a.member_id === m.id);
+    const artistNames = assignedArtists.map(a => {
+      const art = allArtists.find(x => x.id === a.artist_id);
+      return art ? art.name : '?';
+    });
+    const artistLine = roleName === 'agent' && artistNames.length
+      ? `<div style="font-family:var(--mono);font-size:9px;color:var(--muted);margin-top:2px">${artistNames.map(n => esc(n)).join(' · ')}</div>`
+      : '';
+    const inactive = !m.is_active ? ' style="opacity:0.4"' : '';
+    return `<div class="team-card"${inactive}>
+      <div class="tc-avatar">${initials}</div>
+      <div class="tc-info">
+        <div class="tc-name">${esc(m.full_name || m.email.split('@')[0])}${!m.is_active ? ' <span style="color:var(--red);font-size:10px">(inactive)</span>' : ''}</div>
+        <div class="tc-email">${esc(m.email)}</div>
+        ${artistLine}
+      </div>
+      <div class="tc-role role-${roleName}">${roleLabel}</div>
+      <div class="tc-actions">
+        <button class="ra" onclick="openTeamMemberModal('${m.id}')">Edit</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function openTeamMemberModal(memberId = null) {
+  editMemberId = memberId;
+  tmArtistIds = [];
+
+  // Populate role dropdown
+  const roleSelect = document.getElementById('tm-role');
+  roleSelect.innerHTML = '<option value="">Select role...</option>' +
+    RBAC.allRoles.map(r => `<option value="${r.id}">${esc(r.label)}${r.description ? ' — ' + esc(r.description) : ''}</option>`).join('');
+
+  // Populate artist dropdown
+  const artSelect = document.getElementById('tm-artist-select');
+  artSelect.innerHTML = '<option value="">Add artist...</option>' +
+    allArtists.map(a => `<option value="${a.id}">${esc(a.name)}</option>`).join('');
+
+  if (memberId) {
+    const m = RBAC.allMembers.find(x => x.id === memberId);
+    if (!m) return;
+    document.getElementById('team-modal-title').textContent = 'Edit Team Member';
+    document.getElementById('tm-email').value = m.email;
+    document.getElementById('tm-email').disabled = true;
+    document.getElementById('tm-name').value = m.full_name || '';
+    document.getElementById('tm-role').value = m.role_id;
+    document.getElementById('tm-delete-btn').style.display = (m.user_id === RBAC.currentUser?.user_id) ? 'none' : 'inline-block';
+
+    // Load assigned artists
+    tmArtistIds = RBAC.allAssignments.filter(a => a.member_id === memberId).map(a => a.artist_id);
+  } else {
+    document.getElementById('team-modal-title').textContent = 'Add Team Member';
+    document.getElementById('tm-email').value = '';
+    document.getElementById('tm-email').disabled = false;
+    document.getElementById('tm-name').value = '';
+    document.getElementById('tm-role').value = '';
+    document.getElementById('tm-delete-btn').style.display = 'none';
+  }
+
+  toggleArtistAssignment();
+  renderArtistChips();
+  document.getElementById('team-modal').classList.add('open');
+}
+
+function toggleArtistAssignment() {
+  const roleId = document.getElementById('tm-role').value;
+  const role = RBAC.allRoles.find(r => r.id === roleId);
+  const section = document.getElementById('tm-artist-section');
+  section.style.display = (role?.name === 'agent') ? 'block' : 'none';
+}
+
+function addArtistChip() {
+  const sel = document.getElementById('tm-artist-select');
+  const id = sel.value;
+  if (!id || tmArtistIds.includes(id)) return;
+  tmArtistIds.push(id);
+  sel.value = '';
+  renderArtistChips();
+}
+
+function removeArtistChip(id) {
+  tmArtistIds = tmArtistIds.filter(x => x !== id);
+  renderArtistChips();
+}
+
+function renderArtistChips() {
+  const container = document.getElementById('tm-artist-chips');
+  if (!container) return;
+  if (!tmArtistIds.length) {
+    container.innerHTML = '<span style="font-family:var(--mono);font-size:10px;color:var(--muted)">No artists assigned</span>';
+    return;
+  }
+  container.innerHTML = tmArtistIds.map(id => {
+    const a = allArtists.find(x => x.id === id);
+    return `<span class="artist-chip">${esc(a?.name || '?')}<span class="ac-x" onclick="removeArtistChip('${id}')">&times;</span></span>`;
+  }).join('');
+}
+
+async function saveTeamMember() {
+  const email = document.getElementById('tm-email').value.trim();
+  const name = document.getElementById('tm-name').value.trim();
+  const roleId = document.getElementById('tm-role').value;
+
+  if (!email || !roleId) {
+    showToast('Email and role are required', 'error');
+    return;
+  }
+
+  try {
+    if (editMemberId) {
+      // Update existing
+      const { error } = await db.from('team_members').update({
+        full_name: name,
+        role_id: roleId
+      }).eq('id', editMemberId);
+      if (error) throw error;
+
+      // Sync artist assignments
+      await syncArtistAssignments(editMemberId);
+      showToast('Team member updated', 'success');
+    } else {
+      // New member — look up their user_id from Supabase auth
+      // We need to find the user_id by email. Since we can't query auth.users from client,
+      // we'll store the email and set user_id when they first log in (or owner provides it).
+      // For now: create with a placeholder user_id that matches email lookup on login.
+      // Alternative: just store email and resolve on login.
+      const { data: newMember, error } = await db.from('team_members').insert({
+        user_id: crypto.randomUUID(), // placeholder - will be resolved on first login
+        email: email.toLowerCase(),
+        full_name: name,
+        role_id: roleId,
+        is_active: true
+      }).select().single();
+      if (error) throw error;
+
+      // Sync artist assignments
+      if (newMember) {
+        await syncArtistAssignments(newMember.id);
+      }
+      showToast('Team member added. They can now log in.', 'success');
+    }
+
+    document.getElementById('team-modal').classList.remove('open');
+    await loadTeamData();
+  } catch (err) {
+    showToast('Error: ' + (err.message || err), 'error');
+  }
+}
+
+async function syncArtistAssignments(memberId) {
+  // Delete existing assignments
+  await db.from('artist_assignments').delete().eq('member_id', memberId);
+  // Insert new ones
+  if (tmArtistIds.length) {
+    const rows = tmArtistIds.map(aid => ({ member_id: memberId, artist_id: aid }));
+    await db.from('artist_assignments').insert(rows);
+  }
+}
+
+async function deleteTeamMember() {
+  if (!editMemberId) return;
+  const m = RBAC.allMembers.find(x => x.id === editMemberId);
+  if (!confirm(`Remove ${m?.full_name || m?.email} from the team? They will lose all CRM access.`)) return;
+
+  try {
+    // Delete assignments first
+    await db.from('artist_assignments').delete().eq('member_id', editMemberId);
+    await db.from('team_members').delete().eq('id', editMemberId);
+    showToast('Team member removed', 'success');
+    document.getElementById('team-modal').classList.remove('open');
+    await loadTeamData();
+  } catch (err) {
+    showToast('Error: ' + (err.message || err), 'error');
+  }
+}
+
+// ── RBAC: ROLE PERMISSIONS EDITOR ────────────────────────────
+
+function renderRoleSelect() {
+  const sel = document.getElementById('rbac-role-select');
+  if (!sel) return;
+  sel.innerHTML = RBAC.allRoles
+    .filter(r => r.name !== 'owner') // Owner always has full access
+    .map(r => `<option value="${r.id}">${esc(r.label)}</option>`).join('');
+  renderRolePermissions();
+}
+
+async function renderRolePermissions() {
+  const roleId = document.getElementById('rbac-role-select')?.value;
+  if (!roleId) return;
+
+  const { data: perms } = await db.from('role_permissions').select('*').eq('role_id', roleId);
+  const permMap = {};
+  (perms || []).forEach(p => { permMap[p.panel] = p; });
+
+  const grid = document.getElementById('rbac-perm-grid');
+  if (!grid) return;
+
+  let html = '<div class="perm-grid">';
+  html += '<div class="pg-hdr">Panel</div><div class="pg-hdr">View</div><div class="pg-hdr">Edit</div>';
+
+  ALL_PANELS.forEach(panel => {
+    const p = permMap[panel] || { can_view: false, can_edit: false };
+    html += `<div class="pg-cell">${panel}</div>`;
+    html += `<div class="pg-cell"><input type="checkbox" data-panel="${panel}" data-perm="view" ${p.can_view ? 'checked' : ''}></div>`;
+    html += `<div class="pg-cell"><input type="checkbox" data-panel="${panel}" data-perm="edit" ${p.can_edit ? 'checked' : ''}></div>`;
+  });
+
+  html += '</div>';
+  grid.innerHTML = html;
+
+  // Auto-check view when edit is checked
+  grid.querySelectorAll('input[data-perm="edit"]').forEach(cb => {
+    cb.addEventListener('change', () => {
+      if (cb.checked) {
+        const panel = cb.dataset.panel;
+        const viewCb = grid.querySelector(`input[data-panel="${panel}"][data-perm="view"]`);
+        if (viewCb) viewCb.checked = true;
+      }
+    });
+  });
+}
+
+async function saveRolePermissions() {
+  const roleId = document.getElementById('rbac-role-select')?.value;
+  if (!roleId) return;
+  const statusEl = document.getElementById('rbac-perm-status');
+
+  const grid = document.getElementById('rbac-perm-grid');
+  const rows = [];
+  ALL_PANELS.forEach(panel => {
+    const viewCb = grid.querySelector(`input[data-panel="${panel}"][data-perm="view"]`);
+    const editCb = grid.querySelector(`input[data-panel="${panel}"][data-perm="edit"]`);
+    rows.push({
+      role_id: roleId,
+      panel: panel,
+      can_view: viewCb?.checked || false,
+      can_edit: editCb?.checked || false
+    });
+  });
+
+  try {
+    // Delete existing and re-insert (upsert workaround)
+    await db.from('role_permissions').delete().eq('role_id', roleId);
+    const { error } = await db.from('role_permissions').insert(rows);
+    if (error) throw error;
+    if (statusEl) { statusEl.textContent = 'Saved'; setTimeout(() => statusEl.textContent = '', 2000); }
+    showToast('Permissions saved', 'success');
+  } catch (err) {
+    showToast('Error saving permissions: ' + (err.message || err), 'error');
+  }
+}
+
 // ── NAVIGATION ────────────────────────────────────────────────
 function showPanel(name, el) {
+  // RBAC: check view permission
+  if (RBAC.loaded && !canView(name)) {
+    showToast('You do not have access to this section', 'error');
+    return;
+  }
   document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
   document.querySelectorAll('.h-tab').forEach(t => t.classList.remove('active'));
   document.getElementById('panel-' + name).classList.add('active');
   if (el) el.classList.add('active');
+  // Apply read-only styling if no edit permission
+  const panel = document.getElementById('panel-' + name);
+  if (panel && RBAC.loaded && !canEdit(name)) {
+    panel.classList.add('rbac-no-edit');
+  }
 }
 
 function goToContact(email) {
@@ -4703,6 +5354,8 @@ function filterBookings() {
   const yr   = document.getElementById('bk-year').value;
 
   filtBookings = allBookings.filter(b => {
+    // RBAC: agents only see bookings for their assigned artists
+    if (RBAC.isAgent && RBAC.assignedArtistIds.length && !RBAC.assignedArtistIds.includes(b.artist_id)) return false;
     if (q && !`${b.artists?.name||''}${b.venue_name||''}${b.venue_city||''}${b.reference||''}`.toLowerCase().includes(q)) return false;
     if (stat && b.status !== stat) return false;
     if (art  && b.artist_id !== art) return false;
