@@ -4768,8 +4768,10 @@ async function loadRBAC() {
     const { data: assignments } = await db.from('artist_assignments').select('*');
     RBAC.allAssignments = assignments || [];
 
-    // Find current user's team record
-    RBAC.currentUser = RBAC.allMembers.find(m => m.user_id === user.id) || null;
+    // Find current user's team record (match by user_id first, fallback to email)
+    RBAC.currentUser = RBAC.allMembers.find(m => m.user_id === user.id)
+      || RBAC.allMembers.find(m => m.email.toLowerCase() === user.email.toLowerCase())
+      || null;
 
     if (!RBAC.currentUser) {
       // First-ever user with no team_members rows: auto-register as owner
@@ -4796,6 +4798,16 @@ async function loadRBAC() {
         location.reload();
         return;
       }
+    }
+
+    // Guard: if currentUser is still null after all attempts, grant full access as fallback
+    if (!RBAC.currentUser) {
+      console.warn('RBAC: Could not resolve team member, granting full access as fallback');
+      RBAC.loaded = false;
+      RBAC.isOwner = true;
+      RBAC.permissions = {};
+      ALL_PANELS.forEach(p => { RBAC.permissions[p] = { can_view: true, can_edit: true }; });
+      return;
     }
 
     if (!RBAC.currentUser.is_active) {
