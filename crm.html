@@ -1167,6 +1167,7 @@ tbody td { padding: 10px 14px; vertical-align: middle; }
       <div class="h-tab" onclick="showPanel('tours', this);renderTours()">Tours</div>
       <div class="h-tab" onclick="showPanel('pipeline', this);renderPipeline()">Pipeline</div>
       <div class="h-tab" onclick="showPanel('import', this)">Import</div>
+      <div class="h-tab" onclick="showPanel('settings', this);loadAgencySettings()">Settings</div>
     </nav>
     <div class="h-right">
       <span class="h-user" id="h-user"></span>
@@ -2530,6 +2531,110 @@ tbody td { padding: 10px 14px; vertical-align: middle; }
       </div>
     </div>
 
+    <!-- ── SETTINGS PANEL ── -->
+    <div class="panel" id="panel-settings">
+      <div style="max-width:900px">
+        <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:8px">
+          <h2 style="font-family:var(--mono);font-size:13px;letter-spacing:0.15em;text-transform:uppercase;margin:0">
+            Agency Settings
+          </h2>
+          <span style="font-family:var(--mono);font-size:10px;color:var(--muted)">
+            Used on contracts, invoices, email footers & export documents
+          </span>
+        </div>
+        <p style="font-family:var(--mono);font-size:11px;color:var(--muted);line-height:1.6;margin:0 0 24px">
+          These details appear as the agency party on every contract, every invoice and every system email.
+          Change them once here and the whole CRM updates.
+        </p>
+
+        <div class="form-section">Agency Identity</div>
+        <div class="form-grid">
+          <div class="fg" style="grid-column:span 2">
+            <label>Trading Name * <span style="font-family:var(--mono);font-size:9px;color:var(--muted)">(short brand name)</span></label>
+            <input id="as-trading-name" placeholder="Deepbloe Agency">
+          </div>
+          <div class="fg" style="grid-column:span 2">
+            <label>Legal Name * <span style="font-family:var(--mono);font-size:9px;color:var(--muted)">(appears on contracts &amp; invoices)</span></label>
+            <input id="as-legal-name" placeholder="Deepbloe Agency B.V.">
+          </div>
+          <div class="fg">
+            <label>Website</label>
+            <input id="as-website" placeholder="deepbloe.com">
+          </div>
+          <div class="fg">
+            <label>Email</label>
+            <input id="as-email" placeholder="hello@deepbloe.com">
+          </div>
+          <div class="fg">
+            <label>Phone</label>
+            <input id="as-phone" placeholder="+31 ...">
+          </div>
+          <div class="fg">
+            <label>Signatory Name / Title</label>
+            <input id="as-signatory" placeholder="Stephen Texidor, CEO">
+          </div>
+        </div>
+
+        <div class="form-section">Registered Address</div>
+        <div class="form-grid">
+          <div class="fg" style="grid-column:span 2">
+            <label>Street Address</label>
+            <input id="as-address" placeholder="Ambachtshof 88">
+          </div>
+          <div class="fg">
+            <label>Postal Code</label>
+            <input id="as-postal-code" placeholder="2632 BB">
+          </div>
+          <div class="fg">
+            <label>City</label>
+            <input id="as-city" placeholder="Nootdorp">
+          </div>
+          <div class="fg" style="grid-column:span 2">
+            <label>Country</label>
+            <input id="as-country" placeholder="Netherlands">
+          </div>
+        </div>
+
+        <div class="form-section">Legal &amp; Tax</div>
+        <div class="form-grid">
+          <div class="fg">
+            <label>KvK Number</label>
+            <input id="as-kvk" placeholder="86099477">
+          </div>
+          <div class="fg">
+            <label>VAT Number</label>
+            <input id="as-vat" placeholder="NL863860734B01">
+          </div>
+        </div>
+
+        <div class="form-section">Banking</div>
+        <div class="form-grid">
+          <div class="fg">
+            <label>IBAN</label>
+            <input id="as-iban" placeholder="NL84RABO0190352701">
+          </div>
+          <div class="fg">
+            <label>BIC / SWIFT</label>
+            <input id="as-bic" placeholder="RABONL2U">
+          </div>
+          <div class="fg">
+            <label>Bank Name</label>
+            <input id="as-bank-name" placeholder="Rabobank">
+          </div>
+          <div class="fg">
+            <label>Account Holder</label>
+            <input id="as-account-holder" placeholder="Deepbloe Agency B.V.">
+          </div>
+        </div>
+
+        <div style="margin-top:24px;display:flex;gap:10px;align-items:center">
+          <button class="btn primary" onclick="saveAgencySettings()">✓ Save Settings</button>
+          <button class="btn" onclick="loadAgencySettings()">↺ Reload</button>
+          <span id="as-status" style="font-family:var(--mono);font-size:10px;color:var(--muted)"></span>
+        </div>
+      </div>
+    </div>
+
   </main>
 </div>
 
@@ -3071,14 +3176,11 @@ tbody td { padding: 10px 14px; vertical-align: middle; }
       <div class="ce-sidebar-section">Parties</div>
       <div class="ce-field">
         <label>Agency (Party A)</label>
-        <input id="ce-agency" value="Deepbloe Agency B.V." oninput="renderContractPreview()">
+        <input id="ce-agency" oninput="renderContractPreview()">
       </div>
       <div class="ce-field">
         <label>Agency Address</label>
-        <textarea id="ce-agency-address" oninput="renderContractPreview()">Laan van Clingendael 10
-2597 VH The Hague
-The Netherlands
-VAT: NL000000000B00</textarea>
+        <textarea id="ce-agency-address" oninput="renderContractPreview()"></textarea>
       </div>
       <div class="ce-field">
         <label>Promoter (Party B)</label>
@@ -3233,25 +3335,23 @@ VAT: NL000000000B00</textarea>
       <div class="ie-sidebar-section">From (Agency)</div>
       <div class="ie-field">
         <label>Agency Name</label>
-        <input id="ie-agency-name" value="Deepbloe Agency B.V." oninput="renderInvoicePreview()">
+        <input id="ie-agency-name" oninput="renderInvoicePreview()">
       </div>
       <div class="ie-field">
         <label>Agency Address</label>
-        <textarea id="ie-agency-addr" oninput="renderInvoicePreview()" style="min-height:72px;font-size:11px;resize:vertical">Laan van Clingendael 10
-2597 VH The Hague
-The Netherlands</textarea>
+        <textarea id="ie-agency-addr" oninput="renderInvoicePreview()" style="min-height:72px;font-size:11px;resize:vertical"></textarea>
       </div>
       <div class="ie-field">
         <label>Agency VAT / KVK</label>
-        <input id="ie-agency-vat" value="NL000000000B00" oninput="renderInvoicePreview()">
+        <input id="ie-agency-vat" oninput="renderInvoicePreview()">
       </div>
       <div class="ie-field">
         <label>IBAN</label>
-        <input id="ie-iban" placeholder="NL00 BANK 0000 0000 00" oninput="renderInvoicePreview()">
+        <input id="ie-iban" oninput="renderInvoicePreview()">
       </div>
       <div class="ie-field">
         <label>BIC/SWIFT</label>
-        <input id="ie-bic" placeholder="INGBNL2A" oninput="renderInvoicePreview()">
+        <input id="ie-bic" oninput="renderInvoicePreview()">
       </div>
 
       <div class="ie-sidebar-section">Bill To (Promoter)</div>
@@ -4054,6 +4154,140 @@ let importRows = [];
 let bkView = 'list';
 const PG = 30;
 
+// ── AGENCY (Single Source of Truth) ───────────────────────────
+// Loaded from Supabase on startApp(). Defaults are fallbacks only
+// and should never be shown — always load before rendering documents.
+const AGENCY_DEFAULTS = {
+  trading_name:    'Deepbloe Agency',
+  legal_name:      'Deepbloe Agency B.V.',
+  website:         'deepbloe.com',
+  email:           'finance@deepbloe.com',
+  phone:           '',
+  signatory:       'Stephen Texidor, CEO',
+  address:         'Ambachtshof 88',
+  postal_code:     '2632 BB',
+  city:            'Nootdorp',
+  country:         'Netherlands',
+  kvk:             '86099477',
+  vat:             'NL863860734B01',
+  iban:            'NL84RABO0190352701',
+  bic:             'RABONL2U',
+  bank_name:       'Rabobank',
+  account_holder:  'Deepbloe Agency B.V.'
+};
+let AGENCY = { ...AGENCY_DEFAULTS };
+
+// Computed helpers — always read from AGENCY, never hardcode
+function agencyAddressBlock() {
+  // Multi-line: street / postcode + city / country / VAT line
+  const cityLine = [AGENCY.postal_code, AGENCY.city].filter(Boolean).join(' ');
+  return [AGENCY.address, cityLine, AGENCY.country, AGENCY.vat ? 'VAT: ' + AGENCY.vat : '']
+    .filter(Boolean).join('\n');
+}
+function agencyFooterLine() {
+  // Used on email footers, sales deck footer, etc. — single line
+  const parts = [AGENCY.legal_name, AGENCY.website];
+  if (AGENCY.kvk) parts.push('KvK: ' + AGENCY.kvk);
+  if (AGENCY.vat) parts.push('VAT: ' + AGENCY.vat);
+  return parts.join(' · ');
+}
+
+// Load agency settings from Supabase (singleton row with id=1)
+async function loadAgencyOnStartup() {
+  try {
+    const { data, error } = await db.from('agency_settings').select('*').eq('id', 1).maybeSingle();
+    if (!error && data) {
+      AGENCY = {
+        trading_name:   data.trading_name   || AGENCY_DEFAULTS.trading_name,
+        legal_name:     data.legal_name     || AGENCY_DEFAULTS.legal_name,
+        website:        data.website        || AGENCY_DEFAULTS.website,
+        email:          data.email          || AGENCY_DEFAULTS.email,
+        phone:          data.phone          || '',
+        signatory:      data.signatory      || AGENCY_DEFAULTS.signatory,
+        address:        data.address        || AGENCY_DEFAULTS.address,
+        postal_code:    data.postal_code    || AGENCY_DEFAULTS.postal_code,
+        city:           data.city           || AGENCY_DEFAULTS.city,
+        country:        data.country        || AGENCY_DEFAULTS.country,
+        kvk:            data.kvk            || AGENCY_DEFAULTS.kvk,
+        vat:            data.vat            || AGENCY_DEFAULTS.vat,
+        iban:           data.iban           || AGENCY_DEFAULTS.iban,
+        bic:            data.bic            || AGENCY_DEFAULTS.bic,
+        bank_name:      data.bank_name      || AGENCY_DEFAULTS.bank_name,
+        account_holder: data.account_holder || AGENCY_DEFAULTS.account_holder
+      };
+    }
+  } catch (err) {
+    console.warn('Agency settings not loaded, using defaults:', err.message);
+  }
+}
+
+// Populate the Settings panel form with current AGENCY values
+function loadAgencySettings() {
+  document.getElementById('as-trading-name').value    = AGENCY.trading_name   || '';
+  document.getElementById('as-legal-name').value      = AGENCY.legal_name     || '';
+  document.getElementById('as-website').value         = AGENCY.website        || '';
+  document.getElementById('as-email').value           = AGENCY.email          || '';
+  document.getElementById('as-phone').value           = AGENCY.phone          || '';
+  document.getElementById('as-signatory').value       = AGENCY.signatory      || '';
+  document.getElementById('as-address').value         = AGENCY.address        || '';
+  document.getElementById('as-postal-code').value     = AGENCY.postal_code    || '';
+  document.getElementById('as-city').value            = AGENCY.city           || '';
+  document.getElementById('as-country').value         = AGENCY.country        || '';
+  document.getElementById('as-kvk').value             = AGENCY.kvk            || '';
+  document.getElementById('as-vat').value             = AGENCY.vat            || '';
+  document.getElementById('as-iban').value            = AGENCY.iban           || '';
+  document.getElementById('as-bic').value             = AGENCY.bic            || '';
+  document.getElementById('as-bank-name').value       = AGENCY.bank_name      || '';
+  document.getElementById('as-account-holder').value  = AGENCY.account_holder || '';
+  document.getElementById('as-status').textContent = 'Loaded';
+  setTimeout(() => { document.getElementById('as-status').textContent = ''; }, 2000);
+}
+
+// Save the Settings panel form to Supabase + update in-memory AGENCY
+async function saveAgencySettings() {
+  const statusEl = document.getElementById('as-status');
+  statusEl.textContent = 'Saving…';
+
+  const payload = {
+    id: 1,  // singleton
+    trading_name:   document.getElementById('as-trading-name').value.trim()   || null,
+    legal_name:     document.getElementById('as-legal-name').value.trim()     || null,
+    website:        document.getElementById('as-website').value.trim()        || null,
+    email:          document.getElementById('as-email').value.trim()          || null,
+    phone:          document.getElementById('as-phone').value.trim()          || null,
+    signatory:      document.getElementById('as-signatory').value.trim()      || null,
+    address:        document.getElementById('as-address').value.trim()        || null,
+    postal_code:    document.getElementById('as-postal-code').value.trim()    || null,
+    city:           document.getElementById('as-city').value.trim()           || null,
+    country:        document.getElementById('as-country').value.trim()        || null,
+    kvk:            document.getElementById('as-kvk').value.trim()            || null,
+    vat:            document.getElementById('as-vat').value.trim()            || null,
+    iban:           document.getElementById('as-iban').value.trim()           || null,
+    bic:            document.getElementById('as-bic').value.trim()            || null,
+    bank_name:      document.getElementById('as-bank-name').value.trim()      || null,
+    account_holder: document.getElementById('as-account-holder').value.trim() || null,
+    updated_at:     new Date().toISOString()
+  };
+
+  const { error } = await db.from('agency_settings').upsert(payload, { onConflict: 'id' });
+
+  if (error) {
+    showToast('Error saving: ' + error.message, 'error');
+    statusEl.textContent = 'Save failed';
+    return;
+  }
+
+  // Sync in-memory state (non-null values only, to keep fallbacks sane)
+  Object.keys(payload).forEach(k => {
+    if (k !== 'id' && k !== 'updated_at') {
+      AGENCY[k] = payload[k] || AGENCY_DEFAULTS[k] || '';
+    }
+  });
+
+  showToast('Agency settings saved', 'success');
+  statusEl.textContent = 'Saved ' + new Date().toLocaleTimeString();
+}
+
 // ── AUTH ──────────────────────────────────────────────────────
 async function doLogin() {
   const email = document.getElementById('l-email').value.trim();
@@ -4078,6 +4312,7 @@ async function startApp() {
   document.getElementById('login-screen').style.display = 'none';
   document.getElementById('app').style.display = 'block';
   document.getElementById('h-user').textContent = user.email;
+  await loadAgencyOnStartup();  // ← Load agency settings first so all later renders use correct data
   loadOrgs();
   loadContacts();
   loadArtists();
@@ -5547,8 +5782,8 @@ async function openContractEditorById(contractId) {
 }
 
 function resetContractEditor() {
-  document.getElementById('ce-agency').value = 'Deepbloe Agency B.V.';
-  document.getElementById('ce-agency-address').value = 'Laan van Clingendael 10\n2597 VH The Hague\nThe Netherlands\nVAT: NL000000000B00';
+  document.getElementById('ce-agency').value = AGENCY.legal_name || '';
+  document.getElementById('ce-agency-address').value = agencyAddressBlock();
   document.getElementById('ce-promoter').value = '';
   document.getElementById('ce-promoter-address').value = '';
   document.getElementById('ce-promoter-vat').value = '';
@@ -5564,7 +5799,7 @@ function resetContractEditor() {
   document.getElementById('ce-currency').value = 'EUR';
   document.getElementById('ce-withholding').value = 'Not applicable';
   document.getElementById('ce-special').value = '';
-  document.getElementById('ce-agency-sig').value = 'Stephen van der Meulen, CEO';
+  document.getElementById('ce-agency-sig').value = AGENCY.signatory || '';
   document.getElementById('ce-promoter-sig').value = '';
 }
 
@@ -5662,6 +5897,7 @@ function getMergeData() {
     '{{WITHHOLDING}}': document.getElementById('ce-withholding').value || 'Not applicable',
     '{{TODAY}}':     fmtDate(new Date().toISOString().slice(0,10)),
     '{{AGENCY_ADDRESS}}': document.getElementById('ce-agency-address').value.replace(/\n/g,'<br>'),
+    '{{AGENCY_WEBSITE}}': AGENCY.website || '',
     '{{PROMOTER_ADDRESS}}': (document.getElementById('ce-promoter-address').value||'[Address]').replace(/\n/g,'<br>'),
     '{{PROMOTER_VAT}}': document.getElementById('ce-promoter-vat').value || '[VAT ID]',
     '{{AGENCY_SIG}}': document.getElementById('ce-agency-sig').value || 'Authorised Signatory',
@@ -5748,7 +5984,7 @@ function getTemplateEN() {
 <div class="doc-header">
   <div class="doc-ref">BOOKING CONTRACT · {{TODAY}}</div>
   <h1>Booking Contract</h1>
-  <div class="doc-date">Deepbloe Agency B.V. &nbsp;·&nbsp; deepbloe.com</div>
+  <div class="doc-date">{{AGENCY}} &nbsp;·&nbsp; {{AGENCY_WEBSITE}}</div>
 </div>
 
 <p>This Booking Contract ("Agreement") is entered into as of <strong>{{TODAY}}</strong> between the parties set out below.</p>
@@ -5845,7 +6081,7 @@ function getTemplateNL() {
 <div class="doc-header">
   <div class="doc-ref">BOOKINGOVEREENKOMST · {{TODAY}}</div>
   <h1>Bookingovereenkomst</h1>
-  <div class="doc-date">Deepbloe Agency B.V. &nbsp;·&nbsp; deepbloe.com</div>
+  <div class="doc-date">{{AGENCY}} &nbsp;·&nbsp; {{AGENCY_WEBSITE}}</div>
 </div>
 
 <p>Deze Bookingovereenkomst ("Overeenkomst") wordt aangegaan per <strong>{{TODAY}}</strong> tussen de onderstaande partijen.</p>
@@ -6073,6 +6309,17 @@ function openInvoiceEditor(bookingId = null) {
   if (bookingId) sel.value = bookingId;
   const today = new Date().toISOString().slice(0,10);
   const due   = new Date(Date.now()+14*24*60*60*1000).toISOString().slice(0,10);
+  // Agency fields from AGENCY (single source of truth)
+  document.getElementById('ie-agency-name').value = AGENCY.legal_name || '';
+  const agencyAddrForInvoice = [
+    AGENCY.address,
+    [AGENCY.postal_code, AGENCY.city].filter(Boolean).join(' '),
+    AGENCY.country
+  ].filter(Boolean).join('\n');
+  document.getElementById('ie-agency-addr').value = agencyAddrForInvoice;
+  document.getElementById('ie-agency-vat').value  = AGENCY.vat || '';
+  document.getElementById('ie-iban').value        = AGENCY.iban || '';
+  document.getElementById('ie-bic').value         = AGENCY.bic || '';
   document.getElementById('ie-date').value = today;
   document.getElementById('ie-due-date').value = due;
   document.getElementById('ie-type').value = 'deposit';
@@ -6098,6 +6345,16 @@ async function openInvoiceEditorById(invoiceId) {
     ${esc(b.reference||'')} — ${esc(b.artists?.name||'')}
   </option>`).join('');
   if (inv.booking_id) sel.value = inv.booking_id;
+  // Agency fields from AGENCY (single source of truth)
+  document.getElementById('ie-agency-name').value = AGENCY.legal_name || '';
+  document.getElementById('ie-agency-addr').value = [
+    AGENCY.address,
+    [AGENCY.postal_code, AGENCY.city].filter(Boolean).join(' '),
+    AGENCY.country
+  ].filter(Boolean).join('\n');
+  document.getElementById('ie-agency-vat').value = AGENCY.vat || '';
+  document.getElementById('ie-iban').value       = AGENCY.iban || '';
+  document.getElementById('ie-bic').value        = AGENCY.bic || '';
   document.getElementById('ie-type').value = inv.type||'full';
   document.getElementById('ie-date').value = inv.issued_at||'';
   document.getElementById('ie-due-date').value = inv.due_date||'';
@@ -6292,7 +6549,7 @@ ${(d._artist||d._showDate||d._venue)?`
     <div class="inv-due-amount">${fmt(d._netPayable)}</div>
   </div>
   <div style="margin-top:24px;font-family:'DM Mono',monospace;font-size:9px;color:#8a8278;text-align:center">
-    Deepbloe Agency B.V. · deepbloe.com · ${esc(d._agencyVat)}
+    ${esc(AGENCY.legal_name)} · ${esc(AGENCY.website)} · ${esc(d._agencyVat || AGENCY.vat)}
   </div>
 </div>`;
 }
@@ -6887,7 +7144,7 @@ function updateShowPack() {
   ${row('Notes', d.transport_notes)}
 
   <div style="margin-top:32px;padding-top:16px;border-top:1px solid var(--border);font-family:var(--mono);font-size:9px;color:var(--muted);text-align:center">
-    Deepbloe Agency B.V. · deepbloe.com · Confidential
+    ${esc(AGENCY.legal_name)} · ${esc(AGENCY.website)} · Confidential
   </div>
 </div>`;
 }
@@ -8184,15 +8441,15 @@ Amount Due: ${amount}
 Due Date: ${inv?.due_date ? fmtDate(inv.due_date) : ''}
 
 Payment details:
-IBAN: NL84RABO0190352701
-BIC: RABONL2U
+IBAN: ${AGENCY.iban || ''}
+BIC: ${AGENCY.bic || ''}
 Reference: ${invNum}
 
 Please do not hesitate to reach out with any questions.
 
 Kind regards,
-Deepbloe Agency B.V.
-${'finance' + '@' + 'deepbloe.com'}`;
+${AGENCY.legal_name}
+${AGENCY.email || ''}`;
 
   } else if (type === 'contract') {
     const ct  = allContracts.find(c => c.id === id);
@@ -8220,8 +8477,8 @@ Date: ${showDate ? fmtDate(showDate) : ''}
 Please review, sign and return at your earliest convenience. If you have any questions or require amendments, please contact us directly.
 
 Kind regards,
-Deepbloe Agency B.V.
-${'stephen' + '@' + 'deepbloe.com'}`;
+${AGENCY.legal_name}
+${AGENCY.email || ''}`;
   }
 }
 
@@ -8248,7 +8505,7 @@ async function sendEmail() {
     </div>
     <div style="padding:14px 28px;background:#f7f5f0;border:1px solid #e2ddd6;border-top:none;
                 font-family:monospace;font-size:10px;color:#8a8278;text-align:center">
-      Deepbloe Agency B.V. · deepbloe.com · KvK: 86099477 · VAT: NL863860734B01
+      ${esc(agencyFooterLine())}
     </div>
   </div>`;
   try {
