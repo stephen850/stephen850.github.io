@@ -2569,10 +2569,6 @@ tbody td { padding: 10px 14px; vertical-align: middle; }
             <label>Phone</label>
             <input id="as-phone" placeholder="+31 ...">
           </div>
-          <div class="fg">
-            <label>Signatory Name / Title</label>
-            <input id="as-signatory" placeholder="Stephen Texidor, CEO">
-          </div>
         </div>
 
         <div class="form-section">Registered Address</div>
@@ -2626,6 +2622,15 @@ tbody td { padding: 10px 14px; vertical-align: middle; }
             <input id="as-account-holder" placeholder="Deepbloe Agency B.V.">
           </div>
         </div>
+
+        <div class="form-section" style="margin-top:28px">
+          Signatories
+          <span style="font-family:var(--mono);font-size:10px;color:var(--muted);text-transform:none;letter-spacing:0;margin-left:12px;font-weight:400">
+            People authorised to sign contracts &amp; invoices on behalf of the agency
+          </span>
+        </div>
+        <div id="sig-list" style="display:flex;flex-direction:column;gap:12px;margin-bottom:12px"></div>
+        <button class="btn" onclick="addSignatoryRow()" style="margin-bottom:24px">+ Add Signatory</button>
 
         <div style="margin-top:24px;display:flex;gap:10px;align-items:center">
           <button class="btn primary" onclick="saveAgencySettings()">✓ Save Settings</button>
@@ -3260,7 +3265,9 @@ tbody td { padding: 10px 14px; vertical-align: middle; }
       <div class="ce-sidebar-section">Signatories</div>
       <div class="ce-field">
         <label>Agency Signatory</label>
-        <input id="ce-agency-sig" placeholder="Name, Title" oninput="renderContractPreview()">
+        <select id="ce-agency-sig" onchange="renderContractPreview()">
+          <option value="">Select signatory…</option>
+        </select>
       </div>
       <div class="ce-field">
         <label>Promoter Signatory</label>
@@ -4163,7 +4170,6 @@ const AGENCY_DEFAULTS = {
   website:         'deepbloe.com',
   email:           'finance@deepbloe.com',
   phone:           '',
-  signatory:       'Stephen Texidor, CEO',
   address:         'Ambachtshof 88',
   postal_code:     '2632 BB',
   city:            'Nootdorp',
@@ -4176,6 +4182,36 @@ const AGENCY_DEFAULTS = {
   account_holder:  'Deepbloe Agency B.V.'
 };
 let AGENCY = { ...AGENCY_DEFAULTS };
+let AGENCY_SIGNATORIES = []; // [{id, name, title, signature_url, sort_order}]
+
+// Populate a <select> element with current AGENCY_SIGNATORIES
+function populateSignatoryDropdown(selectEl, currentValue = '') {
+  if (!selectEl) return;
+  const opts = ['<option value="">Select signatory…</option>'];
+  AGENCY_SIGNATORIES.forEach(s => {
+    const label = s.title ? `${s.name}, ${s.title}` : s.name;
+    const selected = label === currentValue ? ' selected' : '';
+    opts.push(`<option value="${esc(label)}"${selected}>${esc(label)}</option>`);
+  });
+  selectEl.innerHTML = opts.join('');
+  if (currentValue && !Array.from(selectEl.options).some(o => o.value === currentValue)) {
+    // Custom value (from old contracts), keep as selected
+    const opt = document.createElement('option');
+    opt.value = currentValue;
+    opt.textContent = currentValue + ' (custom)';
+    opt.selected = true;
+    selectEl.appendChild(opt);
+  }
+}
+
+// Look up full signatory record by "Name, Title" label
+function findSignatoryByLabel(label) {
+  if (!label) return null;
+  return AGENCY_SIGNATORIES.find(s => {
+    const l = s.title ? `${s.name}, ${s.title}` : s.name;
+    return l === label;
+  }) || null;
+}
 
 // Computed helpers — always read from AGENCY, never hardcode
 function agencyAddressBlock() {
@@ -4203,7 +4239,6 @@ async function loadAgencyOnStartup() {
         website:        data.website        || AGENCY_DEFAULTS.website,
         email:          data.email          || AGENCY_DEFAULTS.email,
         phone:          data.phone          || '',
-        signatory:      data.signatory      || AGENCY_DEFAULTS.signatory,
         address:        data.address        || AGENCY_DEFAULTS.address,
         postal_code:    data.postal_code    || AGENCY_DEFAULTS.postal_code,
         city:           data.city           || AGENCY_DEFAULTS.city,
@@ -4219,6 +4254,15 @@ async function loadAgencyOnStartup() {
   } catch (err) {
     console.warn('Agency settings not loaded, using defaults:', err.message);
   }
+  // Load signatories (separate table, 1-to-many)
+  try {
+    const { data, error } = await db.from('agency_signatories')
+      .select('*').order('sort_order', { ascending: true });
+    if (!error && Array.isArray(data)) AGENCY_SIGNATORIES = data;
+  } catch (err) {
+    console.warn('Agency signatories not loaded:', err.message);
+    AGENCY_SIGNATORIES = [];
+  }
 }
 
 // Populate the Settings panel form with current AGENCY values
@@ -4228,7 +4272,6 @@ function loadAgencySettings() {
   document.getElementById('as-website').value         = AGENCY.website        || '';
   document.getElementById('as-email').value           = AGENCY.email          || '';
   document.getElementById('as-phone').value           = AGENCY.phone          || '';
-  document.getElementById('as-signatory').value       = AGENCY.signatory      || '';
   document.getElementById('as-address').value         = AGENCY.address        || '';
   document.getElementById('as-postal-code').value     = AGENCY.postal_code    || '';
   document.getElementById('as-city').value            = AGENCY.city           || '';
@@ -4239,6 +4282,7 @@ function loadAgencySettings() {
   document.getElementById('as-bic').value             = AGENCY.bic            || '';
   document.getElementById('as-bank-name').value       = AGENCY.bank_name      || '';
   document.getElementById('as-account-holder').value  = AGENCY.account_holder || '';
+  renderSignatories();
   document.getElementById('as-status').textContent = 'Loaded';
   setTimeout(() => { document.getElementById('as-status').textContent = ''; }, 2000);
 }
@@ -4255,7 +4299,6 @@ async function saveAgencySettings() {
     website:        document.getElementById('as-website').value.trim()        || null,
     email:          document.getElementById('as-email').value.trim()          || null,
     phone:          document.getElementById('as-phone').value.trim()          || null,
-    signatory:      document.getElementById('as-signatory').value.trim()      || null,
     address:        document.getElementById('as-address').value.trim()        || null,
     postal_code:    document.getElementById('as-postal-code').value.trim()    || null,
     city:           document.getElementById('as-city').value.trim()           || null,
@@ -4284,8 +4327,151 @@ async function saveAgencySettings() {
     }
   });
 
+  // Also persist any edited signatories in the UI
+  await saveSignatoriesFromUI();
+
   showToast('Agency settings saved', 'success');
   statusEl.textContent = 'Saved ' + new Date().toLocaleTimeString();
+}
+
+// ── Signatories CRUD ─────────────────────────────────────────
+function renderSignatories() {
+  const container = document.getElementById('sig-list');
+  if (!container) return;
+  if (!AGENCY_SIGNATORIES.length) {
+    container.innerHTML = `<div style="font-family:var(--mono);font-size:11px;color:var(--muted);padding:14px;border:1px dashed var(--border);text-align:center">
+      No signatories yet. Add one below.
+    </div>`;
+    return;
+  }
+  container.innerHTML = AGENCY_SIGNATORIES.map((s, idx) => {
+    const localId = s.id || ('new_' + idx);
+    const sigImg = s.signature_url
+      ? `<img src="${esc(s.signature_url)}" alt="signature" style="max-height:40px;max-width:160px;display:block;background:#fff;padding:4px;border:1px solid var(--border)">`
+      : `<span style="font-family:var(--mono);font-size:10px;color:var(--muted)">No signature image</span>`;
+    return `
+      <div class="sig-row" data-sig-id="${esc(localId)}"
+           style="display:grid;grid-template-columns:1fr 1fr 200px auto;gap:10px;align-items:center;
+                  padding:12px;border:1px solid var(--border);background:var(--surface)">
+        <div>
+          <div style="font-family:var(--mono);font-size:9px;color:var(--muted);margin-bottom:4px;text-transform:uppercase;letter-spacing:0.1em">Full Name</div>
+          <input class="sig-name" value="${esc(s.name||'')}" placeholder="Stephen Texidor" style="width:100%">
+        </div>
+        <div>
+          <div style="font-family:var(--mono);font-size:9px;color:var(--muted);margin-bottom:4px;text-transform:uppercase;letter-spacing:0.1em">Title</div>
+          <input class="sig-title" value="${esc(s.title||'')}" placeholder="CEO" style="width:100%">
+        </div>
+        <div>
+          <div style="font-family:var(--mono);font-size:9px;color:var(--muted);margin-bottom:4px;text-transform:uppercase;letter-spacing:0.1em">Signature</div>
+          ${sigImg}
+          <input type="file" class="sig-file" accept="image/png,image/jpeg,image/svg+xml"
+                 onchange="uploadSignatureImage('${esc(localId)}', this)"
+                 style="font-size:10px;margin-top:4px">
+        </div>
+        <button class="btn" onclick="removeSignatory('${esc(localId)}')"
+                style="color:var(--red);border-color:var(--red);align-self:end">Remove</button>
+      </div>`;
+  }).join('');
+}
+
+function addSignatoryRow() {
+  AGENCY_SIGNATORIES.push({
+    id: null,
+    name: '',
+    title: '',
+    signature_url: null,
+    sort_order: AGENCY_SIGNATORIES.length
+  });
+  readSignatoriesFromUI(); // preserve any unsaved edits first
+  renderSignatories();
+}
+
+function removeSignatory(localId) {
+  readSignatoriesFromUI();
+  AGENCY_SIGNATORIES = AGENCY_SIGNATORIES.filter((s, idx) => {
+    const thisLocalId = s.id || ('new_' + idx);
+    return String(thisLocalId) !== String(localId);
+  });
+  renderSignatories();
+}
+
+// Read all rows from the DOM back into AGENCY_SIGNATORIES
+function readSignatoriesFromUI() {
+  const rows = document.querySelectorAll('#sig-list .sig-row');
+  const updated = [];
+  rows.forEach((row, idx) => {
+    const localId = row.dataset.sigId;
+    const existing = AGENCY_SIGNATORIES.find((s, i) => (s.id || ('new_' + i)) === localId) || {};
+    updated.push({
+      id: existing.id || null,
+      name: row.querySelector('.sig-name').value.trim(),
+      title: row.querySelector('.sig-title').value.trim(),
+      signature_url: existing.signature_url || null,
+      sort_order: idx
+    });
+  });
+  AGENCY_SIGNATORIES = updated;
+}
+
+// Upload a signature image to Supabase Storage and update the row
+async function uploadSignatureImage(localId, fileInput) {
+  const file = fileInput.files?.[0];
+  if (!file) return;
+  if (file.size > 1024 * 1024) {
+    showToast('Signature image too large (max 1MB)', 'error');
+    fileInput.value = '';
+    return;
+  }
+  const ext = file.name.split('.').pop().toLowerCase();
+  const path = `signatures/sig_${Date.now()}_${Math.random().toString(36).slice(2,8)}.${ext}`;
+  const { error: upErr } = await db.storage.from('agency-assets').upload(path, file, { upsert: true });
+  if (upErr) {
+    showToast('Upload failed: ' + upErr.message, 'error');
+    return;
+  }
+  const { data: pub } = db.storage.from('agency-assets').getPublicUrl(path);
+  readSignatoriesFromUI();
+  const sig = AGENCY_SIGNATORIES.find((s, idx) => (s.id || ('new_' + idx)) === localId);
+  if (sig) sig.signature_url = pub.publicUrl;
+  renderSignatories();
+  showToast('Signature uploaded — remember to Save Settings', 'info');
+}
+
+// Persist AGENCY_SIGNATORIES to Supabase (full sync)
+async function saveSignatoriesFromUI() {
+  readSignatoriesFromUI();
+
+  // Delete rows removed in UI: get current DB ids, compare
+  const { data: existing } = await db.from('agency_signatories').select('id');
+  const existingIds = (existing || []).map(r => r.id);
+  const keepIds = AGENCY_SIGNATORIES.filter(s => s.id).map(s => s.id);
+  const toDelete = existingIds.filter(id => !keepIds.includes(id));
+  if (toDelete.length) {
+    await db.from('agency_signatories').delete().in('id', toDelete);
+  }
+
+  // Upsert current rows
+  for (const s of AGENCY_SIGNATORIES) {
+    if (!s.name) continue; // skip empty rows
+    const payload = {
+      name: s.name,
+      title: s.title || null,
+      signature_url: s.signature_url || null,
+      sort_order: s.sort_order || 0
+    };
+    if (s.id) {
+      await db.from('agency_signatories').update(payload).eq('id', s.id);
+    } else {
+      const { data: inserted } = await db.from('agency_signatories').insert(payload).select().single();
+      if (inserted) s.id = inserted.id;
+    }
+  }
+
+  // Refresh local cache from DB
+  const { data: refreshed } = await db.from('agency_signatories')
+    .select('*').order('sort_order', { ascending: true });
+  AGENCY_SIGNATORIES = refreshed || [];
+  renderSignatories();
 }
 
 // ── AUTH ──────────────────────────────────────────────────────
@@ -5768,6 +5954,9 @@ async function openContractEditorById(contractId) {
   </option>`).join('');
 
   document.getElementById('ce-lang').value = c.notes || 'en';
+  // Restore saved signatory into dropdown (supports custom values from old contracts)
+  populateSignatoryDropdown(document.getElementById('ce-agency-sig'), c.agency_signatory || '');
+  document.getElementById('ce-promoter-sig').value = c.promoter_signatory || '';
 
   // Parse saved HTML back into fields (best effort) or just render
   if (c.html_content) {
@@ -5799,7 +5988,7 @@ function resetContractEditor() {
   document.getElementById('ce-currency').value = 'EUR';
   document.getElementById('ce-withholding').value = 'Not applicable';
   document.getElementById('ce-special').value = '';
-  document.getElementById('ce-agency-sig').value = AGENCY.signatory || '';
+  populateSignatoryDropdown(document.getElementById('ce-agency-sig'), '');
   document.getElementById('ce-promoter-sig').value = '';
 }
 
@@ -5901,6 +6090,13 @@ function getMergeData() {
     '{{PROMOTER_ADDRESS}}': (document.getElementById('ce-promoter-address').value||'[Address]').replace(/\n/g,'<br>'),
     '{{PROMOTER_VAT}}': document.getElementById('ce-promoter-vat').value || '[VAT ID]',
     '{{AGENCY_SIG}}': document.getElementById('ce-agency-sig').value || 'Authorised Signatory',
+    '{{AGENCY_SIG_IMAGE}}': (() => {
+      const label = document.getElementById('ce-agency-sig').value;
+      const sig = findSignatoryByLabel(label);
+      return sig?.signature_url
+        ? `<div style="margin-top:8px"><img src="${sig.signature_url}" alt="Signature" style="max-height:50px;max-width:180px;display:block"></div>`
+        : '';
+    })(),
     '{{PROMOTER_SIG}}': document.getElementById('ce-promoter-sig').value || 'Authorised Signatory',
     '{{SPECIAL}}':   document.getElementById('ce-special').value || 'None.',
   };
@@ -6063,6 +6259,7 @@ function getTemplateEN() {
     <div class="sig-label">Party A — Agency</div>
     <div class="sig-name">{{AGENCY}}</div>
     <div class="sig-title">{{AGENCY_SIG}}</div>
+    {{AGENCY_SIG_IMAGE}}
     <br><br>
     <div style="font-family:'DM Mono',monospace;font-size:10px;color:#8a8278">Signature &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Date</div>
   </div>
@@ -6155,6 +6352,7 @@ function getTemplateNL() {
     <div class="sig-label">Partij A — Agency</div>
     <div class="sig-name">{{AGENCY}}</div>
     <div class="sig-title">{{AGENCY_SIG}}</div>
+    {{AGENCY_SIG_IMAGE}}
     <br><br>
     <div style="font-family:'DM Mono',monospace;font-size:10px;color:#8a8278">Handtekening &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Datum</div>
   </div>
