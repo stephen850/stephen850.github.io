@@ -1124,6 +1124,7 @@ tbody td { padding: 10px 14px; vertical-align: middle; }
 #toast.success { border-color: var(--green); color: var(--green); }
 #toast.error   { border-color: var(--red);   color: var(--red); }
 #toast.info    { border-color: var(--blue);  color: var(--blue); }
+#toast.warning { border-color: #d49c3d; color: #8a5d00; }
 </style>
 </head>
 <body>
@@ -4239,7 +4240,7 @@ function populateArtistDropdowns() {
 // ── BOOKINGS ──────────────────────────────────────────────────
 async function loadBookings() {
   const { data, error } = await db.from('bookings')
-    .select('*, artists(name), company:organisations!bookings_company_id_fkey(name, type)')
+    .select('*, artists(name), company:organisations!bookings_company_id_fkey(id, name, legal_name, type, address, postal_code, city, country, vat_number)')
     .order('show_date', { ascending: true });
   if (error) { showToast('Error loading bookings: ' + error.message, 'error'); return; }
   allBookings = data || [];
@@ -5567,11 +5568,30 @@ function resetContractEditor() {
   document.getElementById('ce-promoter-sig').value = '';
 }
 
+/* ── Shared helpers ────────────────────────────────────
+   Build a multi-line postal address from an organisation record.
+   Used by contract editor, invoice editor, settlements, etc.
+   Returns '' if no address data at all. */
+function buildOrgAddress(org) {
+  if (!org) return '';
+  const cityLine = [org.postal_code, org.city].filter(Boolean).join(' ');
+  return [org.address, cityLine, org.country].filter(Boolean).join('\n');
+}
+
+/* Preferred display name on legal documents: legal_name first,
+   then trading name, then generic name as last resort. */
+function orgLegalName(org) {
+  if (!org) return '';
+  return org.legal_name || org.name || '';
+}
+
 function loadBookingIntoContract() {
   const bookingId = document.getElementById('ce-booking').value;
   if (!bookingId) { resetContractEditor(); renderContractPreview(); return; }
   const b = allBookings.find(x => x.id === bookingId);
   if (!b) return;
+
+  const promo = b.company || b.organisations || null;
 
   document.getElementById('ce-booking-ref').textContent = b.reference || '';
   document.getElementById('ce-artist').value    = b.artists?.name || '';
@@ -5581,7 +5601,12 @@ function loadBookingIntoContract() {
   document.getElementById('ce-settime').value   = b.set_time ? b.set_time.slice(0,5) : '';
   document.getElementById('ce-setlength').value = b.set_length_minutes ? b.set_length_minutes + ' minutes' : '';
   document.getElementById('ce-currency').value  = b.fee_currency || 'EUR';
-  document.getElementById('ce-promoter').value  = b.company?.name || b.organisations?.name || '';
+
+  // Promoter identity: legal name + full address + VAT
+  document.getElementById('ce-promoter').value         = orgLegalName(promo);
+  document.getElementById('ce-promoter-address').value = buildOrgAddress(promo);
+  document.getElementById('ce-promoter-vat').value     = promo?.vat_number || '';
+
   document.getElementById('ce-withholding').value = b.withholding_rate && b.withholding_rate > 0
     ? b.withholding_rate + '% (' + (b.withholding_country||'') + ')'
     : 'Not applicable';
@@ -5591,6 +5616,17 @@ function loadBookingIntoContract() {
     document.getElementById('ce-fee').value = sym + b.fee_amount.toLocaleString();
   } else {
     document.getElementById('ce-fee').value = '';
+  }
+
+  // Soft warning if the linked organisation is missing key contract fields
+  if (promo) {
+    const missing = [];
+    if (!promo.address) missing.push('address');
+    if (!promo.vat_number) missing.push('VAT number');
+    if (!promo.legal_name) missing.push('legal name');
+    if (missing.length) {
+      showToast('Promoter record missing: ' + missing.join(', ') + ' — edit the company to complete', 'warning');
+    }
   }
 
   currentContractBookingId = bookingId;
@@ -6088,12 +6124,16 @@ function loadBookingIntoInvoice() {
   if (!bookingId) { updateInvoiceCalc(); return; }
   const b = allBookings.find(x => x.id === bookingId);
   if (!b) return;
+  const promo = b.company || b.organisations || null;
   document.getElementById('ie-booking-ref').textContent = b.reference||'';
   document.getElementById('ie-artist').value    = b.artists?.name||'';
   document.getElementById('ie-show-date').value = b.show_date ? fmtDate(b.show_date) : '';
   document.getElementById('ie-venue').value     = [b.venue_name,b.venue_city,b.venue_country].filter(Boolean).join(', ');
   document.getElementById('ie-currency').value  = b.fee_currency||'EUR';
-  document.getElementById('ie-client-name').value = b.company?.name||'';
+  // Client (promoter) identity — legal name + address + VAT
+  document.getElementById('ie-client-name').value = orgLegalName(promo);
+  document.getElementById('ie-client-addr').value = buildOrgAddress(promo);
+  document.getElementById('ie-client-vat').value  = promo?.vat_number || '';
   document.getElementById('ie-withholding-pct').value = b.withholding_rate||0;
   const type = document.getElementById('ie-type').value;
   const labels = {deposit:'Deposit — ',second_deposit:'2nd Deposit — ',balance:'Balance — ',full:'Performance fee — ',credit_note:'Credit note — '};
