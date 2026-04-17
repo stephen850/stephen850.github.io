@@ -2729,25 +2729,6 @@ tbody td { padding: 10px 14px; vertical-align: middle; }
           <button class="btn" onclick="openTeamMemberModal()" id="rbac-add-btn" style="margin-top:8px">+ Add Team Member</button>
         </div>
 
-        <!-- ═══ RBAC: ROLE PERMISSIONS ═══ -->
-        <div class="rbac-section" id="rbac-perms-section">
-          <div class="rbac-section-title">Role Permissions</div>
-          <p class="rbac-section-sub">
-            Configure which panels each role can access and edit.
-            Changes apply immediately to all team members with that role.
-          </p>
-          <div style="margin-bottom:12px">
-            <label style="font-family:var(--mono);font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted)">
-              Editing role:
-            </label>
-            <select id="rbac-role-select" onchange="renderRolePermissions()" style="margin-left:8px;font-family:var(--sans);font-size:12px;padding:4px 8px;border:1px solid var(--border-dark)">
-            </select>
-          </div>
-          <div id="rbac-perm-grid"></div>
-          <button class="btn primary" onclick="saveRolePermissions()" style="margin-top:8px">✓ Save Permissions</button>
-          <span id="rbac-perm-status" style="font-family:var(--mono);font-size:10px;color:var(--muted);margin-left:10px"></span>
-        </div>
-
       </div>
     </div>
 
@@ -4279,6 +4260,21 @@ tbody td { padding: 10px 14px; vertical-align: middle; }
           <button class="btn" onclick="addArtistChip()">+ Add</button>
         </div>
       </div>
+
+      <!-- Per-member panel permissions -->
+      <div id="tm-perms-section" style="margin-top:16px">
+        <div class="form-section">Panel Permissions</div>
+        <p style="font-family:var(--mono);font-size:10px;color:var(--muted);margin-bottom:10px">
+          Configure which panels this member can see and edit.
+        </p>
+        <div style="display:flex;gap:8px;margin-bottom:10px">
+          <button class="btn" onclick="tmPermsSelectAll(true,true)" style="font-size:10px">All on</button>
+          <button class="btn" onclick="tmPermsSelectAll(true,false)" style="font-size:10px">View only</button>
+          <button class="btn" onclick="tmPermsSelectAll(false,false)" style="font-size:10px">All off</button>
+          <button class="btn" onclick="tmPermsFromRole()" style="font-size:10px">Load from role</button>
+        </div>
+        <div id="tm-perm-grid"></div>
+      </div>
     </div>
     <div class="modal-foot">
       <button class="btn" onclick="document.getElementById('team-modal').classList.remove('open')">Cancel</button>
@@ -4464,7 +4460,6 @@ function loadAgencySettings() {
   // RBAC: render team management if owner
   if (RBAC.isOwner) {
     loadTeamData();
-    renderRoleSelect();
   }
 }
 
@@ -4823,8 +4818,16 @@ async function loadRBAC() {
     RBAC.isManager = RBAC.currentRole?.name === 'manager';
     RBAC.isAgent = RBAC.currentRole?.name === 'agent';
 
-    // Load permissions for this role
-    const { data: perms } = await db.from('role_permissions').select('*').eq('role_id', RBAC.currentUser.role_id);
+    // Load permissions for this member (member_permissions first, fallback to role_permissions)
+    let perms = null;
+    const { data: memberPerms } = await db.from('member_permissions').select('*').eq('member_id', RBAC.currentUser.id);
+    if (memberPerms && memberPerms.length > 0) {
+      perms = memberPerms;
+    } else {
+      // Fallback: load from role_permissions
+      const { data: rolePerms } = await db.from('role_permissions').select('*').eq('role_id', RBAC.currentUser.role_id);
+      perms = rolePerms;
+    }
     RBAC.permissions = {};
     (perms || []).forEach(p => {
       RBAC.permissions[p.panel] = { can_view: p.can_view, can_edit: p.can_edit };
@@ -4900,9 +4903,7 @@ function applyRBACToUI() {
 
   // 4) Hide RBAC sections in settings for non-owners
   const teamSection = document.getElementById('rbac-team-section');
-  const permsSection = document.getElementById('rbac-perms-section');
   if (teamSection) teamSection.style.display = RBAC.isOwner ? 'block' : 'none';
-  if (permsSection) permsSection.style.display = RBAC.isOwner ? 'block' : 'none';
 
   // 5) If current panel is now hidden, redirect to first visible
   const activePanel = document.querySelector('.panel.active');
@@ -5006,6 +5007,7 @@ function openTeamMemberModal(memberId = null) {
 
   toggleArtistAssignment();
   renderArtistChips();
+  renderMemberPermGrid(memberId);
   document.getElementById('team-modal').classList.add('open');
 }
 
@@ -5014,6 +5016,10 @@ function toggleArtistAssignment() {
   const role = RBAC.allRoles.find(r => r.id === roleId);
   const section = document.getElementById('tm-artist-section');
   section.style.display = (role?.name === 'agent') ? 'block' : 'none';
+  // For new members, refresh perm grid defaults when role changes
+  if (!editMemberId && role) {
+    renderMemberPermGrid(null);
+  }
 }
 
 function addArtistChip() {
@@ -5064,13 +5070,11 @@ async function saveTeamMember() {
 
       // Sync artist assignments
       await syncArtistAssignments(editMemberId);
+      // Save member permissions
+      await saveMemberPermissions(editMemberId);
       showToast('Team member updated', 'success');
     } else {
-      // New member — look up their user_id from Supabase auth
-      // We need to find the user_id by email. Since we can't query auth.users from client,
-      // we'll store the email and set user_id when they first log in (or owner provides it).
-      // For now: create with a placeholder user_id that matches email lookup on login.
-      // Alternative: just store email and resolve on login.
+      // New member
       const { data: newMember, error } = await db.from('team_members').insert({
         user_id: crypto.randomUUID(), // placeholder - will be resolved on first login
         email: email.toLowerCase(),
@@ -5080,9 +5084,10 @@ async function saveTeamMember() {
       }).select().single();
       if (error) throw error;
 
-      // Sync artist assignments
+      // Sync artist assignments + permissions
       if (newMember) {
         await syncArtistAssignments(newMember.id);
+        await saveMemberPermissions(newMember.id);
       }
       showToast('Team member added. They can now log in.', 'success');
     }
@@ -5110,8 +5115,9 @@ async function deleteTeamMember() {
   if (!confirm(`Remove ${m?.full_name || m?.email} from the team? They will lose all CRM access.`)) return;
 
   try {
-    // Delete assignments first
+    // Delete assignments and permissions first
     await db.from('artist_assignments').delete().eq('member_id', editMemberId);
+    await db.from('member_permissions').delete().eq('member_id', editMemberId);
     await db.from('team_members').delete().eq('id', editMemberId);
     showToast('Team member removed', 'success');
     document.getElementById('team-modal').classList.remove('open');
@@ -5121,27 +5127,74 @@ async function deleteTeamMember() {
   }
 }
 
-// ── RBAC: ROLE PERMISSIONS EDITOR ────────────────────────────
+// ── RBAC: MEMBER PERMISSIONS (in modal) ─────────────────────
 
-function renderRoleSelect() {
-  const sel = document.getElementById('rbac-role-select');
-  if (!sel) return;
-  sel.innerHTML = RBAC.allRoles
-    .filter(r => r.name !== 'owner') // Owner always has full access
-    .map(r => `<option value="${r.id}">${esc(r.label)}</option>`).join('');
-  renderRolePermissions();
+// Default permissions per role (used for "Load from role" button and new members)
+const ROLE_DEFAULTS = {
+  owner:    { all: { can_view: true, can_edit: true } },
+  manager:  { all: { can_view: true, can_edit: true }, settings: { can_view: true, can_edit: false } },
+  agent:    {
+    dashboard: { can_view: true, can_edit: false },
+    artists: { can_view: true, can_edit: true },
+    bookings: { can_view: true, can_edit: true },
+    contracts: { can_view: true, can_edit: true },
+    advancing: { can_view: true, can_edit: true },
+    calendar: { can_view: true, can_edit: false },
+    reminders: { can_view: true, can_edit: true },
+    tours: { can_view: true, can_edit: true },
+    pipeline: { can_view: true, can_edit: true }
+  },
+  finance:  {
+    dashboard: { can_view: true, can_edit: false },
+    bookings: { can_view: true, can_edit: false },
+    contracts: { can_view: true, can_edit: false },
+    invoices: { can_view: true, can_edit: true },
+    finance: { can_view: true, can_edit: true }
+  },
+  readonly: { all: { can_view: true, can_edit: false } }
+};
+
+function getDefaultPermsForRole(roleName) {
+  const def = ROLE_DEFAULTS[roleName] || {};
+  const result = {};
+  ALL_PANELS.forEach(p => {
+    if (def.all) {
+      result[p] = { ...def.all };
+      // Apply panel-specific overrides
+      if (def[p]) Object.assign(result[p], def[p]);
+    } else {
+      result[p] = def[p] || { can_view: false, can_edit: false };
+    }
+  });
+  return result;
 }
 
-async function renderRolePermissions() {
-  const roleId = document.getElementById('rbac-role-select')?.value;
-  if (!roleId) return;
-
-  const { data: perms } = await db.from('role_permissions').select('*').eq('role_id', roleId);
-  const permMap = {};
-  (perms || []).forEach(p => { permMap[p.panel] = p; });
-
-  const grid = document.getElementById('rbac-perm-grid');
+async function renderMemberPermGrid(memberId) {
+  const grid = document.getElementById('tm-perm-grid');
   if (!grid) return;
+
+  // Load existing member permissions, or fall back to role defaults
+  let permMap = {};
+  if (memberId) {
+    const { data: mPerms } = await db.from('member_permissions').select('*').eq('member_id', memberId);
+    if (mPerms && mPerms.length > 0) {
+      mPerms.forEach(p => { permMap[p.panel] = p; });
+    } else {
+      // Fall back to role_permissions
+      const member = RBAC.allMembers.find(m => m.id === memberId);
+      if (member) {
+        const { data: rPerms } = await db.from('role_permissions').select('*').eq('role_id', member.role_id);
+        (rPerms || []).forEach(p => { permMap[p.panel] = p; });
+      }
+    }
+  } else {
+    // New member: use role defaults based on selected role
+    const roleId = document.getElementById('tm-role').value;
+    const role = RBAC.allRoles.find(r => r.id === roleId);
+    if (role) {
+      permMap = getDefaultPermsForRole(role.name);
+    }
+  }
 
   let html = '<div class="perm-grid">';
   html += '<div class="pg-hdr">Panel</div><div class="pg-hdr">View</div><div class="pg-hdr">Edit</div>';
@@ -5168,34 +5221,52 @@ async function renderRolePermissions() {
   });
 }
 
-async function saveRolePermissions() {
-  const roleId = document.getElementById('rbac-role-select')?.value;
-  if (!roleId) return;
-  const statusEl = document.getElementById('rbac-perm-status');
+function tmPermsSelectAll(view, edit) {
+  const grid = document.getElementById('tm-perm-grid');
+  if (!grid) return;
+  grid.querySelectorAll('input[data-perm="view"]').forEach(cb => { cb.checked = view; });
+  grid.querySelectorAll('input[data-perm="edit"]').forEach(cb => { cb.checked = edit; });
+}
 
-  const grid = document.getElementById('rbac-perm-grid');
+function tmPermsFromRole() {
+  const roleId = document.getElementById('tm-role').value;
+  const role = RBAC.allRoles.find(r => r.id === roleId);
+  if (!role) { showToast('Select a role first', 'error'); return; }
+  const defaults = getDefaultPermsForRole(role.name);
+  const grid = document.getElementById('tm-perm-grid');
+  if (!grid) return;
+  ALL_PANELS.forEach(panel => {
+    const d = defaults[panel] || { can_view: false, can_edit: false };
+    const viewCb = grid.querySelector(`input[data-panel="${panel}"][data-perm="view"]`);
+    const editCb = grid.querySelector(`input[data-panel="${panel}"][data-perm="edit"]`);
+    if (viewCb) viewCb.checked = d.can_view;
+    if (editCb) editCb.checked = d.can_edit;
+  });
+}
+
+function collectMemberPerms(memberId) {
+  const grid = document.getElementById('tm-perm-grid');
+  if (!grid) return [];
   const rows = [];
   ALL_PANELS.forEach(panel => {
     const viewCb = grid.querySelector(`input[data-panel="${panel}"][data-perm="view"]`);
     const editCb = grid.querySelector(`input[data-panel="${panel}"][data-perm="edit"]`);
     rows.push({
-      role_id: roleId,
+      member_id: memberId,
       panel: panel,
       can_view: viewCb?.checked || false,
       can_edit: editCb?.checked || false
     });
   });
+  return rows;
+}
 
-  try {
-    // Delete existing and re-insert (upsert workaround)
-    await db.from('role_permissions').delete().eq('role_id', roleId);
-    const { error } = await db.from('role_permissions').insert(rows);
-    if (error) throw error;
-    if (statusEl) { statusEl.textContent = 'Saved'; setTimeout(() => statusEl.textContent = '', 2000); }
-    showToast('Permissions saved', 'success');
-  } catch (err) {
-    showToast('Error saving permissions: ' + (err.message || err), 'error');
-  }
+async function saveMemberPermissions(memberId) {
+  const rows = collectMemberPerms(memberId);
+  if (!rows.length) return;
+  await db.from('member_permissions').delete().eq('member_id', memberId);
+  const { error } = await db.from('member_permissions').insert(rows);
+  if (error) throw error;
 }
 
 // ── NAVIGATION ────────────────────────────────────────────────
