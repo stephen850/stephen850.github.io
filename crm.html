@@ -1126,6 +1126,54 @@ tbody td { padding: 10px 14px; vertical-align: middle; }
 #toast.info    { border-color: var(--blue);  color: var(--blue); }
 #toast.warning { border-color: #d49c3d; color: #8a5d00; }
 
+/* ── BOOKING DOCUMENTS ────────────────────────────────── */
+.doc-list { display: flex; flex-direction: column; gap: 6px; margin-top: 8px; }
+.doc-item {
+  display: flex; align-items: center; gap: 10px; padding: 8px 12px;
+  background: var(--bg); border: 1px solid var(--border); font-size: 12px;
+}
+.doc-item .doc-icon { font-size: 16px; flex-shrink: 0; }
+.doc-item .doc-name { flex: 1; font-family: var(--mono); font-size: 11px; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.doc-item .doc-type {
+  font-family: var(--mono); font-size: 9px; letter-spacing: 0.08em;
+  text-transform: uppercase; padding: 2px 6px; border: 1px solid var(--border);
+  background: var(--surface); color: var(--muted); flex-shrink: 0;
+}
+.doc-item .doc-date { font-family: var(--mono); font-size: 10px; color: var(--muted); flex-shrink: 0; }
+.doc-item .doc-actions { display: flex; gap: 4px; flex-shrink: 0; }
+.doc-upload-zone {
+  border: 1px dashed var(--border-dark); padding: 16px; text-align: center;
+  font-family: var(--mono); font-size: 11px; color: var(--muted); cursor: pointer;
+  transition: border-color 0.15s, background 0.15s; margin-top: 8px;
+}
+.doc-upload-zone:hover { border-color: var(--accent); background: rgba(0,0,0,0.02); }
+.doc-upload-zone.dragover { border-color: var(--blue); background: #eef3fb; }
+
+/* ── BOOKING DOCUMENTS END ───────────────────────────────── */
+
+/* ── AUDIT LOG VIEWER ────────────────────────────────────── */
+.audit-row {
+  display: grid; grid-template-columns: 140px 120px 1fr 180px;
+  gap: 8px; padding: 8px 12px; border-bottom: 1px solid var(--border);
+  font-size: 12px; align-items: center;
+}
+.audit-row:hover { background: var(--bg); }
+.audit-row .audit-time { font-family: var(--mono); font-size: 10px; color: var(--muted); }
+.audit-row .audit-type {
+  font-family: var(--mono); font-size: 9px; letter-spacing: 0.06em;
+  text-transform: uppercase; padding: 2px 6px; border: 1px solid var(--border);
+  background: var(--bg); text-align: center; white-space: nowrap;
+}
+.audit-row .audit-desc { font-size: 12px; line-height: 1.4; }
+.audit-row .audit-user { font-family: var(--mono); font-size: 10px; color: var(--muted); text-align: right; overflow: hidden; text-overflow: ellipsis; }
+.audit-hdr {
+  display: grid; grid-template-columns: 140px 120px 1fr 180px;
+  gap: 8px; padding: 8px 12px; background: var(--bg); border-bottom: 1px solid var(--border);
+  font-family: var(--mono); font-size: 9px; letter-spacing: 0.1em;
+  text-transform: uppercase; color: var(--muted); font-weight: 500;
+}
+/* ── AUDIT LOG VIEWER END ────────────────────────────────── */
+
 /* ── RBAC / TEAM MANAGEMENT ──────────────────────────── */
 .rbac-section { margin-top: 40px; padding-top: 28px; border-top: 1px solid var(--border); }
 .rbac-section-title {
@@ -1568,6 +1616,15 @@ tbody td { padding: 10px 14px; vertical-align: middle; }
           <option value="2025">2025</option>
           <option value="2026">2026</option>
           <option value="2027">2027</option>
+        </select>
+        <select class="tb-select" id="bk-month" onchange="filterBookings()">
+          <option value="">All months</option>
+          <option value="0">January</option><option value="1">February</option>
+          <option value="2">March</option><option value="3">April</option>
+          <option value="4">May</option><option value="5">June</option>
+          <option value="6">July</option><option value="7">August</option>
+          <option value="8">September</option><option value="9">October</option>
+          <option value="10">November</option><option value="11">December</option>
         </select>
         <div class="view-toggle">
           <button class="vt-btn active" id="vt-list" onclick="setBookingView('list')">List</button>
@@ -2729,6 +2786,31 @@ tbody td { padding: 10px 14px; vertical-align: middle; }
           <button class="btn" onclick="openTeamMemberModal()" id="rbac-add-btn" style="margin-top:8px">+ Add Team Member</button>
         </div>
 
+        <!-- ═══ AUDIT LOG VIEWER ═══ -->
+        <div class="rbac-section" id="audit-log-section">
+          <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:4px">
+            <div class="rbac-section-title">Audit Log</div>
+            <span style="font-family:var(--mono);font-size:10px;color:var(--muted)" id="audit-count"></span>
+          </div>
+          <p class="rbac-section-sub">
+            Track who changed what and when across the CRM.
+          </p>
+          <div style="display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap">
+            <input class="tb-search" type="text" id="audit-search" placeholder="Search description, email..." oninput="filterAuditLog()" style="width:220px">
+            <select class="tb-select" id="audit-type-filter" onchange="filterAuditLog()">
+              <option value="">All event types</option>
+            </select>
+            <select class="tb-select" id="audit-days-filter" onchange="loadAuditLog()">
+              <option value="7">Last 7 days</option>
+              <option value="30" selected>Last 30 days</option>
+              <option value="90">Last 90 days</option>
+              <option value="365">Last year</option>
+            </select>
+            <button class="btn" onclick="loadAuditLog()">Refresh</button>
+          </div>
+          <div id="audit-log-list" style="max-height:500px;overflow-y:auto;border:1px solid var(--border)"></div>
+        </div>
+
       </div>
     </div>
 
@@ -3102,6 +3184,32 @@ tbody td { padding: 10px 14px; vertical-align: middle; }
         <label>Hold Expires</label>
         <input type="datetime-local" id="bm-holdexpiry">
       </div>
+    </div>
+
+    <div class="form-section">Documents</div>
+    <div style="margin:0 0 8px">
+      <div id="bm-doc-list" class="doc-list"></div>
+      <div class="doc-upload-zone" id="bm-doc-dropzone"
+           onclick="document.getElementById('bm-doc-input').click()"
+           ondragover="event.preventDefault();this.classList.add('dragover')"
+           ondragleave="this.classList.remove('dragover')"
+           ondrop="event.preventDefault();this.classList.remove('dragover');handleDocDrop(event)">
+        Drop files here or click to upload
+        <div style="font-size:9px;margin-top:4px;color:var(--muted)">Contracts, riders, receipts, tech specs (max 10 MB)</div>
+      </div>
+      <input type="file" id="bm-doc-input" multiple style="display:none"
+             accept=".pdf,.doc,.docx,.xls,.xlsx,.jpg,.jpeg,.png,.gif,.webp"
+             onchange="handleDocSelect(this.files)">
+      <select id="bm-doc-type" style="margin-top:6px;font-family:var(--mono);font-size:11px;padding:4px 8px;border:1px solid var(--border)">
+        <option value="contract">Contract</option>
+        <option value="rider">Rider</option>
+        <option value="receipt">Receipt</option>
+        <option value="invoice">Invoice</option>
+        <option value="tech_spec">Tech Spec</option>
+        <option value="travel">Travel</option>
+        <option value="other">Other</option>
+      </select>
+      <span style="font-family:var(--mono);font-size:9px;color:var(--muted);margin-left:6px">Type for next upload</span>
     </div>
 
     <div class="form-section">Notes</div>
@@ -4460,6 +4568,7 @@ function loadAgencySettings() {
   // RBAC: render team management if owner
   if (RBAC.isOwner) {
     loadTeamData();
+    loadAuditLog();
   }
 }
 
@@ -4710,6 +4819,8 @@ async function startApp() {
     renderDashboard();
     // Re-apply RBAC after all data is loaded (artists needed for team rendering)
     if (RBAC.loaded) applyRBACToUI();
+    // Source field cleanup (silent, runs once per session)
+    cleanupSourceField();
     // Handle URL params
     const params = new URLSearchParams(window.location.search);
     const open = params.get('open');
@@ -4904,6 +5015,8 @@ function applyRBACToUI() {
   // 4) Hide RBAC sections in settings for non-owners
   const teamSection = document.getElementById('rbac-team-section');
   if (teamSection) teamSection.style.display = RBAC.isOwner ? 'block' : 'none';
+  const auditSection = document.getElementById('audit-log-section');
+  if (auditSection) auditSection.style.display = RBAC.isOwner ? 'block' : 'none';
 
   // 5) If current panel is now hidden, redirect to first visible
   const activePanel = document.querySelector('.panel.active');
@@ -5435,6 +5548,7 @@ function filterBookings() {
   const stat = document.getElementById('bk-status').value;
   const art  = document.getElementById('bk-artist').value;
   const yr   = document.getElementById('bk-year').value;
+  const mo   = document.getElementById('bk-month').value;
 
   filtBookings = allBookings.filter(b => {
     // RBAC: agents only see bookings for their assigned artists
@@ -5443,6 +5557,7 @@ function filterBookings() {
     if (stat && b.status !== stat) return false;
     if (art  && b.artist_id !== art) return false;
     if (yr   && new Date(b.show_date).getFullYear().toString() !== yr) return false;
+    if (mo !== '' && new Date(b.show_date).getMonth().toString() !== mo) return false;
     return true;
   });
   bkPageN = 0;
@@ -5568,6 +5683,9 @@ function openBookingModal(id = null) {
     document.getElementById('bm-currency').value = 'EUR';
     document.getElementById('bm-dealtype').value = 'flat_fee';
     updateDealFields();
+    // Clear documents for new bookings
+    bookingDocs = [];
+    renderBookingDocs();
   }
 
   document.getElementById('bk-modal').classList.add('open');
@@ -5724,6 +5842,8 @@ function editBooking(id) {
     document.getElementById('bm-holdexpiry').value = b.hold_expires_at.slice(0,16);
   }
   updateDealFields();
+  // Load attached documents
+  loadBookingDocs(id);
 }
 
 function updateDealFields() {
@@ -11414,7 +11534,13 @@ function typeBadge(t) {
   return `<span class="badge b-${map[t]||'other'}">${esc(t||'Other')}</span>`;
 }
 function sourceBadge(s) {
-  return `<span class="badge b-${(s||'manual').toLowerCase()}">${esc(s||'Manual')}</span>`;
+  // Normalize common typos
+  const raw = (s||'manual').toLowerCase().trim();
+  const normalized = ['manuel','manueel','manaul','handmatig'].includes(raw) ? 'Manual'
+    : raw === 'import' ? 'Import'
+    : raw === 'claude' ? 'Claude'
+    : s || 'Manual';
+  return `<span class="badge b-${normalized.toLowerCase()}">${esc(normalized)}</span>`;
 }
 function statusBadge(s) {
   const label = (s||'inquiry').replace('_',' ');
@@ -11439,6 +11565,216 @@ function showToast(msg, type='info') {
   t.textContent = msg; t.className = type; t.style.display = 'block';
   setTimeout(() => t.style.display = 'none', 3500);
 }
+
+// ── BOOKING DOCUMENTS ─────────────────────────────────────────
+const DOC_BUCKET = 'booking-documents';
+let bookingDocs = [];
+
+async function loadBookingDocs(bookingId) {
+  bookingDocs = [];
+  const container = document.getElementById('bm-doc-list');
+  if (!container || !bookingId) { if (container) container.innerHTML = ''; return; }
+  try {
+    const { data, error } = await db.from('booking_documents')
+      .select('*').eq('booking_id', bookingId).order('created_at', { ascending: false });
+    if (error) throw error;
+    bookingDocs = data || [];
+  } catch (e) {
+    console.warn('booking_documents table may not exist yet:', e.message);
+    bookingDocs = [];
+  }
+  renderBookingDocs();
+}
+
+function renderBookingDocs() {
+  const container = document.getElementById('bm-doc-list');
+  if (!container) return;
+  if (!bookingDocs.length) {
+    container.innerHTML = '<div style="font-family:var(--mono);font-size:10px;color:var(--muted);padding:8px 0">No documents attached yet.</div>';
+    return;
+  }
+  const icons = { contract:'📄', rider:'📋', receipt:'🧾', invoice:'💰', tech_spec:'🔧', travel:'✈️', other:'📎' };
+  container.innerHTML = bookingDocs.map(d => {
+    const icon = icons[d.doc_type] || '📎';
+    const date = d.created_at ? new Date(d.created_at).toLocaleDateString('en-GB', { day:'2-digit', month:'short' }) : '';
+    return `<div class="doc-item">
+      <span class="doc-icon">${icon}</span>
+      <span class="doc-name" title="${esc(d.file_name)}">${esc(d.file_name)}</span>
+      <span class="doc-type">${esc(d.doc_type||'other')}</span>
+      <span class="doc-date">${date}</span>
+      <div class="doc-actions">
+        <button class="ra" onclick="downloadDoc('${d.id}')" title="Download">↓</button>
+        <button class="ra del" onclick="deleteDoc('${d.id}','${esc(d.file_name)}')" title="Delete">×</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function handleDocDrop(event) {
+  const files = event.dataTransfer?.files;
+  if (files?.length) handleDocSelect(files);
+}
+
+async function handleDocSelect(files) {
+  if (!editBkId) { showToast('Save the booking first before uploading documents', 'error'); return; }
+  const docType = document.getElementById('bm-doc-type')?.value || 'other';
+  for (const file of files) {
+    if (file.size > 10 * 1024 * 1024) { showToast(`${file.name} exceeds 10 MB limit`, 'error'); continue; }
+    await uploadBookingDoc(editBkId, file, docType);
+  }
+  document.getElementById('bm-doc-input').value = '';
+}
+
+async function uploadBookingDoc(bookingId, file, docType) {
+  const ext = file.name.split('.').pop();
+  const path = `${bookingId}/${Date.now()}_${file.name.replace(/[^a-zA-Z0-9._-]/g, '_')}`;
+  try {
+    showToast(`Uploading ${file.name}...`);
+    const { error: upErr } = await db.storage.from(DOC_BUCKET).upload(path, file, { upsert: false });
+    if (upErr) throw upErr;
+    const { data: pub } = db.storage.from(DOC_BUCKET).getPublicUrl(path);
+    const { error: dbErr } = await db.from('booking_documents').insert({
+      booking_id: bookingId,
+      file_name:  file.name,
+      file_path:  path,
+      file_url:   pub?.publicUrl || '',
+      file_size:  file.size,
+      mime_type:  file.type || 'application/octet-stream',
+      doc_type:   docType,
+    });
+    if (dbErr) throw dbErr;
+    showToast(`${file.name} uploaded`, 'success');
+    await logEvent(bookingId, 'document_upload', `Uploaded ${docType}: ${file.name}`);
+    await loadBookingDocs(bookingId);
+  } catch (e) {
+    console.error('Upload error:', e);
+    showToast('Upload failed: ' + e.message, 'error');
+  }
+}
+
+async function downloadDoc(docId) {
+  const doc = bookingDocs.find(d => d.id === docId);
+  if (!doc) return;
+  try {
+    const { data, error } = await db.storage.from(DOC_BUCKET).download(doc.file_path);
+    if (error) throw error;
+    const url = URL.createObjectURL(data);
+    const a = document.createElement('a');
+    a.href = url; a.download = doc.file_name; a.click();
+    URL.revokeObjectURL(url);
+  } catch (e) {
+    // Fallback: try public URL
+    if (doc.file_url) { window.open(doc.file_url, '_blank'); }
+    else { showToast('Download failed: ' + e.message, 'error'); }
+  }
+}
+
+async function deleteDoc(docId, fileName) {
+  if (!confirm(`Delete "${fileName}"?`)) return;
+  const doc = bookingDocs.find(d => d.id === docId);
+  if (!doc) return;
+  try {
+    await db.storage.from(DOC_BUCKET).remove([doc.file_path]);
+    await db.from('booking_documents').delete().eq('id', docId);
+    showToast('Document deleted', 'success');
+    await logEvent(doc.booking_id, 'document_delete', `Deleted: ${fileName}`);
+    await loadBookingDocs(doc.booking_id);
+  } catch (e) {
+    showToast('Delete failed: ' + e.message, 'error');
+  }
+}
+// ── END BOOKING DOCUMENTS ─────────────────────────────────────
+
+// ── AUDIT LOG VIEWER ──────────────────────────────────────────
+let allAuditRows = [];
+let filtAuditRows = [];
+
+async function loadAuditLog() {
+  const days = parseInt(document.getElementById('audit-days-filter')?.value || '30');
+  const since = new Date();
+  since.setDate(since.getDate() - days);
+  try {
+    const { data, error } = await db.from('audit_log')
+      .select('*')
+      .gte('created_at', since.toISOString())
+      .order('created_at', { ascending: false })
+      .limit(500);
+    if (error) throw error;
+    allAuditRows = data || [];
+  } catch (e) {
+    console.warn('Audit log load failed:', e.message);
+    allAuditRows = [];
+  }
+
+  // Populate event type filter
+  const types = [...new Set(allAuditRows.map(r => r.event_type).filter(Boolean))].sort();
+  const sel = document.getElementById('audit-type-filter');
+  if (sel) {
+    const cur = sel.value;
+    sel.innerHTML = '<option value="">All event types</option>' +
+      types.map(t => `<option value="${t}" ${t===cur?'selected':''}>${t.replace(/_/g,' ')}</option>`).join('');
+  }
+  filterAuditLog();
+}
+
+function filterAuditLog() {
+  const q = (document.getElementById('audit-search')?.value || '').toLowerCase();
+  const type = document.getElementById('audit-type-filter')?.value || '';
+  filtAuditRows = allAuditRows.filter(r => {
+    if (type && r.event_type !== type) return false;
+    if (q && !`${r.description||''}${r.user_email||''}${r.event_type||''}`.toLowerCase().includes(q)) return false;
+    return true;
+  });
+  renderAuditLog();
+}
+
+function renderAuditLog() {
+  const container = document.getElementById('audit-log-list');
+  if (!container) return;
+  const countEl = document.getElementById('audit-count');
+  if (countEl) countEl.textContent = filtAuditRows.length + ' event' + (filtAuditRows.length !== 1 ? 's' : '');
+
+  if (!filtAuditRows.length) {
+    container.innerHTML = '<div style="font-family:var(--mono);font-size:11px;color:var(--muted);padding:20px;text-align:center">No audit events found for this period.</div>';
+    return;
+  }
+  const hdr = `<div class="audit-hdr"><div>When</div><div>Event</div><div>Description</div><div>User</div></div>`;
+  const rows = filtAuditRows.slice(0, 200).map(r => {
+    const when = r.created_at ? new Date(r.created_at).toLocaleString('en-GB', {
+      day:'2-digit', month:'short', hour:'2-digit', minute:'2-digit'
+    }) : '';
+    return `<div class="audit-row">
+      <div class="audit-time">${when}</div>
+      <div class="audit-type">${esc((r.event_type||'').replace(/_/g,' '))}</div>
+      <div class="audit-desc">${esc(r.description||'')}</div>
+      <div class="audit-user">${esc(r.user_email||'system')}</div>
+    </div>`;
+  }).join('');
+  container.innerHTML = hdr + rows;
+}
+// ── END AUDIT LOG VIEWER ──────────────────────────────────────
+
+// ── SOURCE FIELD CLEANUP ──────────────────────────────────────
+async function cleanupSourceField() {
+  // Fix "manuel" typo and other variants -> "Manual"
+  try {
+    const { data, error } = await db.from('contacts')
+      .select('id, source')
+      .or('source.ilike.manuel,source.ilike.manueel,source.ilike.manaul,source.is.null');
+    if (error) throw error;
+    if (!data?.length) return;
+    const ids = data.map(c => c.id);
+    const { error: upErr } = await db.from('contacts')
+      .update({ source: 'Manual' })
+      .in('id', ids);
+    if (upErr) throw upErr;
+    console.log(`Source cleanup: fixed ${ids.length} contacts`);
+  } catch (e) {
+    console.warn('Source cleanup skipped:', e.message);
+  }
+}
+// Run source cleanup on startup (silent, non-blocking)
+// ── END SOURCE FIELD CLEANUP ──────────────────────────────────
 </script>
 </body>
 </html>
