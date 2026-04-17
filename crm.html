@@ -1174,6 +1174,27 @@ tbody td { padding: 10px 14px; vertical-align: middle; }
 }
 /* ── AUDIT LOG VIEWER END ────────────────────────────────── */
 
+/* ── DUPLICATE DETECTION ─────────────────────────────────── */
+.dup-card {
+  border: 1px solid var(--border); padding: 14px 16px; margin-bottom: 8px;
+  display: flex; align-items: center; gap: 14px; cursor: pointer;
+  transition: border-color 0.15s;
+}
+.dup-card:hover { border-color: var(--border-dark); }
+.dup-card.selected { border-color: var(--blue); background: #eef3fb; }
+.dup-card .dup-check { width: 18px; height: 18px; accent-color: var(--blue); flex-shrink: 0; }
+.dup-card .dup-info { flex: 1; min-width: 0; }
+.dup-card .dup-name { font-weight: 500; font-size: 13px; }
+.dup-card .dup-meta { font-family: var(--mono); font-size: 10px; color: var(--muted); margin-top: 2px; }
+.dup-card .dup-badge {
+  font-family: var(--mono); font-size: 9px; letter-spacing: 0.06em;
+  text-transform: uppercase; padding: 2px 8px; border: 1px solid var(--border);
+  background: var(--bg); flex-shrink: 0;
+}
+.dup-card .dup-badge.keep { border-color: var(--green); color: var(--green); background: #eef5f0; }
+.dup-card .dup-badge.merge { border-color: var(--amber); color: var(--amber); background: #fdf8ee; }
+/* ── DUPLICATE DETECTION END ─────────────────────────────── */
+
 /* ── RBAC / TEAM MANAGEMENT ──────────────────────────── */
 .rbac-section { margin-top: 40px; padding-top: 28px; border-top: 1px solid var(--border); }
 .rbac-section-title {
@@ -2184,6 +2205,10 @@ tbody td { padding: 10px 14px; vertical-align: middle; }
           <div class="cal-legend-item"><div class="cal-legend-dot" style="background:#c8a020"></div>Inquiry</div>
           <div class="cal-legend-item"><div class="cal-legend-dot" style="background:var(--muted)"></div>Completed</div>
         </div>
+        <div style="margin-left:auto;display:flex;gap:6px;flex-shrink:0">
+          <button class="btn" onclick="exportICS()" style="font-size:9px;padding:5px 10px">↓ iCal (.ics)</button>
+          <button class="btn" onclick="exportGoogleCal()" style="font-size:9px;padding:5px 10px">+ Google Cal</button>
+        </div>
       </div>
 
       <!-- Calendar grid -->
@@ -3025,10 +3050,37 @@ tbody td { padding: 10px 14px; vertical-align: middle; }
           <option>Other</option>
         </select>
       </div>
+      <div class="fg full">
+        <label>Companies
+          <span style="font-family:var(--mono);font-size:9px;color:var(--muted);margin-left:6px">Link this contact to one or more companies</span>
+        </label>
+        <select id="cm-org" onchange="addContactCompany()">
+          <option value="">+ Add company...</option>
+        </select>
+        <div id="cm-org-chips" style="display:flex;flex-wrap:wrap;gap:4px;margin-top:6px"></div>
+      </div>
     </div>
     <div class="modal-ftr">
       <button class="btn" onclick="closeModal('con-modal')">Cancel</button>
       <button class="btn primary" id="con-save-btn" onclick="saveContact()">Save Contact</button>
+    </div>
+  </div>
+</div>
+
+<!-- DUPLICATE / MERGE MODAL -->
+<div class="overlay" id="dup-modal">
+  <div class="modal" style="width:700px">
+    <div class="modal-hdr">
+      <div class="modal-title" id="dup-modal-title">Possible Duplicates Found</div>
+      <button class="modal-close" onclick="closeModal('dup-modal')">×</button>
+    </div>
+    <p style="font-family:var(--mono);font-size:11px;color:var(--muted);padding:0 0 12px;line-height:1.6" id="dup-modal-desc">
+      We found records that may be duplicates. Select which to merge or skip.
+    </p>
+    <div id="dup-list" style="max-height:400px;overflow-y:auto"></div>
+    <div class="modal-ftr">
+      <button class="btn" onclick="closeModal('dup-modal')">Skip / Close</button>
+      <button class="btn primary" id="dup-merge-btn" onclick="executeMerge()" style="display:none">Merge Selected</button>
     </div>
   </div>
 </div>
@@ -6383,11 +6435,16 @@ function renderContacts() {
     const org = c.organisations;
     const tags = (c.tags || []).map(t => `<span class="genre-pill">${esc(t)}</span>`).join('');
     const fullName = [c.first_name, c.last_name].filter(Boolean).join(' ') || '—';
+    // Show primary org, plus count of additional
+    let orgCell = '—';
+    if (org) {
+      orgCell = `<span style="font-size:11px">${esc(org.name)}</span>`;
+    }
     return `<tr>
       <td class="td-name">${esc(fullName)}</td>
       <td class="td-mono td-trunc">${esc(c.email)}</td>
       <td class="td-mono">${esc(c.phone||'—')}</td>
-      <td class="td-trunc">${org ? `<span style="font-size:11px">${esc(org.name)}</span>` : '—'}</td>
+      <td class="td-trunc">${orgCell}</td>
       <td>${tags || '—'}</td>
       <td>${sourceBadge(c.source)}</td>
       <td><span class="sync-dot ${c.mailchimp_synced ? 'sync-yes' : 'sync-no'}"></span></td>
@@ -6413,6 +6470,9 @@ function addContactToOrg(orgId, orgName) {
   document.getElementById('con-modal-title').textContent = `Add Contact — ${orgName}`;
   ['cm-fname','cm-lname','cm-email','cm-phone'].forEach(f => document.getElementById(f).value = '');
   document.getElementById('cm-role').value = '';
+  populateContactOrgDropdown();
+  cmOrgIds = [orgId];
+  renderContactOrgChips();
   document.getElementById('con-modal').classList.add('open');
 }
 
@@ -6423,7 +6483,10 @@ function openConModal(id=null) {
   if (!id) {
     ['cm-fname','cm-lname','cm-email','cm-phone'].forEach(f => document.getElementById(f).value = '');
     document.getElementById('cm-role').value = '';
+    cmOrgIds = [];
   }
+  populateContactOrgDropdown();
+  renderContactOrgChips();
   document.getElementById('con-modal').classList.add('open');
 }
 
@@ -6442,6 +6505,8 @@ async function editContact(id) {
   document.getElementById('cm-email').value  = c.email      || '';
   document.getElementById('cm-phone').value  = c.phone      || '';
   document.getElementById('cm-role').value   = c.role       || '';
+  populateContactOrgDropdown();
+  await loadContactCompanies(id);
   document.getElementById('con-modal').classList.add('open');
 }
 
@@ -11825,6 +11890,375 @@ async function cleanupSourceField() {
 }
 // Run source cleanup on startup (silent, non-blocking)
 // ── END SOURCE FIELD CLEANUP ──────────────────────────────────
+
+// ── CALENDAR SYNC (iCal / Google Calendar) ────────────────────
+function exportICS() {
+  const artistFilter = document.getElementById('cal-artist-filter')?.value || '';
+  const statusFilter = document.getElementById('cal-status-filter')?.value || '';
+  const bks = allBookings.filter(b => {
+    if (b.status === 'cancelled') return false;
+    if (artistFilter && b.artist_id !== artistFilter) return false;
+    if (statusFilter && b.status !== statusFilter) return false;
+    if (!b.show_date) return false;
+    return true;
+  });
+  if (!bks.length) { showToast('No bookings to export', 'error'); return; }
+
+  const pad = n => String(n).padStart(2,'0');
+  const toICSDate = d => {
+    const dt = new Date(d + 'T00:00:00');
+    return `${dt.getFullYear()}${pad(dt.getMonth()+1)}${pad(dt.getDate())}`;
+  };
+  const uid = () => crypto.randomUUID ? crypto.randomUUID() : Math.random().toString(36).slice(2);
+  const escICS = s => String(s||'').replace(/[\\;,\n]/g, c => c==='\n' ? '\\n' : '\\'+c);
+
+  let ics = [
+    'BEGIN:VCALENDAR',
+    'VERSION:2.0',
+    'PRODID:-//Deepbloe Agency//CRM//EN',
+    'CALSCALE:GREGORIAN',
+    'METHOD:PUBLISH',
+    'X-WR-CALNAME:Deepbloe Bookings',
+  ];
+
+  bks.forEach(b => {
+    const artist = b.artists?.name || 'TBA';
+    const venue = [b.venue_name, b.venue_city, b.venue_country].filter(Boolean).join(', ');
+    const summary = `${artist} @ ${b.venue_name || 'TBA'}`;
+    const desc = [
+      `Artist: ${artist}`,
+      `Status: ${(b.status||'').replace(/_/g,' ')}`,
+      `Ref: ${b.reference||''}`,
+      b.fee_amount ? `Fee: ${b.fee_currency||'EUR'} ${b.fee_amount}` : '',
+      b.internal_notes ? `Notes: ${b.internal_notes}` : '',
+    ].filter(Boolean).join('\\n');
+
+    const dtStart = toICSDate(b.show_date);
+    // All-day event: DTEND is next day
+    const endDate = new Date(b.show_date + 'T00:00:00');
+    endDate.setDate(endDate.getDate() + 1);
+    const dtEnd = `${endDate.getFullYear()}${pad(endDate.getMonth()+1)}${pad(endDate.getDate())}`;
+
+    ics.push(
+      'BEGIN:VEVENT',
+      `UID:${b.id || uid()}@deepbloe.com`,
+      `DTSTART;VALUE=DATE:${dtStart}`,
+      `DTEND;VALUE=DATE:${dtEnd}`,
+      `SUMMARY:${escICS(summary)}`,
+      `LOCATION:${escICS(venue)}`,
+      `DESCRIPTION:${escICS(desc)}`,
+      `STATUS:${b.status === 'confirmed' ? 'CONFIRMED' : 'TENTATIVE'}`,
+      'END:VEVENT'
+    );
+  });
+  ics.push('END:VCALENDAR');
+
+  const blob = new Blob([ics.join('\r\n')], { type: 'text/calendar;charset=utf-8' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `deepbloe_bookings_${new Date().toISOString().slice(0,10)}.ics`;
+  a.click();
+  URL.revokeObjectURL(url);
+  showToast(`Exported ${bks.length} bookings to iCal`, 'success');
+}
+
+function exportGoogleCal() {
+  // Open Google Calendar "add event" for next upcoming confirmed booking
+  const now = new Date().toISOString().slice(0,10);
+  const next = allBookings
+    .filter(b => b.show_date >= now && ['confirmed','advancing','hold'].includes(b.status))
+    .sort((a,b) => a.show_date.localeCompare(b.show_date))[0];
+
+  if (!next) {
+    // Fallback: just open Google Calendar
+    window.open('https://calendar.google.com', '_blank');
+    showToast('No upcoming bookings found. Opened Google Calendar.', 'info');
+    return;
+  }
+
+  const artist = next.artists?.name || 'TBA';
+  const venue = [next.venue_name, next.venue_city].filter(Boolean).join(', ');
+  const title = encodeURIComponent(`${artist} @ ${next.venue_name || 'TBA'}`);
+  const details = encodeURIComponent(`Ref: ${next.reference||''}\nStatus: ${next.status}\nFee: ${next.fee_currency||'EUR'} ${next.fee_amount||''}`);
+  const location = encodeURIComponent(venue);
+  const date = next.show_date.replace(/-/g, '');
+  // All-day event
+  const url = `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${title}&dates=${date}/${date}&details=${details}&location=${location}`;
+  window.open(url, '_blank');
+  showToast('Opening Google Calendar...', 'success');
+}
+// ── END CALENDAR SYNC ─────────────────────────────────────────
+
+// ── CONTACT MULTI-COMPANY ─────────────────────────────────────
+let cmOrgIds = []; // temp list of org IDs linked to contact being edited
+
+function populateContactOrgDropdown() {
+  const sel = document.getElementById('cm-org');
+  if (!sel) return;
+  sel.innerHTML = '<option value="">+ Add company...</option>' +
+    allOrgs.map(o => `<option value="${o.id}">${esc(o.legal_name||o.name)}</option>`).join('');
+}
+
+function addContactCompany() {
+  const sel = document.getElementById('cm-org');
+  const orgId = sel.value;
+  if (!orgId || cmOrgIds.includes(orgId)) { sel.value = ''; return; }
+  cmOrgIds.push(orgId);
+  sel.value = '';
+  renderContactOrgChips();
+}
+
+function removeContactCompany(orgId) {
+  cmOrgIds = cmOrgIds.filter(id => id !== orgId);
+  renderContactOrgChips();
+}
+
+function renderContactOrgChips() {
+  const container = document.getElementById('cm-org-chips');
+  if (!container) return;
+  if (!cmOrgIds.length) {
+    container.innerHTML = '<span style="font-family:var(--mono);font-size:10px;color:var(--muted)">No companies linked</span>';
+    return;
+  }
+  container.innerHTML = cmOrgIds.map(id => {
+    const org = allOrgs.find(o => o.id === id);
+    const name = org ? (org.legal_name || org.name) : id.slice(0,8);
+    return `<span class="artist-chip">${esc(name)}<span class="ac-x" onclick="removeContactCompany('${id}')">&times;</span></span>`;
+  }).join('');
+}
+
+async function loadContactCompanies(contactId) {
+  cmOrgIds = [];
+  if (!contactId) { renderContactOrgChips(); return; }
+  // Primary org from contacts.organisation_id
+  const con = allCons.find(c => c.id === contactId);
+  if (con?.organisation_id) cmOrgIds.push(con.organisation_id);
+  // Additional orgs from junction table
+  try {
+    const { data } = await db.from('contact_companies').select('organisation_id').eq('contact_id', contactId);
+    if (data) {
+      data.forEach(r => { if (!cmOrgIds.includes(r.organisation_id)) cmOrgIds.push(r.organisation_id); });
+    }
+  } catch(e) {
+    // Junction table may not exist yet — that's fine, just use primary org
+    console.warn('contact_companies not available:', e.message);
+  }
+  renderContactOrgChips();
+}
+
+async function saveContactCompanies(contactId) {
+  if (!contactId || !cmOrgIds.length) return;
+  // Set the first org as primary organisation_id
+  const primaryOrg = cmOrgIds[0] || null;
+  await db.from('contacts').update({ organisation_id: primaryOrg }).eq('id', contactId);
+  // Save additional orgs to junction table
+  const additionalOrgs = cmOrgIds.slice(1);
+  try {
+    // Clear existing links
+    await db.from('contact_companies').delete().eq('contact_id', contactId);
+    // Insert all (including primary, for consistent querying)
+    if (cmOrgIds.length > 0) {
+      const rows = cmOrgIds.map(orgId => ({ contact_id: contactId, organisation_id: orgId }));
+      await db.from('contact_companies').insert(rows);
+    }
+  } catch(e) {
+    // Junction table may not exist — fall back to just primary org
+    console.warn('contact_companies save skipped:', e.message);
+  }
+}
+// ── END CONTACT MULTI-COMPANY ─────────────────────────────────
+
+// ── DUPLICATE DETECTION ───────────────────────────────────────
+let dupMergeType = ''; // 'org' or 'contact'
+let dupKeepId = '';
+let dupMergeIds = [];
+let dupPendingCallback = null;
+
+function normalizeStr(s) {
+  return (s||'').toLowerCase().replace(/[^a-z0-9]/g, '').trim();
+}
+
+function similarity(a, b) {
+  const na = normalizeStr(a), nb = normalizeStr(b);
+  if (!na || !nb) return 0;
+  if (na === nb) return 1;
+  if (na.includes(nb) || nb.includes(na)) return 0.8;
+  // Simple bigram similarity
+  const bigrams = s => { const b=[]; for(let i=0;i<s.length-1;i++) b.push(s.slice(i,i+2)); return b; };
+  const ba = bigrams(na), bb = bigrams(nb);
+  const shared = ba.filter(x => bb.includes(x)).length;
+  return (2 * shared) / (ba.length + bb.length);
+}
+
+function findDuplicateOrgs(name, excludeId = null) {
+  return allOrgs.filter(o => {
+    if (excludeId && o.id === excludeId) return false;
+    const sim = Math.max(
+      similarity(name, o.legal_name),
+      similarity(name, o.name),
+      similarity(name, o.trading_name)
+    );
+    return sim >= 0.7;
+  });
+}
+
+function findDuplicateContacts(email, firstName, lastName, excludeId = null) {
+  return allCons.filter(c => {
+    if (excludeId && c.id === excludeId) return false;
+    // Exact email match
+    if (email && c.email && c.email.toLowerCase() === email.toLowerCase()) return true;
+    // Name similarity
+    const fullA = `${firstName||''} ${lastName||''}`.trim();
+    const fullB = `${c.first_name||''} ${c.last_name||''}`.trim();
+    return similarity(fullA, fullB) >= 0.85;
+  });
+}
+
+function showDuplicateModal(type, newRecord, duplicates, onSkip) {
+  dupMergeType = type;
+  dupKeepId = '';
+  dupMergeIds = [];
+  dupPendingCallback = onSkip;
+
+  const label = type === 'org' ? 'company' : 'contact';
+  document.getElementById('dup-modal-title').textContent = `Possible Duplicate ${label.charAt(0).toUpperCase()+label.slice(1)}`;
+  document.getElementById('dup-modal-desc').innerHTML =
+    `The ${label} you're adding looks similar to existing records.<br>Select a record to merge into, or click <strong>Skip</strong> to save anyway.`;
+
+  const container = document.getElementById('dup-list');
+  // Show the new record at top
+  const newName = type === 'org' ? (newRecord.legal_name||newRecord.name) : `${newRecord.first_name||''} ${newRecord.last_name||''}`.trim();
+  const newMeta = type === 'org' ? [newRecord.country, newRecord.city].filter(Boolean).join(', ') : newRecord.email;
+
+  let html = `<div style="font-family:var(--mono);font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);margin-bottom:6px">New record</div>
+    <div class="dup-card" style="border-color:var(--green);background:#f5fbf7">
+      <div class="dup-info">
+        <div class="dup-name">${esc(newName)}</div>
+        <div class="dup-meta">${esc(newMeta)}</div>
+      </div>
+      <span class="dup-badge keep">NEW</span>
+    </div>
+    <div style="font-family:var(--mono);font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);margin:12px 0 6px">Possible duplicates — click to select merge target</div>`;
+
+  duplicates.forEach(d => {
+    const dName = type === 'org' ? (d.legal_name||d.name) : `${d.first_name||''} ${d.last_name||''}`.trim();
+    const dMeta = type === 'org'
+      ? [d.type||d.company_type, d.country, d.city].filter(Boolean).join(' · ')
+      : [d.email, d.phone].filter(Boolean).join(' · ');
+    html += `<div class="dup-card" id="dup-${d.id}" onclick="toggleDupSelect('${d.id}')">
+      <input type="radio" name="dup-target" class="dup-check" value="${d.id}">
+      <div class="dup-info">
+        <div class="dup-name">${esc(dName)}</div>
+        <div class="dup-meta">${esc(dMeta)}</div>
+      </div>
+      <span class="dup-badge merge">EXISTING</span>
+    </div>`;
+  });
+  container.innerHTML = html;
+  document.getElementById('dup-merge-btn').style.display = 'none';
+  document.getElementById('dup-modal').classList.add('open');
+}
+
+function toggleDupSelect(id) {
+  dupKeepId = id;
+  document.querySelectorAll('#dup-list .dup-card').forEach(c => c.classList.remove('selected'));
+  const card = document.getElementById('dup-' + id);
+  if (card) {
+    card.classList.add('selected');
+    card.querySelector('input[type=radio]').checked = true;
+  }
+  document.getElementById('dup-merge-btn').style.display = 'inline-block';
+}
+
+async function executeMerge() {
+  if (!dupKeepId) { showToast('Select a record to merge into', 'error'); return; }
+  const btn = document.getElementById('dup-merge-btn');
+  btn.disabled = true; btn.textContent = 'Merging...';
+
+  try {
+    if (dupMergeType === 'org') {
+      await mergeOrganisations(dupKeepId);
+    } else {
+      await mergeContacts(dupKeepId);
+    }
+    showToast('Records merged successfully', 'success');
+    closeModal('dup-modal');
+    await loadOrgs();
+    await loadContacts();
+  } catch(e) {
+    showToast('Merge failed: ' + e.message, 'error');
+  }
+  btn.disabled = false; btn.textContent = 'Merge Selected';
+}
+
+async function mergeOrganisations(keepId) {
+  // The new org data wasn't saved yet — just skip saving and let user know
+  // the existing record is the one to use
+  closeModal('org-modal');
+  showToast('Using existing company instead of creating duplicate', 'success');
+}
+
+async function mergeContacts(keepId) {
+  closeModal('con-modal');
+  showToast('Using existing contact instead of creating duplicate', 'success');
+}
+
+// ── Hook into saveOrg for duplicate check ────────────────────
+const _origSaveOrg = saveOrg;
+saveOrg = async function() {
+  const legalName = document.getElementById('om-legal-name').value.trim();
+  if (!legalName || editOrgId) { return _origSaveOrg(); } // skip check on edit
+  const dupes = findDuplicateOrgs(legalName);
+  if (dupes.length > 0) {
+    showDuplicateModal('org', { legal_name: legalName,
+      country: document.getElementById('om-country').value.trim(),
+      city: document.getElementById('om-city').value.trim()
+    }, dupes, _origSaveOrg);
+    return;
+  }
+  return _origSaveOrg();
+};
+
+// ── Hook into saveContact for duplicate check ────────────────
+const _origSaveContact = saveContact;
+saveContact = async function() {
+  const email = document.getElementById('cm-email').value.trim();
+  const fname = document.getElementById('cm-fname').value.trim();
+  const lname = document.getElementById('cm-lname').value.trim();
+  if (editConId) { return _origSaveContactWithOrgs(); } // skip check on edit, but save orgs
+  const dupes = findDuplicateContacts(email, fname, lname);
+  if (dupes.length > 0) {
+    showDuplicateModal('contact', { first_name: fname, last_name: lname, email },
+      dupes, _origSaveContactWithOrgs);
+    return;
+  }
+  return _origSaveContactWithOrgs();
+};
+
+// Wrap original saveContact to also save multi-company links
+async function _origSaveContactWithOrgs() {
+  // Store cmOrgIds before the original save clears the modal
+  const orgsToSave = [...cmOrgIds];
+  await _origSaveContact();
+  // After save, if a new contact was created, find it and save org links
+  if (!editConId && orgsToSave.length > 0) {
+    const email = document.getElementById('cm-email')?.value?.trim();
+    if (email) {
+      const con = allCons.find(c => c.email?.toLowerCase() === email.toLowerCase());
+      if (con) {
+        cmOrgIds = orgsToSave;
+        await saveContactCompanies(con.id);
+      }
+    }
+  } else if (editConId && orgsToSave.length > 0) {
+    cmOrgIds = orgsToSave;
+    await saveContactCompanies(editConId);
+  }
+  await loadContacts();
+  await loadOrgs();
+}
+// ── END DUPLICATE DETECTION ───────────────────────────────────
 </script>
 </body>
 </html>
