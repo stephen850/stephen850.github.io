@@ -9767,6 +9767,16 @@ window.addEventListener('click', e => {
 });
 
 function renderAvailStrip(daysInMonth) {
+  // Day numbers header row
+  const dayNums = Array.from({length: daysInMonth}, (_,i) => i+1);
+  const headerRow = `<div class="cal-avail-row">
+    <div class="cal-avail-name" style="color:transparent">.</div>
+    <div class="cal-avail-strip" style="height:14px">
+      ${dayNums.map(d => `<div style="flex:1;text-align:center;font-family:var(--mono);font-size:8px;color:var(--muted);line-height:14px">${d}</div>`).join('')}
+    </div>
+    <div style="width:52px;margin-left:8px"></div>
+  </div>`;
+
   const rows = allArtists.map(a => {
     const days = Array.from({length: daysInMonth}, (_,i) => {
       const iso = new Date(calYear, calMonth, i+1).toISOString().slice(0,10);
@@ -9786,7 +9796,7 @@ function renderAvailStrip(daysInMonth) {
       <div style="font-family:var(--mono);font-size:9px;color:var(--muted);margin-left:8px;white-space:nowrap">${freeCount}d free</div>
     </div>`;
   }).join('');
-  document.getElementById('cal-avail-rows').innerHTML = rows;
+  document.getElementById('cal-avail-rows').innerHTML = headerRow + rows;
 }
 // ── END CALENDAR ───────────────────────────────────────────────
 
@@ -11694,13 +11704,41 @@ async function loadAuditLog() {
   const since = new Date();
   since.setDate(since.getDate() - days);
   try {
-    const { data, error } = await db.from('audit_log')
-      .select('*')
-      .gte('created_at', since.toISOString())
-      .order('created_at', { ascending: false })
-      .limit(500);
-    if (error) throw error;
+    // Try with created_at first, fallback to no date filter if column doesn't exist
+    let data = null;
+    let error = null;
+
+    // Attempt 1: try timestamp column
+    const tsColumns = ['created_at', 'inserted_at', 'timestamp'];
+    let usedTsCol = null;
+    for (const col of tsColumns) {
+      const res = await db.from('audit_log')
+        .select('*')
+        .gte(col, since.toISOString())
+        .order(col, { ascending: false })
+        .limit(500);
+      if (!res.error) {
+        data = res.data;
+        usedTsCol = col;
+        break;
+      }
+      // If column doesn't exist, try next
+      if (res.error.message?.includes('does not exist')) continue;
+      // Other error: throw
+      throw res.error;
+    }
+
+    // Attempt 2: no timestamp filter at all
+    if (data === null) {
+      const res = await db.from('audit_log').select('*').order('id', { ascending: false }).limit(500);
+      if (res.error) throw res.error;
+      data = res.data;
+      usedTsCol = null;
+    }
+
     allAuditRows = data || [];
+    // Store which column has the timestamp for rendering
+    window._auditTsCol = usedTsCol;
   } catch (e) {
     console.warn('Audit log load failed:', e.message);
     allAuditRows = [];
@@ -11747,8 +11785,10 @@ function renderAuditLog() {
     return;
   }
   const hdr = `<div class="audit-hdr"><div>When</div><div>Event</div><div>Description</div><div>User</div></div>`;
+  const tsCol = window._auditTsCol || 'created_at';
   const rows = filtAuditRows.slice(0, 200).map(r => {
-    const when = r.created_at ? new Date(r.created_at).toLocaleString('en-GB', {
+    const tsVal = r[tsCol] || r.created_at || r.inserted_at || r.timestamp || '';
+    const when = tsVal ? new Date(tsVal).toLocaleString('en-GB', {
       day:'2-digit', month:'short', hour:'2-digit', minute:'2-digit'
     }) : '';
     return `<div class="audit-row">
