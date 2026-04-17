@@ -940,7 +940,7 @@ tbody td { padding: 10px 14px; vertical-align: middle; }
 .cal-avail-name { font-family:var(--mono); font-size:10px; color:var(--accent); width:80px; flex-shrink:0; }
 .cal-avail-strip { flex:1; display:flex; height:20px; gap:1px; }
 .cal-avail-day { flex:1; border-radius:1px; }
-.cal-avail-day.free      { background:#edf7f2; }
+.cal-avail-day.free      { background:#b8e6cc; }
 .cal-avail-day.confirmed { background:var(--green); }
 .cal-avail-day.hold      { background:#5b8dee; }
 .cal-avail-day.busy      { background:var(--red); }
@@ -4566,7 +4566,7 @@ function loadAgencySettings() {
   document.getElementById('as-status').textContent = 'Loaded';
   setTimeout(() => { document.getElementById('as-status').textContent = ''; }, 2000);
   // RBAC: render team management if owner
-  if (RBAC.isOwner) {
+  if (RBAC.isOwner || !RBAC.loaded) {
     loadTeamData();
     loadAuditLog();
   }
@@ -5016,7 +5016,7 @@ function applyRBACToUI() {
   const teamSection = document.getElementById('rbac-team-section');
   if (teamSection) teamSection.style.display = RBAC.isOwner ? 'block' : 'none';
   const auditSection = document.getElementById('audit-log-section');
-  if (auditSection) auditSection.style.display = RBAC.isOwner ? 'block' : 'none';
+  if (auditSection) auditSection.style.display = (RBAC.isOwner || !RBAC.loaded) ? 'block' : 'none';
 
   // 5) If current panel is now hidden, redirect to first visible
   const activePanel = document.querySelector('.panel.active');
@@ -11704,6 +11704,14 @@ async function loadAuditLog() {
   } catch (e) {
     console.warn('Audit log load failed:', e.message);
     allAuditRows = [];
+    const container = document.getElementById('audit-log-list');
+    if (container) {
+      container.innerHTML = `<div style="font-family:var(--mono);font-size:11px;color:var(--red);padding:20px;text-align:center">
+        Could not load audit log. Make sure the <strong>audit_log</strong> table exists and has RLS policies for authenticated users.
+        <br><span style="color:var(--muted);font-size:10px">${esc(e.message)}</span>
+      </div>`;
+    }
+    return;
   }
 
   // Populate event type filter
