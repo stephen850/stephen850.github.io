@@ -168,6 +168,33 @@ body { background: var(--bg); color: var(--text); font-family: var(--sans); font
 .sd-adv-status.pending    { color: var(--muted); border-color: var(--border-dark); }
 
 /* ── ACTIVITY ── */
+
+/* ── DOCUMENTS ── */
+.sd-doc-item {
+  display: flex; align-items: center; gap: 10px; padding: 8px 0;
+  border-bottom: 1px solid var(--border); font-size: 12px;
+}
+.sd-doc-item:last-child { border-bottom: none; }
+.sd-doc-icon { font-size: 16px; flex-shrink: 0; }
+.sd-doc-name { flex: 1; font-family: var(--mono); font-size: 11px; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.sd-doc-type {
+  font-family: var(--mono); font-size: 9px; letter-spacing: 0.06em;
+  text-transform: uppercase; padding: 2px 6px; border: 1px solid var(--border);
+  background: var(--bg); color: var(--muted); flex-shrink: 0;
+}
+.sd-doc-date { font-family: var(--mono); font-size: 10px; color: var(--muted); flex-shrink: 0; }
+.sd-doc-dl {
+  background: none; border: 1px solid var(--border); padding: 3px 8px;
+  font-family: var(--mono); font-size: 10px; cursor: pointer; color: var(--accent);
+}
+.sd-doc-dl:hover { border-color: var(--accent); }
+.sd-doc-upload-zone {
+  border: 1px dashed var(--border-dark); padding: 14px; text-align: center;
+  font-family: var(--mono); font-size: 11px; color: var(--muted); cursor: pointer;
+  transition: border-color 0.15s, background 0.15s; margin-top: 8px;
+}
+.sd-doc-upload-zone:hover { border-color: var(--accent); background: rgba(0,0,0,0.02); }
+.sd-doc-upload-zone.dragover { border-color: var(--blue); background: #eef3fb; }
 .sd-activity-item {
   display: flex; gap: 12px; padding: 10px 0; border-bottom: 1px solid var(--border);
 }
@@ -341,8 +368,8 @@ body { background: var(--bg); color: var(--text); font-family: var(--sans); font
 
     </div>
 
-    <!-- Row 3: Settlement + Activity -->
-    <div class="sd-grid-2">
+    <!-- Row 3: Settlement + Documents + Activity -->
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;margin-bottom:16px">
 
       <!-- Settlement -->
       <div class="sd-card">
@@ -354,6 +381,32 @@ body { background: var(--bg); color: var(--text); font-family: var(--sans); font
           <div class="sd-loading">Loading...</div>
         </div>
         <div class="sd-card-actions" id="sd-settlement-actions"></div>
+      </div>
+
+      <!-- Documents -->
+      <div class="sd-card">
+        <div class="sd-card-hdr">
+          <div class="sd-card-title">Documents</div>
+          <div id="sd-docs-count" class="sd-card-hdr-badge"></div>
+        </div>
+        <div class="sd-card-body" id="sd-docs-body">
+          <div class="sd-loading">Loading...</div>
+        </div>
+        <div class="sd-card-actions" id="sd-docs-actions">
+          <input type="file" id="sd-doc-input" multiple style="display:none"
+                 accept=".pdf,.doc,.docx,.xls,.xlsx,.jpg,.jpeg,.png,.gif,.webp"
+                 onchange="sdHandleDocUpload(this.files)">
+          <select id="sd-doc-type" style="font-family:var(--mono);font-size:10px;padding:3px 6px;border:1px solid var(--border)">
+            <option value="contract">Contract</option>
+            <option value="rider">Rider</option>
+            <option value="receipt">Receipt</option>
+            <option value="invoice">Invoice</option>
+            <option value="tech_spec">Tech Spec</option>
+            <option value="travel">Travel</option>
+            <option value="other">Other</option>
+          </select>
+          <button class="sd-btn" onclick="document.getElementById('sd-doc-input').click()">+ Upload</button>
+        </div>
       </div>
 
       <!-- Activity -->
@@ -473,6 +526,7 @@ async function loadShow(bookingId) {
   renderAdvancing(booking, advancing);
   renderVCC(booking, venue);
   renderSettlement(booking, settlement);
+  renderDocs(booking);
   await renderActivity(booking, contracts, invoices, advancing, settlement);
 }
 
@@ -865,11 +919,17 @@ async function renderActivity(b, contracts, invoices, advancing, settlement) {
   const body = document.getElementById('sd-activity-body');
 
   // Load real audit log entries
-  const { data: logs } = await db.from('audit_log')
-    .select('*')
-    .eq('booking_id', b.id)
-    .order('created_at', { ascending: false })
-    .limit(30);
+  let logs = [];
+  try {
+    const { data } = await db.from('audit_log')
+      .select('*')
+      .eq('booking_id', b.id)
+      .order('changed_at', { ascending: false })
+      .limit(30);
+    logs = data || [];
+  } catch(e) {
+    console.warn('Audit log load:', e.message);
+  }
 
   // Build synthetic events from existing data as fallback
   const syntheticEvents = [];
@@ -901,9 +961,9 @@ async function renderActivity(b, contracts, invoices, advancing, settlement) {
   };
 
   const realEvents = (logs || []).map(l => ({
-    date: l.created_at,
-    text: l.description,
-    color: eventColorMap[l.event_type] || 'blue',
+    date: l.changed_at || l.created_at,
+    text: l.new_values?.description || l.action?.replace(/_/g,' ') || '',
+    color: eventColorMap[l.action] || eventColorMap[l.event_type] || 'blue',
     user: l.user_email || '',
     real: true,
   }));
@@ -1201,6 +1261,112 @@ function getStatusWarnings(booking, contracts, invoices, advancing, settlement) 
   }
 
   return warnings;
+}
+
+// ── DOCUMENTS ────────────────────────────────────────────────
+const SD_DOC_BUCKET = 'booking-documents';
+let sdDocs = [];
+let sdBookingId = null;
+
+async function renderDocs(b) {
+  sdBookingId = b.id;
+  const body = document.getElementById('sd-docs-body');
+  const countEl = document.getElementById('sd-docs-count');
+  try {
+    const { data, error } = await db.from('booking_documents')
+      .select('*').eq('booking_id', b.id)
+      .order('created_at', { ascending: false });
+    if (error) throw error;
+    sdDocs = data || [];
+  } catch(e) {
+    sdDocs = [];
+  }
+  if (countEl) countEl.textContent = sdDocs.length ? sdDocs.length + ' file' + (sdDocs.length !== 1 ? 's' : '') : '';
+
+  if (!sdDocs.length) {
+    body.innerHTML = `<div style="font-family:var(--mono);font-size:11px;color:var(--muted);padding:12px 0">No documents attached yet.</div>
+      <div class="sd-doc-upload-zone" onclick="document.getElementById('sd-doc-input').click()"
+           ondragover="event.preventDefault();this.classList.add('dragover')"
+           ondragleave="this.classList.remove('dragover')"
+           ondrop="event.preventDefault();this.classList.remove('dragover');sdHandleDocUpload(event.dataTransfer.files)">
+        Drop files here or click to upload
+      </div>`;
+    return;
+  }
+
+  const icons = { contract:'\u{1F4C4}', rider:'\u{1F4CB}', receipt:'\u{1F9FE}', invoice:'\u{1F4B0}', tech_spec:'\u{1F527}', travel:'\u{2708}\uFE0F', other:'\u{1F4CE}' };
+  body.innerHTML = sdDocs.map(d => {
+    const icon = icons[d.doc_type] || '\u{1F4CE}';
+    const date = d.created_at ? new Date(d.created_at).toLocaleDateString('en-GB', { day:'2-digit', month:'short' }) : '';
+    return `<div class="sd-doc-item">
+      <span class="sd-doc-icon">${icon}</span>
+      <span class="sd-doc-name" title="${esc(d.file_name)}">${esc(d.file_name)}</span>
+      <span class="sd-doc-type">${esc(d.doc_type||'other')}</span>
+      <span class="sd-doc-date">${date}</span>
+      <button class="sd-doc-dl" onclick="sdDownloadDoc('${d.id}')">Download</button>
+      <button class="sd-doc-dl" onclick="sdDeleteDoc('${d.id}','${esc(d.file_name)}')" style="color:var(--red);border-color:var(--red)">Del</button>
+    </div>`;
+  }).join('') + `<div class="sd-doc-upload-zone" style="margin-top:10px" onclick="document.getElementById('sd-doc-input').click()"
+    ondragover="event.preventDefault();this.classList.add('dragover')"
+    ondragleave="this.classList.remove('dragover')"
+    ondrop="event.preventDefault();this.classList.remove('dragover');sdHandleDocUpload(event.dataTransfer.files)">
+    + Drop or click to add more
+  </div>`;
+}
+
+async function sdHandleDocUpload(files) {
+  if (!sdBookingId) return;
+  const docType = document.getElementById('sd-doc-type')?.value || 'other';
+  for (const file of files) {
+    if (file.size > 10 * 1024 * 1024) { showToast(file.name + ' exceeds 10 MB', 'error'); continue; }
+    const path = sdBookingId + '/' + Date.now() + '_' + file.name.replace(/[^a-zA-Z0-9._-]/g, '_');
+    try {
+      showToast('Uploading ' + file.name + '...');
+      const { error: upErr } = await db.storage.from(SD_DOC_BUCKET).upload(path, file, { upsert: false });
+      if (upErr) throw upErr;
+      const { data: pub } = db.storage.from(SD_DOC_BUCKET).getPublicUrl(path);
+      const { error: dbErr } = await db.from('booking_documents').insert({
+        booking_id: sdBookingId, file_name: file.name, file_path: path,
+        file_url: pub?.publicUrl || '', file_size: file.size,
+        mime_type: file.type || 'application/octet-stream', doc_type: docType,
+      });
+      if (dbErr) throw dbErr;
+      showToast(file.name + ' uploaded', 'success');
+    } catch(e) {
+      showToast('Upload failed: ' + e.message, 'error');
+    }
+  }
+  document.getElementById('sd-doc-input').value = '';
+  renderDocs({ id: sdBookingId });
+}
+
+async function sdDownloadDoc(docId) {
+  const doc = sdDocs.find(d => d.id === docId);
+  if (!doc) return;
+  try {
+    const { data, error } = await db.storage.from(SD_DOC_BUCKET).download(doc.file_path);
+    if (error) throw error;
+    const url = URL.createObjectURL(data);
+    const a = document.createElement('a'); a.href = url; a.download = doc.file_name; a.click();
+    URL.revokeObjectURL(url);
+  } catch(e) {
+    if (doc.file_url) window.open(doc.file_url, '_blank');
+    else showToast('Download failed: ' + e.message, 'error');
+  }
+}
+
+async function sdDeleteDoc(docId, fileName) {
+  if (!confirm('Delete "' + fileName + '"?')) return;
+  const doc = sdDocs.find(d => d.id === docId);
+  if (!doc) return;
+  try {
+    await db.storage.from(SD_DOC_BUCKET).remove([doc.file_path]);
+    await db.from('booking_documents').delete().eq('id', docId);
+    showToast('Document deleted', 'success');
+    renderDocs({ id: sdBookingId });
+  } catch(e) {
+    showToast('Delete failed: ' + e.message, 'error');
+  }
 }
 </script>
 </body>
