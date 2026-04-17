@@ -4391,8 +4391,9 @@ tbody td { padding: 10px 14px; vertical-align: middle; }
     <div class="modal-body">
       <div class="form-grid">
         <div class="fg" style="grid-column:span 2">
-          <label>Email (must match their Supabase Auth account) *</label>
+          <label>Email *</label>
           <input id="tm-email" placeholder="agent@deepbloe.com">
+          <span id="tm-invite-note" style="font-family:var(--mono);font-size:10px;color:var(--muted);margin-top:4px">An invite email will be sent automatically.</span>
         </div>
         <div class="fg" style="grid-column:span 2">
           <label>Full Name</label>
@@ -4439,7 +4440,7 @@ tbody td { padding: 10px 14px; vertical-align: middle; }
     <div class="modal-foot">
       <button class="btn" onclick="document.getElementById('team-modal').classList.remove('open')">Cancel</button>
       <button class="btn del" id="tm-delete-btn" onclick="deleteTeamMember()" style="display:none">Remove from Team</button>
-      <button class="btn primary" onclick="saveTeamMember()">Save Member</button>
+      <button class="btn primary" id="tm-save-btn" onclick="saveTeamMember()">Invite & Save</button>
     </div>
   </div>
 </div>
@@ -5158,16 +5159,20 @@ function openTeamMemberModal(memberId = null) {
     document.getElementById('tm-name').value = m.full_name || '';
     document.getElementById('tm-role').value = m.role_id;
     document.getElementById('tm-delete-btn').style.display = (m.user_id === RBAC.currentUser?.user_id) ? 'none' : 'inline-block';
+    document.getElementById('tm-invite-note').style.display = 'none';
+    document.getElementById('tm-save-btn').textContent = 'Save Member';
 
     // Load assigned artists
     tmArtistIds = RBAC.allAssignments.filter(a => a.member_id === memberId).map(a => a.artist_id);
   } else {
-    document.getElementById('team-modal-title').textContent = 'Add Team Member';
+    document.getElementById('team-modal-title').textContent = 'Invite Team Member';
     document.getElementById('tm-email').value = '';
     document.getElementById('tm-email').disabled = false;
     document.getElementById('tm-name').value = '';
     document.getElementById('tm-role').value = '';
     document.getElementById('tm-delete-btn').style.display = 'none';
+    document.getElementById('tm-invite-note').style.display = 'block';
+    document.getElementById('tm-save-btn').textContent = 'Invite & Save';
   }
 
   toggleArtistAssignment();
@@ -5224,6 +5229,11 @@ async function saveTeamMember() {
     return;
   }
 
+  const saveBtn = document.getElementById('tm-save-btn');
+  const origLabel = saveBtn.textContent;
+  saveBtn.disabled = true;
+  saveBtn.textContent = 'Sending...';
+
   try {
     if (editMemberId) {
       // Update existing
@@ -5239,9 +5249,31 @@ async function saveTeamMember() {
       await saveMemberPermissions(editMemberId);
       showToast('Team member updated', 'success');
     } else {
-      // New member
+      // ── NEW MEMBER: Invite via Edge Function ──
+      // 1. Call invite-member Edge Function to create auth account + send invite email
+      const { data: { session } } = await db.auth.getSession();
+      const inviteRes = await fetch(SUPABASE_URL + '/functions/v1/invite-member', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer ' + session.access_token,
+          'apikey': SUPABASE_KEY,
+        },
+        body: JSON.stringify({
+          email: email.toLowerCase(),
+          full_name: name,
+          redirect_to: window.location.origin + window.location.pathname,
+        }),
+      });
+      const inviteData = await inviteRes.json();
+
+      if (!inviteRes.ok) {
+        throw new Error(inviteData.error || 'Invite failed');
+      }
+
+      // 2. Insert team_members row with the real auth user_id from the invite
       const { data: newMember, error } = await db.from('team_members').insert({
-        user_id: crypto.randomUUID(), // placeholder - will be resolved on first login
+        user_id: inviteData.user_id,
         email: email.toLowerCase(),
         full_name: name,
         role_id: roleId,
@@ -5249,18 +5281,21 @@ async function saveTeamMember() {
       }).select().single();
       if (error) throw error;
 
-      // Sync artist assignments + permissions
+      // 3. Sync artist assignments + permissions
       if (newMember) {
         await syncArtistAssignments(newMember.id);
         await saveMemberPermissions(newMember.id);
       }
-      showToast('Team member added. They can now log in.', 'success');
+      showToast('Invite sent to ' + email + ' — they will receive a login link.', 'success');
     }
 
     document.getElementById('team-modal').classList.remove('open');
     await loadTeamData();
   } catch (err) {
     showToast('Error: ' + (err.message || err), 'error');
+  } finally {
+    saveBtn.disabled = false;
+    saveBtn.textContent = origLabel;
   }
 }
 
