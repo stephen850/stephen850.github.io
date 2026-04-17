@@ -11524,10 +11524,12 @@ async function logEvent(bookingId, eventType, description, metadata = null) {
     const { data: { user } } = await db.auth.getUser();
     await db.from('audit_log').insert({
       booking_id:  bookingId || null,
-      event_type:  eventType,
-      description,
       user_id:     user?.id || null,
-      user_email:  user?.email || null,
+      changed_by:  user?.id || null,
+      action:      eventType,
+      table_name:  'bookings',
+      record_id:   bookingId || null,
+      new_values:  { description, ...(metadata || {}) },
       metadata:    metadata ? metadata : null,
     });
   } catch(e) {
@@ -11704,56 +11706,27 @@ async function loadAuditLog() {
   const since = new Date();
   since.setDate(since.getDate() - days);
   try {
-    // Try with created_at first, fallback to no date filter if column doesn't exist
-    let data = null;
-    let error = null;
-
-    // Attempt 1: try timestamp column
-    const tsColumns = ['created_at', 'inserted_at', 'timestamp'];
-    let usedTsCol = null;
-    for (const col of tsColumns) {
-      const res = await db.from('audit_log')
-        .select('*')
-        .gte(col, since.toISOString())
-        .order(col, { ascending: false })
-        .limit(500);
-      if (!res.error) {
-        data = res.data;
-        usedTsCol = col;
-        break;
-      }
-      // If column doesn't exist, try next
-      if (res.error.message?.includes('does not exist')) continue;
-      // Other error: throw
-      throw res.error;
-    }
-
-    // Attempt 2: no timestamp filter at all
-    if (data === null) {
-      const res = await db.from('audit_log').select('*').order('id', { ascending: false }).limit(500);
-      if (res.error) throw res.error;
-      data = res.data;
-      usedTsCol = null;
-    }
-
+    const { data, error } = await db.from('audit_log')
+      .select('*')
+      .gte('changed_at', since.toISOString())
+      .order('changed_at', { ascending: false })
+      .limit(500);
+    if (error) throw error;
     allAuditRows = data || [];
-    // Store which column has the timestamp for rendering
-    window._auditTsCol = usedTsCol;
   } catch (e) {
     console.warn('Audit log load failed:', e.message);
     allAuditRows = [];
     const container = document.getElementById('audit-log-list');
     if (container) {
       container.innerHTML = `<div style="font-family:var(--mono);font-size:11px;color:var(--red);padding:20px;text-align:center">
-        Could not load audit log. Make sure the <strong>audit_log</strong> table exists and has RLS policies for authenticated users.
-        <br><span style="color:var(--muted);font-size:10px">${esc(e.message)}</span>
+        Could not load audit log: <span style="color:var(--muted);font-size:10px">${esc(e.message)}</span>
       </div>`;
     }
     return;
   }
 
   // Populate event type filter
-  const types = [...new Set(allAuditRows.map(r => r.event_type).filter(Boolean))].sort();
+  const types = [...new Set(allAuditRows.map(r => r.action).filter(Boolean))].sort();
   const sel = document.getElementById('audit-type-filter');
   if (sel) {
     const cur = sel.value;
@@ -11767,8 +11740,10 @@ function filterAuditLog() {
   const q = (document.getElementById('audit-search')?.value || '').toLowerCase();
   const type = document.getElementById('audit-type-filter')?.value || '';
   filtAuditRows = allAuditRows.filter(r => {
-    if (type && r.event_type !== type) return false;
-    if (q && !`${r.description||''}${r.user_email||''}${r.event_type||''}`.toLowerCase().includes(q)) return false;
+    if (type && r.action !== type) return false;
+    const desc = r.new_values?.description || '';
+    const tbl = r.table_name || '';
+    if (q && !`${desc}${r.action||''}${tbl}${r.changed_by||''}`.toLowerCase().includes(q)) return false;
     return true;
   });
   renderAuditLog();
@@ -11784,23 +11759,50 @@ function renderAuditLog() {
     container.innerHTML = '<div style="font-family:var(--mono);font-size:11px;color:var(--muted);padding:20px;text-align:center">No audit events found for this period.</div>';
     return;
   }
-  const hdr = `<div class="audit-hdr"><div>When</div><div>Event</div><div>Description</div><div>User</div></div>`;
-  const tsCol = window._auditTsCol || 'created_at';
+  const hdr = `<div class="audit-hdr"><div>When</div><div>Action</div><div>Description</div><div>Table / Record</div></div>`;
   const rows = filtAuditRows.slice(0, 200).map(r => {
-    const tsVal = r[tsCol] || r.created_at || r.inserted_at || r.timestamp || '';
-    const when = tsVal ? new Date(tsVal).toLocaleString('en-GB', {
+    const when = r.changed_at ? new Date(r.changed_at).toLocaleString('en-GB', {
       day:'2-digit', month:'short', hour:'2-digit', minute:'2-digit'
     }) : '';
+    const desc = r.new_values?.description || summarizeChanges(r) || '';
+    const tableRef = [r.table_name, r.record_id?.slice(0,8)].filter(Boolean).join(' / ');
     return `<div class="audit-row">
       <div class="audit-time">${when}</div>
-      <div class="audit-type">${esc((r.event_type||'').replace(/_/g,' '))}</div>
-      <div class="audit-desc">${esc(r.description||'')}</div>
-      <div class="audit-user">${esc(r.user_email||'system')}</div>
+      <div class="audit-type">${esc((r.action||'').replace(/_/g,' '))}</div>
+      <div class="audit-desc">${esc(desc)}</div>
+      <div class="audit-user">${esc(tableRef || '')}</div>
     </div>`;
   }).join('');
   container.innerHTML = hdr + rows;
 }
 // ── END AUDIT LOG VIEWER ──────────────────────────────────────
+
+function summarizeChanges(row) {
+  // For DB-trigger generated rows (UPDATE with old_values/new_values)
+  if (row.old_values && row.new_values && typeof row.old_values === 'object' && typeof row.new_values === 'object') {
+    const changes = [];
+    for (const key of Object.keys(row.new_values)) {
+      if (key === 'description') continue; // already shown
+      const oldVal = row.old_values[key];
+      const newVal = row.new_values[key];
+      if (JSON.stringify(oldVal) !== JSON.stringify(newVal)) {
+        const label = key.replace(/_/g, ' ');
+        if (oldVal == null || oldVal === '') {
+          changes.push(`${label}: set to "${newVal}"`);
+        } else {
+          changes.push(`${label}: "${oldVal}" -> "${newVal}"`);
+        }
+      }
+    }
+    if (changes.length) return changes.slice(0, 3).join(', ') + (changes.length > 3 ? ` (+${changes.length - 3} more)` : '');
+  }
+  // For INSERT with only new_values
+  if (row.new_values && !row.old_values) {
+    const keys = Object.keys(row.new_values).filter(k => k !== 'description' && row.new_values[k] != null);
+    if (keys.length) return keys.slice(0, 4).map(k => k.replace(/_/g,' ')).join(', ');
+  }
+  return row.action || '';
+}
 
 // ── SOURCE FIELD CLEANUP ──────────────────────────────────────
 async function cleanupSourceField() {
