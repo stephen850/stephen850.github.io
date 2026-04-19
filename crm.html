@@ -3172,8 +3172,12 @@ tbody td { padding: 10px 14px; vertical-align: middle; }
         </select>
       </div>
       <div class="fg">
-        <label>Show Date *</label>
+        <label>Start Date *</label>
         <input type="date" id="bm-date">
+      </div>
+      <div class="fg">
+        <label>End Date <span style="font-family:var(--mono);font-size:9px;color:var(--muted)">(multi-day)</span></label>
+        <input type="date" id="bm-date-end">
       </div>
       <div class="fg">
         <label>Set Time</label>
@@ -3234,9 +3238,16 @@ tbody td { padding: 10px 14px; vertical-align: middle; }
             <button type="button" id="bm-comm-fix-btn" class="btn" onclick="setCommType('fixed')"
               style="padding:2px 8px;font-size:9px;border:none;background:transparent;color:var(--muted)">Fixed</button>
           </span>
+          <span style="display:inline-flex;gap:0;border:1px solid var(--border-dark);font-family:var(--mono);font-size:9px;margin-left:4px">
+            <button type="button" id="bm-comm-incl-btn" class="btn" onclick="setCommIncl('inclusive')"
+              style="padding:2px 8px;font-size:9px;border:none;background:var(--accent);color:#fff">Incl</button>
+            <button type="button" id="bm-comm-excl-btn" class="btn" onclick="setCommIncl('exclusive')"
+              style="padding:2px 8px;font-size:9px;border:none;background:transparent;color:var(--muted)">Excl</button>
+          </span>
         </label>
         <input type="number" id="bm-commission" placeholder="15" value="15">
         <input type="hidden" id="bm-commission-type" value="percentage">
+        <input type="hidden" id="bm-commission-incl" value="inclusive">
       </div>
       <div class="fg">
         <label>Withholding %</label>
@@ -5946,7 +5957,7 @@ function renderBookingList() {
     const fee    = b.fee_amount
       ? `<span class="fee-val">${fmtFee(b.fee_amount, b.fee_currency)}</span>`
       : '<span style="color:var(--muted)">—</span>';
-    const date   = b.show_date ? fmtDate(b.show_date) : '—';
+    const date   = b.show_date ? (b.show_date_end && b.show_date_end !== b.show_date ? fmtDate(b.show_date) + ' - ' + fmtDate(b.show_date_end) : fmtDate(b.show_date)) : '---';
     const venue  = [b.venue_name, b.venue_city].filter(Boolean).join(' · ') || '—';
     return `<tr>
       <td class="td-mono" style="font-size:10px">${esc(b.reference||'—')}</td>
@@ -6045,13 +6056,14 @@ function openBookingModal(id = null) {
     ['bm-artist','bm-dealtype','bm-currency'].forEach(f => {
       const el = document.getElementById(f); if (el) el.value = '';
     });
-    ['bm-date','bm-venue','bm-city','bm-country','bm-capacity','bm-settime',
+    ['bm-date','bm-date-end','bm-venue','bm-city','bm-country','bm-capacity','bm-settime',
      'bm-setlength','bm-fee','bm-guarantee','bm-pct','bm-territory',
      'bm-holdexpiry','bm-notes','bm-wh-country'].forEach(f => {
       document.getElementById(f).value = '';
     });
     document.getElementById('bm-commission').value = '15';
     setCommType('percentage');
+    setCommIncl('inclusive');
     document.getElementById('bm-withholding').value = '0';
     document.getElementById('bm-currency').value = 'EUR';
     document.getElementById('bm-dealtype').value = 'flat_fee';
@@ -6182,6 +6194,7 @@ function editBooking(id) {
   // Fill fields
   document.getElementById('bm-artist').value    = b.artist_id || '';
   document.getElementById('bm-date').value      = b.show_date || '';
+  document.getElementById('bm-date-end').value  = b.show_date_end || '';
   document.getElementById('bm-venue').value     = b.venue_name || '';
   document.getElementById('bm-city').value      = b.venue_city || '';
   document.getElementById('bm-country').value   = b.venue_country || '';
@@ -6196,6 +6209,8 @@ function editBooking(id) {
   document.getElementById('bm-commission').value  = b.commission_type === 'fixed' ? (b.commission_fixed || 0) : (b.commission_rate || 15);
   document.getElementById('bm-commission-type').value = b.commission_type || 'percentage';
   setCommType(b.commission_type || 'percentage');
+  document.getElementById('bm-commission-incl').value = b.commission_incl || 'inclusive';
+  setCommIncl(b.commission_incl || 'inclusive');
   document.getElementById('bm-withholding').value  = b.withholding_rate || 0;
   document.getElementById('bm-wh-country').value   = b.withholding_country || '';
 
@@ -6244,10 +6259,31 @@ function setCommType(type) {
   }
 }
 
+function setCommIncl(mode) {
+  document.getElementById('bm-commission-incl').value = mode;
+  const inclBtn = document.getElementById('bm-comm-incl-btn');
+  const exclBtn = document.getElementById('bm-comm-excl-btn');
+  if (mode === 'inclusive') {
+    inclBtn.style.background = 'var(--accent)'; inclBtn.style.color = '#fff';
+    exclBtn.style.background = 'transparent'; exclBtn.style.color = 'var(--muted)';
+  } else {
+    exclBtn.style.background = 'var(--accent)'; exclBtn.style.color = '#fff';
+    inclBtn.style.background = 'transparent'; inclBtn.style.color = 'var(--muted)';
+  }
+}
+
 // Calculate commission for a booking (used everywhere in finance)
+// inclusive = commission is part of the fee (artist gets fee minus commission)
+// exclusive = commission is on top of the fee (artist gets full fee, promoter pays fee + commission)
 function calcCommission(b) {
   if (b.commission_type === 'fixed') return b.commission_fixed || 0;
-  return (b.fee_amount || 0) * (b.commission_rate || 15) / 100;
+  const rate = (b.commission_rate || 15) / 100;
+  const fee = b.fee_amount || 0;
+  if (b.commission_incl === 'exclusive') {
+    return fee * rate;
+  }
+  // inclusive (default): commission is already inside the fee
+  return fee * rate;
 }
 
 function updateDealFields() {
@@ -6380,6 +6416,7 @@ async function saveBooking() {
   const data = {
     artist_id:           artistId,
     show_date:           date,
+    show_date_end:       document.getElementById('bm-date-end').value || null,
     venue_name:          document.getElementById('bm-venue').value.trim() || null,
     venue_city:          document.getElementById('bm-city').value.trim() || null,
     venue_country:       document.getElementById('bm-country').value.trim() || null,
@@ -6394,6 +6431,7 @@ async function saveBooking() {
     commission_rate:     document.getElementById('bm-commission-type').value === 'percentage' ? (parseFloat(document.getElementById('bm-commission').value) || 15) : 0,
     commission_type:     document.getElementById('bm-commission-type').value || 'percentage',
     commission_fixed:    document.getElementById('bm-commission-type').value === 'fixed' ? (parseFloat(document.getElementById('bm-commission').value) || 0) : null,
+    commission_incl:     document.getElementById('bm-commission-incl').value || 'inclusive',
     withholding_rate:    parseFloat(document.getElementById('bm-withholding').value) || 0,
     withholding_country: document.getElementById('bm-wh-country').value.trim() || null,
     company_id:          document.getElementById('bm-org').value || null,
@@ -6456,6 +6494,7 @@ function exportBookings() {
     Reference:   b.reference,
     Artist:      b.artists?.name,
     ShowDate:    b.show_date,
+    EndDate:     b.show_date_end,
     Venue:       b.venue_name,
     City:        b.venue_city,
     Country:     b.venue_country,
@@ -10065,11 +10104,14 @@ function renderCalendar() {
   document.getElementById('cal-month-label').textContent = `${MONTH_NAMES[calMonth]} ${calYear}`;
   document.getElementById('cal-avail-month').textContent = `${MONTH_NAMES[calMonth]} ${calYear}`;
 
-  // Filter bookings
+  // Filter bookings (include multi-day events that overlap this month)
   let bks = allBookings.filter(b => {
     if (!b.show_date) return false;
-    const d = new Date(b.show_date);
-    if (d.getFullYear() !== calYear || d.getMonth() !== calMonth) return false;
+    const start = new Date(b.show_date);
+    const end = b.show_date_end ? new Date(b.show_date_end) : start;
+    const monthStart = new Date(calYear, calMonth, 1);
+    const monthEnd = new Date(calYear, calMonth + 1, 0);
+    if (end < monthStart || start > monthEnd) return false;
     if (artistFilter && b.artist_id !== artistFilter) return false;
     if (statusFilter && b.status !== statusFilter) return false;
     if (b.status === 'cancelled') return false;
@@ -10118,7 +10160,10 @@ function renderCalendar() {
 
 function makeCalDay(date, bks, otherMonth, today) {
   const iso = date.toISOString().slice(0,10);
-  const dayBks = bks.filter(b => b.show_date === iso);
+  const dayBks = bks.filter(b => {
+    const end = b.show_date_end || b.show_date;
+    return iso >= b.show_date && iso <= end;
+  });
   const isToday = iso === today;
 
   const cell = document.createElement('div');
@@ -10160,7 +10205,7 @@ function showCalPopup(event, bookingId) {
 
   document.getElementById('cal-popup-title').textContent = artist;
   document.getElementById('cal-popup-body').innerHTML = `
-    <div class="cal-popup-row"><span class="cal-popup-label">Date</span><span class="cal-popup-val">${fmtDate(b.show_date)}</span></div>
+    <div class="cal-popup-row"><span class="cal-popup-label">Date</span><span class="cal-popup-val">${b.show_date_end && b.show_date_end !== b.show_date ? fmtDate(b.show_date)+' - '+fmtDate(b.show_date_end) : fmtDate(b.show_date)}</span></div>
     <div class="cal-popup-row"><span class="cal-popup-label">Venue</span><span class="cal-popup-val">${esc([b.venue_name,b.venue_city,b.venue_country].filter(Boolean).join(', ')||'—')}</span></div>
     <div class="cal-popup-row"><span class="cal-popup-label">Status</span><span class="cal-popup-val">${statusBadge(b.status)}</span></div>
     <div class="cal-popup-row"><span class="cal-popup-label">Fee</span><span class="cal-popup-val">${b.fee_amount?sym+b.fee_amount.toLocaleString():'—'}</span></div>

@@ -579,12 +579,17 @@ function renderHero(b, venue) {
   renderStatusDropdown(s);
 
   // Meta row
+  const dateDisplay = b.show_date
+    ? (b.show_date_end && b.show_date_end !== b.show_date
+      ? fmtDate(b.show_date) + ' - ' + fmtDate(b.show_date_end)
+      : fmtDate(b.show_date))
+    : '---';
   const meta = [
-    { label: 'Date', val: b.show_date ? fmtDate(b.show_date) : '—' },
-    { label: 'Set Time', val: b.set_time || '—' },
-    { label: 'Set Length', val: b.set_length_minutes ? b.set_length_minutes+'min' : '—' },
-    { label: 'Territory', val: b.territory || '—' },
-    { label: 'Deal Type', val: (b.deal_type||'').replace('_',' ') || '—' },
+    { label: b.show_date_end && b.show_date_end !== b.show_date ? 'Dates' : 'Date', val: dateDisplay },
+    { label: 'Set Time', val: b.set_time || '---' },
+    { label: 'Set Length', val: b.set_length_minutes ? b.set_length_minutes+'min' : '---' },
+    { label: 'Territory', val: b.territory || '---' },
+    { label: 'Deal Type', val: (b.deal_type||'').replace('_',' ') || '---' },
   ];
   document.getElementById('sd-meta').innerHTML = meta.map(m => `
     <div class="sd-meta-item">
