@@ -1309,7 +1309,7 @@ tbody td { padding: 10px 14px; vertical-align: middle; }
 .artist-chip .ac-x:hover { color: var(--red); }
 .h-tab.rbac-hidden { display: none !important; }
 .rbac-no-edit .btn.primary,
-.rbac-no-edit .ra,
+.rbac-no-edit .ra:not(.ra-view),
 .rbac-no-edit button[onclick*="save"],
 .rbac-no-edit button[onclick*="Save"],
 .rbac-no-edit button[onclick*="add"],
@@ -5967,7 +5967,7 @@ function renderBookingList() {
       <td>${fee}</td>
       <td class="td-trunc">${esc(org)}</td>
       <td><div class="row-actions">
-        <button class="ra primary" onclick="window.location.href='show.html?id=${b.id}'" style="border-color:var(--accent);background:var(--accent);color:#fff">Show</button>
+        <button class="ra ra-view primary" onclick="window.location.href='show.html?id=${b.id}'" style="border-color:var(--accent);background:var(--accent);color:#fff">Show</button>
         <button class="ra confirm" onclick="openContractEditor('${b.id}')">Contract</button>
         <button class="ra" style="border-color:var(--amber);color:var(--amber)" onclick="openInvoiceEditor('${b.id}')">Invoice</button>
         <button class="ra" style="border-color:var(--blue);color:var(--blue)" onclick="openAdvancingEditor('${b.id}')">Advance</button>
