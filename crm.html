@@ -3147,9 +3147,9 @@ tbody td { padding: 10px 14px; vertical-align: middle; }
       <button class="modal-close" onclick="closeModal('bk-modal')">×</button>
     </div>
 
-    <!-- Status bar (edit mode only) -->
-    <div id="bk-status-bar" style="display:none">
-      <div style="font-family:var(--mono);font-size:9px;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);margin-bottom:8px">Change status</div>
+    <!-- Status bar (always visible) -->
+    <div id="bk-status-bar">
+      <div style="font-family:var(--mono);font-size:9px;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);margin-bottom:8px">Status</div>
       <div class="status-bar">
         <button class="status-btn" data-status="inquiry" onclick="setBookingStatus('inquiry')">Inquiry</button>
         <button class="status-btn" data-status="hold" onclick="setBookingStatus('hold')">Hold</button>
@@ -3160,6 +3160,7 @@ tbody td { padding: 10px 14px; vertical-align: middle; }
         <button class="status-btn" data-status="completed" onclick="setBookingStatus('completed')">Completed</button>
         <button class="status-btn" data-status="cancelled" onclick="setBookingStatus('cancelled')">Cancelled</button>
       </div>
+      <input type="hidden" id="bm-status" value="inquiry">
     </div>
 
     <div class="form-section">Show Details</div>
@@ -6008,9 +6009,16 @@ function openBookingModal(id = null) {
   editBkId = id;
   document.getElementById('bk-modal-title').textContent = id ? 'Edit Booking' : 'New Booking';
   document.getElementById('bk-modal-ref').textContent = '';
-  document.getElementById('bk-status-bar').style.display = id ? 'block' : 'none';
   document.getElementById('bm-delete-btn').style.display = id ? 'inline-block' : 'none';
   document.getElementById('bm-settlement-btn').style.display = id ? 'inline-block' : 'none';
+
+  // Default status for new bookings
+  if (!id) {
+    document.getElementById('bm-status').value = 'inquiry';
+    document.querySelectorAll('.status-btn').forEach(btn => {
+      btn.classList.toggle('active-status', btn.dataset.status === 'inquiry');
+    });
+  }
 
   // Populate company searchable select (step 1)
   const orgOpts = allOrgs.map(o => ({ value: o.id, label: o.legal_name||o.name, sub: [o.company_type, o.city, o.country].filter(Boolean).join(' / ') }));
@@ -6166,6 +6174,7 @@ function editBooking(id) {
   document.getElementById('bk-modal-ref').textContent = b.reference || '';
 
   // Highlight current status
+  document.getElementById('bm-status').value = b.status;
   document.querySelectorAll('.status-btn').forEach(btn => {
     btn.classList.toggle('active-status', btn.dataset.status === b.status);
   });
@@ -6311,11 +6320,18 @@ async function checkStatusRequirements(targetStatus, bookingId) {
 }
 
 async function setBookingStatus(status) {
-  if (!editBkId) return;
+  // For new bookings (not yet saved), just update the UI
+  if (!editBkId) {
+    document.getElementById('bm-status').value = status;
+    document.querySelectorAll('.status-btn').forEach(btn => {
+      btn.classList.toggle('active-status', btn.dataset.status === status);
+    });
+    return;
+  }
 
   const issues = await checkStatusRequirements(status, editBkId);
 
-  // For "confirmed" without signed contract — allow with warning
+  // For "confirmed" without signed contract -- allow with warning
   const softIssues = issues.filter(i => i.includes('Signed contract required'));
   const hardIssues = issues.filter(i => !i.includes('Signed contract required'));
 
@@ -6325,7 +6341,7 @@ async function setBookingStatus(status) {
   }
 
   if (softIssues.length > 0) {
-    const ok = confirm('⚠️ No signed contract yet.\n\nAre you sure you want to confirm this booking without a signed contract?');
+    const ok = confirm('No signed contract yet.\n\nAre you sure you want to confirm this booking without a signed contract?');
     if (!ok) return;
   }
 
@@ -6334,6 +6350,7 @@ async function setBookingStatus(status) {
 
   await logEvent(editBkId, 'status_change', `Status changed to: ${status.replace(/_/g,' ')}`, { status });
 
+  document.getElementById('bm-status').value = status;
   document.querySelectorAll('.status-btn').forEach(btn => {
     btn.classList.toggle('active-status', btn.dataset.status === status);
   });
@@ -6343,7 +6360,7 @@ async function setBookingStatus(status) {
 
   // Auto-actions on status change
   if (status === 'confirmed') {
-    showToast('✓ Confirmed — remember to send contract & create invoice', 'info');
+    showToast('Confirmed -- remember to send contract & create invoice', 'info');
   }
 }
 // ── END STATUS MACHINE ─────────────────────────────────────────
@@ -6394,7 +6411,7 @@ async function saveBooking() {
   if (editBkId) {
     ({ error } = await db.from('bookings').update(data).eq('id', editBkId));
   } else {
-    ({ error } = await db.from('bookings').insert({ ...data, status: 'inquiry' }));
+    ({ error } = await db.from('bookings').insert({ ...data, status: document.getElementById('bm-status').value || 'inquiry' }));
   }
 
   btn.disabled = false; btn.textContent = 'Save Booking';
