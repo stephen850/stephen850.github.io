@@ -5533,7 +5533,11 @@ async function saveTeamMember() {
     } else {
       // ── NEW MEMBER: Invite via Edge Function ──
       // 1. Call invite-member Edge Function to create auth account + send invite email
-      const { data: { session } } = await db.auth.getSession();
+      const { data: sessionData } = await db.auth.getSession();
+      const session = sessionData?.session;
+      if (!session) {
+        throw new Error('Session expired. Please log in again.');
+      }
       const inviteRes = await fetch(SUPABASE_URL + '/functions/v1/invite-member', {
         method: 'POST',
         headers: {
