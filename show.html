@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Show Dashboard — Deepbloe CRM</title>
+<title>Show Dashboard - Deepbloe CRM</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@300;400;500&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
 <script data-cfasync="false" src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
@@ -292,8 +292,8 @@ body { background: var(--bg); color: var(--text); font-family: var(--sans); font
   <div class="sd-hero">
     <div class="sd-hero-top">
       <div>
-        <div class="sd-artist" id="sd-artist">—</div>
-        <div class="sd-venue-line" id="sd-venue-line">—</div>
+        <div class="sd-artist" id="sd-artist">-</div>
+        <div class="sd-venue-line" id="sd-venue-line">-</div>
         <div class="sd-ref" id="sd-ref"></div>
       </div>
       <div class="sd-status-wrap">
@@ -313,7 +313,7 @@ body { background: var(--bg); color: var(--text); font-family: var(--sans); font
     <div id="sd-open-actions-wrap" style="margin-bottom:16px;display:none">
       <div class="sd-card">
         <div class="sd-card-hdr">
-          <div class="sd-card-title">⚠ Open Actions — This Show</div>
+          <div class="sd-card-title">⚠ Open Actions - This Show</div>
         </div>
         <div class="sd-card-body" id="sd-open-actions"></div>
       </div>
@@ -493,7 +493,7 @@ async function startApp() {
 // ── HELPERS ──────────────────────────────────────────────────
 function esc(s) { return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
 function fmtDate(d) {
-  if (!d) return '—';
+  if (!d) return '-';
   return new Date(d + 'T00:00:00').toLocaleDateString('en-GB', { day:'2-digit', month:'short', year:'numeric' });
 }
 function fmtMoney(amount, currency='EUR') {
@@ -556,8 +556,8 @@ async function loadShow(bookingId) {
 
 // ── HERO ──────────────────────────────────────────────────────
 function renderHero(b, venue) {
-  const artist = b.artists?.name || '—';
-  const venueName = venue?.name || b.venue_name || '—';
+  const artist = b.artists?.name || '-';
+  const venueName = venue?.name || b.venue_name || '-';
   const city = b.venue_city || venue?.city || '';
   const country = b.venue_country || venue?.country || '';
   const loc = [city, country].filter(Boolean).join(', ');
@@ -565,7 +565,7 @@ function renderHero(b, venue) {
   document.getElementById('sd-artist').textContent = artist;
   document.getElementById('sd-venue-line').innerHTML = `<strong>${esc(venueName)}</strong>${loc ? ' · '+esc(loc) : ''}`;
   document.getElementById('sd-ref').textContent = b.reference || '';
-  document.title = `${artist} · ${venueName} — Deepbloe`;
+  document.title = `${artist} · ${venueName} - Deepbloe`;
 
   // Status badge
   const statusColors = {
@@ -658,9 +658,9 @@ function renderOpenActions(b, contracts, invoices, advancing, settlement) {
 
   const showDate = b.show_date ? new Date(b.show_date + 'T00:00:00') : null;
   if (showDate && showDate < new Date() && status === 'confirmed') {
-    if (!settlement) actions.push({ color:'var(--red)', text: 'Show passed — settlement not completed', action: 'openSettlement()' });
+    if (!settlement) actions.push({ color:'var(--red)', text: 'Show passed - settlement not completed', action: 'openSettlement()' });
     else if (settlement.payouts?.[0]?.status !== 'paid') {
-      actions.push({ color:'var(--amber)', text: 'Settlement done — artist payout pending', action: 'openSettlement()' });
+      actions.push({ color:'var(--amber)', text: 'Settlement done - artist payout pending', action: 'openSettlement()' });
     }
   }
 
@@ -688,7 +688,7 @@ function renderDeal(b) {
     { label: 'Deal Type', val: (b.deal_type||'flat_fee').replace('_',' ') },
     { label: 'Artist Fee', val: fmtMoney(gross, cur), cls: 'green' },
     { label: `Commission (${commRate}%)`, val: '− ' + fmtMoney(commAmt, cur), cls: 'red' },
-    { label: `Withholding (${whRate}%)`, val: whAmt > 0 ? '− ' + fmtMoney(whAmt, cur) : '—' },
+    { label: `Withholding (${whRate}%)`, val: whAmt > 0 ? '− ' + fmtMoney(whAmt, cur) : '-' },
     { label: 'Net Fee', val: fmtMoney(net, cur), cls: 'blue' },
     { label: 'Currency', val: cur },
   ];
@@ -723,8 +723,8 @@ function renderContract(b, contracts) {
     { label: 'Status', val: statusLabel[s] || s },
     { label: 'Version', val: latest.version || '1' },
     { label: 'Created', val: fmtDate(latest.created_at?.slice(0,10)) },
-    { label: 'Sent', val: latest.sent_at ? fmtDate(latest.sent_at.slice(0,10)) : '—' },
-    { label: 'Signed', val: latest.signed_at ? fmtDate(latest.signed_at.slice(0,10)) : '—' },
+    { label: 'Sent', val: latest.sent_at ? fmtDate(latest.sent_at.slice(0,10)) : '-' },
+    { label: 'Signed', val: latest.signed_at ? fmtDate(latest.signed_at.slice(0,10)) : '-' },
   ];
   document.getElementById('sd-contract-body').innerHTML = fields.map(f =>
     `<div class="sd-field"><div class="sd-field-label">${esc(f.label)}</div><div class="sd-field-val">${esc(f.val)}</div></div>`).join('');
@@ -763,11 +763,11 @@ function renderInvoices(b, invoices) {
     const typeLabel = {deposit:'Deposit',second_deposit:'2nd Dep.',balance:'Balance',full:'Full',credit_note:'Credit'}[i.type]||i.type;
     return `<div class="sd-inv-row">
       <div>
-        <div style="font-family:var(--mono);font-size:10px">${esc(i.invoice_number||'—')}</div>
+        <div style="font-family:var(--mono);font-size:10px">${esc(i.invoice_number||'-')}</div>
         <div style="font-family:var(--mono);font-size:9px;color:var(--muted)">${esc(typeLabel)}</div>
       </div>
       <div style="font-family:var(--mono);font-size:11px">${fmtMoney(i.total_amount,i.currency)}</div>
-      <div style="font-family:var(--mono);font-size:10px;color:var(--muted)">${i.due_date?fmtDate(i.due_date):'—'}</div>
+      <div style="font-family:var(--mono);font-size:10px;color:var(--muted)">${i.due_date?fmtDate(i.due_date):'-'}</div>
       <div><span class="inv-badge inv-badge-${eff}">${eff}</span></div>
       <div></div>
     </div>`;
@@ -826,13 +826,13 @@ function renderAdvancing(b, adv) {
 
   // Key details
   const keyFields = [
-    { label: 'Load In', val: d.load_in_time || '—' },
-    { label: 'Soundcheck', val: d.soundcheck_time || '—' },
-    { label: 'Set Time', val: d.set_time || d.set_times || '—' },
-    { label: 'Doors', val: d.doors || '—' },
-    { label: 'Curfew', val: d.curfew || '—' },
-    { label: 'Hotel', val: d.hotel_name || '—' },
-    { label: 'Status', val: adv.status || '—' },
+    { label: 'Load In', val: d.load_in_time || '-' },
+    { label: 'Soundcheck', val: d.soundcheck_time || '-' },
+    { label: 'Set Time', val: d.set_time || d.set_times || '-' },
+    { label: 'Doors', val: d.doors || '-' },
+    { label: 'Curfew', val: d.curfew || '-' },
+    { label: 'Hotel', val: d.hotel_name || '-' },
+    { label: 'Status', val: adv.status || '-' },
   ];
 
   document.getElementById('sd-advancing-body').innerHTML =
@@ -876,7 +876,7 @@ function renderVCC(b, venue) {
     ${org ? `
       <div style="margin-bottom:12px">
         <div style="font-family:var(--mono);font-size:9px;letter-spacing:0.12em;text-transform:uppercase;color:var(--muted);margin-bottom:6px">Company</div>
-        <div style="font-size:13px;font-weight:500;margin-bottom:3px">${esc(org.legal_name||org.name||'—')}</div>
+        <div style="font-size:13px;font-weight:500;margin-bottom:3px">${esc(org.legal_name||org.name||'-')}</div>
         ${org.trading_name && org.trading_name !== org.legal_name ? `<div style="font-family:var(--mono);font-size:10px;color:var(--muted)">${esc(org.trading_name)}</div>` : ''}
         ${org.vat_number ? `<div style="font-family:var(--mono);font-size:10px;color:var(--muted)">VAT: ${esc(org.vat_number)}</div>` : ''}
       </div>` : '<div style="font-family:var(--mono);font-size:11px;color:var(--muted);margin-bottom:12px">No company linked</div>'}
@@ -886,7 +886,7 @@ function renderVCC(b, venue) {
     ${con ? `
       <div>
         <div style="font-family:var(--mono);font-size:9px;letter-spacing:0.12em;text-transform:uppercase;color:var(--muted);margin-bottom:6px">Contact</div>
-        <div style="font-size:13px;font-weight:500;margin-bottom:3px">${esc([con.first_name,con.last_name].filter(Boolean).join(' ')||'—')}</div>
+        <div style="font-size:13px;font-weight:500;margin-bottom:3px">${esc([con.first_name,con.last_name].filter(Boolean).join(' ')||'-')}</div>
         ${con.role ? `<div style="font-family:var(--mono);font-size:10px;color:var(--muted)">${esc(con.role)}</div>` : ''}
         ${con.email ? `<div style="font-family:var(--mono);font-size:10px;color:var(--blue)">${esc(con.email)}</div>` : ''}
         ${con.phone ? `<div style="font-family:var(--mono);font-size:10px;color:var(--muted)">${esc(con.phone)}</div>` : ''}
@@ -907,7 +907,7 @@ function renderSettlement(b, sett) {
     const showPassed = showDate && showDate < new Date();
     document.getElementById('sd-settlement-body').innerHTML =
       `<div style="padding:12px 0;font-family:var(--mono);font-size:11px;color:var(--muted)">
-        ${showPassed ? '⚠ Show has passed — settlement not created' : 'Settlement not yet created'}
+        ${showPassed ? '⚠ Show has passed - settlement not created' : 'Settlement not yet created'}
       </div>`;
     document.getElementById('sd-settlement-actions').innerHTML =
       `<button class="sd-btn primary" onclick="openSettlement()">Create Settlement</button>`;
@@ -925,10 +925,10 @@ function renderSettlement(b, sett) {
 
   const fields = [
     { label: 'Gross Fee', val: fmtMoney(sett.gross_fee, cur), cls: '' },
-    { label: `Withholding (${sett.withholding_rate||0}%)`, val: sett.withholding_amount > 0 ? '− '+fmtMoney(sett.withholding_amount, cur) : '—' },
+    { label: `Withholding (${sett.withholding_rate||0}%)`, val: sett.withholding_amount > 0 ? '− '+fmtMoney(sett.withholding_amount, cur) : '-' },
     { label: 'Net Fee', val: fmtMoney(sett.net_fee, cur) },
     { label: `Commission (${sett.commission_rate||15}% on ${sett.commission_base||'gross'})`, val: '− '+fmtMoney(sett.commission_amount, cur), cls: 'red' },
-    { label: 'Show Expenses', val: sett.total_expenses > 0 ? '− '+fmtMoney(sett.total_expenses, cur) : '—' },
+    { label: 'Show Expenses', val: sett.total_expenses > 0 ? '− '+fmtMoney(sett.total_expenses, cur) : '-' },
     { label: 'Net Payout', val: fmtMoney(sett.net_payout, cur), cls: 'green' },
     { label: 'Payout Status', val: paid ? `✓ Paid${payout.paid_at?' on '+fmtDate(payout.paid_at.slice(0,10)):''}` : '⏳ Pending', cls: paid?'green':'amber' },
   ];
@@ -1065,16 +1065,16 @@ function printSettlement() {
   const commAmt  = gross * (commRate/100);
   const payout   = netFee - commAmt;
   const fmt = n => cs + Number(n).toLocaleString('nl-NL', { minimumFractionDigits: 2 });
-  const fmtD = d => d ? new Date(d+'T00:00:00').toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'}) : '—';
-  const artist   = b.artists?.name || '—';
-  const venue    = [b.venue_name, b.venue_city, b.venue_country].filter(Boolean).join(', ') || '—';
-  const promoter = b.organisations?.legal_name || b.organisations?.name || '—';
+  const fmtD = d => d ? new Date(d+'T00:00:00').toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'}) : '-';
+  const artist   = b.artists?.name || '-';
+  const venue    = [b.venue_name, b.venue_city, b.venue_country].filter(Boolean).join(', ') || '-';
+  const promoter = b.organisations?.legal_name || b.organisations?.name || '-';
   const paid     = s?.payouts?.[0]?.status === 'paid';
 
   const win = window.open('', '_blank');
   win.document.write(`<!DOCTYPE html><html><head>
     <meta charset="UTF-8">
-    <title>Settlement — ${artist} — ${fmtD(b.show_date)}</title>
+    <title>Settlement - ${artist} - ${fmtD(b.show_date)}</title>
     <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@300;400;500&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
     <style>
       *{box-sizing:border-box;margin:0;padding:0;}
@@ -1106,14 +1106,14 @@ function printSettlement() {
       </div>
       <div>
         <div class="doc-title">Settlement</div>
-        <div class="doc-ref">${b.reference || '—'}</div>
+        <div class="doc-ref">${b.reference || '-'}</div>
       </div>
     </div>
 
     <div class="show-box">
       <div><div class="show-item-label">Artist</div><div class="show-item-val">${artist}</div></div>
       <div><div class="show-item-label">Show Date</div><div class="show-item-val">${fmtD(b.show_date)}</div></div>
-      <div><div class="show-item-label">Venue</div><div class="show-item-val">${b.venue_name || '—'}</div></div>
+      <div><div class="show-item-label">Venue</div><div class="show-item-val">${b.venue_name || '-'}</div></div>
       <div><div class="show-item-label">Promoter</div><div class="show-item-val">${promoter}</div></div>
     </div>
 
@@ -1145,17 +1145,17 @@ function printItinerary() {
   const adv = _currentAdvancing;
   if (!b) { alert('Booking not loaded yet'); return; }
 
-  const fmtD  = d => d ? new Date(d+'T00:00:00').toLocaleDateString('en-GB',{weekday:'long',day:'2-digit',month:'long',year:'numeric'}) : '—';
-  const fmtDT = d => d ? new Date(d).toLocaleString('en-GB',{day:'2-digit',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'}) : '—';
-  const artist = b.artists?.name || '—';
-  const ref    = b.reference || '—';
+  const fmtD  = d => d ? new Date(d+'T00:00:00').toLocaleDateString('en-GB',{weekday:'long',day:'2-digit',month:'long',year:'numeric'}) : '-';
+  const fmtDT = d => d ? new Date(d).toLocaleString('en-GB',{day:'2-digit',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'}) : '-';
+  const artist = b.artists?.name || '-';
+  const ref    = b.reference || '-';
 
   const row = (label, val) => val ? `<tr><td class="it-label">${label}</td><td class="it-val">${val}</td></tr>` : '';
 
   const win = window.open('', '_blank');
   win.document.write(`<!DOCTYPE html><html><head>
     <meta charset="UTF-8">
-    <title>Itinerary — ${artist} — ${fmtD(b.show_date)}</title>
+    <title>Itinerary - ${artist} - ${fmtD(b.show_date)}</title>
     <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@300;400;500&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
     <style>
       *{box-sizing:border-box;margin:0;padding:0;}
@@ -1190,10 +1190,10 @@ function printItinerary() {
     <div class="hero-box">
       <div><div class="hero-item-label">Artist</div><div class="hero-item-val">${artist}</div></div>
       <div><div class="hero-item-label">Show Date</div><div class="hero-item-val">${fmtD(b.show_date)}</div></div>
-      <div><div class="hero-item-label">Set Time</div><div class="hero-item-val">${adv?.set_time || b.set_time || '—'}</div></div>
-      <div><div class="hero-item-label">Venue</div><div class="hero-item-val">${b.venue_name || '—'}</div></div>
-      <div><div class="hero-item-label">City</div><div class="hero-item-val">${b.venue_city || '—'}, ${b.venue_country || '—'}</div></div>
-      <div><div class="hero-item-label">Capacity</div><div class="hero-item-val">${b.venue_capacity ? b.venue_capacity.toLocaleString() : '—'}</div></div>
+      <div><div class="hero-item-label">Set Time</div><div class="hero-item-val">${adv?.set_time || b.set_time || '-'}</div></div>
+      <div><div class="hero-item-label">Venue</div><div class="hero-item-val">${b.venue_name || '-'}</div></div>
+      <div><div class="hero-item-label">City</div><div class="hero-item-val">${b.venue_city || '-'}, ${b.venue_country || '-'}</div></div>
+      <div><div class="hero-item-label">Capacity</div><div class="hero-item-val">${b.venue_capacity ? b.venue_capacity.toLocaleString() : '-'}</div></div>
     </div>
 
     <div class="it-section">
@@ -1285,7 +1285,7 @@ function getStatusWarnings(booking, contracts, invoices, advancing, settlement) 
   const showDate = booking?.show_date;
   if (showDate && showDate < today && status !== 'completed' && status !== 'cancelled') {
     if (!settlement)
-      warnings.push({ level: 'red', text: 'Show passed — settlement pending' });
+      warnings.push({ level: 'red', text: 'Show passed - settlement pending' });
     else if (settlement.payouts?.[0]?.status !== 'paid')
       warnings.push({ level: 'amber', text: 'Payout not completed' });
   }

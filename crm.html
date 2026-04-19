@@ -77,7 +77,7 @@ header {
 .h-nav { display: flex; gap: 0; flex: 1; overflow-x: auto; scrollbar-width: none; min-width: 0; }
 .h-tab {
   padding: 0 10px; height: 48px; display: flex; align-items: center;
-  font-family: var(--mono); font-size: 9px; letter-spacing: 0.08em;
+  font-family: var(--mono); font-size: 9px; letter-spacing: 0.1em;
   text-transform: uppercase; color: rgba(255,255,255,0.4); cursor: pointer;
   border-bottom: 2px solid transparent; transition: all 0.15s;
   white-space: nowrap; flex-shrink: 0;
@@ -88,7 +88,7 @@ header {
 .h-user { font-family: var(--mono); font-size: 10px; color: rgba(255,255,255,0.4); white-space: nowrap; max-width: 160px; overflow: hidden; text-overflow: ellipsis; }
 .h-logout {
   background: none; border: 1px solid rgba(255,255,255,0.2); color: rgba(255,255,255,0.5);
-  padding: 5px 10px; font-family: var(--mono); font-size: 10px; letter-spacing: 0.08em;
+  padding: 5px 10px; font-family: var(--mono); font-size: 10px; letter-spacing: 0.1em;
   text-transform: uppercase; cursor: pointer; transition: all 0.15s; white-space: nowrap; flex-shrink: 0;
 }
 .h-logout:hover { border-color: rgba(255,255,255,0.5); color: #fff; }
@@ -172,7 +172,7 @@ tbody td { padding: 10px 14px; vertical-align: middle; }
 /* badges */
 .badge {
   display: inline-block; padding: 2px 7px; font-family: var(--mono);
-  font-size: 9px; letter-spacing: 0.08em; text-transform: uppercase;
+  font-size: 9px; letter-spacing: 0.1em; text-transform: uppercase;
   border: 1px solid; border-radius: 2px; white-space: nowrap;
 }
 .b-club      { color: #1a3a6b; border-color: #b5c8e8; background: #eef3fb; }
@@ -212,7 +212,7 @@ tbody td { padding: 10px 14px; vertical-align: middle; }
 .ra {
   background: none; border: 1px solid var(--border); color: var(--muted);
   padding: 3px 8px; font-family: var(--mono); font-size: 9px;
-  letter-spacing: 0.06em; cursor: pointer; transition: all 0.1s;
+  letter-spacing: 0.1em; cursor: pointer; transition: all 0.1s;
 }
 .ra:hover { border-color: var(--accent); color: var(--accent); background: var(--bg); }
 .ra.del:hover { border-color: var(--red); color: var(--red); }
@@ -249,7 +249,7 @@ tbody td { padding: 10px 14px; vertical-align: middle; }
 }
 .pipe-hdr {
   padding: 8px 12px; border-bottom: 1px solid var(--border);
-  font-family: var(--mono); font-size: 9px; letter-spacing: 0.12em;
+  font-family: var(--mono); font-size: 9px; letter-spacing: 0.1em;
   text-transform: uppercase; color: var(--muted);
   display: flex; justify-content: space-between; align-items: center;
 }
@@ -340,6 +340,19 @@ tbody td { padding: 10px 14px; vertical-align: middle; }
 .country-chip .cc-x { cursor: pointer; opacity: 0.6; font-size: 12px; }
 .country-chip .cc-x:hover { opacity: 1; }
 
+/* toggle group */
+.toggle-group {
+  display: inline-flex; gap: 0; border: 1px solid var(--border-dark);
+  font-family: var(--mono); font-size: 9px;
+}
+.toggle-btn {
+  padding: 2px 8px; font-size: 9px; border: none;
+  background: transparent; color: var(--muted); cursor: pointer;
+  font-family: var(--mono); letter-spacing: 0.1em; text-transform: uppercase;
+  transition: all 0.1s;
+}
+.toggle-btn.active { background: var(--accent); color: #fff; }
+
 /* searchable select */
 .ss-wrap { position: relative; }
 .ss-wrap input {
@@ -356,7 +369,7 @@ tbody td { padding: 10px 14px; vertical-align: middle; }
 .ss-dd {
   position: absolute; top: 100%; left: 0; right: 0; max-height: 200px; overflow-y: auto;
   background: #fff; border: 1px solid var(--border-dark); border-top: none; z-index: 60;
-  display: none; box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+  display: none;
 }
 .ss-dd.open { display: block; }
 .ss-dd div {
@@ -375,7 +388,7 @@ tbody td { padding: 10px 14px; vertical-align: middle; }
   display: flex; gap: 6px; margin-bottom: 20px; flex-wrap: wrap;
 }
 .status-btn {
-  padding: 5px 12px; font-family: var(--mono); font-size: 9px; letter-spacing: 0.08em;
+  padding: 5px 12px; font-family: var(--mono); font-size: 9px; letter-spacing: 0.1em;
   text-transform: uppercase; cursor: pointer; border: 1px solid var(--border);
   background: var(--bg); color: var(--muted); transition: all 0.15s;
 }
@@ -421,7 +434,7 @@ tbody td { padding: 10px 14px; vertical-align: middle; }
 .contract-status-signed    { color: #1a6b3c; border-color: #a8d5b8; background: #edf7f2; }
 .contract-status-cancelled { color: var(--red); border-color: #f0a8a8; background: #fdf0f0; }
 
-/* Contract editor overlay — fullscreen */
+/* Contract editor overlay - fullscreen */
 #contract-editor-overlay {
   position: fixed; inset: 0; background: var(--bg);
   z-index: 300; display: none; flex-direction: column;
@@ -432,7 +445,7 @@ tbody td { padding: 10px 14px; vertical-align: middle; }
   background: var(--accent); color: #fff; padding: 0 28px;
   display: flex; align-items: center; height: 52px; gap: 16px; flex-shrink: 0;
 }
-.ce-title { font-family: var(--mono); font-size: 11px; letter-spacing: 0.2em;
+.ce-title { font-family: var(--mono); font-size: 11px; letter-spacing: 0.15em;
             text-transform: uppercase; color: rgba(255,255,255,0.6); flex: 1; }
 .ce-title strong { color: #fff; }
 .ce-actions { display: flex; gap: 8px; }
@@ -450,7 +463,7 @@ tbody td { padding: 10px 14px; vertical-align: middle; }
 
 .ce-body { display: flex; flex: 1; overflow: hidden; }
 
-/* Left sidebar — contract settings */
+/* Left sidebar - contract settings */
 .ce-sidebar {
   width: 300px; flex-shrink: 0; background: var(--surface);
   border-right: 1px solid var(--border); overflow-y: auto; padding: 20px;
@@ -462,7 +475,7 @@ tbody td { padding: 10px 14px; vertical-align: middle; }
 }
 .ce-sidebar-section:first-child { margin-top: 0; }
 .ce-field { display: flex; flex-direction: column; gap: 4px; margin-bottom: 10px; }
-.ce-field label { font-family: var(--mono); font-size: 9px; letter-spacing: 0.08em;
+.ce-field label { font-family: var(--mono); font-size: 9px; letter-spacing: 0.1em;
                   text-transform: uppercase; color: var(--muted); }
 .ce-field input, .ce-field select, .ce-field textarea {
   border: 1px solid var(--border-dark); padding: 7px 9px; font-family: var(--sans);
@@ -486,7 +499,7 @@ tbody td { padding: 10px 14px; vertical-align: middle; }
 }
 .mf-pill:hover { background: #1a3a6b; color: #fff; border-color: #1a3a6b; }
 
-/* Right — contract preview/editor */
+/* Right - contract preview/editor */
 .ce-preview { flex: 1; overflow-y: auto; padding: 40px; background: var(--bg); }
 .ce-doc {
   max-width: 800px; margin: 0 auto; background: #fff;
@@ -497,7 +510,7 @@ tbody td { padding: 10px 14px; vertical-align: middle; }
 }
 .ce-doc-editable { outline: none; }
 .ce-doc h1 { font-size: 18px; font-weight: 500; text-align: center;
-             letter-spacing: 0.05em; margin-bottom: 6px; }
+             letter-spacing: 0.1em; margin-bottom: 6px; }
 .ce-doc h2 { font-size: 13px; font-weight: 500; text-transform: uppercase;
              letter-spacing: 0.1em; margin: 28px 0 10px;
              padding-bottom: 4px; border-bottom: 1px solid #e2ddd6; }
@@ -521,7 +534,7 @@ tbody td { padding: 10px 14px; vertical-align: middle; }
 .ce-doc .sig-block { margin-top: 48px; display: grid; grid-template-columns: 1fr 1fr; gap: 40px; }
 .ce-doc .sig-party { border-top: 1px solid #1a1a1a; padding-top: 12px; }
 .ce-doc .sig-label { font-family: 'DM Mono', monospace; font-size: 9px;
-                     letter-spacing: 0.12em; text-transform: uppercase; color: #8a8278; }
+                     letter-spacing: 0.1em; text-transform: uppercase; color: #8a8278; }
 .ce-doc .sig-name { font-weight: 500; margin-top: 32px; font-size: 12px; }
 .ce-doc .sig-title { font-size: 11px; color: #8a8278; }
 .ce-doc .highlight { background: #fffbea; padding: 0 2px; }
@@ -554,7 +567,7 @@ tbody td { padding: 10px 14px; vertical-align: middle; }
   background: var(--accent); color: #fff; padding: 0 28px;
   display: flex; align-items: center; height: 52px; gap: 16px; flex-shrink: 0;
 }
-.ie-title { font-family: var(--mono); font-size: 11px; letter-spacing: 0.2em;
+.ie-title { font-family: var(--mono); font-size: 11px; letter-spacing: 0.15em;
             text-transform: uppercase; color: rgba(255,255,255,0.6); flex: 1; }
 .ie-title strong { color: #fff; }
 .ie-actions { display: flex; gap: 8px; }
@@ -581,7 +594,7 @@ tbody td { padding: 10px 14px; vertical-align: middle; }
 }
 .ie-sidebar-section:first-child { margin-top: 0; }
 .ie-field { display: flex; flex-direction: column; gap: 4px; margin-bottom: 10px; }
-.ie-field label { font-family: var(--mono); font-size: 9px; letter-spacing: 0.08em;
+.ie-field label { font-family: var(--mono); font-size: 9px; letter-spacing: 0.1em;
                   text-transform: uppercase; color: var(--muted); }
 .ie-field input, .ie-field select, .ie-field textarea {
   border: 1px solid var(--border-dark); padding: 7px 9px; font-family: var(--sans);
@@ -618,7 +631,7 @@ tbody td { padding: 10px 14px; vertical-align: middle; }
                              color: #8a8278; margin-top: 4px; }
 
 .inv-parties { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; margin-bottom: 36px; }
-.inv-party-label { font-family: 'DM Mono', monospace; font-size: 9px; letter-spacing: 0.12em;
+.inv-party-label { font-family: 'DM Mono', monospace; font-size: 9px; letter-spacing: 0.1em;
                    text-transform: uppercase; color: #8a8278; margin-bottom: 8px; }
 .inv-party-name  { font-weight: 500; font-size: 14px; margin-bottom: 4px; }
 .inv-party-addr  { font-size: 12px; color: #444; line-height: 1.6; }
@@ -628,14 +641,14 @@ tbody td { padding: 10px 14px; vertical-align: middle; }
 .inv-ref-box { background: #f7f5f0; padding: 12px 16px; margin-bottom: 28px;
                border-left: 3px solid #1a1a1a; }
 .inv-ref-box .ref-label { font-family: 'DM Mono', monospace; font-size: 9px;
-                           letter-spacing: 0.12em; text-transform: uppercase;
+                           letter-spacing: 0.1em; text-transform: uppercase;
                            color: #8a8278; margin-bottom: 4px; }
 .inv-ref-box .ref-value { font-size: 13px; }
 
 .inv-lines { width: 100%; border-collapse: collapse; margin-bottom: 0; }
 .inv-lines thead th { background: #1a1a1a; color: rgba(255,255,255,0.8);
                       padding: 9px 12px; text-align: left; font-family: 'DM Mono', monospace;
-                      font-size: 9px; letter-spacing: 0.12em; text-transform: uppercase;
+                      font-size: 9px; letter-spacing: 0.1em; text-transform: uppercase;
                       font-weight: 400; }
 .inv-lines thead th:last-child { text-align: right; }
 .inv-lines tbody td { padding: 11px 12px; border-bottom: 1px solid #e2ddd6;
@@ -655,12 +668,12 @@ tbody td { padding: 10px 14px; vertical-align: middle; }
 
 .inv-bottom { margin-top: 40px; padding-top: 24px; border-top: 1px solid #e2ddd6; }
 .inv-payment-box { background: #f7f5f0; padding: 16px; margin-bottom: 16px; }
-.inv-payment-label { font-family: 'DM Mono', monospace; font-size: 9px; letter-spacing: 0.12em;
+.inv-payment-label { font-family: 'DM Mono', monospace; font-size: 9px; letter-spacing: 0.1em;
                      text-transform: uppercase; color: #8a8278; margin-bottom: 10px; }
 .inv-payment-row   { display: flex; gap: 24px; font-size: 12px; flex-wrap: wrap; }
 .inv-payment-item  { display: flex; flex-direction: column; gap: 2px; }
 .inv-payment-item .pi-label { font-family: 'DM Mono', monospace; font-size: 9px;
-                               color: #8a8278; text-transform: uppercase; letter-spacing: 0.08em; }
+                               color: #8a8278; text-transform: uppercase; letter-spacing: 0.1em; }
 .inv-payment-item .pi-val   { font-weight: 500; }
 .inv-vat-note { font-size: 11px; color: #8a8278; font-style: italic; margin-top: 8px; }
 .inv-due-box { background: #edf7f2; border: 1px solid #a8d5b8; padding: 12px 16px;
@@ -702,7 +715,7 @@ tbody td { padding: 10px 14px; vertical-align: middle; }
   background: var(--accent); color: #fff; padding: 0 28px;
   display: flex; align-items: center; height: 52px; gap: 16px; flex-shrink: 0;
 }
-.adv-title { font-family: var(--mono); font-size: 11px; letter-spacing: 0.2em;
+.adv-title { font-family: var(--mono); font-size: 11px; letter-spacing: 0.15em;
              text-transform: uppercase; color: rgba(255,255,255,0.6); flex: 1; }
 .adv-title strong { color: #fff; }
 .adv-actions { display: flex; gap: 8px; }
@@ -738,7 +751,7 @@ tbody td { padding: 10px 14px; vertical-align: middle; }
 }
 .adv-section-hdr {
   padding: 12px 16px; background: var(--accent); color: #fff;
-  font-family: var(--mono); font-size: 10px; letter-spacing: 0.12em;
+  font-family: var(--mono); font-size: 10px; letter-spacing: 0.1em;
   text-transform: uppercase; display: flex; justify-content: space-between; align-items: center;
 }
 .adv-section-hdr .adv-lock {
@@ -756,7 +769,7 @@ tbody td { padding: 10px 14px; vertical-align: middle; }
 .adv-field:nth-child(even) { border-right: none; }
 .adv-field.full { grid-column: 1/-1; border-right: none; }
 .adv-field label {
-  font-family: var(--mono); font-size: 9px; letter-spacing: 0.08em;
+  font-family: var(--mono); font-size: 9px; letter-spacing: 0.1em;
   text-transform: uppercase; color: var(--muted); display: block; margin-bottom: 4px;
 }
 .adv-field input, .adv-field select, .adv-field textarea {
@@ -867,7 +880,7 @@ tbody td { padding: 10px 14px; vertical-align: middle; }
 /* Line header row */
 .fin-line-col-hdr { display:grid; grid-template-columns:160px repeat(12,62px) 80px 24px;
                     border-bottom:1px solid var(--border); background:var(--bg); overflow-x:auto; }
-.fin-line-col-hdr > div { padding:5px 4px; font-family:var(--mono); font-size:9px; letter-spacing:0.08em;
+.fin-line-col-hdr > div { padding:5px 4px; font-family:var(--mono); font-size:9px; letter-spacing:0.1em;
                            text-transform:uppercase; color:var(--muted); text-align:center; }
 .fin-line-col-hdr > div:first-child { text-align:left; padding-left:36px; }
 
@@ -932,13 +945,13 @@ tbody td { padding: 10px 14px; vertical-align: middle; }
 .cal-artist-filter { margin-left:auto; display:flex; gap:6px; flex-wrap:wrap; align-items:center; }
 .cal-legend { display:flex; gap:16px; align-items:center; }
 .cal-legend-item { display:flex; align-items:center; gap:5px; font-family:var(--mono); font-size:9px;
-                   letter-spacing:0.08em; text-transform:uppercase; color:var(--muted); }
+                   letter-spacing:0.1em; text-transform:uppercase; color:var(--muted); }
 .cal-legend-dot { width:10px; height:10px; border-radius:50%; }
 
 .cal-grid { display:grid; grid-template-columns:repeat(7,1fr); gap:1px;
             background:var(--border); border:1px solid var(--border); }
 .cal-day-hdr { background:var(--accent); color:rgba(255,255,255,0.6); padding:8px 10px;
-               font-family:var(--mono); font-size:9px; letter-spacing:0.12em; text-transform:uppercase;
+               font-family:var(--mono); font-size:9px; letter-spacing:0.1em; text-transform:uppercase;
                text-align:center; }
 .cal-day {
   background:var(--surface); min-height:110px; padding:6px;
@@ -1034,7 +1047,7 @@ tbody td { padding: 10px 14px; vertical-align: middle; }
 /* Statement */
 .stmt-doc { background:#fff; max-width:700px; margin:0 auto; padding:40px; font-family:var(--sans); font-size:13px; }
 .stmt-hdr { display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:32px; border-bottom:2px solid var(--accent); padding-bottom:20px; }
-.stmt-brand { font-family:var(--mono); font-size:11px; letter-spacing:0.2em; text-transform:uppercase; color:var(--accent); }
+.stmt-brand { font-family:var(--mono); font-size:11px; letter-spacing:0.15em; text-transform:uppercase; color:var(--accent); }
 .stmt-title { font-size:20px; font-weight:300; color:var(--accent); margin-top:8px; }
 .stmt-table { width:100%; border-collapse:collapse; margin-top:16px; font-size:11px; }
 .stmt-table th { font-family:var(--mono); font-size:9px; letter-spacing:0.1em; text-transform:uppercase;
@@ -1119,7 +1132,7 @@ tbody td { padding: 10px 14px; vertical-align: middle; }
 .wiz-header {
   background:var(--accent);padding:16px 24px;display:flex;justify-content:space-between;align-items:center;
 }
-.wiz-header-title { font-family:var(--mono);font-size:11px;letter-spacing:0.2em;text-transform:uppercase;color:rgba(255,255,255,0.7); }
+.wiz-header-title { font-family:var(--mono);font-size:11px;letter-spacing:0.15em;text-transform:uppercase;color:rgba(255,255,255,0.7); }
 .wiz-header-close { background:none;border:none;color:rgba(255,255,255,0.5);font-size:20px;cursor:pointer; }
 .wiz-header-close:hover { color:#fff; }
 
@@ -1153,7 +1166,7 @@ tbody td { padding: 10px 14px; vertical-align: middle; }
 .wiz-select-or-create { display:flex;gap:8px;margin-bottom:16px;align-items:center; }
 .wiz-toggle { display:flex;border:1px solid var(--border);overflow:hidden; }
 .wiz-toggle-btn {
-  padding:6px 14px;font-family:var(--mono);font-size:10px;letter-spacing:0.08em;
+  padding:6px 14px;font-family:var(--mono);font-size:10px;letter-spacing:0.1em;
   cursor:pointer;border:none;background:var(--bg);color:var(--muted);transition:all 0.1s;
 }
 .wiz-toggle-btn.active { background:var(--accent);color:#fff; }
@@ -1168,7 +1181,7 @@ tbody td { padding: 10px 14px; vertical-align: middle; }
 /* toast */
 #toast {
   position: fixed; bottom: 24px; right: 24px; padding: 12px 20px;
-  font-family: var(--mono); font-size: 11px; letter-spacing: 0.05em;
+  font-family: var(--mono); font-size: 11px; letter-spacing: 0.1em;
   display: none; z-index: 999; border-top: 2px solid;
   background: var(--surface); box-shadow: 0 4px 20px rgba(0,0,0,0.1);
 }
@@ -1186,7 +1199,7 @@ tbody td { padding: 10px 14px; vertical-align: middle; }
 .doc-item .doc-icon { font-size: 16px; flex-shrink: 0; }
 .doc-item .doc-name { flex: 1; font-family: var(--mono); font-size: 11px; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .doc-item .doc-type {
-  font-family: var(--mono); font-size: 9px; letter-spacing: 0.08em;
+  font-family: var(--mono); font-size: 9px; letter-spacing: 0.1em;
   text-transform: uppercase; padding: 2px 6px; border: 1px solid var(--border);
   background: var(--surface); color: var(--muted); flex-shrink: 0;
 }
@@ -1211,7 +1224,7 @@ tbody td { padding: 10px 14px; vertical-align: middle; }
 .audit-row:hover { background: var(--bg); }
 .audit-row .audit-time { font-family: var(--mono); font-size: 10px; color: var(--muted); }
 .audit-row .audit-type {
-  font-family: var(--mono); font-size: 9px; letter-spacing: 0.06em;
+  font-family: var(--mono); font-size: 9px; letter-spacing: 0.1em;
   text-transform: uppercase; padding: 2px 6px; border: 1px solid var(--border);
   background: var(--bg); text-align: center; white-space: nowrap;
 }
@@ -1238,7 +1251,7 @@ tbody td { padding: 10px 14px; vertical-align: middle; }
 .dup-card .dup-name { font-weight: 500; font-size: 13px; }
 .dup-card .dup-meta { font-family: var(--mono); font-size: 10px; color: var(--muted); margin-top: 2px; }
 .dup-card .dup-badge {
-  font-family: var(--mono); font-size: 9px; letter-spacing: 0.06em;
+  font-family: var(--mono); font-size: 9px; letter-spacing: 0.1em;
   text-transform: uppercase; padding: 2px 8px; border: 1px solid var(--border);
   background: var(--bg); flex-shrink: 0;
 }
@@ -1272,7 +1285,7 @@ tbody td { padding: 10px 14px; vertical-align: middle; }
 .team-card .tc-name { font-weight: 500; font-size: 13px; }
 .team-card .tc-email { font-family: var(--mono); font-size: 10px; color: var(--muted); }
 .team-card .tc-role {
-  font-family: var(--mono); font-size: 10px; letter-spacing: 0.08em;
+  font-family: var(--mono); font-size: 10px; letter-spacing: 0.1em;
   text-transform: uppercase; padding: 3px 8px; border: 1px solid var(--border);
   background: var(--bg);
 }
@@ -1324,7 +1337,7 @@ tbody td { padding: 10px 14px; vertical-align: middle; }
 .rbac-no-edit button[onclick*="Delete"],
 .rbac-no-edit button[onclick*="Del"] { opacity: 0.3; pointer-events: none; }
 .rbac-badge {
-  font-family: var(--mono); font-size: 9px; letter-spacing: 0.08em;
+  font-family: var(--mono); font-size: 9px; letter-spacing: 0.1em;
   text-transform: uppercase; padding: 2px 6px; border-radius: 2px;
   margin-left: 8px;
 }
@@ -1387,29 +1400,29 @@ tbody td { padding: 10px 14px; vertical-align: middle; }
       <div class="stats" style="grid-template-columns:repeat(6,1fr);margin-bottom:20px">
         <div class="stat red">
           <div class="stat-lbl">Pipeline Value</div>
-          <div class="stat-val" id="db-pipeline">—</div>
+          <div class="stat-val" id="db-pipeline">-</div>
           <div class="stat-sub">EUR confirmed</div>
         </div>
         <div class="stat green">
           <div class="stat-lbl">Confirmed Shows</div>
-          <div class="stat-val" id="db-confirmed">—</div>
+          <div class="stat-val" id="db-confirmed">-</div>
         </div>
         <div class="stat blue">
           <div class="stat-lbl">Next 30 Days</div>
-          <div class="stat-val" id="db-30days">—</div>
+          <div class="stat-val" id="db-30days">-</div>
         </div>
         <div class="stat amber">
           <div class="stat-lbl">Open Invoices</div>
-          <div class="stat-val" id="db-invoices-open">—</div>
+          <div class="stat-val" id="db-invoices-open">-</div>
           <div class="stat-sub" id="db-invoices-val"></div>
         </div>
         <div class="stat">
           <div class="stat-lbl">Unsigned Contracts</div>
-          <div class="stat-val" id="db-contracts-unsigned">—</div>
+          <div class="stat-val" id="db-contracts-unsigned">-</div>
         </div>
         <div class="stat">
           <div class="stat-lbl">Advancing Open</div>
-          <div class="stat-val" id="db-advancing-open">—</div>
+          <div class="stat-val" id="db-advancing-open">-</div>
         </div>
       </div>
 
@@ -1418,7 +1431,7 @@ tbody td { padding: 10px 14px; vertical-align: middle; }
         <!-- Upcoming shows -->
         <div class="tbl-wrap">
           <div style="background:var(--accent);padding:10px 14px;font-family:var(--mono);font-size:9px;letter-spacing:0.15em;text-transform:uppercase;color:rgba(255,255,255,0.7)">
-            Upcoming Shows — Next 90 Days
+            Upcoming Shows - Next 90 Days
           </div>
           <table>
             <thead>
@@ -1500,11 +1513,11 @@ tbody td { padding: 10px 14px; vertical-align: middle; }
       <!-- COMPANIES VIEW -->
       <div id="cv-companies">
         <div class="stats" id="org-stats">
-          <div class="stat red"><div class="stat-lbl">Total</div><div class="stat-val" id="s-total">—</div></div>
-          <div class="stat blue"><div class="stat-lbl">Clubs</div><div class="stat-val" id="s-clubs">—</div></div>
-          <div class="stat green"><div class="stat-lbl">Festivals</div><div class="stat-val" id="s-fests">—</div></div>
-          <div class="stat"><div class="stat-lbl">Promoters</div><div class="stat-val" id="s-proms">—</div></div>
-          <div class="stat"><div class="stat-lbl">Countries</div><div class="stat-val" id="s-countries">—</div></div>
+          <div class="stat red"><div class="stat-lbl">Total</div><div class="stat-val" id="s-total">-</div></div>
+          <div class="stat blue"><div class="stat-lbl">Clubs</div><div class="stat-val" id="s-clubs">-</div></div>
+          <div class="stat green"><div class="stat-lbl">Festivals</div><div class="stat-val" id="s-fests">-</div></div>
+          <div class="stat"><div class="stat-lbl">Promoters</div><div class="stat-val" id="s-proms">-</div></div>
+          <div class="stat"><div class="stat-lbl">Countries</div><div class="stat-val" id="s-countries">-</div></div>
         </div>
         <div class="toolbar">
           <input class="tb-search" type="text" id="org-search" placeholder="Search name, city..." oninput="filterOrgs()">
@@ -1543,11 +1556,11 @@ tbody td { padding: 10px 14px; vertical-align: middle; }
       <!-- PEOPLE VIEW -->
       <div id="cv-people" style="display:none">
         <div class="stats">
-          <div class="stat red"><div class="stat-lbl">Total Contacts</div><div class="stat-val" id="sc-total">—</div></div>
-          <div class="stat green"><div class="stat-lbl">Mailchimp Synced</div><div class="stat-val" id="sc-synced">—</div></div>
-          <div class="stat blue"><div class="stat-lbl">Manual</div><div class="stat-val" id="sc-manual">—</div></div>
-          <div class="stat"><div class="stat-lbl">Imported</div><div class="stat-val" id="sc-import">—</div></div>
-          <div class="stat"><div class="stat-lbl">Claude</div><div class="stat-val" id="sc-claude">—</div></div>
+          <div class="stat red"><div class="stat-lbl">Total Contacts</div><div class="stat-val" id="sc-total">-</div></div>
+          <div class="stat green"><div class="stat-lbl">Mailchimp Synced</div><div class="stat-val" id="sc-synced">-</div></div>
+          <div class="stat blue"><div class="stat-lbl">Manual</div><div class="stat-val" id="sc-manual">-</div></div>
+          <div class="stat"><div class="stat-lbl">Imported</div><div class="stat-val" id="sc-import">-</div></div>
+          <div class="stat"><div class="stat-lbl">Claude</div><div class="stat-val" id="sc-claude">-</div></div>
         </div>
         <div class="toolbar">
           <input class="tb-search" type="text" id="con-search" placeholder="Search name, email..." oninput="filterContacts()">
@@ -1585,10 +1598,10 @@ tbody td { padding: 10px 14px; vertical-align: middle; }
     <!-- ── VENUES PANEL ── -->
     <div class="panel" id="panel-venues">
       <div class="stats">
-        <div class="stat red"><div class="stat-lbl">Total Projects</div><div class="stat-val" id="sv-total">—</div></div>
-        <div class="stat blue"><div class="stat-lbl">Clubs</div><div class="stat-val" id="sv-clubs">—</div></div>
-        <div class="stat green"><div class="stat-lbl">Festivals</div><div class="stat-val" id="sv-fests">—</div></div>
-        <div class="stat"><div class="stat-lbl">Countries</div><div class="stat-val" id="sv-countries">—</div></div>
+        <div class="stat red"><div class="stat-lbl">Total Projects</div><div class="stat-val" id="sv-total">-</div></div>
+        <div class="stat blue"><div class="stat-lbl">Clubs</div><div class="stat-val" id="sv-clubs">-</div></div>
+        <div class="stat green"><div class="stat-lbl">Festivals</div><div class="stat-val" id="sv-fests">-</div></div>
+        <div class="stat"><div class="stat-lbl">Countries</div><div class="stat-val" id="sv-countries">-</div></div>
       </div>
       <div class="toolbar">
         <input class="tb-search" type="text" id="venue-search" placeholder="Search project, city..." oninput="filterVenues()">
@@ -1629,7 +1642,7 @@ tbody td { padding: 10px 14px; vertical-align: middle; }
     <!-- ── ARTISTS PANEL ── -->
     <div class="panel" id="panel-artists">
       <div class="stats">
-        <div class="stat red"><div class="stat-lbl">Total Artists</div><div class="stat-val" id="sa-total">—</div></div>
+        <div class="stat red"><div class="stat-lbl">Total Artists</div><div class="stat-val" id="sa-total">-</div></div>
       </div>
       <div class="toolbar">
         <input class="tb-search" type="text" id="artist-search" placeholder="Search artist..." oninput="renderArtists()">
@@ -1652,24 +1665,24 @@ tbody td { padding: 10px 14px; vertical-align: middle; }
       <div class="stats">
         <div class="stat red">
           <div class="stat-lbl">Total Bookings</div>
-          <div class="stat-val" id="sb-total">—</div>
+          <div class="stat-val" id="sb-total">-</div>
         </div>
         <div class="stat blue">
           <div class="stat-lbl">Confirmed</div>
-          <div class="stat-val" id="sb-confirmed">—</div>
+          <div class="stat-val" id="sb-confirmed">-</div>
         </div>
         <div class="stat green">
           <div class="stat-lbl">Pipeline Value</div>
-          <div class="stat-val" id="sb-value">—</div>
+          <div class="stat-val" id="sb-value">-</div>
           <div class="stat-sub">EUR confirmed</div>
         </div>
         <div class="stat amber">
           <div class="stat-lbl">This Month</div>
-          <div class="stat-val" id="sb-month">—</div>
+          <div class="stat-val" id="sb-month">-</div>
         </div>
         <div class="stat">
           <div class="stat-lbl">Open Holds</div>
-          <div class="stat-val" id="sb-holds">—</div>
+          <div class="stat-val" id="sb-holds">-</div>
         </div>
       </div>
 
@@ -1772,23 +1785,23 @@ tbody td { padding: 10px 14px; vertical-align: middle; }
       <div class="stats">
         <div class="stat red">
           <div class="stat-lbl">Total Contracts</div>
-          <div class="stat-val" id="sct-total">—</div>
+          <div class="stat-val" id="sct-total">-</div>
         </div>
         <div class="stat blue">
           <div class="stat-lbl">Sent</div>
-          <div class="stat-val" id="sct-sent">—</div>
+          <div class="stat-val" id="sct-sent">-</div>
         </div>
         <div class="stat green">
           <div class="stat-lbl">Signed</div>
-          <div class="stat-val" id="sct-signed">—</div>
+          <div class="stat-val" id="sct-signed">-</div>
         </div>
         <div class="stat amber">
           <div class="stat-lbl">Draft</div>
-          <div class="stat-val" id="sct-draft">—</div>
+          <div class="stat-val" id="sct-draft">-</div>
         </div>
         <div class="stat">
           <div class="stat-lbl">Cancelled</div>
-          <div class="stat-val" id="sct-cancelled">—</div>
+          <div class="stat-val" id="sct-cancelled">-</div>
         </div>
       </div>
 
@@ -1835,24 +1848,24 @@ tbody td { padding: 10px 14px; vertical-align: middle; }
       <div class="stats">
         <div class="stat red">
           <div class="stat-lbl">Total Invoices</div>
-          <div class="stat-val" id="si-total">—</div>
+          <div class="stat-val" id="si-total">-</div>
         </div>
         <div class="stat blue">
           <div class="stat-lbl">Sent</div>
-          <div class="stat-val" id="si-sent">—</div>
+          <div class="stat-val" id="si-sent">-</div>
         </div>
         <div class="stat green">
           <div class="stat-lbl">Paid</div>
-          <div class="stat-val" id="si-paid">—</div>
+          <div class="stat-val" id="si-paid">-</div>
         </div>
         <div class="stat amber">
           <div class="stat-lbl">Outstanding</div>
-          <div class="stat-val" id="si-outstanding">—</div>
+          <div class="stat-val" id="si-outstanding">-</div>
           <div class="stat-sub">EUR open</div>
         </div>
         <div class="stat">
           <div class="stat-lbl">Overdue</div>
-          <div class="stat-val" id="si-overdue">—</div>
+          <div class="stat-val" id="si-overdue">-</div>
         </div>
       </div>
 
@@ -1906,23 +1919,23 @@ tbody td { padding: 10px 14px; vertical-align: middle; }
       <div class="stats">
         <div class="stat red">
           <div class="stat-lbl">Total</div>
-          <div class="stat-val" id="sadv-total">—</div>
+          <div class="stat-val" id="sadv-total">-</div>
         </div>
         <div class="stat amber">
           <div class="stat-lbl">In Progress</div>
-          <div class="stat-val" id="sadv-progress">—</div>
+          <div class="stat-val" id="sadv-progress">-</div>
         </div>
         <div class="stat green">
           <div class="stat-lbl">Completed</div>
-          <div class="stat-val" id="sadv-done">—</div>
+          <div class="stat-val" id="sadv-done">-</div>
         </div>
         <div class="stat blue">
           <div class="stat-lbl">Not Started</div>
-          <div class="stat-val" id="sadv-new">—</div>
+          <div class="stat-val" id="sadv-new">-</div>
         </div>
         <div class="stat">
           <div class="stat-lbl">Shared w/ Artist</div>
-          <div class="stat-val" id="sadv-shared">—</div>
+          <div class="stat-val" id="sadv-shared">-</div>
         </div>
       </div>
 
@@ -1982,32 +1995,32 @@ tbody td { padding: 10px 14px; vertical-align: middle; }
       <div class="fin-grid">
         <div class="fin-card green">
           <div class="fin-card-lbl">Total Revenue (Commission)</div>
-          <div class="fin-card-val" id="fin-revenue">€ —</div>
+          <div class="fin-card-val" id="fin-revenue">€ -</div>
           <div class="fin-card-sub" id="fin-revenue-sub">from confirmed bookings</div>
         </div>
         <div class="fin-card red">
           <div class="fin-card-lbl">Total Expenses</div>
-          <div class="fin-card-val" id="fin-expenses">€ —</div>
+          <div class="fin-card-val" id="fin-expenses">€ -</div>
           <div class="fin-card-sub" id="fin-expenses-sub">fixed costs this year</div>
         </div>
         <div class="fin-card blue">
           <div class="fin-card-lbl">Net Profit / Loss</div>
-          <div class="fin-card-val" id="fin-profit">€ —</div>
+          <div class="fin-card-val" id="fin-profit">€ -</div>
           <div class="fin-card-sub" id="fin-profit-sub">revenue minus expenses</div>
         </div>
         <div class="fin-card">
           <div class="fin-card-lbl">Pipeline (unconfirmed)</div>
-          <div class="fin-card-val" id="fin-pipeline">€ —</div>
+          <div class="fin-card-val" id="fin-pipeline">€ -</div>
           <div class="fin-card-sub">potential commission</div>
         </div>
         <div class="fin-card">
           <div class="fin-card-lbl">Avg Commission / Show</div>
-          <div class="fin-card-val" id="fin-avg">€ —</div>
+          <div class="fin-card-val" id="fin-avg">€ -</div>
           <div class="fin-card-sub" id="fin-avg-sub">confirmed shows</div>
         </div>
         <div class="fin-card amber">
           <div class="fin-card-lbl">Outstanding Invoices</div>
-          <div class="fin-card-val" id="fin-outstanding">€ —</div>
+          <div class="fin-card-val" id="fin-outstanding">€ -</div>
           <div class="fin-card-sub">sent, not yet paid</div>
         </div>
       </div>
@@ -2018,7 +2031,7 @@ tbody td { padding: 10px 14px; vertical-align: middle; }
         <!-- Monthly P&L table -->
         <div>
           <div class="fin-pl-table">
-            <div class="fin-pl-hdr">Monthly P&L — <span id="fin-pl-year">2026</span></div>
+            <div class="fin-pl-hdr">Monthly P&L - <span id="fin-pl-year">2026</span></div>
             <div class="fin-pl-row" style="background:var(--bg)">
               <div class="fin-pl-month" style="font-weight:500">Month</div>
               <div class="fin-pl-num" style="color:var(--muted);font-size:9px">REVENUE</div>
@@ -2028,9 +2041,9 @@ tbody td { padding: 10px 14px; vertical-align: middle; }
             <div id="fin-pl-rows"></div>
             <div class="fin-pl-row total" id="fin-pl-total">
               <div class="fin-pl-month">TOTAL</div>
-              <div class="fin-pl-num" id="fin-pl-total-rev">—</div>
-              <div class="fin-pl-num" id="fin-pl-total-exp">—</div>
-              <div class="fin-pl-num" id="fin-pl-total-net">—</div>
+              <div class="fin-pl-num" id="fin-pl-total-rev">-</div>
+              <div class="fin-pl-num" id="fin-pl-total-exp">-</div>
+              <div class="fin-pl-num" id="fin-pl-total-net">-</div>
             </div>
           </div>
         </div>
@@ -2039,7 +2052,7 @@ tbody td { padding: 10px 14px; vertical-align: middle; }
         <div>
           <div class="fin-ledger">
             <div class="fin-ledger-hdr">
-              <span>Cost Ledger — <span id="fin-exp-year">2026</span></span>
+              <span>Cost Ledger - <span id="fin-exp-year">2026</span></span>
               <span style="font-size:9px;opacity:0.6">Click category to expand · Click amounts to edit</span>
             </div>
             <div id="fin-ledger-body" style="overflow-x:auto"></div>
@@ -2052,7 +2065,7 @@ tbody td { padding: 10px 14px; vertical-align: middle; }
       <!-- Per artist breakdown -->
       <div class="tbl-wrap">
         <div style="background:var(--accent);padding:10px 14px;display:flex;justify-content:space-between;align-items:center;">
-          <span style="font-family:var(--mono);font-size:9px;letter-spacing:0.15em;text-transform:uppercase;color:rgba(255,255,255,0.7)">Revenue by Artist — <span id="fin-artist-year">2026</span></span>
+          <span style="font-family:var(--mono);font-size:9px;letter-spacing:0.15em;text-transform:uppercase;color:rgba(255,255,255,0.7)">Revenue by Artist - <span id="fin-artist-year">2026</span></span>
           <button class="btn" onclick="exportPLPerArtist()" style="padding:4px 12px;font-size:9px;border-color:rgba(255,255,255,0.3);color:rgba(255,255,255,0.7)">↓ Export</button>
         </div>
         <table>
@@ -2068,7 +2081,7 @@ tbody td { padding: 10px 14px; vertical-align: middle; }
       <!-- P&L per artiest uitgebreid -->
       <div class="tbl-wrap" style="margin-top:12px;" id="fin-pl-artist-wrap">
         <div style="background:var(--accent);padding:10px 14px;font-family:var(--mono);font-size:9px;letter-spacing:0.15em;text-transform:uppercase;color:rgba(255,255,255,0.7)">
-          P&L per Artiest — Maandoverzicht — <span id="fin-pl-artist-year">2026</span>
+          P&L per Artiest - Maandoverzicht - <span id="fin-pl-artist-year">2026</span>
         </div>
         <div id="fin-pl-artist-body" style="overflow-x:auto;"></div>
       </div>
@@ -2078,7 +2091,7 @@ tbody td { padding: 10px 14px; vertical-align: middle; }
         <div class="tbl-wrap">
           <div style="background:var(--accent);padding:10px 14px;display:flex;justify-content:space-between;align-items:center">
             <span style="font-family:var(--mono);font-size:9px;letter-spacing:0.15em;text-transform:uppercase;color:rgba(255,255,255,0.7)">
-              BTW / VAT Rapportage — <span id="fin-vat-year">2026</span>
+              BTW / VAT Rapportage - <span id="fin-vat-year">2026</span>
             </span>
             <button class="btn" onclick="exportVAT()" style="padding:4px 12px;font-size:9px;border-color:rgba(255,255,255,0.3);color:rgba(255,255,255,0.7)">↓ Export voor boekhouder</button>
             <button class="btn" onclick="exportOBAangifte()" style="padding:4px 12px;font-size:9px;border-color:rgba(255,165,0,0.6);color:rgba(255,165,0,0.9)">↓ OB-Aangifte Rubrieken</button>
@@ -2104,7 +2117,7 @@ tbody td { padding: 10px 14px; vertical-align: middle; }
         <!-- VAT detail per invoice -->
         <div class="tbl-wrap" style="margin-top:12px">
           <div style="background:var(--accent);padding:10px 14px;font-family:var(--mono);font-size:9px;letter-spacing:0.15em;text-transform:uppercase;color:rgba(255,255,255,0.7)">
-            Factuurdetail BTW — <span id="fin-vat-detail-year">2026</span>
+            Factuurdetail BTW - <span id="fin-vat-detail-year">2026</span>
           </div>
           <table>
             <thead>
@@ -2122,7 +2135,7 @@ tbody td { padding: 10px 14px; vertical-align: middle; }
         <div class="tbl-wrap">
           <div style="background:var(--accent);padding:10px 14px;display:flex;justify-content:space-between;align-items:center">
             <span style="font-family:var(--mono);font-size:9px;letter-spacing:0.15em;text-transform:uppercase;color:rgba(255,255,255,0.7)">
-              Cashflow — Verwacht vs Ontvangen — <span id="fin-cf-year">2026</span>
+              Cashflow - Verwacht vs Ontvangen - <span id="fin-cf-year">2026</span>
             </span>
             <button class="btn" onclick="exportCashflow()" style="padding:4px 12px;font-size:9px;border-color:rgba(255,255,255,0.3);color:rgba(255,255,255,0.7)">↓ Export</button>
           </div>
@@ -2146,7 +2159,7 @@ tbody td { padding: 10px 14px; vertical-align: middle; }
         <!-- Upcoming payments -->
         <div class="tbl-wrap" style="margin-top:12px">
           <div style="background:var(--accent);padding:10px 14px;font-family:var(--mono);font-size:9px;letter-spacing:0.15em;text-transform:uppercase;color:rgba(255,255,255,0.7)">
-            Aankomende Betalingen — Openstaande Facturen
+            Aankomende Betalingen - Openstaande Facturen
           </div>
           <table>
             <thead>
@@ -2161,7 +2174,7 @@ tbody td { padding: 10px 14px; vertical-align: middle; }
         <!-- Comments overview -->
         <div class="tbl-wrap" style="margin-top:12px">
           <div style="background:var(--accent);padding:10px 14px;font-family:var(--mono);font-size:9px;letter-spacing:0.15em;text-transform:uppercase;color:rgba(255,255,255,0.7)">
-            Facturen met Comments — Intern Overzicht
+            Facturen met Comments - Intern Overzicht
           </div>
           <table>
             <thead>
@@ -2281,7 +2294,7 @@ tbody td { padding: 10px 14px; vertical-align: middle; }
 
       <!-- Availability strip -->
       <div class="cal-avail" id="cal-avail-section">
-        <div class="cal-avail-hdr">Artist Availability — <span id="cal-avail-month"></span></div>
+        <div class="cal-avail-hdr">Artist Availability - <span id="cal-avail-month"></span></div>
         <div id="cal-avail-rows"></div>
       </div>
 
@@ -2333,15 +2346,15 @@ tbody td { padding: 10px 14px; vertical-align: middle; }
 
       <!-- Edit rule modal inline -->
       <div id="rem-edit-panel" style="display:none;background:var(--surface);border:1px solid var(--border);padding:24px;margin-bottom:20px">
-        <div style="font-family:var(--mono);font-size:10px;font-weight:500;color:var(--accent);margin-bottom:16px">Edit Rule — <span id="rem-edit-type"></span></div>
+        <div style="font-family:var(--mono);font-size:10px;font-weight:500;color:var(--accent);margin-bottom:16px">Edit Rule - <span id="rem-edit-type"></span></div>
         <input type="hidden" id="rem-edit-id">
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px">
           <div class="fg"><label>Trigger after (days)</label>
             <input type="number" id="rem-edit-days" min="1" max="90" placeholder="7"></div>
           <div class="fg"><label>Enabled</label>
             <select id="rem-edit-enabled">
-              <option value="true">Yes — active</option>
-              <option value="false">No — disabled</option>
+              <option value="true">Yes - active</option>
+              <option value="false">No - disabled</option>
             </select></div>
         </div>
         <div class="fg" style="margin-bottom:12px"><label>Email Subject</label>
@@ -2361,7 +2374,7 @@ tbody td { padding: 10px 14px; vertical-align: middle; }
       <!-- Log -->
       <div class="tbl-wrap">
         <div style="background:var(--accent);padding:10px 14px;font-family:var(--mono);font-size:9px;letter-spacing:0.15em;text-transform:uppercase;color:rgba(255,255,255,0.7)">
-          Reminder Log — Recent
+          Reminder Log - Recent
         </div>
         <table>
           <thead>
@@ -2380,7 +2393,7 @@ tbody td { padding: 10px 14px; vertical-align: middle; }
          TOURS PANEL
     ═══════════════════════════════════════════════ -->
     <!-- ══════════════════════════════════════════
-         TOURS — shadow agenda
+         TOURS - shadow agenda
     ══════════════════════════════════════════ -->
     <div class="panel" id="panel-tours">
       <!-- Top bar -->
@@ -2488,7 +2501,7 @@ tbody td { padding: 10px 14px; vertical-align: middle; }
     <div class="overlay" id="add-dates-modal">
       <div class="modal" style="width:680px;max-height:85vh;overflow-y:auto;">
         <div class="modal-hdr">
-          <span>Add Dates — <span id="adm-artist-name" style="color:var(--muted);font-weight:400;"></span></span>
+          <span>Add Dates - <span id="adm-artist-name" style="color:var(--muted);font-weight:400;"></span></span>
           <button class="modal-close" onclick="closeModal('add-dates-modal')">✕</button>
         </div>
 
@@ -2506,7 +2519,7 @@ tbody td { padding: 10px 14px; vertical-align: middle; }
 
         <!-- Fields for selected dates -->
         <div style="border-top:1px solid var(--border);padding-top:16px;margin-bottom:16px;">
-          <div style="font-family:var(--mono);font-size:9px;letter-spacing:0.12em;text-transform:uppercase;color:var(--muted);margin-bottom:12px;">
+          <div style="font-family:var(--mono);font-size:9px;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);margin-bottom:12px;">
             Default values for selected dates (can edit per date after saving)
           </div>
           <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;">
@@ -2612,7 +2625,7 @@ tbody td { padding: 10px 14px; vertical-align: middle; }
     </div>
 
     <!-- ══════════════════════════════════════════
-         SALES BOARD — vaste klantenpoel per artiest
+         SALES BOARD - vaste klantenpoel per artiest
     ══════════════════════════════════════════ -->
     <div class="panel" id="panel-pipeline">
       <div class="tb-bar" style="flex-wrap:wrap;gap:10px;">
@@ -2661,7 +2674,7 @@ tbody td { padding: 10px 14px; vertical-align: middle; }
       </div>
     </div>
 
-    <!-- Tour Date Detail — slide-in panel showing artist pool for a date -->
+    <!-- Tour Date Detail - slide-in panel showing artist pool for a date -->
     <div id="tour-date-panel" style="display:none;position:fixed;top:0;right:0;width:520px;height:100vh;background:var(--surface);border-left:1px solid var(--border);z-index:300;overflow-y:auto;box-shadow:-4px 0 20px rgba(0,0,0,0.1);">
       <div style="background:var(--accent);padding:16px 20px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:1;">
         <div>
@@ -2681,8 +2694,8 @@ tbody td { padding: 10px 14px; vertical-align: middle; }
       <!-- Pool section -->
       <div style="padding:14px 20px 8px;">
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
-          <div style="font-family:var(--mono);font-size:9px;letter-spacing:0.12em;text-transform:uppercase;color:var(--muted);">
-            Artist Pool — <span id="tdp-artist-name"></span>
+          <div style="font-family:var(--mono);font-size:9px;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);">
+            Artist Pool - <span id="tdp-artist-name"></span>
           </div>
           <div style="display:flex;gap:6px;">
             <button class="btn" id="tdp-export-sel-btn" onclick="exportPoolSelected()" style="display:none;font-size:10px;padding:4px 10px;border-color:var(--green);color:var(--green);">↓ Export Selected</button>
@@ -2703,7 +2716,7 @@ tbody td { padding: 10px 14px; vertical-align: middle; }
           </tr>
         </thead>
         <tbody id="tdp-tbody">
-          <tr class="tbl-msg"><td colspan="5">No pool yet — build one in the Pipeline tab.</td></tr>
+          <tr class="tbl-msg"><td colspan="5">No pool yet - build one in the Pipeline tab.</td></tr>
         </tbody>
       </table>
     </div>
@@ -2721,7 +2734,7 @@ tbody td { padding: 10px 14px; vertical-align: middle; }
            ondragover="e=>e.preventDefault()" ondrop="handleDrop(event)">
         <div class="import-icon">📂</div>
         <div class="import-lbl">Drop Excel file here or click to browse</div>
-        <div class="import-sub">Accepts .xlsx — columns: type, name, country, city, genre, first_name, email, phone</div>
+        <div class="import-sub">Accepts .xlsx - columns: type, name, country, city, genre, first_name, email, phone</div>
       </div>
       <input type="file" id="file-input" accept=".xlsx,.xls" style="display:none" onchange="handleFile(this.files[0])">
 
@@ -3238,17 +3251,13 @@ tbody td { padding: 10px 14px; vertical-align: middle; }
       <div class="fg">
         <label style="display:flex;align-items:center;gap:8px">
           Commission
-          <span style="display:inline-flex;gap:0;border:1px solid var(--border-dark);font-family:var(--mono);font-size:9px">
-            <button type="button" id="bm-comm-pct-btn" class="btn" onclick="setCommType('percentage')"
-              style="padding:2px 8px;font-size:9px;border:none;background:var(--accent);color:#fff">%</button>
-            <button type="button" id="bm-comm-fix-btn" class="btn" onclick="setCommType('fixed')"
-              style="padding:2px 8px;font-size:9px;border:none;background:transparent;color:var(--muted)">Fixed</button>
+          <span class="toggle-group">
+            <button type="button" id="bm-comm-pct-btn" class="toggle-btn active" onclick="setCommType('percentage')">%</button>
+            <button type="button" id="bm-comm-fix-btn" class="toggle-btn" onclick="setCommType('fixed')">Fixed</button>
           </span>
-          <span style="display:inline-flex;gap:0;border:1px solid var(--border-dark);font-family:var(--mono);font-size:9px;margin-left:4px">
-            <button type="button" id="bm-comm-incl-btn" class="btn" onclick="setCommIncl('inclusive')"
-              style="padding:2px 8px;font-size:9px;border:none;background:var(--accent);color:#fff">Incl</button>
-            <button type="button" id="bm-comm-excl-btn" class="btn" onclick="setCommIncl('exclusive')"
-              style="padding:2px 8px;font-size:9px;border:none;background:transparent;color:var(--muted)">Excl</button>
+          <span class="toggle-group" style="margin-left:4px">
+            <button type="button" id="bm-comm-incl-btn" class="toggle-btn active" onclick="setCommIncl('inclusive')">Incl</button>
+            <button type="button" id="bm-comm-excl-btn" class="toggle-btn" onclick="setCommIncl('exclusive')">Excl</button>
           </span>
         </label>
         <input type="number" id="bm-commission" placeholder="15" value="15" oninput="updateBookingCalc()">
@@ -3269,29 +3278,29 @@ tbody td { padding: 10px 14px; vertical-align: middle; }
     <div id="bm-calc" style="background:var(--accent);padding:16px;margin-top:4px">
       <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:rgba(255,255,255,0.1)">
         <div style="background:var(--accent);padding:10px;text-align:center">
-          <div style="font-family:var(--mono);font-size:8px;letter-spacing:0.1em;text-transform:uppercase;color:rgba(255,255,255,0.5);margin-bottom:4px">Gross Fee</div>
+          <div style="font-family:var(--mono);font-size:9px;letter-spacing:0.1em;text-transform:uppercase;color:rgba(255,255,255,0.5);margin-bottom:4px">Gross Fee</div>
           <div style="font-family:var(--mono);font-size:16px;color:#fff" id="bc-gross">--</div>
         </div>
         <div style="background:var(--accent);padding:10px;text-align:center">
-          <div style="font-family:var(--mono);font-size:8px;letter-spacing:0.1em;text-transform:uppercase;color:rgba(255,255,255,0.5);margin-bottom:4px">Withholding Tax</div>
+          <div style="font-family:var(--mono);font-size:9px;letter-spacing:0.1em;text-transform:uppercase;color:rgba(255,255,255,0.5);margin-bottom:4px">Withholding Tax</div>
           <div style="font-family:var(--mono);font-size:16px;color:#fff" id="bc-wh">--</div>
         </div>
         <div style="background:var(--accent);padding:10px;text-align:center">
-          <div style="font-family:var(--mono);font-size:8px;letter-spacing:0.1em;text-transform:uppercase;color:rgba(255,255,255,0.5);margin-bottom:4px">Nett Fee</div>
+          <div style="font-family:var(--mono);font-size:9px;letter-spacing:0.1em;text-transform:uppercase;color:rgba(255,255,255,0.5);margin-bottom:4px">Nett Fee</div>
           <div style="font-family:var(--mono);font-size:16px;color:#fff" id="bc-nett">--</div>
         </div>
         <div style="background:var(--accent);padding:10px;text-align:center">
-          <div style="font-family:var(--mono);font-size:8px;letter-spacing:0.1em;text-transform:uppercase;color:rgba(255,255,255,0.5);margin-bottom:4px">Commission</div>
+          <div style="font-family:var(--mono);font-size:9px;letter-spacing:0.1em;text-transform:uppercase;color:rgba(255,255,255,0.5);margin-bottom:4px">Commission</div>
           <div style="font-family:var(--mono);font-size:16px;color:#fff" id="bc-comm">--</div>
         </div>
       </div>
       <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:1px;background:rgba(255,255,255,0.1);margin-top:1px">
         <div style="background:var(--accent);padding:10px;text-align:center">
-          <div style="font-family:var(--mono);font-size:8px;letter-spacing:0.1em;text-transform:uppercase;color:rgba(255,255,255,0.4);margin-bottom:4px">Due to Booker</div>
+          <div style="font-family:var(--mono);font-size:9px;letter-spacing:0.1em;text-transform:uppercase;color:rgba(255,255,255,0.4);margin-bottom:4px">Due to Booker</div>
           <div style="font-family:var(--mono);font-size:16px;color:var(--green)" id="bc-booker">--</div>
         </div>
         <div style="background:var(--accent);padding:10px;text-align:center">
-          <div style="font-family:var(--mono);font-size:8px;letter-spacing:0.1em;text-transform:uppercase;color:rgba(255,255,255,0.4);margin-bottom:4px">Due to Artist</div>
+          <div style="font-family:var(--mono);font-size:9px;letter-spacing:0.1em;text-transform:uppercase;color:rgba(255,255,255,0.4);margin-bottom:4px">Due to Artist</div>
           <div style="font-family:var(--mono);font-size:16px;color:#fff" id="bc-artist">--</div>
         </div>
       </div>
@@ -3377,7 +3386,7 @@ tbody td { padding: 10px 14px; vertical-align: middle; }
 <!-- SETTLEMENT OVERLAY -->
 <div id="settlement-overlay" style="position:fixed;inset:0;background:#1a1a1a;z-index:350;display:none;flex-direction:column">
   <div style="background:#111;padding:12px 24px;display:flex;align-items:center;gap:16px;border-bottom:1px solid #333;flex-shrink:0">
-    <div style="font-family:var(--mono);font-size:11px;letter-spacing:0.2em;text-transform:uppercase;color:rgba(255,255,255,0.5)">DEEPBLOE · SETTLEMENT</div>
+    <div style="font-family:var(--mono);font-size:11px;letter-spacing:0.15em;text-transform:uppercase;color:rgba(255,255,255,0.5)">DEEPBLOE · SETTLEMENT</div>
     <div style="font-family:var(--mono);font-size:11px;color:rgba(255,255,255,0.7)" id="sett-booking-ref"></div>
     <div style="margin-left:auto;display:flex;gap:8px">
       <button class="ie-btn" onclick="printSettlement()">⎙ Print / PDF</button>
@@ -3445,23 +3454,23 @@ tbody td { padding: 10px 14px; vertical-align: middle; }
     <div style="flex:1;padding:24px;overflow-y:auto;background:#1e1e1e" id="sett-preview">
 
       <div style="max-width:600px;margin:0 auto">
-        <div style="font-family:var(--mono);font-size:9px;letter-spacing:0.2em;text-transform:uppercase;color:rgba(255,255,255,0.3);margin-bottom:20px">Settlement Statement</div>
+        <div style="font-family:var(--mono);font-size:9px;letter-spacing:0.15em;text-transform:uppercase;color:rgba(255,255,255,0.3);margin-bottom:20px">Settlement Statement</div>
 
         <div class="sett-section">
           <div class="sett-section-hdr">Revenue</div>
-          <div class="sett-row"><div class="sett-label">Gross Fee</div><div class="sett-val" id="sp-gross">—</div></div>
+          <div class="sett-row"><div class="sett-label">Gross Fee</div><div class="sett-val" id="sp-gross">-</div></div>
           <div class="sett-row" id="sp-wh-row" style="display:none">
             <div class="sett-label">Tax Withholding (<span id="sp-wh-pct">0</span>%)</div>
-            <div class="sett-val red" id="sp-wh-amt">—</div>
+            <div class="sett-val red" id="sp-wh-amt">-</div>
           </div>
-          <div class="sett-row"><div class="sett-label">Net Fee</div><div class="sett-val blue" id="sp-net">—</div></div>
+          <div class="sett-row"><div class="sett-label">Net Fee</div><div class="sett-val blue" id="sp-net">-</div></div>
         </div>
 
         <div class="sett-section">
           <div class="sett-section-hdr">Commission</div>
           <div class="sett-row">
             <div class="sett-label">Commission (<span id="sp-comm-pct">15</span>% on <span id="sp-comm-base">gross</span>)</div>
-            <div class="sett-val red" id="sp-comm-amt">—</div>
+            <div class="sett-val red" id="sp-comm-amt">-</div>
           </div>
         </div>
 
@@ -3470,14 +3479,14 @@ tbody td { padding: 10px 14px; vertical-align: middle; }
           <div id="sp-exp-lines"></div>
           <div class="sett-row">
             <div class="sett-label" style="font-weight:500">Total Expenses</div>
-            <div class="sett-val red" id="sp-exp-total">—</div>
+            <div class="sett-val red" id="sp-exp-total">-</div>
           </div>
         </div>
 
         <div class="sett-section">
           <div class="sett-total">
             <div class="sett-total-label">Net Payout to Artist</div>
-            <div class="sett-total-val" id="sp-payout">—</div>
+            <div class="sett-total-val" id="sp-payout">-</div>
           </div>
         </div>
 
@@ -3723,7 +3732,7 @@ tbody td { padding: 10px 14px; vertical-align: middle; }
       <div class="ie-sidebar-section">Description</div>
       <div class="ie-field">
         <label>Line Description</label>
-        <input id="ie-description" placeholder="Performance fee — DJ Liu" oninput="renderInvoicePreview()">
+        <input id="ie-description" placeholder="Performance fee - DJ Liu" oninput="renderInvoicePreview()">
       </div>
       <div class="ie-field">
         <label>Artist</label>
@@ -3760,9 +3769,9 @@ tbody td { padding: 10px 14px; vertical-align: middle; }
       <div class="ie-field">
         <label>VAT Regime</label>
         <select id="ie-vat-regime" onchange="updateVatRegime()">
-          <option value="nl_21">NL — 21% BTW (Dutch client)</option>
-          <option value="eu_reverse">EU B2B — 0% Reverse Charge</option>
-          <option value="eu_exempt">Outside EU — 0% Exempt</option>
+          <option value="nl_21">NL - 21% BTW (Dutch client)</option>
+          <option value="eu_reverse">EU B2B - 0% Reverse Charge</option>
+          <option value="eu_exempt">Outside EU - 0% Exempt</option>
           <option value="custom">Custom rate</option>
         </select>
       </div>
@@ -3857,7 +3866,7 @@ tbody td { padding: 10px 14px; vertical-align: middle; }
       <!-- Promoter link -->
       <div class="adv-link-box" id="adv-promoter-link-box" style="display:none">
         <span style="font-family:var(--mono);font-size:9px;text-transform:uppercase;letter-spacing:0.1em;color:var(--blue)">Promoter form link</span>
-        <span class="adv-link-url" id="adv-link-url">—</span>
+        <span class="adv-link-url" id="adv-link-url">-</span>
         <button class="btn" onclick="copyPromoterLink()" style="padding:4px 10px;font-size:9px">Copy</button>
       </div>
 
@@ -4016,7 +4025,7 @@ tbody td { padding: 10px 14px; vertical-align: middle; }
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px">
         <div>
           <div style="font-family:var(--mono);font-size:11px;font-weight:500;color:var(--accent)">Show Costs</div>
-          <div style="font-family:var(--mono);font-size:10px;color:var(--muted);margin-top:4px">Costs linked to this show — automatically included in settlement</div>
+          <div style="font-family:var(--mono);font-size:10px;color:var(--muted);margin-top:4px">Costs linked to this show - automatically included in settlement</div>
         </div>
         <button class="btn success" onclick="saveCosts()" style="font-size:10px">✓ Save Costs</button>
       </div>
@@ -4437,7 +4446,7 @@ tbody td { padding: 10px 14px; vertical-align: middle; }
 
         <!-- Summary -->
         <div id="wiz-summary" style="margin-top:20px;padding:16px;background:var(--bg);border:1px solid var(--border);display:none">
-          <div style="font-family:var(--mono);font-size:9px;letter-spacing:0.15em;text-transform:uppercase;color:var(--muted);margin-bottom:12px">Summary — will be saved</div>
+          <div style="font-family:var(--mono);font-size:9px;letter-spacing:0.15em;text-transform:uppercase;color:var(--muted);margin-bottom:12px">Summary - will be saved</div>
           <div id="wiz-summary-content"></div>
         </div>
       </div>
@@ -4784,7 +4793,7 @@ let tmArtistIds = [];  // temp artist IDs being assigned in modal
 
 // ── AGENCY (Single Source of Truth) ───────────────────────────
 // Loaded from Supabase on startApp(). Defaults are fallbacks only
-// and should never be shown — always load before rendering documents.
+// and should never be shown - always load before rendering documents.
 const AGENCY_DEFAULTS = {
   trading_name:    'Deepbloe Agency',
   legal_name:      'Deepbloe Agency B.V.',
@@ -4834,7 +4843,7 @@ function findSignatoryByLabel(label) {
   }) || null;
 }
 
-// Computed helpers — always read from AGENCY, never hardcode
+// Computed helpers - always read from AGENCY, never hardcode
 function agencyAddressBlock() {
   // Multi-line: street / postcode + city / country / VAT line
   const cityLine = [AGENCY.postal_code, AGENCY.city].filter(Boolean).join(' ');
@@ -4842,7 +4851,7 @@ function agencyAddressBlock() {
     .filter(Boolean).join('\n');
 }
 function agencyFooterLine() {
-  // Used on email footers, sales deck footer, etc. — single line
+  // Used on email footers, sales deck footer, etc. - single line
   const parts = [AGENCY.legal_name, AGENCY.website];
   if (AGENCY.kvk) parts.push('KvK: ' + AGENCY.kvk);
   if (AGENCY.vat) parts.push('VAT: ' + AGENCY.vat);
@@ -5022,12 +5031,12 @@ function removeSignatory(localId) {
 }
 
 // Read all rows from the DOM back into AGENCY_SIGNATORIES.
-// Only overwrites the state if rows actually exist in DOM — otherwise
+// Only overwrites the state if rows actually exist in DOM - otherwise
 // the in-memory AGENCY_SIGNATORIES list stays untouched (e.g. when the
 // Settings panel hasn't been rendered yet).
 function readSignatoriesFromUI() {
   const rows = document.querySelectorAll('#sig-list .sig-row');
-  if (!rows.length) return; // nothing rendered yet — keep existing state
+  if (!rows.length) return; // nothing rendered yet - keep existing state
   const updated = [];
   rows.forEach((row, idx) => {
     const localId = row.dataset.sigId;
@@ -5064,7 +5073,7 @@ async function uploadSignatureImage(localId, fileInput) {
   const sig = AGENCY_SIGNATORIES.find((s, idx) => (s.id || ('new_' + idx)) === localId);
   if (sig) sig.signature_url = pub.publicUrl;
   renderSignatories();
-  showToast('Signature uploaded — remember to Save Settings', 'info');
+  showToast('Signature uploaded - remember to Save Settings', 'info');
 }
 
 // Persist AGENCY_SIGNATORIES to Supabase (full sync)
@@ -5431,7 +5440,7 @@ function openTeamMemberModal(memberId = null) {
   // Populate role dropdown
   const roleSelect = document.getElementById('tm-role');
   roleSelect.innerHTML = '<option value="">Select role...</option>' +
-    RBAC.allRoles.map(r => `<option value="${r.id}">${esc(r.label)}${r.description ? ' — ' + esc(r.description) : ''}</option>`).join('');
+    RBAC.allRoles.map(r => `<option value="${r.id}">${esc(r.label)}${r.description ? ' - ' + esc(r.description) : ''}</option>`).join('');
 
   // Populate artist dropdown
   const artSelect = document.getElementById('tm-artist-select');
@@ -5578,7 +5587,7 @@ async function saveTeamMember() {
         await syncArtistAssignments(newMember.id);
         await saveMemberPermissions(newMember.id);
       }
-      showToast('Invite sent to ' + email + ' — they will receive a login link.', 'success');
+      showToast('Invite sent to ' + email + ' - they will receive a login link.', 'success');
     }
 
     document.getElementById('team-modal').classList.remove('open');
@@ -5812,9 +5821,9 @@ function renderArtists() {
   }
   tbody.innerHTML = filtered.map(a => `<tr>
     <td class="td-name" style="font-weight:500">${esc(a.name)}</td>
-    <td class="td-mono" style="font-size:11px">${esc(a.slug||'—')}</td>
-    <td style="font-size:11px">${esc(Array.isArray(a.genre)?a.genre.join(', '):(a.genre||'—'))}</td>
-    <td style="font-size:11px">${esc(a.home_country||'—')}</td>
+    <td class="td-mono" style="font-size:11px">${esc(a.slug||'-')}</td>
+    <td style="font-size:11px">${esc(Array.isArray(a.genre)?a.genre.join(', '):(a.genre||'-'))}</td>
+    <td style="font-size:11px">${esc(a.home_country||'-')}</td>
     <td><div class="row-actions">
       <button class="ra" onclick="openArtistModal('${a.id}')">Edit</button>
       <button class="ra del" onclick="deleteArtistById('${a.id}','${esc(a.name)}')">Del</button>
@@ -5956,19 +5965,19 @@ function renderBookingList() {
     return;
   }
   tbody.innerHTML = slice.map(b => {
-    const artist = b.artists?.name || '—';
-    const org    = b.company?.name || b.organisations?.name || '—';
+    const artist = b.artists?.name || '-';
+    const org    = b.company?.name || b.organisations?.name || '-';
     const fee    = b.fee_amount
       ? `<span class="fee-val">${fmtFee(b.fee_amount, b.fee_currency)}</span>`
-      : '<span style="color:var(--muted)">—</span>';
+      : '<span style="color:var(--muted)">-</span>';
     const date   = b.show_date ? (b.show_date_end && b.show_date_end !== b.show_date ? fmtDate(b.show_date) + ' - ' + fmtDate(b.show_date_end) : fmtDate(b.show_date)) : '---';
-    const venue  = [b.venue_name, b.venue_city].filter(Boolean).join(' · ') || '—';
+    const venue  = [b.venue_name, b.venue_city].filter(Boolean).join(' · ') || '-';
     return `<tr>
-      <td class="td-mono" style="font-size:10px">${esc(b.reference||'—')}</td>
+      <td class="td-mono" style="font-size:10px">${esc(b.reference||'-')}</td>
       <td class="td-name">${esc(artist)}</td>
       <td class="td-mono">${date}</td>
       <td class="td-trunc" style="max-width:180px">${esc(venue)}</td>
-      <td>${esc(b.venue_country||'—')}</td>
+      <td>${esc(b.venue_country||'-')}</td>
       <td>${statusBadge(b.status)}</td>
       <td>${fee}</td>
       <td class="td-trunc">${esc(org)}</td>
@@ -5999,9 +6008,9 @@ function renderBookingPipeline() {
     document.getElementById('pc-' + s).textContent = cards.length;
     document.getElementById('pc-cards-' + s).innerHTML = cards.slice(0,10).map(b => `
       <div class="pipe-card" onclick="editBooking('${b.id}')">
-        <div class="pipe-card-artist">${esc(b.artists?.name||'—')}</div>
-        <div class="pipe-card-venue">${esc([b.venue_name,b.venue_city].filter(Boolean).join(', ')||'—')}</div>
-        <div class="pipe-card-date">${b.show_date ? fmtDate(b.show_date) : '—'}</div>
+        <div class="pipe-card-artist">${esc(b.artists?.name||'-')}</div>
+        <div class="pipe-card-venue">${esc([b.venue_name,b.venue_city].filter(Boolean).join(', ')||'-')}</div>
+        <div class="pipe-card-date">${b.show_date ? fmtDate(b.show_date) : '-'}</div>
         ${b.fee_amount ? `<div class="pipe-card-fee">${fmtFee(b.fee_amount, b.fee_currency)}</div>` : ''}
       </div>
     `).join('') || '<div style="padding:8px;font-family:var(--mono);font-size:10px;color:var(--muted)">Empty</div>';
@@ -6036,7 +6045,7 @@ function openBookingModal(id = null) {
   }
 
   // Populate company searchable select (step 1)
-  const orgOpts = allOrgs.map(o => ({ value: o.id, label: o.legal_name||o.name, sub: [o.company_type, o.city, o.country].filter(Boolean).join(' / ') }));
+  const orgOpts = allOrgs.map(o => ({ value: o.id, label: o.legal_name||o.name, sub: [o.company_type, o.city, o.country].filter(Boolean).join(' · ') }));
   ssPopulate('ss-bm-org', orgOpts, {
     hiddenId: 'bm-org',
     placeholder: 'Search company...',
@@ -6104,7 +6113,7 @@ function bookingStep1() {
 
   const conOpts = orgCons.map(c => {
     const name = [c.first_name, c.last_name].filter(Boolean).join(' ') || c.email;
-    return { value: c.id, label: name, sub: [c.role, c.email].filter(Boolean).join(' / ') };
+    return { value: c.id, label: name, sub: [c.role, c.email].filter(Boolean).join(' · ') };
   });
   ssPopulate('ss-bm-contact', conOpts, {
     hiddenId: 'bm-contact',
@@ -6129,7 +6138,7 @@ function bookingStep2() {
   // Show contact info
   const con = allCons.find(c => c.id === conId);
   document.getElementById('bm-contact-info').textContent =
-    con ? [con.email, con.phone].filter(Boolean).join(' / ') : '';
+    con ? [con.email, con.phone].filter(Boolean).join(' · ') : '';
 
   // Load venues for this company
   const orgVenues = allVenues.filter(v => v.organisation_id === orgId);
@@ -6141,7 +6150,7 @@ function bookingStep2() {
   const venueOpts = orgVenues.map(v => ({
     value: v.id,
     label: v.name,
-    sub: [v.venue_type, v.city, v.country].filter(Boolean).join(' / '),
+    sub: [v.venue_type, v.city, v.country].filter(Boolean).join(' · '),
   }));
   ssPopulate('ss-bm-venue', venueOpts, {
     hiddenId: 'bm-venue-id',
@@ -6157,7 +6166,7 @@ function bookingStep3() {
   const venue = allVenues.find(v => v.id === venueId);
   if (!venue) return;
   document.getElementById('bm-venue-info').textContent =
-    [venue.venue_type, venue.city, venue.country].filter(Boolean).join(' / ');
+    [venue.venue_type, venue.city, venue.country].filter(Boolean).join(' · ');
   // Fill hidden fields for saving
   document.getElementById('bm-venue').value   = venue.name || '';
   document.getElementById('bm-city').value    = venue.city || '';
@@ -6165,7 +6174,7 @@ function bookingStep3() {
 }
 
 function loadVenueIntoBooking(preSelectContactId = null) {
-  // Legacy — no-op, handled by step functions
+  // Legacy - no-op, handled by step functions
 }
 
 function loadContactsForOrg(preSelectId = null) {
@@ -6247,31 +6256,16 @@ function editBooking(id) {
 
 function setCommType(type) {
   document.getElementById('bm-commission-type').value = type;
-  const pctBtn = document.getElementById('bm-comm-pct-btn');
-  const fixBtn = document.getElementById('bm-comm-fix-btn');
-  if (type === 'percentage') {
-    pctBtn.style.background = 'var(--accent)'; pctBtn.style.color = '#fff';
-    fixBtn.style.background = 'transparent'; fixBtn.style.color = 'var(--muted)';
-    document.getElementById('bm-commission').placeholder = '15';
-  } else {
-    fixBtn.style.background = 'var(--accent)'; fixBtn.style.color = '#fff';
-    pctBtn.style.background = 'transparent'; pctBtn.style.color = 'var(--muted)';
-    document.getElementById('bm-commission').placeholder = '600';
-  }
+  document.getElementById('bm-comm-pct-btn').classList.toggle('active', type === 'percentage');
+  document.getElementById('bm-comm-fix-btn').classList.toggle('active', type === 'fixed');
+  document.getElementById('bm-commission').placeholder = type === 'percentage' ? '15' : '600';
   updateBookingCalc();
 }
 
 function setCommIncl(mode) {
   document.getElementById('bm-commission-incl').value = mode;
-  const inclBtn = document.getElementById('bm-comm-incl-btn');
-  const exclBtn = document.getElementById('bm-comm-excl-btn');
-  if (mode === 'inclusive') {
-    inclBtn.style.background = 'var(--accent)'; inclBtn.style.color = '#fff';
-    exclBtn.style.background = 'transparent'; exclBtn.style.color = 'var(--muted)';
-  } else {
-    exclBtn.style.background = 'var(--accent)'; exclBtn.style.color = '#fff';
-    inclBtn.style.background = 'transparent'; inclBtn.style.color = 'var(--muted)';
-  }
+  document.getElementById('bm-comm-incl-btn').classList.toggle('active', mode === 'inclusive');
+  document.getElementById('bm-comm-excl-btn').classList.toggle('active', mode === 'exclusive');
   updateBookingCalc();
 }
 
@@ -6387,7 +6381,7 @@ async function checkStatusRequirements(targetStatus, bookingId) {
     // Check contract
     const { data: contracts } = await db.from('contracts').select('status').eq('booking_id', bookingId);
     const hasSigned = contracts?.some(c => c.status === 'fully_signed');
-    if (!hasSigned) issues.push('Signed contract required — or confirm without contract?');
+    if (!hasSigned) issues.push('Signed contract required - or confirm without contract?');
   }
 
   if (targetStatus === 'advancing') {
@@ -6572,7 +6566,7 @@ async function loadOrgs() {
     .or('is_active.is.null,is_active.eq.true')
     .order('name');
   if (error) { showToast('Error loading organisations: ' + error.message, 'error'); return; }
-  allOrgs = (data || []).map(o => ({ ...o, name: o.legal_name || o.name || o.trading_name || '—' }));
+  allOrgs = (data || []).map(o => ({ ...o, name: o.legal_name || o.name || o.trading_name || '-' }));
   updateOrgStats();
   filterOrgs();
 }
@@ -6614,8 +6608,8 @@ function renderOrgs() {
     const genres = (o.genre || []).map(g => `<span class="genre-pill">${esc(g)}</span>`).join('');
     const firstCon = (o.contacts || [])[0];
     const conName  = firstCon
-      ? `<span style="font-weight:500">${esc([firstCon.first_name, firstCon.last_name].filter(Boolean).join(' ') || '—')}</span>`
-      : '<span style="color:var(--muted)">—</span>';
+      ? `<span style="font-weight:500">${esc([firstCon.first_name, firstCon.last_name].filter(Boolean).join(' ') || '-')}</span>`
+      : '<span style="color:var(--muted)">-</span>';
     const conEmail = firstCon?.email
       ? `<a onclick="goToContact('${esc(firstCon.email)}')" style="color:var(--blue);cursor:pointer;font-family:var(--mono);font-size:11px;text-decoration:none;border-bottom:1px solid var(--border)">${esc(firstCon.email)}</a>`
       : `<button class="ra" onclick="addContactToOrg('${o.id}','${esc(o.name)}')">+ add</button>`;
@@ -6626,8 +6620,8 @@ function renderOrgs() {
     return `<tr style="cursor:pointer" onclick="openCompanyDetail('${o.id}')">
       <td class="td-name td-trunc">${esc(o.name)}</td>
       <td>${typeBadge(o.type)}</td>
-      <td>${esc(o.country||'—')}</td>
-      <td class="td-trunc">${esc(o.city||'—')}</td>
+      <td>${esc(o.country||'-')}</td>
+      <td class="td-trunc">${esc(o.city||'-')}</td>
       <td>${conName}${extraLabel}</td>
       <td class="td-trunc">${conEmail}</td>
       <td><div class="row-actions">
@@ -6885,18 +6879,18 @@ function renderContacts() {
   tbody.innerHTML = slice.map(c => {
     const org = c.organisations;
     const tags = (c.tags || []).map(t => `<span class="genre-pill">${esc(t)}</span>`).join('');
-    const fullName = [c.first_name, c.last_name].filter(Boolean).join(' ') || '—';
+    const fullName = [c.first_name, c.last_name].filter(Boolean).join(' ') || '-';
     // Show primary org, plus count of additional
-    let orgCell = '—';
+    let orgCell = '-';
     if (org) {
       orgCell = `<span style="font-size:11px">${esc(org.name)}</span>`;
     }
     return `<tr>
       <td class="td-name">${esc(fullName)}</td>
       <td class="td-mono td-trunc">${esc(c.email)}</td>
-      <td class="td-mono">${esc(c.phone||'—')}</td>
+      <td class="td-mono">${esc(c.phone||'-')}</td>
       <td class="td-trunc">${orgCell}</td>
-      <td>${tags || '—'}</td>
+      <td>${tags || '-'}</td>
       <td>${sourceBadge(c.source)}</td>
       <td><span class="sync-dot ${c.mailchimp_synced ? 'sync-yes' : 'sync-no'}"></span></td>
       <td><div class="row-actions">
@@ -6918,7 +6912,7 @@ function conPage(d) { conPageN += d; renderContacts(); }
 function addContactToOrg(orgId, orgName) {
   editConId = null;
   _pendingOrgId = orgId;
-  document.getElementById('con-modal-title').textContent = `Add Contact — ${orgName}`;
+  document.getElementById('con-modal-title').textContent = `Add Contact - ${orgName}`;
   ['cm-fname','cm-lname','cm-email','cm-phone'].forEach(f => document.getElementById(f).value = '');
   document.getElementById('cm-role').value = '';
   populateContactOrgDropdown();
@@ -7241,10 +7235,10 @@ function renderContracts() {
     const statusLabel = c.status.replace(/_/g,' ');
     return `<tr>
       <td class="td-mono" style="font-size:10px">${esc(c.id.slice(0,8).toUpperCase())}</td>
-      <td class="td-mono" style="font-size:10px">${esc(bk?.reference||'—')}</td>
-      <td class="td-name">${esc(bk?.artists?.name||'—')}</td>
-      <td class="td-trunc">${esc(allOrgs.find(o => o.id === bk?.company_id)?.name || '—')}</td>
-      <td class="td-mono">${bk?.show_date ? fmtDate(bk.show_date) : '—'}</td>
+      <td class="td-mono" style="font-size:10px">${esc(bk?.reference||'-')}</td>
+      <td class="td-name">${esc(bk?.artists?.name||'-')}</td>
+      <td class="td-trunc">${esc(allOrgs.find(o => o.id === bk?.company_id)?.name || '-')}</td>
+      <td class="td-mono">${bk?.show_date ? fmtDate(bk.show_date) : '-'}</td>
       <td><span class="genre-pill">${esc((c.notes||'en').toUpperCase())}</span></td>
       <td><span class="badge ${statusCls}">${statusLabel}</span></td>
       <td class="td-mono" style="font-size:10px">v${c.version||1}</td>
@@ -7289,17 +7283,17 @@ function openContractEditor(bookingId = null) {
   if (bookingId) {
     const b = allBookings.find(x => x.id === bookingId);
     if (b && !b.company_id) {
-      showToast('Contract requires a company — edit the booking first', 'error'); return;
+      showToast('Contract requires a company - edit the booking first', 'error'); return;
     }
     if (b && !b.contact_id) {
-      showToast('Contract requires a contact person — edit the booking first', 'error'); return;
+      showToast('Contract requires a contact person - edit the booking first', 'error'); return;
     }
   }
 
   editContractId = null;
   currentContractBookingId = bookingId;
 
-  // Always populate Agency (Party A) fields from AGENCY — single source of truth
+  // Always populate Agency (Party A) fields from AGENCY - single source of truth
   document.getElementById('ce-agency').value = AGENCY.legal_name || '';
   document.getElementById('ce-agency-address').value = agencyAddressBlock();
   populateSignatoryDropdown(document.getElementById('ce-agency-sig'), '');
@@ -7309,7 +7303,7 @@ function openContractEditor(bookingId = null) {
   sel.innerHTML = '<option value="">Select booking...</option>' +
     allBookings
       .map(b => `<option value="${b.id}" ${b.id === bookingId ? 'selected' : ''}>
-        ${esc(b.reference||'')} — ${esc(b.artists?.name||'')} — ${b.show_date||''}
+        ${esc(b.reference||'')} - ${esc(b.artists?.name||'')} - ${b.show_date||''}
       </option>`).join('');
 
   // Force the select value explicitly
@@ -7335,7 +7329,7 @@ async function openContractEditorById(contractId) {
   // Populate booking dropdown
   const sel = document.getElementById('ce-booking');
   sel.innerHTML = allBookings.map(b => `<option value="${b.id}" ${b.id === c.booking_id ? 'selected' : ''}>
-    ${esc(b.reference||'')} — ${esc(b.artists?.name||'')}
+    ${esc(b.reference||'')} - ${esc(b.artists?.name||'')}
   </option>`).join('');
 
   document.getElementById('ce-lang').value = c.notes || 'en';
@@ -7434,7 +7428,7 @@ function loadBookingIntoContract() {
     if (!promo.vat_number) missing.push('VAT number');
     if (!promo.legal_name) missing.push('legal name');
     if (missing.length) {
-      showToast('Promoter record missing: ' + missing.join(', ') + ' — edit the company to complete', 'warning');
+      showToast('Promoter record missing: ' + missing.join(', ') + ' - edit the company to complete', 'warning');
     }
   }
 
@@ -7573,8 +7567,8 @@ function getTemplateEN() {
 <h2>1. Parties</h2>
 <table class="parties">
   <tr>
-    <th>Party A — Agency</th>
-    <th>Party B — Promoter / Buyer</th>
+    <th>Party A - Agency</th>
+    <th>Party B - Promoter / Buyer</th>
   </tr>
   <tr>
     <td><strong>{{AGENCY}}</strong><br>{{AGENCY_ADDRESS}}</td>
@@ -7607,9 +7601,9 @@ function getTemplateEN() {
 <h2>4. Cancellation</h2>
 <div class="clause">
   <p><span class="clause-num">4.1</span> Cancellation by Promoter: If the Promoter cancels this Agreement, the following cancellation fees apply:
-  <br>— More than 60 days before the event: 50% of the total fee
-  <br>— 30–60 days before the event: 75% of the total fee
-  <br>— Less than 30 days before the event: 100% of the total fee</p>
+  <br>- More than 60 days before the event: 50% of the total fee
+  <br>- 30–60 days before the event: 75% of the total fee
+  <br>- Less than 30 days before the event: 100% of the total fee</p>
   <p><span class="clause-num">4.2</span> Cancellation by Artist/Agency: In the event that the Artist is unable to perform due to illness, injury, or circumstances beyond their control, the Agency shall use reasonable endeavours to offer a replacement date. The Agency's liability is limited to the return of any advance payment received.</p>
 </div>
 
@@ -7641,7 +7635,7 @@ function getTemplateEN() {
 
 <div class="sig-block">
   <div class="sig-party">
-    <div class="sig-label">Party A — Agency</div>
+    <div class="sig-label">Party A - Agency</div>
     <div class="sig-name">{{AGENCY}}</div>
     <div class="sig-title">{{AGENCY_SIG}}</div>
     {{AGENCY_SIG_IMAGE}}
@@ -7649,7 +7643,7 @@ function getTemplateEN() {
     <div style="font-family:'DM Mono',monospace;font-size:10px;color:#8a8278">Signature &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Date</div>
   </div>
   <div class="sig-party">
-    <div class="sig-label">Party B — Promoter</div>
+    <div class="sig-label">Party B - Promoter</div>
     <div class="sig-name">{{PROMOTER}}</div>
     <div class="sig-title">{{PROMOTER_SIG}}</div>
     <br><br>
@@ -7671,8 +7665,8 @@ function getTemplateNL() {
 <h2>1. Partijen</h2>
 <table class="parties">
   <tr>
-    <th>Partij A — Agency</th>
-    <th>Partij B — Promotor / Koper</th>
+    <th>Partij A - Agency</th>
+    <th>Partij B - Promotor / Koper</th>
   </tr>
   <tr>
     <td><strong>{{AGENCY}}</strong><br>{{AGENCY_ADDRESS}}</td>
@@ -7705,9 +7699,9 @@ function getTemplateNL() {
 <h2>4. Annulering</h2>
 <div class="clause">
   <p><span class="clause-num">4.1</span> Annulering door Promotor: De volgende annuleringskosten zijn van toepassing:
-  <br>— Meer dan 60 dagen voor het evenement: 50% van het totale honorarium
-  <br>— 30–60 dagen voor het evenement: 75% van het totale honorarium
-  <br>— Minder dan 30 dagen voor het evenement: 100% van het totale honorarium</p>
+  <br>- Meer dan 60 dagen voor het evenement: 50% van het totale honorarium
+  <br>- 30–60 dagen voor het evenement: 75% van het totale honorarium
+  <br>- Minder dan 30 dagen voor het evenement: 100% van het totale honorarium</p>
   <p><span class="clause-num">4.2</span> Annulering door Artiest/Agency: Indien de Artiest door ziekte, letsel of overmacht niet kan optreden, zal de Agency trachten een vervangende datum aan te bieden. De aansprakelijkheid van de Agency is beperkt tot terugbetaling van reeds ontvangen aanbetalingen.</p>
 </div>
 
@@ -7734,7 +7728,7 @@ function getTemplateNL() {
 
 <div class="sig-block">
   <div class="sig-party">
-    <div class="sig-label">Partij A — Agency</div>
+    <div class="sig-label">Partij A - Agency</div>
     <div class="sig-name">{{AGENCY}}</div>
     <div class="sig-title">{{AGENCY_SIG}}</div>
     {{AGENCY_SIG_IMAGE}}
@@ -7742,7 +7736,7 @@ function getTemplateNL() {
     <div style="font-family:'DM Mono',monospace;font-size:10px;color:#8a8278">Handtekening &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Datum</div>
   </div>
   <div class="sig-party">
-    <div class="sig-label">Partij B — Promotor</div>
+    <div class="sig-label">Partij B - Promotor</div>
     <div class="sig-name">{{PROMOTER}}</div>
     <div class="sig-title">{{PROMOTER_SIG}}</div>
     <br><br>
@@ -7759,8 +7753,8 @@ let editInvoiceId = null, currentInvoiceBookingId = null;
 
 const VAT_REGIMES = {
   nl_21:      { rate: 21, note: '' },
-  eu_reverse: { rate: 0,  note: 'BTW verlegd / Reverse charge — Art. 196 EU VAT Directive 2006/112/EC' },
-  eu_exempt:  { rate: 0,  note: 'VAT exempt — Services outside scope of EU VAT' },
+  eu_reverse: { rate: 0,  note: 'BTW verlegd / Reverse charge - Art. 196 EU VAT Directive 2006/112/EC' },
+  eu_exempt:  { rate: 0,  note: 'VAT exempt - Services outside scope of EU VAT' },
   custom:     { rate: 0,  note: '' },
 };
 
@@ -7816,15 +7810,15 @@ function renderInvoices() {
     const sym = {EUR:'€',USD:'$',GBP:'£',SGD:'S$',AED:'AED ',IDR:'Rp',THB:'฿'}[i.currency||'EUR']||'';
     const vatPct = i.vat_rate > 0 ? i.vat_rate+'%' : (i.vat_reverse_charge ? 'RC' : '0%');
     return `<tr>
-      <td class="td-mono" style="font-size:10px">${esc(i.invoice_number||'—')}</td>
-      <td class="td-mono" style="font-size:10px">${esc(i.bookings?.reference||'—')}</td>
-      <td class="td-name">${esc(i.bookings?.artists?.name||'—')}</td>
-      <td class="td-trunc">${esc(i.bill_to_name||'—')}</td>
+      <td class="td-mono" style="font-size:10px">${esc(i.invoice_number||'-')}</td>
+      <td class="td-mono" style="font-size:10px">${esc(i.bookings?.reference||'-')}</td>
+      <td class="td-name">${esc(i.bookings?.artists?.name||'-')}</td>
+      <td class="td-trunc">${esc(i.bill_to_name||'-')}</td>
       <td><span class="genre-pill">${esc((i.type||'').replace('_',' '))}</span></td>
       <td class="td-mono" style="font-size:11px">${sym}${(i.subtotal||0).toLocaleString()}</td>
       <td class="td-mono" style="font-size:11px">${vatPct}</td>
       <td class="td-mono" style="font-size:11px;font-weight:500">${sym}${(i.total_amount||0).toLocaleString()}</td>
-      <td class="td-mono" style="font-size:10px">${i.due_date ? fmtDate(i.due_date) : '—'}</td>
+      <td class="td-mono" style="font-size:10px">${i.due_date ? fmtDate(i.due_date) : '-'}</td>
       <td><span class="badge inv-status-${es}">${es}</span></td>
       <td><div class="row-actions">
         <button class="ra" onclick="openInvoiceEditorById('${i.id}')">Open</button>
@@ -7877,17 +7871,17 @@ function openInvoiceEditor(bookingId = null) {
   if (bookingId) {
     const b = allBookings.find(x => x.id === bookingId);
     if (b && !b.company_id) {
-      showToast('Invoice requires a company — edit the booking first', 'error'); return;
+      showToast('Invoice requires a company - edit the booking first', 'error'); return;
     }
     if (b && !b.contact_id) {
-      showToast('Invoice requires a contact person — edit the booking first', 'error'); return;
+      showToast('Invoice requires a contact person - edit the booking first', 'error'); return;
     }
   }
   editInvoiceId = null; currentInvoiceBookingId = bookingId;
   const sel = document.getElementById('ie-booking');
   sel.innerHTML = '<option value="">Select booking...</option>' +
     allBookings.map(b => `<option value="${b.id}" ${b.id===bookingId?'selected':''}>
-      ${esc(b.reference||'')} — ${esc(b.artists?.name||'')} — ${b.show_date||''}
+      ${esc(b.reference||'')} - ${esc(b.artists?.name||'')} - ${b.show_date||''}
     </option>`).join('');
   if (bookingId) sel.value = bookingId;
   const today = new Date().toISOString().slice(0,10);
@@ -7925,7 +7919,7 @@ async function openInvoiceEditorById(invoiceId) {
   editInvoiceId = invoiceId;
   const sel = document.getElementById('ie-booking');
   sel.innerHTML = allBookings.map(b => `<option value="${b.id}" ${b.id===inv.booking_id?'selected':''}>
-    ${esc(b.reference||'')} — ${esc(b.artists?.name||'')}
+    ${esc(b.reference||'')} - ${esc(b.artists?.name||'')}
   </option>`).join('');
   if (inv.booking_id) sel.value = inv.booking_id;
   // Agency fields from AGENCY (single source of truth)
@@ -7970,13 +7964,13 @@ function loadBookingIntoInvoice() {
   document.getElementById('ie-show-date').value = b.show_date ? fmtDate(b.show_date) : '';
   document.getElementById('ie-venue').value     = [b.venue_name,b.venue_city,b.venue_country].filter(Boolean).join(', ');
   document.getElementById('ie-currency').value  = b.fee_currency||'EUR';
-  // Client (promoter) identity — legal name + address + VAT
+  // Client (promoter) identity - legal name + address + VAT
   document.getElementById('ie-client-name').value = orgLegalName(promo);
   document.getElementById('ie-client-addr').value = buildOrgAddress(promo);
   document.getElementById('ie-client-vat').value  = promo?.vat_number || '';
   document.getElementById('ie-withholding-pct').value = b.withholding_rate||0;
   const type = document.getElementById('ie-type').value;
-  const labels = {deposit:'Deposit — ',second_deposit:'2nd Deposit — ',balance:'Balance — ',full:'Performance fee — ',credit_note:'Credit note — '};
+  const labels = {deposit:'Deposit - ',second_deposit:'2nd Deposit - ',balance:'Balance - ',full:'Performance fee - ',credit_note:'Credit note - '};
   document.getElementById('ie-description').value = (labels[type]||'')+(b.artists?.name||'')+(b.show_date?' · '+fmtDate(b.show_date):'');
   const country = b.venue_country||'';
   const euC = ['Netherlands','Germany','France','Belgium','Spain','Italy','Portugal','Austria','Sweden','Denmark','Finland','Poland'];
@@ -8066,7 +8060,7 @@ function renderInvoicePreview() {
   const d = getInvoiceData();
   const invNum = editInvoiceId ? (allInvoices.find(i=>i.id===editInvoiceId)?.invoice_number||'DRAFT') : 'DRAFT';
   const today   = fmtDate(d.issued_at||new Date().toISOString().slice(0,10));
-  const dueDate = d.due_date ? fmtDate(d.due_date) : '—';
+  const dueDate = d.due_date ? fmtDate(d.due_date) : '-';
   const fmt = n => d._sym+n.toLocaleString('nl-NL',{minimumFractionDigits:2});
   document.getElementById('ie-doc-content').innerHTML = `
 <div class="inv-doc-top">
@@ -8171,7 +8165,7 @@ async function saveInvoice() {
   btn.disabled=false; btn.textContent='✓ Save Invoice';
   if (error) { showToast('Error: '+error.message,'error'); return; }
   await logEvent(payload.booking_id, editInvoiceId ? 'invoice_updated' : 'invoice_created',
-    editInvoiceId ? `Invoice updated (${payload.invoice_number||''})` : `Invoice created: ${payload.invoice_number||''} — ${payload.type||''} — ${payload.total_amount||0} ${payload.currency||'EUR'}`,
+    editInvoiceId ? `Invoice updated (${payload.invoice_number||''})` : `Invoice created: ${payload.invoice_number||''} - ${payload.type||''} - ${payload.total_amount||0} ${payload.currency||'EUR'}`,
     { invoice_number: payload.invoice_number, type: payload.type, amount: payload.total_amount });
   showToast(editInvoiceId?'Invoice updated':'Invoice saved as draft','success');
   if (editInvoiceId) loadInvoiceComments(editInvoiceId);
@@ -8309,12 +8303,12 @@ function renderAdvancing() {
     const prodPct  = calcSectionPct(data, 'production');
     const hospPct  = calcSectionPct(data, 'hospitality');
     const travPct  = calcSectionPct(data, 'travel');
-    const shared   = a.shared_with_artist_at ? '<span style="color:var(--green)">✓</span>' : '—';
+    const shared   = a.shared_with_artist_at ? '<span style="color:var(--green)">✓</span>' : '-';
     return `<tr>
-      <td class="td-mono" style="font-size:10px">${esc(bk?.reference||'—')}</td>
-      <td class="td-name">${esc(bk?.artists?.name||'—')}</td>
-      <td class="td-mono">${bk?.show_date ? fmtDate(bk.show_date) : '—'}</td>
-      <td class="td-trunc">${esc([bk?.venue_name,bk?.venue_city].filter(Boolean).join(', ')||'—')}</td>
+      <td class="td-mono" style="font-size:10px">${esc(bk?.reference||'-')}</td>
+      <td class="td-name">${esc(bk?.artists?.name||'-')}</td>
+      <td class="td-mono">${bk?.show_date ? fmtDate(bk.show_date) : '-'}</td>
+      <td class="td-trunc">${esc([bk?.venue_name,bk?.venue_city].filter(Boolean).join(', ')||'-')}</td>
       <td><span class="badge adv-status-${a.status||'not_started'}">${(a.status||'not started').replace('_',' ')}</span></td>
       <td>${progressBar(prodPct)}</td>
       <td>${progressBar(hospPct)}</td>
@@ -8367,7 +8361,7 @@ function openAdvancingEditor(bookingId = null) {
   const sel = document.getElementById('adv-booking-sel');
   sel.innerHTML = '<option value="">Select booking...</option>' +
     allBookings.map(b => `<option value="${b.id}" ${b.id===bookingId?'selected':''}>
-      ${esc(b.reference||'')} — ${esc(b.artists?.name||'')} — ${b.show_date||''}
+      ${esc(b.reference||'')} - ${esc(b.artists?.name||'')} - ${b.show_date||''}
     </option>`).join('');
   if (bookingId) sel.value = bookingId;
 
@@ -8395,7 +8389,7 @@ async function openAdvancingEditorById(advancingId) {
 
   const sel = document.getElementById('adv-booking-sel');
   sel.innerHTML = allBookings.map(b => `<option value="${b.id}" ${b.id===a.booking_id?'selected':''}>
-    ${esc(b.reference||'')} — ${esc(b.artists?.name||'')}
+    ${esc(b.reference||'')} - ${esc(b.artists?.name||'')}
   </option>`).join('');
   if (a.booking_id) sel.value = a.booking_id;
 
@@ -8644,7 +8638,7 @@ function showPromoterLink(advancingId) {
 
 function copyPromoterLink() {
   const url = document.getElementById('adv-link-url').textContent;
-  if (!url || url === '—') { showToast('Save advancing first to get link', 'info'); return; }
+  if (!url || url === '-') { showToast('Save advancing first to get link', 'info'); return; }
   navigator.clipboard.writeText(url);
   showToast('Promoter link copied ✓', 'success');
 }
@@ -8864,10 +8858,10 @@ function renderDashboard() {
         const urgency = daysLeft <= 14 ? 'color:var(--red)' : daysLeft <= 30 ? 'color:var(--amber)' : '';
         return `<tr style="cursor:pointer" onclick="window.location.href='show.html?id=${b.id}'">
           <td class="td-mono" style="font-size:10px;${urgency}">${fmtDate(b.show_date)}</td>
-          <td class="td-name">${esc(b.artists?.name||'—')}</td>
-          <td class="td-trunc">${esc([b.venue_name,b.venue_city].filter(Boolean).join(', ')||'—')}</td>
+          <td class="td-name">${esc(b.artists?.name||'-')}</td>
+          <td class="td-trunc">${esc([b.venue_name,b.venue_city].filter(Boolean).join(', ')||'-')}</td>
           <td>${statusBadge(b.status)}</td>
-          <td class="fee-val">${b.fee_amount ? sym+(b.fee_amount/1000).toFixed(0)+'k' : '—'}</td>
+          <td class="fee-val">${b.fee_amount ? sym+(b.fee_amount/1000).toFixed(0)+'k' : '-'}</td>
         </tr>`;
       }).join('')
     : '<tr class="tbl-msg"><td colspan="5">No shows in next 90 days</td></tr>';
@@ -8882,7 +8876,7 @@ function renderDashboard() {
       type: 'Contract',
       typeCls: 'color:var(--amber)',
       ref: bk?.reference || c.id.slice(0,8),
-      artist: bk?.artists?.name || '—',
+      artist: bk?.artists?.name || '-',
       action: 'Awaiting signature',
       onclick: `openContractEditorById('${c.id}')`,
     });
@@ -8894,8 +8888,8 @@ function renderDashboard() {
     actions.push({
       type: 'Invoice',
       typeCls: 'color:var(--red)',
-      ref: i.invoice_number || '—',
-      artist: bk?.artists?.name || '—',
+      ref: i.invoice_number || '-',
+      artist: bk?.artists?.name || '-',
       action: 'OVERDUE',
       onclick: `openInvoiceEditorById('${i.id}')`,
     });
@@ -8908,8 +8902,8 @@ function renderDashboard() {
       actions.push({
         type: 'Advancing',
         typeCls: 'color:var(--blue)',
-        ref: b.reference || '—',
-        artist: b.artists?.name || '—',
+        ref: b.reference || '-',
+        artist: b.artists?.name || '-',
         action: 'Not started',
         onclick: `openAdvancingEditor('${b.id}')`,
       });
@@ -8923,7 +8917,7 @@ function renderDashboard() {
         <td class="td-name">${esc(a.artist)}</td>
         <td style="font-family:var(--mono);font-size:10px;${a.typeCls}">${esc(a.action)}</td>
       </tr>`).join('')
-    : '<tr class="tbl-msg"><td colspan="4">No open actions — all clear!</td></tr>';
+    : '<tr class="tbl-msg"><td colspan="4">No open actions - all clear!</td></tr>';
 
   // ── INVOICE DEADLINES ──
   const invoiceDue = allInvoices
@@ -8940,8 +8934,8 @@ function renderDashboard() {
         const clr = overdue ? 'color:var(--red)' : soon ? 'color:var(--amber)' : '';
         const eff = overdue ? 'overdue' : i.status;
         return `<tr style="cursor:pointer" onclick="openInvoiceEditorById('${i.id}')">
-          <td class="td-mono" style="font-size:10px">${esc(i.invoice_number||'—')}</td>
-          <td class="td-name">${esc(bk?.artists?.name||'—')}</td>
+          <td class="td-mono" style="font-size:10px">${esc(i.invoice_number||'-')}</td>
+          <td class="td-name">${esc(bk?.artists?.name||'-')}</td>
           <td class="fee-val">${sym}${(i.total_amount||0).toLocaleString()}</td>
           <td class="td-mono" style="font-size:10px;${clr}">${fmtDate(i.due_date)}</td>
           <td><span class="badge inv-status-${eff}">${eff}</span></td>
@@ -8959,9 +8953,9 @@ function renderDashboard() {
                         .reduce((s,b) => s + (b.fee_amount||0), 0);
         return `<tr>
           <td class="td-name">${esc(a.name)}</td>
-          <td class="td-mono" style="font-size:11px;color:var(--muted)">${holds||'—'}</td>
-          <td class="td-mono" style="font-size:11px;color:var(--green)">${conf||'—'}</td>
-          <td class="fee-val">${val >= 1000 ? '€'+(val/1000).toFixed(0)+'k' : val > 0 ? '€'+val : '—'}</td>
+          <td class="td-mono" style="font-size:11px;color:var(--muted)">${holds||'-'}</td>
+          <td class="td-mono" style="font-size:11px;color:var(--green)">${conf||'-'}</td>
+          <td class="fee-val">${val >= 1000 ? '€'+(val/1000).toFixed(0)+'k' : val > 0 ? '€'+val : '-'}</td>
         </tr>`;
       }).join('')
     : '<tr class="tbl-msg"><td colspan="4">No artists</td></tr>';
@@ -9054,9 +9048,9 @@ async function renderFinance() {
     const nc = mNet > 0 ? 'pos' : mNet < 0 ? 'neg' : '';
     return `<div class="fin-pl-row">
       <div class="fin-pl-month">${m}</div>
-      <div class="fin-pl-num">${mRev>0?fmt(mRev):'—'}</div>
-      <div class="fin-pl-num neg">${mExp>0?'− '+fmt(mExp):'—'}</div>
-      <div class="fin-pl-num ${nc}">${mRev>0||mExp>0?fmt(mNet):'—'}</div>
+      <div class="fin-pl-num">${mRev>0?fmt(mRev):'-'}</div>
+      <div class="fin-pl-num neg">${mExp>0?'− '+fmt(mExp):'-'}</div>
+      <div class="fin-pl-num ${nc}">${mRev>0||mExp>0?fmt(mNet):'-'}</div>
     </div>`;
   }).join('');
   document.getElementById('fin-pl-rows').innerHTML = plRows;
@@ -9086,8 +9080,8 @@ async function renderFinance() {
       <td class="fee-val">${fmt(totalFee)}</td>
       <td class="td-mono">${Math.round(avgComm)}%</td>
       <td class="fee-val" style="color:var(--green)">${fmt(commission)}</td>
-      <td class="td-mono">${invoiced>0?fmt(invoiced):'—'}</td>
-      <td class="td-mono" style="color:var(--green)">${paid>0?fmt(paid):'—'}</td>
+      <td class="td-mono">${invoiced>0?fmt(invoiced):'-'}</td>
+      <td class="td-mono" style="color:var(--green)">${paid>0?fmt(paid):'-'}</td>
     </tr>`;
   }).filter(Boolean).join('');
   document.getElementById('fin-artist-tbody').innerHTML = artistRows ||
@@ -9142,7 +9136,7 @@ function renderLedger(year, yearLines) {
         <div class="fin-line-label"><input type="text" value="${esc(line.label)}" placeholder="Label"
           onchange="markLineChange('${line.id}','label',this.value)"></div>
         ${cells}
-        <div class="fin-line-total">${lineTotal>0?'€'+Math.round(lineTotal).toLocaleString('nl-NL'):'—'}</div>
+        <div class="fin-line-total">${lineTotal>0?'€'+Math.round(lineTotal).toLocaleString('nl-NL'):'-'}</div>
         <div class="fin-line-del" onclick="deleteLine('${line.id}','${cat.id}')">×</div>
       </div>`;
     }).join('');
@@ -9151,7 +9145,7 @@ function renderLedger(year, yearLines) {
       <div class="fin-cat-hdr" onclick="toggleCat('${cat.id}')">
         <div class="fin-cat-toggle" id="cat-toggle-${cat.id}">+</div>
         <div class="fin-cat-name">${esc(cat.name)}</div>
-        <div class="fin-cat-total">${catTotal>0?'€'+Math.round(catTotal).toLocaleString('nl-NL'):'—'}</div>
+        <div class="fin-cat-total">${catTotal>0?'€'+Math.round(catTotal).toLocaleString('nl-NL'):'-'}</div>
         <button class="fin-cat-add" onclick="event.stopPropagation();addLine('${cat.id}')">+ Add line</button>
       </div>
       <div class="fin-lines" id="lines-${cat.id}" style="overflow-x:auto">
@@ -9313,12 +9307,12 @@ function renderVATReport(year) {
 
     return `<tr>
       <td class="td-mono" style="font-weight:500">${q.label}</td>
-      <td class="td-mono">${nl21Sub > 0 ? fmt(nl21Sub) : '—'}</td>
-      <td class="td-mono" style="color:var(--red)">${nl21VAT > 0 ? fmt(nl21VAT) : '—'}</td>
-      <td class="td-mono">${rcTotal > 0 ? fmt(rcTotal) : '—'}</td>
-      <td class="td-mono">${exTotal > 0 ? fmt(exTotal) : '—'}</td>
-      <td class="td-mono" style="font-weight:500">${allTotal > 0 ? fmt(allTotal) : '—'}</td>
-      <td class="td-mono" style="${afdCls};font-weight:500">${afdracht > 0 ? fmt(afdracht) : '—'}</td>
+      <td class="td-mono">${nl21Sub > 0 ? fmt(nl21Sub) : '-'}</td>
+      <td class="td-mono" style="color:var(--red)">${nl21VAT > 0 ? fmt(nl21VAT) : '-'}</td>
+      <td class="td-mono">${rcTotal > 0 ? fmt(rcTotal) : '-'}</td>
+      <td class="td-mono">${exTotal > 0 ? fmt(exTotal) : '-'}</td>
+      <td class="td-mono" style="font-weight:500">${allTotal > 0 ? fmt(allTotal) : '-'}</td>
+      <td class="td-mono" style="${afdCls};font-weight:500">${afdracht > 0 ? fmt(afdracht) : '-'}</td>
     </tr>`;
   }).join('');
 
@@ -9350,14 +9344,14 @@ function renderVATReport(year) {
       const sym = {EUR:'€',USD:'$',GBP:'£',SGD:'S$'}[i.currency||'EUR']||'';
       const eff = i.status === 'sent' && i.due_date && i.due_date < new Date().toISOString().slice(0,10) ? 'overdue' : i.status;
       return `<tr>
-        <td class="td-mono" style="font-size:10px">${esc(i.invoice_number||'—')}</td>
-        <td class="td-mono" style="font-size:10px">${i.issued_at ? fmtDate(i.issued_at) : '—'}</td>
-        <td class="td-name">${esc(bk?.artists?.name||'—')}</td>
-        <td class="td-trunc">${esc(i.bill_to_name||'—')}</td>
+        <td class="td-mono" style="font-size:10px">${esc(i.invoice_number||'-')}</td>
+        <td class="td-mono" style="font-size:10px">${i.issued_at ? fmtDate(i.issued_at) : '-'}</td>
+        <td class="td-name">${esc(bk?.artists?.name||'-')}</td>
+        <td class="td-trunc">${esc(i.bill_to_name||'-')}</td>
         <td>${vatRegimeLabel(i)}</td>
         <td class="td-mono" style="font-size:11px">${sym}${(i.subtotal||0).toLocaleString()}</td>
         <td class="td-mono" style="font-size:11px">${i.vat_rate > 0 ? i.vat_rate+'%' : (i.vat_reverse_charge?'RC':'0%')}</td>
-        <td class="td-mono" style="font-size:11px;color:var(--red)">${i.vat_amount > 0 ? sym+(i.vat_amount||0).toLocaleString() : '—'}</td>
+        <td class="td-mono" style="font-size:11px;color:var(--red)">${i.vat_amount > 0 ? sym+(i.vat_amount||0).toLocaleString() : '-'}</td>
         <td class="td-mono" style="font-size:11px;font-weight:500">${sym}${(i.total_amount||0).toLocaleString()}</td>
         <td><span class="badge inv-status-${eff}">${eff}</span></td>
       </tr>`;
@@ -9408,7 +9402,7 @@ function exportVAT() {
 // Rubriek 1a: NL leveringen/diensten belast met 21%
 // Rubriek 3a: Diensten naar EU ondernemer (reverse charge)
 // Rubriek 3b: Diensten buiten EU (niet belast)
-// Rubriek 4a: Prestaties buiten Nederland — overige
+// Rubriek 4a: Prestaties buiten Nederland - overige
 // Rubriek 5b: Totaal BTW afdracht
 function exportOBAangifte() {
   const year = finYear;
@@ -9557,9 +9551,9 @@ function renderPLPerArtist(year) {
       <td class="td-mono" style="text-align:right;">${bks.length}</td>
       <td class="td-mono" style="text-align:right;">${fmt(totalFee)}</td>
       <td class="td-mono" style="text-align:right;color:var(--green);">${fmt(commission)}</td>
-      <td class="td-mono" style="text-align:right;">${invoiced > 0 ? fmt(invoiced) : '—'}</td>
-      <td class="td-mono" style="text-align:right;color:var(--green);">${paid > 0 ? fmt(paid) : '—'}</td>
-      <td class="td-mono" style="text-align:right;${outstanding>0?'color:var(--amber);':''}">${outstanding > 0 ? fmt(outstanding) : '—'}</td>
+      <td class="td-mono" style="text-align:right;">${invoiced > 0 ? fmt(invoiced) : '-'}</td>
+      <td class="td-mono" style="text-align:right;color:var(--green);">${paid > 0 ? fmt(paid) : '-'}</td>
+      <td class="td-mono" style="text-align:right;${outstanding>0?'color:var(--amber);':''}">${outstanding > 0 ? fmt(outstanding) : '-'}</td>
       <td class="td-mono" style="text-align:right;">${Math.round(margin)}%</td>
     </tr>`;
 
@@ -9584,8 +9578,8 @@ function renderPLPerArtist(year) {
     <td class="td-mono" style="text-align:right;color:var(--green);">${fmt(grandComm)}</td>
     <td class="td-mono" style="text-align:right;">${fmt(grandInv)}</td>
     <td class="td-mono" style="text-align:right;color:var(--green);">${fmt(grandPaid)}</td>
-    <td class="td-mono" style="text-align:right;${grandOutstanding>0?'color:var(--amber);':''}">${grandOutstanding > 0 ? fmt(grandOutstanding) : '—'}</td>
-    <td class="td-mono" style="text-align:right;">${grandFee > 0 ? Math.round(grandComm/grandFee*100)+'%' : '—'}</td>
+    <td class="td-mono" style="text-align:right;${grandOutstanding>0?'color:var(--amber);':''}">${grandOutstanding > 0 ? fmt(grandOutstanding) : '-'}</td>
+    <td class="td-mono" style="text-align:right;">${grandFee > 0 ? Math.round(grandComm/grandFee*100)+'%' : '-'}</td>
   </tr>`;
 
   html += `</tbody></table>`;
@@ -9673,7 +9667,7 @@ function renderCashflow(year) {
   const fmt = n => '€ ' + Math.round(n).toLocaleString('nl-NL');
 
   // Only use actual invoices with EUR currency, not cancelled
-  // Use due_date if available, otherwise issued_at — never show unfactured amounts
+  // Use due_date if available, otherwise issued_at - never show unfactured amounts
   const yearInvoices = allInvoices.filter(i => {
     if (i.status === 'cancelled') return false;
     if (i.currency !== 'EUR') return false;
@@ -9686,7 +9680,7 @@ function renderCashflow(year) {
     return new Date(d).getFullYear() === year;
   });
 
-  // Monthly cashflow — based purely on invoices
+  // Monthly cashflow - based purely on invoices
   let cumulative = 0;
   const months = ['Jan','Feb','Mrt','Apr','Mei','Jun','Jul','Aug','Sep','Okt','Nov','Dec'];
   const cfRows = months.map((m, idx) => {
@@ -9713,21 +9707,21 @@ function renderCashflow(year) {
 
     if (expected === 0 && received === 0) return `<tr>
       <td class="td-mono" style="color:var(--muted)">${m}</td>
-      <td class="td-mono" style="color:var(--muted)">—</td>
-      <td class="td-mono" style="color:var(--muted)">—</td>
-      <td class="td-mono" style="color:var(--muted)">—</td>
-      <td class="td-mono" style="color:var(--muted)">—</td>
-      <td class="td-mono" style="color:var(--muted)">—</td>
+      <td class="td-mono" style="color:var(--muted)">-</td>
+      <td class="td-mono" style="color:var(--muted)">-</td>
+      <td class="td-mono" style="color:var(--muted)">-</td>
+      <td class="td-mono" style="color:var(--muted)">-</td>
+      <td class="td-mono" style="color:var(--muted)">-</td>
     </tr>`;
 
     const cumCls = cumulative >= 0 ? 'color:var(--green)' : 'color:var(--red)';
     return `<tr>
       <td class="td-mono" style="font-weight:500">${m}</td>
-      <td class="td-mono" style="color:var(--blue)">${expected > 0 ? fmt(expected) : '—'}</td>
-      <td class="td-mono" style="color:var(--green)">${received > 0 ? fmt(received) : '—'}</td>
-      <td class="td-mono" style="color:var(--amber)">${expected > 0 ? fmt(expected) : '—'}</td>
+      <td class="td-mono" style="color:var(--blue)">${expected > 0 ? fmt(expected) : '-'}</td>
+      <td class="td-mono" style="color:var(--green)">${received > 0 ? fmt(received) : '-'}</td>
+      <td class="td-mono" style="color:var(--amber)">${expected > 0 ? fmt(expected) : '-'}</td>
       <td class="td-mono" style="${cumCls}">${fmt(cumulative)}</td>
-      <td class="td-mono" style="color:var(--muted)">${invCount > 0 ? invCount : '—'}</td>
+      <td class="td-mono" style="color:var(--muted)">${invCount > 0 ? invCount : '-'}</td>
     </tr>`;
   }).join('');
 
@@ -9750,9 +9744,9 @@ function renderCashflow(year) {
     const eff = overdue ? 'overdue' : i.status;
     return `<tr style="cursor:pointer" onclick="openInvoiceEditorById('${i.id}')">
       <td class="td-mono" style="font-size:10px;${overdue?'color:var(--red)':''}">${fmtDate(i.due_date)}</td>
-      <td class="td-mono" style="font-size:10px">${esc(i.invoice_number||'—')}</td>
-      <td class="td-name">${esc(bk?.artists?.name||'—')}</td>
-      <td class="td-trunc">${esc(i.bill_to_name||'—')}</td>
+      <td class="td-mono" style="font-size:10px">${esc(i.invoice_number||'-')}</td>
+      <td class="td-name">${esc(bk?.artists?.name||'-')}</td>
+      <td class="td-trunc">${esc(i.bill_to_name||'-')}</td>
       <td><span class="genre-pill">${esc(typeLabel)}</span></td>
       <td class="fee-val">${sym}${(i.total_amount||0).toLocaleString()}</td>
       <td><span class="badge inv-status-${eff}">${eff}</span></td>
@@ -9805,7 +9799,7 @@ async function renderCommentsOverview() {
     return;
   }
 
-  // Group by invoice_id — keep only latest comment per invoice
+  // Group by invoice_id - keep only latest comment per invoice
   const byInvoice = {};
   comments.forEach(c => {
     if (!byInvoice[c.invoice_id]) byInvoice[c.invoice_id] = c;
@@ -9823,8 +9817,8 @@ async function renderCommentsOverview() {
     // Truncate comment to 60 chars
     const shortComment = c.comment.length > 60 ? c.comment.slice(0,60)+'…' : c.comment;
     return `<tr style="cursor:pointer" onclick="openInvoiceEditorById('${inv.id}')">
-      <td class="td-mono" style="font-size:10px">${esc(inv.invoice_number||'—')}</td>
-      <td class="td-name">${esc(bk?.artists?.name||'—')}</td>
+      <td class="td-mono" style="font-size:10px">${esc(inv.invoice_number||'-')}</td>
+      <td class="td-name">${esc(bk?.artists?.name||'-')}</td>
       <td class="fee-val">${sym}${(inv.total_amount||0).toLocaleString()}</td>
       <td><span class="badge inv-status-${eff}">${eff}</span></td>
       <td style="font-size:12px;max-width:240px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(shortComment)}</td>
@@ -9858,12 +9852,12 @@ async function renderPayoutsOverview() {
     const sym  = {EUR:'€',USD:'$',GBP:'£',SGD:'S$',AED:'AED ',IDR:'Rp',THB:'฿'}[p.currency||'EUR']||'€';
     const paid = p.status === 'paid';
     return `<tr>
-      <td class="td-mono" style="font-size:10px">${b?.show_date ? fmtDate(b.show_date) : '—'}</td>
-      <td class="td-name">${esc(a?.name||'—')}</td>
-      <td class="td-trunc">${esc(b?.venue_name||'—')}</td>
-      <td class="td-mono">${sett ? fmt(sett.gross_fee, sym) : '—'}</td>
-      <td class="td-mono" style="color:var(--red)">${sett ? '− '+fmt(sett.commission_amount, sym) : '—'}</td>
-      <td class="td-mono" style="color:var(--red)">${sett?.total_expenses > 0 ? '− '+fmt(sett.total_expenses, sym) : '—'}</td>
+      <td class="td-mono" style="font-size:10px">${b?.show_date ? fmtDate(b.show_date) : '-'}</td>
+      <td class="td-name">${esc(a?.name||'-')}</td>
+      <td class="td-trunc">${esc(b?.venue_name||'-')}</td>
+      <td class="td-mono">${sett ? fmt(sett.gross_fee, sym) : '-'}</td>
+      <td class="td-mono" style="color:var(--red)">${sett ? '− '+fmt(sett.commission_amount, sym) : '-'}</td>
+      <td class="td-mono" style="color:var(--red)">${sett?.total_expenses > 0 ? '− '+fmt(sett.total_expenses, sym) : '-'}</td>
       <td class="td-mono" style="color:var(--green);font-weight:500">${fmt(p.amount, sym)}</td>
       <td><span class="${paid?'payout-paid':'payout-pending'}">${paid?'✓ PAID':'⏳ PENDING'}</span></td>
       <td><button class="ra" style="font-size:9px" onclick="openSettlementFromPayout('${p.booking_id}')">Open</button></td>
@@ -9952,14 +9946,14 @@ async function generateStatement() {
       totExp += sett?.total_expenses||0; totPayout += p.amount||0;
     }
     return `<tr>
-      <td class="td-mono" style="font-size:10px">${b?.show_date?fmtDate(b.show_date):'—'}</td>
-      <td class="td-name">${esc(a?.name||'—')}</td>
-      <td class="td-trunc">${esc([b?.venue_name,b?.venue_city].filter(Boolean).join(', ')||'—')}</td>
-      <td class="td-mono">${sett?f(sett.gross_fee):'—'}</td>
-      <td class="td-mono" style="color:var(--red)">${sett?.withholding_amount>0?'−'+f(sett.withholding_amount):'—'}</td>
-      <td class="td-mono">${sett?f(sett.net_fee):'—'}</td>
-      <td class="td-mono" style="color:var(--red)">${sett?'−'+f(sett.commission_amount):'—'}</td>
-      <td class="td-mono" style="color:var(--red)">${sett?.total_expenses>0?'−'+f(sett.total_expenses):'—'}</td>
+      <td class="td-mono" style="font-size:10px">${b?.show_date?fmtDate(b.show_date):'-'}</td>
+      <td class="td-name">${esc(a?.name||'-')}</td>
+      <td class="td-trunc">${esc([b?.venue_name,b?.venue_city].filter(Boolean).join(', ')||'-')}</td>
+      <td class="td-mono">${sett?f(sett.gross_fee):'-'}</td>
+      <td class="td-mono" style="color:var(--red)">${sett?.withholding_amount>0?'−'+f(sett.withholding_amount):'-'}</td>
+      <td class="td-mono">${sett?f(sett.net_fee):'-'}</td>
+      <td class="td-mono" style="color:var(--red)">${sett?'−'+f(sett.commission_amount):'-'}</td>
+      <td class="td-mono" style="color:var(--red)">${sett?.total_expenses>0?'−'+f(sett.total_expenses):'-'}</td>
       <td class="td-mono" style="color:var(--green);font-weight:500">${f(p.amount)}</td>
       <td><span class="${paid?'payout-paid':'payout-pending'}">${paid?'✓ PAID':'⏳ PENDING'}</span></td>
     </tr>`;
@@ -9976,7 +9970,7 @@ async function generateStatement() {
 }
 
 function exportStatement() {
-  showToast('Export functie — genereer eerst de statement', 'info');
+  showToast('Export functie - genereer eerst de statement', 'info');
 }
 
 // ── END FINANCE ────────────────────────────────────────────────
@@ -10005,7 +9999,7 @@ function openEmailModal(type, id) {
     subEl.textContent   = invNum;
     document.getElementById('email-to').value = con?.email || '';
     document.getElementById('email-subject').value =
-      `Invoice ${invNum}${artistName ? ' — ' + artistName : ''}${venueName ? ' · ' + venueName : ''}`;
+      `Invoice ${invNum}${artistName ? ' - ' + artistName : ''}${venueName ? ' · ' + venueName : ''}`;
 
     const sym = {EUR:'€',USD:'$',GBP:'£',SGD:'S$',AED:'AED ',IDR:'Rp',THB:'฿'}[inv?.currency||'EUR']||'';
     const amount = inv?.total_amount ? sym + inv.total_amount.toLocaleString() : '';
@@ -10047,7 +10041,7 @@ ${AGENCY.email || ''}`;
     subEl.textContent   = bk?.reference || ct?.bookings?.reference || '';
     document.getElementById('email-to').value = con?.email || '';
     document.getElementById('email-subject').value =
-      `Booking Contract — ${artistName}${venueName ? ' · ' + venueName : ''}${showDate ? ' · ' + fmtDate(showDate) : ''}`;
+      `Booking Contract - ${artistName}${venueName ? ' · ' + venueName : ''}${showDate ? ' · ' + fmtDate(showDate) : ''}`;
     document.getElementById('email-body').value =
 `Dear ${con?.first_name||'Team'},
 
@@ -10234,7 +10228,7 @@ function makeCalDay(date, bks, otherMonth, today) {
     const isExpiring = b.status === 'hold' && b.hold_expires_at &&
       new Date(b.hold_expires_at) < new Date(Date.now() + 48*60*60*1000);
     html += `<div class="cal-event ${b.status}" onclick="event.stopPropagation();showCalPopup(event,'${b.id}')"
-      title="${esc(artist)} — ${esc(b.venue_name||'')}${isExpiring?' ⚠ Hold expiring!':''}">
+      title="${esc(artist)} - ${esc(b.venue_name||'')}${isExpiring?' ⚠ Hold expiring!':''}">
       ${isExpiring?'⚠ ':''}${esc(artist)}${b.venue_city?' · '+esc(b.venue_city):''}
     </div>`;
   });
@@ -10249,18 +10243,18 @@ function makeCalDay(date, bks, otherMonth, today) {
 function showCalPopup(event, bookingId) {
   const b = allBookings.find(x => x.id === bookingId);
   if (!b) return;
-  const artist = b.artists?.name || allArtists.find(a=>a.id===b.artist_id)?.name || '—';
+  const artist = b.artists?.name || allArtists.find(a=>a.id===b.artist_id)?.name || '-';
   const org    = allOrgs.find(o => o.id === b.company_id);
   const sym    = {EUR:'€',USD:'$',GBP:'£',SGD:'S$',AED:'AED ',IDR:'Rp',THB:'฿'}[b.fee_currency||'EUR']||'';
 
   document.getElementById('cal-popup-title').textContent = artist;
   document.getElementById('cal-popup-body').innerHTML = `
     <div class="cal-popup-row"><span class="cal-popup-label">Date</span><span class="cal-popup-val">${b.show_date_end && b.show_date_end !== b.show_date ? fmtDate(b.show_date)+' - '+fmtDate(b.show_date_end) : fmtDate(b.show_date)}</span></div>
-    <div class="cal-popup-row"><span class="cal-popup-label">Venue</span><span class="cal-popup-val">${esc([b.venue_name,b.venue_city,b.venue_country].filter(Boolean).join(', ')||'—')}</span></div>
+    <div class="cal-popup-row"><span class="cal-popup-label">Venue</span><span class="cal-popup-val">${esc([b.venue_name,b.venue_city,b.venue_country].filter(Boolean).join(', ')||'-')}</span></div>
     <div class="cal-popup-row"><span class="cal-popup-label">Status</span><span class="cal-popup-val">${statusBadge(b.status)}</span></div>
-    <div class="cal-popup-row"><span class="cal-popup-label">Fee</span><span class="cal-popup-val">${b.fee_amount?sym+b.fee_amount.toLocaleString():'—'}</span></div>
-    <div class="cal-popup-row"><span class="cal-popup-label">Promoter</span><span class="cal-popup-val">${esc(org?.name||'—')}</span></div>
-    <div class="cal-popup-row"><span class="cal-popup-label">Ref</span><span class="cal-popup-val" style="font-family:var(--mono);font-size:10px">${esc(b.reference||'—')}</span></div>
+    <div class="cal-popup-row"><span class="cal-popup-label">Fee</span><span class="cal-popup-val">${b.fee_amount?sym+b.fee_amount.toLocaleString():'-'}</span></div>
+    <div class="cal-popup-row"><span class="cal-popup-label">Promoter</span><span class="cal-popup-val">${esc(org?.name||'-')}</span></div>
+    <div class="cal-popup-row"><span class="cal-popup-label">Ref</span><span class="cal-popup-val" style="font-family:var(--mono);font-size:10px">${esc(b.reference||'-')}</span></div>
     ${b.status==='hold'&&b.hold_expires_at?`<div class="cal-popup-row"><span class="cal-popup-label">Hold expires</span><span class="cal-popup-val" style="color:var(--amber)">${fmtDate(b.hold_expires_at.slice(0,10))}</span></div>`:''}
   `;
 
@@ -10294,7 +10288,7 @@ function renderAvailStrip(daysInMonth) {
   const headerRow = `<div class="cal-avail-row">
     <div class="cal-avail-name" style="color:transparent">.</div>
     <div class="cal-avail-strip" style="height:14px">
-      ${dayNums.map(d => `<div style="flex:1;text-align:center;font-family:var(--mono);font-size:8px;color:var(--muted);line-height:14px">${d}</div>`).join('')}
+      ${dayNums.map(d => `<div style="flex:1;text-align:center;font-family:var(--mono);font-size:9px;color:var(--muted);line-height:14px">${d}</div>`).join('')}
     </div>
     <div style="width:52px;margin-left:8px"></div>
   </div>`;
@@ -10313,7 +10307,7 @@ function renderAvailStrip(daysInMonth) {
     return `<div class="cal-avail-row">
       <div class="cal-avail-name">${esc(a.name)}</div>
       <div class="cal-avail-strip">
-        ${days.map((d,i) => `<div class="cal-avail-day ${d}" title="${new Date(calYear,calMonth,i+1).getDate()} — ${d}"></div>`).join('')}
+        ${days.map((d,i) => `<div class="cal-avail-day ${d}" title="${new Date(calYear,calMonth,i+1).getDate()} - ${d}"></div>`).join('')}
       </div>
       <div style="font-family:var(--mono);font-size:9px;color:var(--muted);margin-left:8px;white-space:nowrap">${freeCount}d free</div>
     </div>`;
@@ -10337,15 +10331,15 @@ async function openSettlement(bookingId) {
     const today = new Date().toISOString().slice(0,10);
     // Guard: needs show date
     if (!b.show_date) {
-      showToast('Settlement requires a show date — edit the booking first', 'error'); return;
+      showToast('Settlement requires a show date - edit the booking first', 'error'); return;
     }
     // Guard: show date must be in past (or today)
     if (b.show_date > today) {
-      showToast(`Show is on ${fmtDate(b.show_date)} — settlement can only be created after the show`, 'error'); return;
+      showToast(`Show is on ${fmtDate(b.show_date)} - settlement can only be created after the show`, 'error'); return;
     }
     // Guard: needs company + contact
     if (!b.company_id) {
-      showToast('Settlement requires a company — edit the booking first', 'error'); return;
+      showToast('Settlement requires a company - edit the booking first', 'error'); return;
     }
   }
 
@@ -10449,14 +10443,14 @@ function calcSettlement() {
   const payout   = netFee - commAmt - totalExp;
 
   // Update preview
-  document.getElementById('sp-gross').textContent = gross > 0 ? fmt(gross) : '—';
+  document.getElementById('sp-gross').textContent = gross > 0 ? fmt(gross) : '-';
   document.getElementById('sp-wh-row').style.display = whRate > 0 ? 'grid' : 'none';
   document.getElementById('sp-wh-pct').textContent = whRate;
-  document.getElementById('sp-wh-amt').textContent = whAmt > 0 ? '− '+fmt(whAmt) : '—';
-  document.getElementById('sp-net').textContent = netFee > 0 ? fmt(netFee) : '—';
+  document.getElementById('sp-wh-amt').textContent = whAmt > 0 ? '− '+fmt(whAmt) : '-';
+  document.getElementById('sp-net').textContent = netFee > 0 ? fmt(netFee) : '-';
   document.getElementById('sp-comm-pct').textContent = commRate;
   document.getElementById('sp-comm-base').textContent = commBase === 'net' ? 'net' : 'gross';
-  document.getElementById('sp-comm-amt').textContent = commAmt > 0 ? '− '+fmt(commAmt) : '—';
+  document.getElementById('sp-comm-amt').textContent = commAmt > 0 ? '− '+fmt(commAmt) : '-';
 
   // Expenses in preview
   const expSection = document.getElementById('sp-exp-section');
@@ -10587,10 +10581,10 @@ function printSettlement() { window.print(); }
 const REMINDER_FUNCTION_URL = 'https://ksnxgidklhonpsneerbu.supabase.co/functions/v1/send-reminders';
 
 const REMINDER_TYPE_LABELS = {
-  invoice_due_soon:     'Invoice — Due Soon',
-  invoice_overdue:      'Invoice — Overdue',
-  contract_unsigned:    'Contract — Unsigned',
-  advancing_incomplete: 'Advancing — Incomplete',
+  invoice_due_soon:     'Invoice - Due Soon',
+  invoice_overdue:      'Invoice - Overdue',
+  contract_unsigned:    'Contract - Unsigned',
+  advancing_incomplete: 'Advancing - Incomplete',
 };
 
 async function renderReminders() {
@@ -10673,9 +10667,9 @@ async function runRemindersNow() {
     });
     const data = await res.json();
     if (data.results) {
-      showToast(`Done — ${data.results.sent} sent, ${data.results.skipped} skipped`, 'success');
+      showToast(`Done - ${data.results.sent} sent, ${data.results.skipped} skipped`, 'success');
     } else {
-      showToast('Ran — check log', 'success');
+      showToast('Ran - check log', 'success');
     }
     renderReminders();
   } catch(e) {
@@ -10791,17 +10785,17 @@ async function loadCdContacts(orgId) {
   const tbody = document.getElementById('cd-contacts-tbody');
   const { data: cons } = await db.from('contacts').select('*').eq('organisation_id', orgId);
   if (!cons?.length) {
-    tbody.innerHTML = '<tr class="tbl-msg"><td colspan="6">No contacts yet — click "+ Add Contact"</td></tr>';
+    tbody.innerHTML = '<tr class="tbl-msg"><td colspan="6">No contacts yet - click "+ Add Contact"</td></tr>';
     return;
   }
   tbody.innerHTML = cons.map(c => {
-    const name = [c.first_name, c.last_name].filter(Boolean).join(' ') || '—';
+    const name = [c.first_name, c.last_name].filter(Boolean).join(' ') || '-';
     const synced = c.mailchimp_id ? '<span class="badge bs-confirmed">synced</span>' : '<span class="badge bs-cancelled">not synced</span>';
     return `<tr>
       <td class="td-name">${esc(name)}</td>
-      <td class="td-mono" style="font-size:11px">${esc(c.email||'—')}</td>
-      <td class="td-mono" style="font-size:11px">${esc(c.phone||'—')}</td>
-      <td class="td-mono" style="font-size:11px">${esc(c.role||'—')}</td>
+      <td class="td-mono" style="font-size:11px">${esc(c.email||'-')}</td>
+      <td class="td-mono" style="font-size:11px">${esc(c.phone||'-')}</td>
+      <td class="td-mono" style="font-size:11px">${esc(c.role||'-')}</td>
       <td>${synced}</td>
       <td><div class="row-actions">
         <button class="ra" onclick="editConFromDetail('${c.id}')">Edit</button>
@@ -10820,11 +10814,11 @@ async function loadCdBookings(orgId) {
   }
   const sym = s => ({EUR:'€',USD:'$',GBP:'£',SGD:'S$'}[s]||s);
   tbody.innerHTML = bks.sort((a,b) => (b.show_date||'').localeCompare(a.show_date||'')).map(b => `<tr>
-    <td class="td-mono" style="font-size:11px">${b.show_date?fmtDate(b.show_date):'—'}</td>
-    <td class="td-name">${esc(b.artists?.name||'—')}</td>
-    <td class="td-trunc">${esc([b.venue_name,b.venue_city].filter(Boolean).join(', ')||'—')}</td>
+    <td class="td-mono" style="font-size:11px">${b.show_date?fmtDate(b.show_date):'-'}</td>
+    <td class="td-name">${esc(b.artists?.name||'-')}</td>
+    <td class="td-trunc">${esc([b.venue_name,b.venue_city].filter(Boolean).join(', ')||'-')}</td>
     <td>${statusBadge(b.status)}</td>
-    <td class="td-mono">${b.fee_amount?(sym(b.fee_currency)+b.fee_amount.toLocaleString()):'—'}</td>
+    <td class="td-mono">${b.fee_amount?(sym(b.fee_currency)+b.fee_amount.toLocaleString()):'-'}</td>
     <td><button class="ra" onclick="editBooking('${b.id}')">Open</button></td>
   </tr>`).join('');
 }
@@ -10908,18 +10902,18 @@ function renderVenues() {
   tbody.innerHTML = slice.map(v => {
     const org     = v.organisations;
     const con     = v.contacts;
-    const conName = con ? [con.first_name, con.last_name].filter(Boolean).join(' ') : '—';
-    const conEmail = con?.email || '—';
+    const conName = con ? [con.first_name, con.last_name].filter(Boolean).join(' ') : '-';
+    const conEmail = con?.email || '-';
     const tags    = (v.venue_tags||[]).map(vt => `<span class="genre-pill">${esc(vt.tags?.name||'')}</span>`).join('');
     return `<tr style="cursor:pointer" onclick="openVenueModal('${v.id}')">
       <td class="td-name">${esc(v.name)}</td>
       <td><span class="genre-pill">${v.venue_type||'club'}</span></td>
-      <td>${esc(v.city||'—')}</td>
-      <td>${esc(v.country||'—')}</td>
-      <td class="td-trunc">${esc(org?.legal_name||org?.name||'—')}</td>
+      <td>${esc(v.city||'-')}</td>
+      <td>${esc(v.country||'-')}</td>
+      <td class="td-trunc">${esc(org?.legal_name||org?.name||'-')}</td>
       <td class="td-trunc">${esc(conName)}</td>
       <td class="td-mono" style="font-size:11px;">${esc(conEmail)}</td>
-      <td>${tags||'—'}</td>
+      <td>${tags||'-'}</td>
       <td><div class="row-actions">
         <button class="ra" onclick="event.stopPropagation();openVenueModal('${v.id}')">Edit</button>
         <button class="ra del" onclick="event.stopPropagation();deleteVenueById('${v.id}')">Del</button>
@@ -10945,7 +10939,7 @@ async function openVenueModal(id = null) {
   document.getElementById('vm-delete-btn').style.display = id ? 'inline-block' : 'none';
 
   // Populate org searchable select
-  const orgOpts = allOrgs.map(o => ({ value: o.id, label: o.legal_name||o.name, sub: [o.company_type, o.city, o.country].filter(Boolean).join(' / ') }));
+  const orgOpts = allOrgs.map(o => ({ value: o.id, label: o.legal_name||o.name, sub: [o.company_type, o.city, o.country].filter(Boolean).join(' · ') }));
   ssPopulate('ss-vm-org', orgOpts, {
     hiddenId: 'vm-org',
     placeholder: 'Search company...',
@@ -11166,7 +11160,7 @@ function openWizard(fromBooking = false) {
   wizSelectedTags = new Set();
 
   // Populate company searchable select
-  const orgOpts = allOrgs.map(o => ({ value: o.id, label: o.legal_name||o.name, sub: [o.company_type, o.city, o.country].filter(Boolean).join(' / ') }));
+  const orgOpts = allOrgs.map(o => ({ value: o.id, label: o.legal_name||o.name, sub: [o.company_type, o.city, o.country].filter(Boolean).join(' · ') }));
   ssPopulate('ss-wiz-org', orgOpts, {
     hiddenId: 'wiz-org-select',
     placeholder: 'Search company...',
@@ -11174,7 +11168,7 @@ function openWizard(fromBooking = false) {
   });
 
   // Populate venue searchable select
-  const venueOpts = allVenues.map(v => ({ value: v.id, label: v.name, sub: [v.venue_type, v.city, v.country].filter(Boolean).join(' / ') }));
+  const venueOpts = allVenues.map(v => ({ value: v.id, label: v.name, sub: [v.venue_type, v.city, v.country].filter(Boolean).join(' · ') }));
   ssPopulate('ss-wiz-venue', venueOpts, {
     hiddenId: 'wiz-venue-select',
     placeholder: 'Search venue...',
@@ -11246,7 +11240,7 @@ function wizSelectOrg() {
   const org = allOrgs.find(o => o.id === id);
   preview.style.display = 'block';
   preview.innerHTML = `<div style="font-family:var(--mono);font-size:11px;color:var(--accent)">${esc(org?.legal_name||org?.name||'')}</div>
-    <div style="font-family:var(--mono);font-size:10px;color:var(--muted);margin-top:4px">${[org?.company_type,org?.city,org?.country].filter(Boolean).join(' / ')}</div>`;
+    <div style="font-family:var(--mono);font-size:10px;color:var(--muted);margin-top:4px">${[org?.company_type,org?.city,org?.country].filter(Boolean).join(' · ')}</div>`;
   document.getElementById('wiz-sub-1').textContent = org?.legal_name||org?.name||'';
 
   // Pre-load contacts for step 2
@@ -11267,7 +11261,7 @@ function wizSelectOrg() {
   const venueOpts = [...orgVenues, ...otherVenues].map(v => ({
     value: v.id,
     label: v.name + (v.organisation_id === id ? ' *' : ''),
-    sub: [v.venue_type, v.city, v.country].filter(Boolean).join(' / '),
+    sub: [v.venue_type, v.city, v.country].filter(Boolean).join(' · '),
   }));
   ssPopulate('ss-wiz-venue', venueOpts, {
     hiddenId: 'wiz-venue-select',
@@ -11284,7 +11278,7 @@ function wizSelectContact() {
   const con = allCons.find(c => c.id === id);
   preview.style.display = 'block';
   preview.innerHTML = `<div style="font-family:var(--mono);font-size:11px;color:var(--accent)">${esc([con?.first_name,con?.last_name].filter(Boolean).join(' '))}</div>
-    <div style="font-family:var(--mono);font-size:10px;color:var(--muted);margin-top:4px">${[con?.email,con?.phone,con?.role].filter(Boolean).join(' / ')}</div>`;
+    <div style="font-family:var(--mono);font-size:10px;color:var(--muted);margin-top:4px">${[con?.email,con?.phone,con?.role].filter(Boolean).join(' · ')}</div>`;
   document.getElementById('wiz-sub-2').textContent = [con?.first_name,con?.last_name].filter(Boolean).join(' ')||con?.email||'';
 }
 
@@ -11308,7 +11302,7 @@ function wizRenderTags() {
   allTags.forEach(t => { if (!grouped[t.tag_type]) grouped[t.tag_type]=[]; grouped[t.tag_type].push(t); });
   container.innerHTML = Object.entries(grouped).map(([type, tags]) =>
     `<div style="width:100%;margin-bottom:6px">
-      <div style="font-family:var(--mono);font-size:9px;color:var(--muted);margin-bottom:3px;text-transform:uppercase;letter-spacing:0.08em">${type}</div>
+      <div style="font-family:var(--mono);font-size:9px;color:var(--muted);margin-bottom:3px;text-transform:uppercase;letter-spacing:0.1em">${type}</div>
       <div style="display:flex;flex-wrap:wrap;gap:3px">
         ${tags.map(t => `<button type="button" onclick="wizToggleTag('${t.id}')" id="wtag-${t.id}"
           style="padding:2px 8px;font-family:var(--mono);font-size:10px;cursor:pointer;transition:all 0.1s;
@@ -11507,7 +11501,7 @@ async function wizSave() {
 // ── END SETUP WIZARD ───────────────────────────────────────────
 
 // ══════════════════════════════════════════════════════════════
-// TOURS MODULE — shadow agenda
+// TOURS MODULE - shadow agenda
 // Supabase table: tour_slots
 // ══════════════════════════════════════════════════════════════
 let allTourSlots = [];
@@ -11560,7 +11554,7 @@ function renderTourTable() {
   if (currentTourArtistId) slots = slots.filter(s => s.artist_id === currentTourArtistId);
   if (filterStatus) slots = slots.filter(s => s.status === filterStatus);
   if (!slots.length) {
-    const msg = currentTourArtistId ? 'No dates yet — click "+ Add Dates" to build the tour.' : 'Select an artist to view or build their tour.';
+    const msg = currentTourArtistId ? 'No dates yet - click "+ Add Dates" to build the tour.' : 'Select an artist to view or build their tour.';
     tbody.innerHTML = `<tr class="tbl-msg"><td colspan="10">${msg}</td></tr>`;
     return;
   }
@@ -11573,11 +11567,11 @@ function renderTourTable() {
       <td style="padding:6px 8px;color:var(--muted);font-family:var(--mono);font-size:10px;">${day}</td>
       <td class="td-mono" style="font-size:11px;white-space:nowrap;">${fmtDate(s.date)}</td>
       <td class="td-mono" style="font-size:10px;color:var(--muted);">${day}</td>
-      <td class="td-trunc" style="max-width:180px;">${esc(s.venue || '—')}</td>
-      <td class="td-mono" style="font-size:11px;">${esc(s.city || '—')}</td>
-      <td class="td-mono" style="font-size:11px;">${esc(s.country || '—')}</td>
+      <td class="td-trunc" style="max-width:180px;">${esc(s.venue || '-')}</td>
+      <td class="td-mono" style="font-size:11px;">${esc(s.city || '-')}</td>
+      <td class="td-mono" style="font-size:11px;">${esc(s.country || '-')}</td>
       <td><span class="badge" style="${stl}font-size:10px;padding:2px 8px;">${s.status}</span></td>
-      <td class="td-mono" style="font-size:11px;">${esc(s.fee_ballpark || '—')}</td>
+      <td class="td-mono" style="font-size:11px;">${esc(s.fee_ballpark || '-')}</td>
       <td class="td-trunc" style="font-size:11px;color:var(--muted);max-width:200px;">${esc(s.notes || '')}</td>
       <td><button class="ra" onclick="event.stopPropagation();openEditDateModal('${s.id}')">Edit</button></td>
     </tr>`;
@@ -11621,7 +11615,7 @@ function renderCalGrid() {
     const title   = isExisting ? ' title="Already in tour"' : '';
     html += `<div ${onclick}${title} style="border:1px solid ${border};background:${bg};color:${color};border-radius:3px;padding:6px 4px;text-align:center;font-family:var(--mono);font-size:12px;cursor:${cursor};user-select:none;${isExisting?'opacity:0.6;':''}">
       <div style="font-weight:${isWeekend?'600':'400'}">${d}</div>
-      <div style="font-size:8px;opacity:0.7;">${TOUR_DAYS[dow]}</div>
+      <div style="font-size:9px;opacity:0.7;">${TOUR_DAYS[dow]}</div>
       ${isExisting?'<div style="font-size:7px;margin-top:1px;">✓</div>':''}
     </div>`;
   }
@@ -11797,7 +11791,7 @@ async function renderContactsPool() {
   const tbody = document.getElementById('pool-tbody');
   if (!orgs.length) {
     const msg = poolOrgIds.length === 0
-      ? `No contacts in ${artist?.name}'s pool yet — go to Pipeline tab to add contacts.`
+      ? `No contacts in ${artist?.name}'s pool yet - go to Pipeline tab to add contacts.`
       : 'No contacts match the current filter.';
     tbody.innerHTML = `<tr class="tbl-msg"><td colspan="8">${msg}</td></tr>`;
     poolUpdateExportBtn(); return;
@@ -11806,17 +11800,17 @@ async function renderContactsPool() {
   tbody.innerHTML = orgs.map(o => {
     const cons     = allCons.filter(c => c.organisation_id === o.id && c.is_active !== false);
     const primary  = cons[0];
-    const conName  = primary ? [primary.first_name, primary.last_name].filter(Boolean).join(' ') : '—';
+    const conName  = primary ? [primary.first_name, primary.last_name].filter(Boolean).join(' ') : '-';
     const typeCls  = {promoter:'club',festival:'festival',agency:'agency',brand:'brand'}[o.company_type||o.type]||'other';
     return `<tr>
       <td style="padding:6px;"><input type="checkbox" class="pool-row-check" data-org-id="${o.id}" onchange="poolUpdateExportBtn()"></td>
-      <td class="td-name" style="font-weight:500;">${esc(o.legal_name||o.name||'—')}</td>
-      <td><span class="badge b-${typeCls}" style="font-size:10px;">${esc(o.company_type||o.type||'—')}</span></td>
-      <td class="td-mono" style="font-size:11px;">${esc(o.country||'—')}</td>
-      <td class="td-mono" style="font-size:11px;">${esc(o.city||'—')}</td>
+      <td class="td-name" style="font-weight:500;">${esc(o.legal_name||o.name||'-')}</td>
+      <td><span class="badge b-${typeCls}" style="font-size:10px;">${esc(o.company_type||o.type||'-')}</span></td>
+      <td class="td-mono" style="font-size:11px;">${esc(o.country||'-')}</td>
+      <td class="td-mono" style="font-size:11px;">${esc(o.city||'-')}</td>
       <td class="td-trunc" style="max-width:140px;">${esc(conName)}</td>
-      <td class="td-mono" style="font-size:11px;">${esc(primary?.email||'—')}</td>
-      <td class="td-mono" style="font-size:11px;">${esc(primary?.phone||'—')}</td>
+      <td class="td-mono" style="font-size:11px;">${esc(primary?.email||'-')}</td>
+      <td class="td-mono" style="font-size:11px;">${esc(primary?.phone||'-')}</td>
     </tr>`;
   }).join('');
 
@@ -11897,7 +11891,7 @@ function exportPoolRows(orgs, filename) {
 
 
 // ══════════════════════════════════════════════════════════════
-// PIPELINE — contacts pool with per-artist checkboxes
+// PIPELINE - contacts pool with per-artist checkboxes
 // Supabase table: artist_contact_pool (artist_id, org_id)
 // ══════════════════════════════════════════════════════════════
 let allPoolLinks = [];    // {artist_id, org_id} from Supabase
@@ -11949,7 +11943,7 @@ function renderSalesBoard() {
   const countBar = document.getElementById('sb-count-bar');
   if (countBar) countBar.textContent = `${orgs.length} organisation${orgs.length!==1?'s':''}`;
 
-  // Build artist header columns — sort by name for consistent order
+  // Build artist header columns - sort by name for consistent order
   const sortedArtists = [...allArtists].sort((a,b) => a.name.localeCompare(b.name));
   const thead = document.querySelector('#sb-table thead tr');
   if (thead) {
@@ -11972,10 +11966,10 @@ function renderSalesBoard() {
   tbody.innerHTML = orgs.map(o => {
     const cons    = allCons.filter(c => c.organisation_id === o.id && c.is_active !== false);
     const primary = cons[0];
-    const conName = primary ? [primary.first_name, primary.last_name].filter(Boolean).join(' ') : '—';
+    const conName = primary ? [primary.first_name, primary.last_name].filter(Boolean).join(' ') : '-';
     const typeCls = {promoter:'club',festival:'festival',agency:'agency',brand:'brand'}[o.company_type||o.type]||'other';
 
-    // Per-artist checkboxes — same sorted order as headers
+    // Per-artist checkboxes - same sorted order as headers
     const artistCells = sortedArtists.map(a => {
       const inPool = allPoolLinks.some(l => l.artist_id === a.id && l.org_id === o.id);
       return `<td style="text-align:center;">
@@ -11989,11 +11983,11 @@ function renderSalesBoard() {
 
     return `<tr>
       <td style="padding:6px;"><input type="checkbox" class="sb-row-check" data-org-id="${o.id}" onchange="sbUpdateExportBtn()"></td>
-      <td class="td-name" style="font-weight:500;">${esc(o.legal_name||o.name||'—')}</td>
-      <td><span class="badge b-${typeCls}" style="font-size:10px;">${esc(o.company_type||o.type||'—')}</span></td>
-      <td class="td-mono" style="font-size:11px;">${esc(o.country||'—')}</td>
+      <td class="td-name" style="font-weight:500;">${esc(o.legal_name||o.name||'-')}</td>
+      <td><span class="badge b-${typeCls}" style="font-size:10px;">${esc(o.company_type||o.type||'-')}</span></td>
+      <td class="td-mono" style="font-size:11px;">${esc(o.country||'-')}</td>
       <td class="td-trunc" style="max-width:140px;">${esc(conName)}</td>
-      <td class="td-mono" style="font-size:11px;">${esc(primary?.email||'—')}</td>
+      <td class="td-mono" style="font-size:11px;">${esc(primary?.email||'-')}</td>
       ${artistCells}
     </tr>`;
   }).join('');
@@ -12047,7 +12041,7 @@ async function savePool() {
   document.getElementById('sb-unsaved-label').style.display = 'none';
 
   if (hasError) {
-    showToast('Saved with some errors — check console', 'info');
+    showToast('Saved with some errors - check console', 'info');
   } else {
     showToast('Pool saved ✓', 'success');
   }
@@ -12140,7 +12134,7 @@ async function logEvent(bookingId, eventType, description, metadata = null) {
       metadata:    metadata ? metadata : null,
     });
   } catch(e) {
-    // Silent fail — audit log should never break the app
+    // Silent fail - audit log should never break the app
     console.warn('Audit log failed:', e.message);
   }
 }
@@ -12172,7 +12166,7 @@ function fmtFee(amount, currency) {
   return sym + amount.toLocaleString();
 }
 function fmtDate(d) {
-  if (!d) return '—';
+  if (!d) return '-';
   const dt = new Date(d + 'T00:00:00');
   return dt.toLocaleDateString('en-GB', { day:'2-digit', month:'short', year:'numeric' });
 }
@@ -12372,7 +12366,7 @@ function renderAuditLog() {
       day:'2-digit', month:'short', hour:'2-digit', minute:'2-digit'
     }) : '';
     const desc = r.new_values?.description || summarizeChanges(r) || '';
-    const tableRef = [r.table_name, r.record_id?.slice(0,8)].filter(Boolean).join(' / ');
+    const tableRef = [r.table_name, r.record_id?.slice(0,8)].filter(Boolean).join(' · ');
     return `<div class="audit-row">
       <div class="audit-time">${when}</div>
       <div class="audit-type">${esc((r.action||'').replace(/_/g,' '))}</div>
@@ -12583,7 +12577,7 @@ async function loadContactCompanies(contactId) {
       data.forEach(r => { if (!cmOrgIds.includes(r.organisation_id)) cmOrgIds.push(r.organisation_id); });
     }
   } catch(e) {
-    // Junction table may not exist yet — that's fine, just use primary org
+    // Junction table may not exist yet - that's fine, just use primary org
     console.warn('contact_companies not available:', e.message);
   }
   renderContactOrgChips();
@@ -12605,7 +12599,7 @@ async function saveContactCompanies(contactId) {
       await db.from('contact_companies').insert(rows);
     }
   } catch(e) {
-    // Junction table may not exist — fall back to just primary org
+    // Junction table may not exist - fall back to just primary org
     console.warn('contact_companies save skipped:', e.message);
   }
 }
@@ -12681,7 +12675,7 @@ function showDuplicateModal(type, newRecord, duplicates, onSkip) {
       </div>
       <span class="dup-badge keep">NEW</span>
     </div>
-    <div style="font-family:var(--mono);font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);margin:12px 0 6px">Possible duplicates — click to select merge target</div>`;
+    <div style="font-family:var(--mono);font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);margin:12px 0 6px">Possible duplicates - click to select merge target</div>`;
 
   duplicates.forEach(d => {
     const dName = type === 'org' ? (d.legal_name||d.name) : `${d.first_name||''} ${d.last_name||''}`.trim();
@@ -12735,7 +12729,7 @@ async function executeMerge() {
 }
 
 async function mergeOrganisations(keepId) {
-  // The new org data wasn't saved yet — just skip saving and let user know
+  // The new org data wasn't saved yet - just skip saving and let user know
   // the existing record is the one to use
   closeModal('org-modal');
   showToast('Using existing company instead of creating duplicate', 'success');
