@@ -3225,8 +3225,17 @@ tbody td { padding: 10px 14px; vertical-align: middle; }
         <input type="number" id="bm-pct" placeholder="70" min="0" max="100">
       </div>
       <div class="fg">
-        <label>Commission Rate %</label>
+        <label style="display:flex;align-items:center;gap:8px">
+          Commission
+          <span style="display:inline-flex;gap:0;border:1px solid var(--border-dark);font-family:var(--mono);font-size:9px">
+            <button type="button" id="bm-comm-pct-btn" class="btn" onclick="setCommType('percentage')"
+              style="padding:2px 8px;font-size:9px;border:none;background:var(--accent);color:#fff">%</button>
+            <button type="button" id="bm-comm-fix-btn" class="btn" onclick="setCommType('fixed')"
+              style="padding:2px 8px;font-size:9px;border:none;background:transparent;color:var(--muted)">Fixed</button>
+          </span>
+        </label>
         <input type="number" id="bm-commission" placeholder="15" value="15">
+        <input type="hidden" id="bm-commission-type" value="percentage">
       </div>
       <div class="fg">
         <label>Withholding %</label>
@@ -6034,6 +6043,7 @@ function openBookingModal(id = null) {
       document.getElementById(f).value = '';
     });
     document.getElementById('bm-commission').value = '15';
+    setCommType('percentage');
     document.getElementById('bm-withholding').value = '0';
     document.getElementById('bm-currency').value = 'EUR';
     document.getElementById('bm-dealtype').value = 'flat_fee';
@@ -6174,7 +6184,9 @@ function editBooking(id) {
   document.getElementById('bm-fee').value       = b.fee_amount || '';
   document.getElementById('bm-guarantee').value = b.guarantee_amount || '';
   document.getElementById('bm-pct').value       = b.percentage || '';
-  document.getElementById('bm-commission').value  = b.commission_rate || 15;
+  document.getElementById('bm-commission').value  = b.commission_type === 'fixed' ? (b.commission_fixed || 0) : (b.commission_rate || 15);
+  document.getElementById('bm-commission-type').value = b.commission_type || 'percentage';
+  setCommType(b.commission_type || 'percentage');
   document.getElementById('bm-withholding').value  = b.withholding_rate || 0;
   document.getElementById('bm-wh-country').value   = b.withholding_country || '';
 
@@ -6206,6 +6218,27 @@ function editBooking(id) {
   updateDealFields();
   // Load attached documents
   loadBookingDocs(id);
+}
+
+function setCommType(type) {
+  document.getElementById('bm-commission-type').value = type;
+  const pctBtn = document.getElementById('bm-comm-pct-btn');
+  const fixBtn = document.getElementById('bm-comm-fix-btn');
+  if (type === 'percentage') {
+    pctBtn.style.background = 'var(--accent)'; pctBtn.style.color = '#fff';
+    fixBtn.style.background = 'transparent'; fixBtn.style.color = 'var(--muted)';
+    document.getElementById('bm-commission').placeholder = '15';
+  } else {
+    fixBtn.style.background = 'var(--accent)'; fixBtn.style.color = '#fff';
+    pctBtn.style.background = 'transparent'; pctBtn.style.color = 'var(--muted)';
+    document.getElementById('bm-commission').placeholder = '600';
+  }
+}
+
+// Calculate commission for a booking (used everywhere in finance)
+function calcCommission(b) {
+  if (b.commission_type === 'fixed') return b.commission_fixed || 0;
+  return (b.fee_amount || 0) * (b.commission_rate || 15) / 100;
 }
 
 function updateDealFields() {
@@ -6341,7 +6374,9 @@ async function saveBooking() {
     fee_amount:          parseFloat(document.getElementById('bm-fee').value) || null,
     guarantee_amount:    parseFloat(document.getElementById('bm-guarantee').value) || null,
     percentage:          parseFloat(document.getElementById('bm-pct').value) || null,
-    commission_rate:     parseFloat(document.getElementById('bm-commission').value) || 15,
+    commission_rate:     document.getElementById('bm-commission-type').value === 'percentage' ? (parseFloat(document.getElementById('bm-commission').value) || 15) : 0,
+    commission_type:     document.getElementById('bm-commission-type').value || 'percentage',
+    commission_fixed:    document.getElementById('bm-commission-type').value === 'fixed' ? (parseFloat(document.getElementById('bm-commission').value) || 0) : null,
     withholding_rate:    parseFloat(document.getElementById('bm-withholding').value) || 0,
     withholding_country: document.getElementById('bm-wh-country').value.trim() || null,
     company_id:          document.getElementById('bm-org').value || null,
@@ -8873,8 +8908,8 @@ async function renderFinance() {
     b.show_date && new Date(b.show_date).getFullYear() === year &&
     b.fee_currency === 'EUR'
   );
-  const totalRevenue  = confirmedBks.reduce((s,b) => s + ((b.fee_amount||0)*(b.commission_rate||15)/100), 0);
-  const pipelineRev   = pipelineBks.reduce((s,b)  => s + ((b.fee_amount||0)*(b.commission_rate||15)/100), 0);
+  const totalRevenue  = confirmedBks.reduce((s,b) => s + (calcCommission(b)), 0);
+  const pipelineRev   = pipelineBks.reduce((s,b)  => s + (calcCommission(b)), 0);
   const avgCommission = confirmedBks.length ? totalRevenue / confirmedBks.length : 0;
 
   // ── EXPENSES from lines for this year ──
@@ -8906,7 +8941,7 @@ async function renderFinance() {
   const plRows = MONTHS.map((m,i) => {
     const month = i + 1;
     const mBks  = confirmedBks.filter(b => new Date(b.show_date).getMonth()+1 === month);
-    const mRev  = mBks.reduce((s,b) => s + ((b.fee_amount||0)*(b.commission_rate||15)/100), 0);
+    const mRev  = mBks.reduce((s,b) => s + (calcCommission(b)), 0);
     const mExp  = yearLines.reduce((s,l) => s + (parseFloat(l[MONTH_KEYS[i]])||0), 0);
     const mNet  = mRev - mExp;
     totRev += mRev; totExp += mExp;
@@ -8934,8 +8969,8 @@ async function renderFinance() {
     const bks = confirmedBks.filter(b => b.artist_id === a.id);
     if (!bks.length) return '';
     const totalFee   = bks.reduce((s,b) => s+(b.fee_amount||0), 0);
-    const avgComm    = bks.reduce((s,b) => s+(b.commission_rate||15),0)/bks.length;
-    const commission = bks.reduce((s,b) => s+((b.fee_amount||0)*(b.commission_rate||15)/100), 0);
+    const avgComm    = totalFee > 0 ? (commission / totalFee * 100) : 0;
+    const commission = bks.reduce((s,b) => s+(calcCommission(b)), 0);
     const bkIds = bks.map(b=>b.id);
     const invoiced = allInvoices.filter(i=>bkIds.includes(i.booking_id)&&i.currency==='EUR'&&i.status!=='cancelled').reduce((s,i)=>s+(i.total_amount||0),0);
     const paid     = allInvoices.filter(i=>bkIds.includes(i.booking_id)&&i.currency==='EUR'&&i.status==='paid').reduce((s,i)=>s+(i.total_amount||0),0);
@@ -9107,7 +9142,7 @@ function exportFinance() {
   const rows = MONTHS.map((m,i) => {
     const month = i+1;
     const mBks = confirmedBks.filter(b => new Date(b.show_date).getMonth()+1===month);
-    const rev   = mBks.reduce((s,b)=>s+((b.fee_amount||0)*(b.commission_rate||15)/100),0);
+    const rev   = mBks.reduce((s,b)=>s+(calcCommission(b)),0);
     const exp   = yearLines.reduce((s,l)=>s+(parseFloat(l[MONTH_KEYS[i]])||0),0);
     const row = { Year:year, Month:m, Revenue:Math.round(rev), Expenses:Math.round(exp), Net:Math.round(rev-exp) };
     allExpenseCategories.forEach(cat => {
@@ -9399,7 +9434,7 @@ function renderPLPerArtist(year) {
     if (!bks.length) return;
 
     const totalFee   = bks.reduce((s,b) => s + (b.fee_amount||0), 0);
-    const commission = bks.reduce((s,b) => s + ((b.fee_amount||0)*(b.commission_rate||15)/100), 0);
+    const commission = bks.reduce((s,b) => s + (calcCommission(b)), 0);
     const bkIds      = bks.map(b => b.id);
     const invoiced   = allInvoices.filter(i => bkIds.includes(i.booking_id) && i.currency==='EUR' && i.status!=='cancelled').reduce((s,i) => s+(i.total_amount||0), 0);
     const paid       = allInvoices.filter(i => bkIds.includes(i.booking_id) && i.currency==='EUR' && i.status==='paid').reduce((s,i) => s+(i.total_amount||0), 0);
@@ -9425,7 +9460,7 @@ function renderPLPerArtist(year) {
     // Monthly breakdown per artiest
     const monthRow = MONTHS.map((m, i) => {
       const mBks  = bks.filter(b => new Date(b.show_date).getMonth() === i);
-      const mComm = mBks.reduce((s,b) => s + ((b.fee_amount||0)*(b.commission_rate||15)/100), 0);
+      const mComm = mBks.reduce((s,b) => s + (calcCommission(b)), 0);
       return `<td class="td-mono" style="text-align:right;font-size:10px;color:var(--muted);">${mComm > 0 ? '€'+Math.round(mComm/1000)+'k' : ''}</td>`;
     }).join('');
     html += `<tr style="background:var(--bg);">
@@ -9467,7 +9502,7 @@ function exportPLPerArtist() {
     if (!bks.length) return;
 
     const totalFee   = bks.reduce((s,b) => s + (b.fee_amount||0), 0);
-    const commission = bks.reduce((s,b) => s + ((b.fee_amount||0)*(b.commission_rate||15)/100), 0);
+    const commission = bks.reduce((s,b) => s + (calcCommission(b)), 0);
     const bkIds      = bks.map(b => b.id);
     const invoiced   = allInvoices.filter(i => bkIds.includes(i.booking_id) && i.currency==='EUR' && i.status!=='cancelled').reduce((s,i) => s+(i.total_amount||0), 0);
     const paid       = allInvoices.filter(i => bkIds.includes(i.booking_id) && i.currency==='EUR' && i.status==='paid').reduce((s,i) => s+(i.total_amount||0), 0);
@@ -9490,7 +9525,7 @@ function exportPLPerArtist() {
     // Monthly commission
     MONTHS.forEach((m, i) => {
       const mBks = bks.filter(b => new Date(b.show_date).getMonth() === i);
-      baseRow['Commissie_' + m] = fmt2(mBks.reduce((s,b) => s + ((b.fee_amount||0)*(b.commission_rate||15)/100), 0));
+      baseRow['Commissie_' + m] = fmt2(mBks.reduce((s,b) => s + (calcCommission(b)), 0));
     });
 
     rows.push(baseRow);
@@ -9502,8 +9537,8 @@ function exportPLPerArtist() {
         Jaar: year,
         Shows: '',
         Totaal_Fee_EUR: fmt2(b.fee_amount||0),
-        Commissie_EUR: fmt2((b.fee_amount||0)*(b.commission_rate||15)/100),
-        Marge_Pct: (b.commission_rate||15) + '%',
+        Commissie_EUR: fmt2(calcCommission(b)),
+        Marge_Pct: b.commission_type === 'fixed' ? 'fixed' : ((b.commission_rate||15) + '%'),
         Gefactureerd_EUR: '',
         Ontvangen_EUR: '',
         Openstaand_EUR: '',
