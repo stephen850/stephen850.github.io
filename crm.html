@@ -340,6 +340,31 @@ tbody td { padding: 10px 14px; vertical-align: middle; }
 .country-chip .cc-x { cursor: pointer; opacity: 0.6; font-size: 12px; }
 .country-chip .cc-x:hover { opacity: 1; }
 
+/* searchable select */
+.ss-wrap { position: relative; }
+.ss-wrap input {
+  width: 100%; padding: 7px 28px 7px 10px; font-family: var(--sans); font-size: 12px;
+  border: 1px solid var(--border-dark); background: var(--bg); outline: none;
+  text-overflow: ellipsis;
+}
+.ss-wrap input:focus { border-color: var(--accent); background: #fff; }
+.ss-wrap .ss-clear {
+  position: absolute; right: 8px; top: 50%; transform: translateY(-50%);
+  cursor: pointer; font-size: 14px; color: var(--muted); line-height: 1; display: none;
+}
+.ss-wrap .ss-clear:hover { color: var(--accent); }
+.ss-dd {
+  position: absolute; top: 100%; left: 0; right: 0; max-height: 200px; overflow-y: auto;
+  background: #fff; border: 1px solid var(--border-dark); border-top: none; z-index: 60;
+  display: none; box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+}
+.ss-dd.open { display: block; }
+.ss-dd div {
+  padding: 6px 10px; font-size: 12px; cursor: pointer;
+}
+.ss-dd div:hover, .ss-dd div.ss-active { background: var(--bg); }
+.ss-dd div .ss-sub { font-family: var(--mono); font-size: 10px; color: var(--muted); margin-left: 6px; }
+
 .modal-ftr {
   display: flex; justify-content: flex-end; gap: 8px;
   margin-top: 24px; padding-top: 20px; border-top: 1px solid var(--border);
@@ -3222,9 +3247,14 @@ tbody td { padding: 10px 14px; vertical-align: middle; }
           <span style="background:var(--accent);color:#fff;font-family:var(--mono);font-size:9px;padding:1px 6px">1</span>
           Company *
         </label>
-        <select id="bm-org" onchange="bookingStep1()">
+        <select id="bm-org" onchange="bookingStep1()" style="display:none">
           <option value="">Select company...</option>
         </select>
+        <div class="ss-wrap" id="ss-bm-org">
+          <input type="text" placeholder="Search company..." autocomplete="off">
+          <span class="ss-clear">&times;</span>
+          <div class="ss-dd"></div>
+        </div>
       </div>
 
       <!-- STEP 2: Contact Person -->
@@ -3233,9 +3263,14 @@ tbody td { padding: 10px 14px; vertical-align: middle; }
           <span id="bm-step2-badge" style="background:var(--border);color:var(--muted);font-family:var(--mono);font-size:9px;padding:1px 6px">2</span>
           Contact Person *
         </label>
-        <select id="bm-contact" disabled onchange="bookingStep2()">
-          <option value="">— select company first —</option>
+        <select id="bm-contact" disabled onchange="bookingStep2()" style="display:none">
+          <option value="">-- select company first --</option>
         </select>
+        <div class="ss-wrap" id="ss-bm-contact">
+          <input type="text" placeholder="-- select company first --" autocomplete="off" disabled>
+          <span class="ss-clear">&times;</span>
+          <div class="ss-dd"></div>
+        </div>
         <div style="margin-top:4px;font-family:var(--mono);font-size:10px;color:var(--muted)" id="bm-contact-info"></div>
       </div>
 
@@ -3245,9 +3280,14 @@ tbody td { padding: 10px 14px; vertical-align: middle; }
           <span id="bm-step3-badge" style="background:var(--border);color:var(--muted);font-family:var(--mono);font-size:9px;padding:1px 6px">3</span>
           Venue / Festival *
         </label>
-        <select id="bm-venue-id" disabled onchange="bookingStep3()">
-          <option value="">— select contact first —</option>
+        <select id="bm-venue-id" disabled onchange="bookingStep3()" style="display:none">
+          <option value="">-- select contact first --</option>
         </select>
+        <div class="ss-wrap" id="ss-bm-venue">
+          <input type="text" placeholder="-- select contact first --" autocomplete="off" disabled>
+          <span class="ss-clear">&times;</span>
+          <div class="ss-dd"></div>
+        </div>
         <div style="margin-top:4px;font-family:var(--mono);font-size:10px;color:var(--muted)" id="bm-venue-info"></div>
       </div>
 
@@ -4163,14 +4203,20 @@ tbody td { padding: 10px 14px; vertical-align: middle; }
     <div class="form-section">Links</div>
     <div class="form-grid">
       <div class="fg full"><label>Organisation (billing party)</label>
-        <select id="vm-org" onchange="loadVenueContacts()">
-          <option value="">Select organisation...</option>
-        </select>
+        <div class="ss-wrap" id="ss-vm-org">
+          <input type="text" placeholder="Search company..." autocomplete="off">
+          <span class="ss-clear">&times;</span>
+          <div class="ss-dd"></div>
+        </div>
+        <input type="hidden" id="vm-org">
       </div>
       <div class="fg full"><label>Marketing Contact <span style="font-family:var(--mono);font-size:9px;color:var(--muted)">(receives newsletter · Mailchimp sync)</span></label>
-        <select id="vm-contact">
-          <option value="">— select organisation first —</option>
-        </select>
+        <div class="ss-wrap" id="ss-vm-contact">
+          <input type="text" placeholder="-- select organisation first --" autocomplete="off" disabled>
+          <span class="ss-clear">&times;</span>
+          <div class="ss-dd"></div>
+        </div>
+        <input type="hidden" id="vm-contact">
       </div>
     </div>
 
@@ -4235,9 +4281,14 @@ tbody td { padding: 10px 14px; vertical-align: middle; }
         <div id="wiz1-existing">
           <div class="fg" style="margin-bottom:0">
             <label>Select Company</label>
-            <select id="wiz-org-select" onchange="wizSelectOrg()">
+            <select id="wiz-org-select" onchange="wizSelectOrg()" style="display:none">
               <option value="">Search company...</option>
             </select>
+            <div class="ss-wrap" id="ss-wiz-org">
+              <input type="text" placeholder="Search company..." autocomplete="off">
+              <span class="ss-clear">&times;</span>
+              <div class="ss-dd"></div>
+            </div>
           </div>
           <div id="wiz1-org-preview" style="display:none;margin-top:12px;padding:12px;background:var(--bg);border:1px solid var(--border)"></div>
         </div>
@@ -4280,9 +4331,14 @@ tbody td { padding: 10px 14px; vertical-align: middle; }
         <div id="wiz2-existing">
           <div class="fg" style="margin-bottom:0">
             <label>Select Contact Person</label>
-            <select id="wiz-contact-select" onchange="wizSelectContact()">
-              <option value="">— contacts from selected company —</option>
+            <select id="wiz-contact-select" onchange="wizSelectContact()" style="display:none">
+              <option value="">-- contacts from selected company --</option>
             </select>
+            <div class="ss-wrap" id="ss-wiz-contact">
+              <input type="text" placeholder="-- contacts from selected company --" autocomplete="off">
+              <span class="ss-clear">&times;</span>
+              <div class="ss-dd"></div>
+            </div>
           </div>
           <div id="wiz2-contact-preview" style="display:none;margin-top:12px;padding:12px;background:var(--bg);border:1px solid var(--border)"></div>
         </div>
@@ -4327,9 +4383,14 @@ tbody td { padding: 10px 14px; vertical-align: middle; }
         <div id="wiz3-existing">
           <div class="fg" style="margin-bottom:0">
             <label>Select Venue</label>
-            <select id="wiz-venue-select" onchange="wizSelectVenue()">
+            <select id="wiz-venue-select" onchange="wizSelectVenue()" style="display:none">
               <option value="">Search venue...</option>
             </select>
+            <div class="ss-wrap" id="ss-wiz-venue">
+              <input type="text" placeholder="Search venue..." autocomplete="off">
+              <span class="ss-clear">&times;</span>
+              <div class="ss-dd"></div>
+            </div>
           </div>
           <div id="wiz3-venue-preview" style="display:none;margin-top:12px;padding:12px;background:var(--bg);border:1px solid var(--border)"></div>
         </div>
@@ -4502,6 +4563,186 @@ let editOrgId = null, editConId = null, editBkId = null, _pendingOrgId = null;
 let importRows = [];
 let bkView = 'list';
 const PG = 30;
+
+// ── SEARCHABLE SELECT ENGINE ─────────────────────────────────
+// Usage: ssPopulate('ss-vm-org', options, { onSelect, onChange, placeholder })
+//   options = [{ value, label, sub? }]
+const _ssInstances = {};
+
+function ssPopulate(wrapperId, options, config = {}) {
+  const wrap = document.getElementById(wrapperId);
+  if (!wrap) return;
+  const input = wrap.querySelector('input[type="text"]');
+  const dd = wrap.querySelector('.ss-dd');
+  const clearBtn = wrap.querySelector('.ss-clear');
+  if (!input || !dd) return;
+
+  const inst = {
+    options,
+    filtered: options,
+    selectedValue: '',
+    selectedLabel: '',
+    config,
+    activeIdx: -1,
+  };
+  _ssInstances[wrapperId] = inst;
+
+  // Reset
+  input.value = '';
+  input.disabled = config.disabled || false;
+  if (config.placeholder) input.placeholder = config.placeholder;
+  clearBtn.style.display = 'none';
+  dd.classList.remove('open');
+
+  // Update associated hidden input
+  const hiddenId = config.hiddenId || wrapperId.replace('ss-','');
+  const hidden = document.getElementById(hiddenId);
+  if (hidden) hidden.value = '';
+
+  // Remove old listeners by cloning
+  const newInput = input.cloneNode(true);
+  input.parentNode.replaceChild(newInput, input);
+  const newClear = clearBtn.cloneNode(true);
+  clearBtn.parentNode.replaceChild(newClear, clearBtn);
+
+  newInput.addEventListener('input', () => {
+    const q = newInput.value.toLowerCase().trim();
+    inst.filtered = q ? inst.options.filter(o => o.label.toLowerCase().includes(q) || (o.sub||'').toLowerCase().includes(q)) : inst.options;
+    inst.activeIdx = -1;
+    _ssRenderDD(wrapperId);
+    dd.classList.add('open');
+  });
+
+  newInput.addEventListener('focus', () => {
+    if (inst.selectedValue) {
+      newInput.value = '';
+      inst.filtered = inst.options;
+    }
+    inst.activeIdx = -1;
+    _ssRenderDD(wrapperId);
+    dd.classList.add('open');
+  });
+
+  newInput.addEventListener('blur', () => {
+    setTimeout(() => {
+      dd.classList.remove('open');
+      if (inst.selectedValue) {
+        newInput.value = inst.selectedLabel;
+      } else {
+        newInput.value = '';
+      }
+    }, 180);
+  });
+
+  newInput.addEventListener('keydown', e => {
+    if (!dd.classList.contains('open')) return;
+    const items = dd.querySelectorAll('div');
+    if (e.key === 'ArrowDown') {
+      e.preventDefault();
+      inst.activeIdx = Math.min(inst.activeIdx + 1, items.length - 1);
+      items.forEach((d,i) => d.classList.toggle('ss-active', i === inst.activeIdx));
+    } else if (e.key === 'ArrowUp') {
+      e.preventDefault();
+      inst.activeIdx = Math.max(inst.activeIdx - 1, 0);
+      items.forEach((d,i) => d.classList.toggle('ss-active', i === inst.activeIdx));
+    } else if (e.key === 'Enter') {
+      e.preventDefault();
+      if (inst.activeIdx >= 0 && items[inst.activeIdx]) {
+        items[inst.activeIdx].dispatchEvent(new Event('mousedown'));
+      }
+    } else if (e.key === 'Escape') {
+      dd.classList.remove('open');
+      newInput.blur();
+    }
+  });
+
+  newClear.addEventListener('click', () => {
+    _ssClear(wrapperId);
+    if (inst.config.onChange) inst.config.onChange('');
+  });
+}
+
+function _ssRenderDD(wrapperId) {
+  const wrap = document.getElementById(wrapperId);
+  const dd = wrap?.querySelector('.ss-dd');
+  const inst = _ssInstances[wrapperId];
+  if (!dd || !inst) return;
+  const slice = inst.filtered.slice(0, 50);
+  dd.innerHTML = slice.map(o =>
+    `<div onmousedown="_ssSelect('${wrapperId}','${o.value.replace(/'/g, "\\'")}')">${esc(o.label)}${o.sub ? '<span class="ss-sub">' + esc(o.sub) + '</span>' : ''}</div>`
+  ).join('') || '<div style="color:var(--muted);cursor:default">No results</div>';
+}
+
+function _ssSelect(wrapperId, value) {
+  const wrap = document.getElementById(wrapperId);
+  const inst = _ssInstances[wrapperId];
+  if (!wrap || !inst) return;
+  const input = wrap.querySelector('input[type="text"]');
+  const dd = wrap.querySelector('.ss-dd');
+  const clearBtn = wrap.querySelector('.ss-clear');
+  const opt = inst.options.find(o => o.value === value);
+  if (!opt) return;
+
+  inst.selectedValue = value;
+  inst.selectedLabel = opt.label;
+  input.value = opt.label;
+  dd.classList.remove('open');
+  clearBtn.style.display = 'block';
+
+  // Update hidden input
+  const hiddenId = inst.config.hiddenId || wrapperId.replace('ss-','');
+  const hidden = document.getElementById(hiddenId);
+  if (hidden) hidden.value = value;
+
+  // Fire callbacks
+  if (inst.config.onSelect) inst.config.onSelect(value, opt);
+  if (inst.config.onChange) inst.config.onChange(value);
+}
+
+function _ssClear(wrapperId) {
+  const wrap = document.getElementById(wrapperId);
+  const inst = _ssInstances[wrapperId];
+  if (!wrap || !inst) return;
+  const input = wrap.querySelector('input[type="text"]');
+  const clearBtn = wrap.querySelector('.ss-clear');
+  inst.selectedValue = '';
+  inst.selectedLabel = '';
+  input.value = '';
+  clearBtn.style.display = 'none';
+  const hiddenId = inst.config.hiddenId || wrapperId.replace('ss-','');
+  const hidden = document.getElementById(hiddenId);
+  if (hidden) hidden.value = '';
+}
+
+function ssSetValue(wrapperId, value) {
+  const inst = _ssInstances[wrapperId];
+  if (!inst) return;
+  const wrap = document.getElementById(wrapperId);
+  if (!wrap) return;
+  const input = wrap.querySelector('input[type="text"]');
+  const clearBtn = wrap.querySelector('.ss-clear');
+  if (!value) { _ssClear(wrapperId); return; }
+  const opt = inst.options.find(o => o.value === value);
+  if (!opt) return;
+  inst.selectedValue = value;
+  inst.selectedLabel = opt.label;
+  input.value = opt.label;
+  clearBtn.style.display = 'block';
+  const hiddenId = inst.config.hiddenId || wrapperId.replace('ss-','');
+  const hidden = document.getElementById(hiddenId);
+  if (hidden) hidden.value = value;
+}
+
+function ssDisable(wrapperId, disabled, placeholder) {
+  const wrap = document.getElementById(wrapperId);
+  if (!wrap) return;
+  const input = wrap.querySelector('input[type="text"]');
+  if (input) {
+    input.disabled = disabled;
+    if (placeholder) input.placeholder = placeholder;
+  }
+  _ssClear(wrapperId);
+}
 
 // ── RBAC STATE ───────────────────────────────────────────────
 let RBAC = {
@@ -5762,18 +6003,19 @@ function openBookingModal(id = null) {
   document.getElementById('bm-delete-btn').style.display = id ? 'inline-block' : 'none';
   document.getElementById('bm-settlement-btn').style.display = id ? 'inline-block' : 'none';
 
-  // Populate company dropdown (step 1)
-  const orgSel = document.getElementById('bm-org');
-  orgSel.innerHTML = '<option value="">Select company...</option>' +
-    allOrgs.map(o => `<option value="${o.id}">${esc(o.legal_name||o.name)}</option>`).join('');
+  // Populate company searchable select (step 1)
+  const orgOpts = allOrgs.map(o => ({ value: o.id, label: o.legal_name||o.name, sub: [o.company_type, o.city, o.country].filter(Boolean).join(' / ') }));
+  ssPopulate('ss-bm-org', orgOpts, {
+    hiddenId: 'bm-org',
+    placeholder: 'Search company...',
+    onChange: (v) => { document.getElementById('bm-org').value = v; bookingStep1(); },
+  });
 
   // Reset steps 2+3
-  const conSel = document.getElementById('bm-contact');
-  conSel.innerHTML = '<option value="">— select company first —</option>';
-  conSel.disabled = true;
-  const venueSel = document.getElementById('bm-venue-id');
-  venueSel.innerHTML = '<option value="">— select contact first —</option>';
-  venueSel.disabled = true;
+  ssDisable('ss-bm-contact', true, '-- select company first --');
+  ssDisable('ss-bm-venue', true, '-- select contact first --');
+  document.getElementById('bm-contact').value = '';
+  document.getElementById('bm-venue-id').value = '';
   document.getElementById('bm-contact-info').textContent = '';
   document.getElementById('bm-venue-info').textContent = '';
   const s2 = document.getElementById('bm-step2-badge');
@@ -5783,7 +6025,7 @@ function openBookingModal(id = null) {
 
   if (!id) {
     // Clear form
-    ['bm-artist','bm-dealtype','bm-currency','bm-venue-id','bm-contact'].forEach(f => {
+    ['bm-artist','bm-dealtype','bm-currency'].forEach(f => {
       const el = document.getElementById(f); if (el) el.value = '';
     });
     ['bm-date','bm-venue','bm-city','bm-country','bm-capacity','bm-settime',
@@ -5806,16 +6048,14 @@ function openBookingModal(id = null) {
 
 function bookingStep1() {
   const orgId  = document.getElementById('bm-org').value;
-  const conSel = document.getElementById('bm-contact');
-  const venueSel = document.getElementById('bm-venue-id');
   const step2 = document.getElementById('bm-step2-badge');
   const step3 = document.getElementById('bm-step3-badge');
 
   // Reset steps 2 + 3
-  conSel.innerHTML = '<option value="">— select company first —</option>';
-  conSel.disabled = true;
-  venueSel.innerHTML = '<option value="">— select contact first —</option>';
-  venueSel.disabled = true;
+  ssDisable('ss-bm-contact', true, '-- select company first --');
+  ssDisable('ss-bm-venue', true, '-- select contact first --');
+  document.getElementById('bm-contact').value = '';
+  document.getElementById('bm-venue-id').value = '';
   document.getElementById('bm-contact-info').textContent = '';
   document.getElementById('bm-venue-info').textContent = '';
   step2.style.background = 'var(--border)'; step2.style.color = 'var(--muted)';
@@ -5826,30 +6066,30 @@ function bookingStep1() {
   // Load contacts for this company
   const orgCons = allCons.filter(c => c.organisation_id === orgId && c.is_active !== false);
   if (!orgCons.length) {
-    conSel.innerHTML = '<option value="">No contacts — add one first</option>';
-    conSel.disabled = false;
-    showToast('No contacts for this company — add a contact first', 'error');
+    showToast('No contacts for this company -- add a contact first', 'error');
     return;
   }
 
-  conSel.innerHTML = '<option value="">Select contact person...</option>' +
-    orgCons.map(c => {
-      const name = [c.first_name, c.last_name].filter(Boolean).join(' ') || c.email;
-      return `<option value="${c.id}">${esc(name)}${c.role?' — '+esc(c.role):''}</option>`;
-    }).join('');
-  conSel.disabled = false;
+  const conOpts = orgCons.map(c => {
+    const name = [c.first_name, c.last_name].filter(Boolean).join(' ') || c.email;
+    return { value: c.id, label: name, sub: [c.role, c.email].filter(Boolean).join(' / ') };
+  });
+  ssPopulate('ss-bm-contact', conOpts, {
+    hiddenId: 'bm-contact',
+    placeholder: 'Search contact...',
+    onChange: (v) => { document.getElementById('bm-contact').value = v; bookingStep2(); },
+  });
   step2.style.background = 'var(--accent)'; step2.style.color = '#fff';
 }
 
 function bookingStep2() {
   const conId  = document.getElementById('bm-contact').value;
   const orgId  = document.getElementById('bm-org').value;
-  const venueSel = document.getElementById('bm-venue-id');
   const step3  = document.getElementById('bm-step3-badge');
 
   document.getElementById('bm-venue-info').textContent = '';
-  venueSel.innerHTML = '<option value="">— select contact first —</option>';
-  venueSel.disabled = true;
+  ssDisable('ss-bm-venue', true, '-- select contact first --');
+  document.getElementById('bm-venue-id').value = '';
   step3.style.background = 'var(--border)'; step3.style.color = 'var(--muted)';
 
   if (!conId) return;
@@ -5857,20 +6097,25 @@ function bookingStep2() {
   // Show contact info
   const con = allCons.find(c => c.id === conId);
   document.getElementById('bm-contact-info').textContent =
-    con ? [con.email, con.phone].filter(Boolean).join(' · ') : '';
+    con ? [con.email, con.phone].filter(Boolean).join(' / ') : '';
 
   // Load venues for this company
   const orgVenues = allVenues.filter(v => v.organisation_id === orgId);
   if (!orgVenues.length) {
-    venueSel.innerHTML = '<option value="">No venues for this company — add one first</option>';
-    venueSel.disabled = false;
-    showToast('No venues for this company — add a venue first', 'error');
+    showToast('No venues for this company -- add a venue first', 'error');
     return;
   }
 
-  venueSel.innerHTML = '<option value="">Select venue / festival...</option>' +
-    orgVenues.map(v => `<option value="${v.id}">${esc(v.name)}${v.city?' — '+esc(v.city):''}${v.venue_type?' ('+esc(v.venue_type)+')':''}</option>`).join('');
-  venueSel.disabled = false;
+  const venueOpts = orgVenues.map(v => ({
+    value: v.id,
+    label: v.name,
+    sub: [v.venue_type, v.city, v.country].filter(Boolean).join(' / '),
+  }));
+  ssPopulate('ss-bm-venue', venueOpts, {
+    hiddenId: 'bm-venue-id',
+    placeholder: 'Search venue...',
+    onChange: (v) => { document.getElementById('bm-venue-id').value = v; bookingStep3(); },
+  });
   step3.style.background = 'var(--accent)'; step3.style.color = '#fff';
 }
 
@@ -5880,7 +6125,7 @@ function bookingStep3() {
   const venue = allVenues.find(v => v.id === venueId);
   if (!venue) return;
   document.getElementById('bm-venue-info').textContent =
-    [venue.venue_type, venue.city, venue.country].filter(Boolean).join(' · ');
+    [venue.venue_type, venue.city, venue.country].filter(Boolean).join(' / ');
   // Fill hidden fields for saving
   document.getElementById('bm-venue').value   = venue.name || '';
   document.getElementById('bm-city').value    = venue.city || '';
@@ -5892,10 +6137,11 @@ function loadVenueIntoBooking(preSelectContactId = null) {
 }
 
 function loadContactsForOrg(preSelectId = null) {
-  // Legacy — redirect to step1
+  // Legacy -- redirect to step1
   bookingStep1();
   if (preSelectId) {
     setTimeout(() => {
+      ssSetValue('ss-bm-contact', preSelectId);
       document.getElementById('bm-contact').value = preSelectId;
       bookingStep2();
     }, 50);
@@ -5934,14 +6180,17 @@ function editBooking(id) {
 
   // Restore 3-step flow
   if (b.company_id) {
+    ssSetValue('ss-bm-org', b.company_id);
     document.getElementById('bm-org').value = b.company_id;
     bookingStep1();
     setTimeout(() => {
       if (b.contact_id) {
+        ssSetValue('ss-bm-contact', b.contact_id);
         document.getElementById('bm-contact').value = b.contact_id;
         bookingStep2();
         setTimeout(() => {
           if (b.venue_id) {
+            ssSetValue('ss-bm-venue', b.venue_id);
             document.getElementById('bm-venue-id').value = b.venue_id;
             bookingStep3();
           }
@@ -10548,10 +10797,16 @@ async function openVenueModal(id = null) {
   document.getElementById('venue-modal-title').textContent = id ? 'Edit Project' : 'New Project';
   document.getElementById('vm-delete-btn').style.display = id ? 'inline-block' : 'none';
 
-  // Populate org dropdown
-  const orgSel = document.getElementById('vm-org');
-  orgSel.innerHTML = '<option value="">Select organisation...</option>' +
-    allOrgs.map(o => `<option value="${o.id}">${esc(o.legal_name||o.name)}</option>`).join('');
+  // Populate org searchable select
+  const orgOpts = allOrgs.map(o => ({ value: o.id, label: o.legal_name||o.name, sub: [o.company_type, o.city, o.country].filter(Boolean).join(' / ') }));
+  ssPopulate('ss-vm-org', orgOpts, {
+    hiddenId: 'vm-org',
+    placeholder: 'Search company...',
+    onChange: () => loadVenueContacts(),
+  });
+
+  // Reset contact
+  ssDisable('ss-vm-contact', true, '-- select organisation first --');
 
   // Reset
   selectedVenueTags = new Set();
@@ -10560,7 +10815,6 @@ async function openVenueModal(id = null) {
   document.getElementById('vm-city').value = '';
   document.getElementById('vm-country').value = '';
   document.getElementById('vm-notes').value = '';
-  document.getElementById('vm-contact').innerHTML = '<option value="">— select organisation first —</option>';
   renderVenueTagPicker();
 
   if (id) {
@@ -10571,8 +10825,10 @@ async function openVenueModal(id = null) {
       document.getElementById('vm-city').value    = v.city || '';
       document.getElementById('vm-country').value = v.country || '';
       document.getElementById('vm-notes').value   = v.notes || '';
-      orgSel.value = v.organisation_id || '';
-      if (v.organisation_id) loadVenueContacts(v.primary_contact_id);
+      if (v.organisation_id) {
+        ssSetValue('ss-vm-org', v.organisation_id);
+        loadVenueContacts(v.primary_contact_id);
+      }
       (v.venue_tags||[]).forEach(vt => selectedVenueTags.add(vt.tag_id));
       renderVenueTagPicker();
     }
@@ -10583,15 +10839,20 @@ async function openVenueModal(id = null) {
 
 function loadVenueContacts(preSelectId = null) {
   const orgId = document.getElementById('vm-org').value;
-  const conSel = document.getElementById('vm-contact');
-  if (!orgId) { conSel.innerHTML = '<option value="">— select organisation first —</option>'; return; }
+  if (!orgId) {
+    ssDisable('ss-vm-contact', true, '-- select organisation first --');
+    return;
+  }
   const orgCons = allCons.filter(c => c.organisation_id === orgId && c.is_active !== false);
-  conSel.innerHTML = '<option value="">Select primary contact...</option>' +
-    orgCons.map(c => {
-      const name = [c.first_name, c.last_name].filter(Boolean).join(' ') || c.email;
-      return `<option value="${c.id}">${esc(name)}</option>`;
-    }).join('');
-  if (preSelectId) conSel.value = preSelectId;
+  const conOpts = orgCons.map(c => {
+    const name = [c.first_name, c.last_name].filter(Boolean).join(' ') || c.email;
+    return { value: c.id, label: name, sub: c.email || '' };
+  });
+  ssPopulate('ss-vm-contact', conOpts, {
+    hiddenId: 'vm-contact',
+    placeholder: 'Search contact...',
+  });
+  if (preSelectId) ssSetValue('ss-vm-contact', preSelectId);
 }
 
 function renderVenueTagPicker() {
@@ -10757,15 +11018,24 @@ function openWizard(fromBooking = false) {
   wizMode = { 1: 'existing', 2: 'existing', 3: 'existing' };
   wizSelectedTags = new Set();
 
-  // Populate company select
-  const orgSel = document.getElementById('wiz-org-select');
-  orgSel.innerHTML = '<option value="">Select company...</option>' +
-    allOrgs.map(o => `<option value="${o.id}">${esc(o.legal_name||o.name)}</option>`).join('');
+  // Populate company searchable select
+  const orgOpts = allOrgs.map(o => ({ value: o.id, label: o.legal_name||o.name, sub: [o.company_type, o.city, o.country].filter(Boolean).join(' / ') }));
+  ssPopulate('ss-wiz-org', orgOpts, {
+    hiddenId: 'wiz-org-select',
+    placeholder: 'Search company...',
+    onChange: (v) => { document.getElementById('wiz-org-select').value = v; wizSelectOrg(); },
+  });
 
-  // Populate venue select
-  const venueSel = document.getElementById('wiz-venue-select');
-  venueSel.innerHTML = '<option value="">Select venue...</option>' +
-    allVenues.map(v => `<option value="${v.id}">${esc(v.name)}${v.city?' — '+esc(v.city):''}</option>`).join('');
+  // Populate venue searchable select
+  const venueOpts = allVenues.map(v => ({ value: v.id, label: v.name, sub: [v.venue_type, v.city, v.country].filter(Boolean).join(' / ') }));
+  ssPopulate('ss-wiz-venue', venueOpts, {
+    hiddenId: 'wiz-venue-select',
+    placeholder: 'Search venue...',
+    onChange: (v) => { document.getElementById('wiz-venue-select').value = v; wizSelectVenue(); },
+  });
+
+  // Reset contact
+  ssDisable('ss-wiz-contact', true, '-- contacts from selected company --');
 
   // Render tag picker
   wizRenderTags();
@@ -10829,25 +11099,34 @@ function wizSelectOrg() {
   const org = allOrgs.find(o => o.id === id);
   preview.style.display = 'block';
   preview.innerHTML = `<div style="font-family:var(--mono);font-size:11px;color:var(--accent)">${esc(org?.legal_name||org?.name||'')}</div>
-    <div style="font-family:var(--mono);font-size:10px;color:var(--muted);margin-top:4px">${[org?.company_type,org?.city,org?.country].filter(Boolean).join(' · ')}</div>`;
+    <div style="font-family:var(--mono);font-size:10px;color:var(--muted);margin-top:4px">${[org?.company_type,org?.city,org?.country].filter(Boolean).join(' / ')}</div>`;
   document.getElementById('wiz-sub-1').textContent = org?.legal_name||org?.name||'';
 
   // Pre-load contacts for step 2
   const orgCons = allCons.filter(c => c.organisation_id === id && c.is_active !== false);
-  const conSel = document.getElementById('wiz-contact-select');
-  conSel.innerHTML = '<option value="">Select contact...</option>' +
-    orgCons.map(c => {
-      const name = [c.first_name,c.last_name].filter(Boolean).join(' ')||c.email;
-      return `<option value="${c.id}">${esc(name)}</option>`;
-    }).join('');
+  const conOpts = orgCons.map(c => {
+    const name = [c.first_name,c.last_name].filter(Boolean).join(' ')||c.email;
+    return { value: c.id, label: name, sub: c.email || '' };
+  });
+  ssPopulate('ss-wiz-contact', conOpts, {
+    hiddenId: 'wiz-contact-select',
+    placeholder: 'Search contact...',
+    onChange: (v) => { document.getElementById('wiz-contact-select').value = v; wizSelectContact(); },
+  });
 
-  // Pre-load venues
+  // Pre-load venues (org venues first, then others)
   const orgVenues = allVenues.filter(v => v.organisation_id === id);
-  const venueSel = document.getElementById('wiz-venue-select');
-  venueSel.innerHTML = '<option value="">Select venue...</option>' +
-    [...orgVenues, ...allVenues.filter(v => v.organisation_id !== id)].map(v =>
-      `<option value="${v.id}">${esc(v.name)}${v.city?' — '+esc(v.city):''}${v.organisation_id===id?' ★':''}</option>`
-    ).join('');
+  const otherVenues = allVenues.filter(v => v.organisation_id !== id);
+  const venueOpts = [...orgVenues, ...otherVenues].map(v => ({
+    value: v.id,
+    label: v.name + (v.organisation_id === id ? ' *' : ''),
+    sub: [v.venue_type, v.city, v.country].filter(Boolean).join(' / '),
+  }));
+  ssPopulate('ss-wiz-venue', venueOpts, {
+    hiddenId: 'wiz-venue-select',
+    placeholder: 'Search venue...',
+    onChange: (v) => { document.getElementById('wiz-venue-select').value = v; wizSelectVenue(); },
+  });
 }
 
 function wizSelectContact() {
@@ -10858,7 +11137,7 @@ function wizSelectContact() {
   const con = allCons.find(c => c.id === id);
   preview.style.display = 'block';
   preview.innerHTML = `<div style="font-family:var(--mono);font-size:11px;color:var(--accent)">${esc([con?.first_name,con?.last_name].filter(Boolean).join(' '))}</div>
-    <div style="font-family:var(--mono);font-size:10px;color:var(--muted);margin-top:4px">${[con?.email,con?.phone,con?.role].filter(Boolean).join(' · ')}</div>`;
+    <div style="font-family:var(--mono);font-size:10px;color:var(--muted);margin-top:4px">${[con?.email,con?.phone,con?.role].filter(Boolean).join(' / ')}</div>`;
   document.getElementById('wiz-sub-2').textContent = [con?.first_name,con?.last_name].filter(Boolean).join(' ')||con?.email||'';
 }
 
