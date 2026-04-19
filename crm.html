@@ -3268,9 +3268,7 @@ tbody td { padding: 10px 14px; vertical-align: middle; }
           <span style="background:var(--accent);color:#fff;font-family:var(--mono);font-size:9px;padding:1px 6px">1</span>
           Company *
         </label>
-        <select id="bm-org" onchange="bookingStep1()" style="display:none">
-          <option value="">Select company...</option>
-        </select>
+        <input type="hidden" id="bm-org">
         <div class="ss-wrap" id="ss-bm-org">
           <input type="text" placeholder="Search company..." autocomplete="off">
           <span class="ss-clear">&times;</span>
@@ -3284,9 +3282,7 @@ tbody td { padding: 10px 14px; vertical-align: middle; }
           <span id="bm-step2-badge" style="background:var(--border);color:var(--muted);font-family:var(--mono);font-size:9px;padding:1px 6px">2</span>
           Contact Person *
         </label>
-        <select id="bm-contact" disabled onchange="bookingStep2()" style="display:none">
-          <option value="">-- select company first --</option>
-        </select>
+        <input type="hidden" id="bm-contact">
         <div class="ss-wrap" id="ss-bm-contact">
           <input type="text" placeholder="-- select company first --" autocomplete="off" disabled>
           <span class="ss-clear">&times;</span>
@@ -3301,9 +3297,7 @@ tbody td { padding: 10px 14px; vertical-align: middle; }
           <span id="bm-step3-badge" style="background:var(--border);color:var(--muted);font-family:var(--mono);font-size:9px;padding:1px 6px">3</span>
           Venue / Festival *
         </label>
-        <select id="bm-venue-id" disabled onchange="bookingStep3()" style="display:none">
-          <option value="">-- select contact first --</option>
-        </select>
+        <input type="hidden" id="bm-venue-id">
         <div class="ss-wrap" id="ss-bm-venue">
           <input type="text" placeholder="-- select contact first --" autocomplete="off" disabled>
           <span class="ss-clear">&times;</span>
@@ -4302,9 +4296,7 @@ tbody td { padding: 10px 14px; vertical-align: middle; }
         <div id="wiz1-existing">
           <div class="fg" style="margin-bottom:0">
             <label>Select Company</label>
-            <select id="wiz-org-select" onchange="wizSelectOrg()" style="display:none">
-              <option value="">Search company...</option>
-            </select>
+            <input type="hidden" id="wiz-org-select">
             <div class="ss-wrap" id="ss-wiz-org">
               <input type="text" placeholder="Search company..." autocomplete="off">
               <span class="ss-clear">&times;</span>
@@ -4352,9 +4344,7 @@ tbody td { padding: 10px 14px; vertical-align: middle; }
         <div id="wiz2-existing">
           <div class="fg" style="margin-bottom:0">
             <label>Select Contact Person</label>
-            <select id="wiz-contact-select" onchange="wizSelectContact()" style="display:none">
-              <option value="">-- contacts from selected company --</option>
-            </select>
+            <input type="hidden" id="wiz-contact-select">
             <div class="ss-wrap" id="ss-wiz-contact">
               <input type="text" placeholder="-- contacts from selected company --" autocomplete="off">
               <span class="ss-clear">&times;</span>
@@ -4404,9 +4394,7 @@ tbody td { padding: 10px 14px; vertical-align: middle; }
         <div id="wiz3-existing">
           <div class="fg" style="margin-bottom:0">
             <label>Select Venue</label>
-            <select id="wiz-venue-select" onchange="wizSelectVenue()" style="display:none">
-              <option value="">Search venue...</option>
-            </select>
+            <input type="hidden" id="wiz-venue-select">
             <div class="ss-wrap" id="ss-wiz-venue">
               <input type="text" placeholder="Search venue..." autocomplete="off">
               <span class="ss-clear">&times;</span>
