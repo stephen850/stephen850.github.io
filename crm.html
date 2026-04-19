@@ -5544,7 +5544,7 @@ async function saveTeamMember() {
         body: JSON.stringify({
           email: email.toLowerCase(),
           full_name: name,
-          redirect_to: window.location.origin + window.location.pathname,
+          redirect_to: window.location.origin + '/set-password.html',
         }),
       });
       const inviteData = await inviteRes.json();
