@@ -60,6 +60,27 @@ body { background: var(--bg); color: var(--text); font-family: var(--sans); font
 .sd-badge-completed  { color: var(--muted); border-color: var(--border-dark); }
 .sd-badge-cancelled  { color: var(--red); border-color: var(--red); }
 
+/* Status picker dropdown */
+.sd-status-wrap { position: relative; display: inline-block; }
+.sd-status-trigger { cursor: pointer; transition: opacity 0.15s; }
+.sd-status-trigger:hover { opacity: 0.8; }
+.sd-status-dd {
+  display: none; position: absolute; top: 100%; right: 0; margin-top: 6px;
+  background: #1a1a1a; border: 1px solid #333; z-index: 20; min-width: 160px;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.4);
+}
+.sd-status-dd.open { display: block; }
+.sd-status-opt {
+  padding: 8px 14px; font-family: var(--mono); font-size: 10px; letter-spacing: 0.08em;
+  text-transform: uppercase; cursor: pointer; color: rgba(255,255,255,0.5);
+  transition: all 0.1s; display: flex; align-items: center; gap: 8px;
+}
+.sd-status-opt:hover { background: #222; color: #fff; }
+.sd-status-opt.active { color: #fff; }
+.sd-status-opt .sd-s-dot {
+  width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0;
+}
+
 /* ── LIFECYCLE BAR ── */
 .sd-lifecycle {
   display: flex; align-items: center; padding: 0 0 0 0; overflow-x: auto;
@@ -275,7 +296,10 @@ body { background: var(--bg); color: var(--text); font-family: var(--sans); font
         <div class="sd-venue-line" id="sd-venue-line">—</div>
         <div class="sd-ref" id="sd-ref"></div>
       </div>
-      <div id="sd-status-badge"></div>
+      <div class="sd-status-wrap">
+        <div class="sd-status-trigger" id="sd-status-badge" onclick="toggleStatusPicker()"></div>
+        <div class="sd-status-dd" id="sd-status-dd"></div>
+      </div>
     </div>
     <div class="sd-meta" id="sd-meta"></div>
     <!-- Lifecycle bar -->
@@ -552,6 +576,7 @@ function renderHero(b, venue) {
   const s = b.status || 'inquiry';
   document.getElementById('sd-status-badge').innerHTML =
     `<div class="sd-badge ${statusColors[s]||'sd-badge-inquiry'}">${s.replace('_',' ')}</div>`;
+  renderStatusDropdown(s);
 
   // Meta row
   const meta = [
@@ -1367,6 +1392,64 @@ async function sdDeleteDoc(docId, fileName) {
   } catch(e) {
     showToast('Delete failed: ' + e.message, 'error');
   }
+}
+
+// ── STATUS PICKER ─────────────────────────────────────────────
+const SD_STATUSES = [
+  { key: 'inquiry',     label: 'Inquiry',     color: '#c8a020' },
+  { key: 'hold',        label: 'Hold',        color: '#5b8dee' },
+  { key: 'offer_sent',  label: 'Offer sent',  color: '#e08030' },
+  { key: 'negotiating', label: 'Negotiating', color: '#a050c0' },
+  { key: 'confirmed',   label: 'Confirmed',   color: '#1a6b3c' },
+  { key: 'advancing',   label: 'Advancing',   color: '#3a6bbf' },
+  { key: 'completed',   label: 'Completed',   color: '#8a8278' },
+  { key: 'cancelled',   label: 'Cancelled',   color: '#c0392b' },
+];
+
+function renderStatusDropdown(currentStatus) {
+  const dd = document.getElementById('sd-status-dd');
+  if (!dd) return;
+  dd.innerHTML = SD_STATUSES.map(s =>
+    `<div class="sd-status-opt${s.key === currentStatus ? ' active' : ''}" onclick="changeShowStatus('${s.key}')">
+      <span class="sd-s-dot" style="background:${s.color}"></span>
+      ${s.label}
+    </div>`
+  ).join('');
+}
+
+function toggleStatusPicker() {
+  const dd = document.getElementById('sd-status-dd');
+  if (!dd) return;
+  dd.classList.toggle('open');
+}
+
+document.addEventListener('click', e => {
+  if (!e.target.closest('.sd-status-wrap')) {
+    document.getElementById('sd-status-dd')?.classList.remove('open');
+  }
+});
+
+async function changeShowStatus(status) {
+  if (!sdBookingId) return;
+  document.getElementById('sd-status-dd').classList.remove('open');
+
+  const { error } = await db.from('bookings').update({ status }).eq('id', sdBookingId);
+  if (error) { showToast('Error updating status', 'error'); return; }
+
+  showToast('Status: ' + status.replace(/_/g, ' '), 'success');
+
+  // Re-render badge
+  const statusColors = {
+    inquiry:'sd-badge-inquiry', hold:'sd-badge-hold', offer_sent:'sd-badge-offer_sent',
+    negotiating:'sd-badge-negotiating', confirmed:'sd-badge-confirmed', advancing:'sd-badge-advancing',
+    completed:'sd-badge-completed', cancelled:'sd-badge-cancelled',
+  };
+  document.getElementById('sd-status-badge').innerHTML =
+    `<div class="sd-badge ${statusColors[status]||'sd-badge-inquiry'}">${status.replace('_',' ')}</div>`;
+  renderStatusDropdown(status);
+
+  // Reload full page to update lifecycle bar, open actions, etc.
+  setTimeout(() => loadShow(sdBookingId), 300);
 }
 </script>
 </body>
