@@ -3207,7 +3207,7 @@ tbody td { padding: 10px 14px; vertical-align: middle; }
       </div>
       <div class="fg">
         <label>Currency</label>
-        <select id="bm-currency">
+        <select id="bm-currency" onchange="updateBookingCalc()">
           <option value="EUR">EUR €</option>
           <option value="USD">USD $</option>
           <option value="GBP">GBP £</option>
@@ -3219,15 +3219,15 @@ tbody td { padding: 10px 14px; vertical-align: middle; }
       </div>
       <div class="fg" id="bm-fee-field">
         <label>Fee Amount *</label>
-        <input type="number" id="bm-fee" placeholder="5000">
+        <input type="number" id="bm-fee" placeholder="5000" oninput="updateBookingCalc()">
       </div>
       <div class="fg" id="bm-guarantee-field" style="display:none">
         <label>Guarantee</label>
-        <input type="number" id="bm-guarantee" placeholder="3000">
+        <input type="number" id="bm-guarantee" placeholder="3000" oninput="updateBookingCalc()">
       </div>
       <div class="fg" id="bm-pct-field" style="display:none">
         <label>Percentage %</label>
-        <input type="number" id="bm-pct" placeholder="70" min="0" max="100">
+        <input type="number" id="bm-pct" placeholder="70" min="0" max="100" oninput="updateBookingCalc()">
       </div>
       <div class="fg">
         <label style="display:flex;align-items:center;gap:8px">
@@ -3245,13 +3245,13 @@ tbody td { padding: 10px 14px; vertical-align: middle; }
               style="padding:2px 8px;font-size:9px;border:none;background:transparent;color:var(--muted)">Excl</button>
           </span>
         </label>
-        <input type="number" id="bm-commission" placeholder="15" value="15">
+        <input type="number" id="bm-commission" placeholder="15" value="15" oninput="updateBookingCalc()">
         <input type="hidden" id="bm-commission-type" value="percentage">
         <input type="hidden" id="bm-commission-incl" value="inclusive">
       </div>
       <div class="fg">
         <label>Withholding %</label>
-        <input type="number" id="bm-withholding" placeholder="0" value="0">
+        <input type="number" id="bm-withholding" placeholder="0" value="0" oninput="updateBookingCalc()">
       </div>
       <div class="fg">
         <label>Withholding Country</label>
@@ -3319,30 +3319,36 @@ tbody td { padding: 10px 14px; vertical-align: middle; }
       </div>
     </div>
 
-    <div class="form-section">Documents</div>
-    <div style="margin:0 0 8px">
-      <div id="bm-doc-list" class="doc-list"></div>
-      <div class="doc-upload-zone" id="bm-doc-dropzone"
-           onclick="document.getElementById('bm-doc-input').click()"
-           ondragover="event.preventDefault();this.classList.add('dragover')"
-           ondragleave="this.classList.remove('dragover')"
-           ondrop="event.preventDefault();this.classList.remove('dragover');handleDocDrop(event)">
-        Drop files here or click to upload
-        <div style="font-size:9px;margin-top:4px;color:var(--muted)">Contracts, riders, receipts, tech specs (max 10 MB)</div>
+    <!-- Live deal calculation -->
+    <div id="bm-calc" style="background:var(--accent);padding:16px;margin-top:4px">
+      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:rgba(255,255,255,0.1)">
+        <div style="background:var(--accent);padding:10px;text-align:center">
+          <div style="font-family:var(--mono);font-size:8px;letter-spacing:0.1em;text-transform:uppercase;color:rgba(255,255,255,0.5);margin-bottom:4px">Gross Fee</div>
+          <div style="font-family:var(--mono);font-size:16px;color:#fff" id="bc-gross">--</div>
+        </div>
+        <div style="background:var(--accent);padding:10px;text-align:center">
+          <div style="font-family:var(--mono);font-size:8px;letter-spacing:0.1em;text-transform:uppercase;color:rgba(255,255,255,0.5);margin-bottom:4px">Withholding Tax</div>
+          <div style="font-family:var(--mono);font-size:16px;color:#fff" id="bc-wh">--</div>
+        </div>
+        <div style="background:var(--accent);padding:10px;text-align:center">
+          <div style="font-family:var(--mono);font-size:8px;letter-spacing:0.1em;text-transform:uppercase;color:rgba(255,255,255,0.5);margin-bottom:4px">Nett Fee</div>
+          <div style="font-family:var(--mono);font-size:16px;color:#fff" id="bc-nett">--</div>
+        </div>
+        <div style="background:var(--accent);padding:10px;text-align:center">
+          <div style="font-family:var(--mono);font-size:8px;letter-spacing:0.1em;text-transform:uppercase;color:rgba(255,255,255,0.5);margin-bottom:4px">Commission</div>
+          <div style="font-family:var(--mono);font-size:16px;color:#fff" id="bc-comm">--</div>
+        </div>
       </div>
-      <input type="file" id="bm-doc-input" multiple style="display:none"
-             accept=".pdf,.doc,.docx,.xls,.xlsx,.jpg,.jpeg,.png,.gif,.webp"
-             onchange="handleDocSelect(this.files)">
-      <select id="bm-doc-type" style="margin-top:6px;font-family:var(--mono);font-size:11px;padding:4px 8px;border:1px solid var(--border)">
-        <option value="contract">Contract</option>
-        <option value="rider">Rider</option>
-        <option value="receipt">Receipt</option>
-        <option value="invoice">Invoice</option>
-        <option value="tech_spec">Tech Spec</option>
-        <option value="travel">Travel</option>
-        <option value="other">Other</option>
-      </select>
-      <span style="font-family:var(--mono);font-size:9px;color:var(--muted);margin-left:6px">Type for next upload</span>
+      <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:1px;background:rgba(255,255,255,0.1);margin-top:1px">
+        <div style="background:var(--accent);padding:10px;text-align:center">
+          <div style="font-family:var(--mono);font-size:8px;letter-spacing:0.1em;text-transform:uppercase;color:rgba(255,255,255,0.4);margin-bottom:4px">Due to Booker</div>
+          <div style="font-family:var(--mono);font-size:16px;color:var(--green)" id="bc-booker">--</div>
+        </div>
+        <div style="background:var(--accent);padding:10px;text-align:center">
+          <div style="font-family:var(--mono);font-size:8px;letter-spacing:0.1em;text-transform:uppercase;color:rgba(255,255,255,0.4);margin-bottom:4px">Due to Artist</div>
+          <div style="font-family:var(--mono);font-size:16px;color:#fff" id="bc-artist">--</div>
+        </div>
+      </div>
     </div>
 
     <div class="form-section">Notes</div>
@@ -6056,9 +6062,7 @@ function openBookingModal(id = null) {
     document.getElementById('bm-currency').value = 'EUR';
     document.getElementById('bm-dealtype').value = 'flat_fee';
     updateDealFields();
-    // Clear documents for new bookings
-    bookingDocs = [];
-    renderBookingDocs();
+    updateBookingCalc();
   }
 
   document.getElementById('bk-modal').classList.add('open');
@@ -6228,8 +6232,7 @@ function editBooking(id) {
     document.getElementById('bm-holdexpiry').value = b.hold_expires_at.slice(0,16);
   }
   updateDealFields();
-  // Load attached documents
-  loadBookingDocs(id);
+  updateBookingCalc();
 }
 
 function setCommType(type) {
@@ -6245,6 +6248,7 @@ function setCommType(type) {
     pctBtn.style.background = 'transparent'; pctBtn.style.color = 'var(--muted)';
     document.getElementById('bm-commission').placeholder = '600';
   }
+  updateBookingCalc();
 }
 
 function setCommIncl(mode) {
@@ -6258,6 +6262,54 @@ function setCommIncl(mode) {
     exclBtn.style.background = 'var(--accent)'; exclBtn.style.color = '#fff';
     inclBtn.style.background = 'transparent'; inclBtn.style.color = 'var(--muted)';
   }
+  updateBookingCalc();
+}
+
+function updateBookingCalc() {
+  const fee = parseFloat(document.getElementById('bm-fee').value) || 0;
+  const commType = document.getElementById('bm-commission-type').value;
+  const commIncl = document.getElementById('bm-commission-incl').value;
+  const commVal = parseFloat(document.getElementById('bm-commission').value) || 0;
+  const whRate = parseFloat(document.getElementById('bm-withholding').value) || 0;
+  const cur = document.getElementById('bm-currency').value || 'EUR';
+  const sym = {EUR:'€',USD:'$',GBP:'£',SGD:'S$',AED:'AED',IDR:'Rp',THB:'฿'}[cur] || cur;
+
+  if (!fee) {
+    ['bc-gross','bc-wh','bc-nett','bc-comm','bc-booker','bc-artist'].forEach(id =>
+      document.getElementById(id).textContent = '--');
+    return;
+  }
+
+  // Commission amount
+  let commission = 0;
+  if (commType === 'fixed') {
+    commission = commVal;
+  } else {
+    commission = fee * commVal / 100;
+  }
+
+  const gross = fee;
+  const wh = fee * whRate / 100;
+  const nett = gross - wh;
+
+  let dueBooker, dueArtist;
+  if (commIncl === 'inclusive') {
+    // Commission is inside the fee
+    dueBooker = commission;
+    dueArtist = nett - commission;
+  } else {
+    // Commission is on top -- promoter pays fee + commission to agency
+    dueBooker = commission;
+    dueArtist = nett;
+  }
+
+  const fmt = (v) => sym + ' ' + v.toLocaleString('nl-NL', {minimumFractionDigits:2, maximumFractionDigits:2});
+  document.getElementById('bc-gross').textContent = fmt(gross);
+  document.getElementById('bc-wh').textContent = fmt(wh);
+  document.getElementById('bc-nett').textContent = fmt(nett);
+  document.getElementById('bc-comm').textContent = fmt(commission);
+  document.getElementById('bc-booker').textContent = fmt(dueBooker);
+  document.getElementById('bc-artist').textContent = fmt(dueArtist);
 }
 
 // Calculate commission for a booking (used everywhere in finance)
