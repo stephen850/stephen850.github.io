@@ -1905,7 +1905,7 @@ tbody td { padding: 10px 14px; vertical-align: middle; }
           <thead>
             <tr>
               <th>Invoice #</th><th>Booking</th><th>Artist</th><th>Promoter</th>
-              <th>Description</th><th>Type</th><th>Amount</th><th>VAT</th><th>Total</th>
+              <th>Project</th><th>Type</th><th>Amount</th><th>VAT</th><th>Total</th>
               <th>Due Date</th><th>Status</th><th>Actions</th>
             </tr>
           </thead>
@@ -7821,7 +7821,7 @@ const VAT_REGIMES = {
 
 async function loadInvoices() {
   const { data, error } = await db.from('invoices')
-    .select('*, bookings(reference, show_date, artists(name))')
+    .select('*, bookings(reference, show_date, venue_name, artists(name))')
     .order('created_at', { ascending: false });
   if (error) { showToast('Error loading invoices: ' + error.message, 'error'); return; }
   allInvoices = data || [];
@@ -7875,7 +7875,7 @@ function renderInvoices() {
       <td class="td-mono" style="font-size:10px">${esc(i.bookings?.reference||'-')}</td>
       <td class="td-name">${esc(i.bookings?.artists?.name||'-')}</td>
       <td class="td-trunc">${esc(i.bill_to_name||'-')}</td>
-      <td class="td-trunc" style="max-width:160px;font-size:11px">${esc(i.description||'-')}</td>
+      <td class="td-trunc" style="max-width:180px">${esc(i.bookings?.venue_name||'-')}${i.description?'<div style="font-family:var(--mono);font-size:9px;color:var(--muted);margin-top:2px">'+esc(i.description)+'</div>':''}</td>
       <td><span class="genre-pill">${esc((i.type||'').replace('_',' '))}</span></td>
       <td class="td-mono" style="font-size:11px">${sym}${(i.subtotal||0).toLocaleString()}</td>
       <td class="td-mono" style="font-size:11px">${vatPct}</td>
