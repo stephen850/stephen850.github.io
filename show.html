@@ -281,7 +281,7 @@ body { background: var(--bg); color: var(--text); font-family: var(--sans); font
 
   <!-- Top bar -->
   <div class="sd-topbar">
-    <a href="crm.html" class="sd-back">← Back to CRM</a>
+    <a href="crm.html" class="sd-back" onclick="event.preventDefault(); if (document.referrer.includes('crm.html')) history.back(); else location.href='crm.html';">← Back to CRM</a>
     <div class="sd-brand"><strong>DEEPBLOE</strong> · SHOW DASHBOARD</div>
     <div class="sd-topbar-right">
       <span class="sd-user" id="sd-user"></span>
@@ -487,6 +487,22 @@ async function startApp() {
   const params = new URLSearchParams(window.location.search);
   const bookingId = params.get('id');
   if (!bookingId) { showToast('No booking ID in URL', 'error'); return; }
+
+  // Try instant render from cached data
+  try {
+    const cached = sessionStorage.getItem('show_booking');
+    if (cached) {
+      const b = JSON.parse(cached);
+      if (b.id === bookingId) {
+        // Instant hero render with cached booking data
+        renderHero(b, null);
+        renderDeal(b);
+      }
+      sessionStorage.removeItem('show_booking');
+    }
+  } catch(e) {}
+
+  // Full load (fetches all related data)
   await loadShow(bookingId);
 }
 

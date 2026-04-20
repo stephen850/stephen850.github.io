@@ -5797,6 +5797,15 @@ function goToContact(email) {
   filterContacts();
 }
 
+function goToShow(bookingId) {
+  // Cache booking data in sessionStorage for instant load
+  const b = allBookings.find(x => x.id === bookingId);
+  if (b) {
+    try { sessionStorage.setItem('show_booking', JSON.stringify(b)); } catch(e) {}
+  }
+  window.location.href = 'show.html?id=' + bookingId;
+}
+
 // ── ARTISTS ───────────────────────────────────────────────────
 async function loadArtists() {
   const { data, error } = await db.from('artists').select('id, name, slug, genre, home_country').order('name');
@@ -5979,7 +5988,7 @@ function renderBookingList() {
       <td>${fee}</td>
       <td class="td-trunc">${esc(org)}</td>
       <td><div class="row-actions">
-        <button class="ra ra-view primary" onclick="window.location.href='show.html?id=${b.id}'" style="border-color:var(--accent);background:var(--accent);color:#fff">Show</button>
+        <button class="ra ra-view primary" onclick="goToShow('${b.id}')" style="border-color:var(--accent);background:var(--accent);color:#fff">Show</button>
         <button class="ra confirm" onclick="openContractEditor('${b.id}')">Contract</button>
         <button class="ra" style="border-color:var(--amber);color:var(--amber)" onclick="openInvoiceEditor('${b.id}')">Invoice</button>
         <button class="ra" style="border-color:var(--blue);color:var(--blue)" onclick="openAdvancingEditor('${b.id}')">Advance</button>
@@ -8853,7 +8862,7 @@ function renderDashboard() {
         const sym = {EUR:'€',USD:'$',GBP:'£',SGD:'S$',AED:'AED ',IDR:'Rp',THB:'฿'}[b.fee_currency||'EUR']||'';
         const daysLeft = Math.ceil((new Date(b.show_date) - now) / (1000*60*60*24));
         const urgency = daysLeft <= 14 ? 'color:var(--red)' : daysLeft <= 30 ? 'color:var(--amber)' : '';
-        return `<tr style="cursor:pointer" onclick="window.location.href='show.html?id=${b.id}'">
+        return `<tr style="cursor:pointer" onclick="goToShow('${b.id}')">
           <td class="td-mono" style="font-size:10px;${urgency}">${fmtDate(b.show_date)}</td>
           <td class="td-name">${esc(b.artists?.name||'-')}</td>
           <td class="td-trunc">${esc([b.venue_name,b.venue_city].filter(Boolean).join(', ')||'-')}</td>
