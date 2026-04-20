@@ -1054,44 +1054,36 @@ async function renderActivity(b, contracts, invoices, advancing, settlement) {
 
 // ── QUICK ACTIONS ─────────────────────────────────────────────
 function openSettlement() {
-  const params = new URLSearchParams(window.location.search);
-  const bookingId = params.get('id');
+  const bookingId = new URLSearchParams(window.location.search).get('id');
   if (window.parent !== window) {
-    window.parent.closeShowOverlay();
-    setTimeout(() => window.parent.openSettlement(bookingId), 100);
+    window.parent.openSettlement(bookingId);
   } else {
     window.location.href = `crm.html?open=settlement&booking=${bookingId}`;
   }
 }
 
 function openContract() {
-  const params = new URLSearchParams(window.location.search);
-  const bookingId = params.get('id');
+  const bookingId = new URLSearchParams(window.location.search).get('id');
   if (window.parent !== window) {
-    window.parent.closeShowOverlay();
-    setTimeout(() => window.parent.openContractEditor(bookingId), 100);
+    window.parent.openContractEditor(bookingId);
   } else {
     window.location.href = `crm.html?open=contract&booking=${bookingId}`;
   }
 }
 
 function openInvoice() {
-  const params = new URLSearchParams(window.location.search);
-  const bookingId = params.get('id');
+  const bookingId = new URLSearchParams(window.location.search).get('id');
   if (window.parent !== window) {
-    window.parent.closeShowOverlay();
-    setTimeout(() => window.parent.openInvoiceEditor(bookingId), 100);
+    window.parent.openInvoiceEditor(bookingId);
   } else {
     window.location.href = `crm.html?open=invoice&booking=${bookingId}`;
   }
 }
 
 function openAdvancing() {
-  const params = new URLSearchParams(window.location.search);
-  const bookingId = params.get('id');
+  const bookingId = new URLSearchParams(window.location.search).get('id');
   if (window.parent !== window) {
-    window.parent.closeShowOverlay();
-    setTimeout(() => window.parent.openAdvancingEditor(bookingId), 100);
+    window.parent.openAdvancingEditor(bookingId);
   } else {
     window.location.href = `crm.html?open=advancing&booking=${bookingId}`;
   }
