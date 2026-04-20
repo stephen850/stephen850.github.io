@@ -5153,46 +5153,43 @@ async function startApp() {
   }
 
   await loadAgencyOnStartup();  // Load agency settings first so all later renders use correct data
-  loadOrgs();
-  loadContacts();
-  loadArtists();
-  loadBookings();
-  loadContracts();
-  loadInvoices();
-  loadAdvancing();
-  loadExpenses();
-  loadVenues();
-  loadTags();
-  loadTourSlots();
-  loadPoolLinks();
-  setTimeout(() => {
-    renderDashboard();
-    // Re-apply RBAC after all data is loaded (artists needed for team rendering)
-    if (RBAC.loaded) applyRBACToUI();
-    // Source field cleanup (silent, runs once per session)
-    cleanupSourceField();
-    // Handle URL params
-    const params = new URLSearchParams(window.location.search);
-    const open = params.get('open');
-    const bookingId = params.get('booking');
-    if (open === 'settlement' && bookingId) {
-      const bkTab = document.querySelector('.h-tab[onclick*="bookings"]');
-      showPanel('bookings', bkTab);
-      setTimeout(() => openSettlement(bookingId), 500);
-    } else if (open === 'contract' && bookingId) {
-      const bkTab = document.querySelector('.h-tab[onclick*="bookings"]');
-      showPanel('bookings', bkTab);
-      setTimeout(() => openContractEditor(bookingId), 500);
-    } else if (open === 'invoice' && bookingId) {
-      const bkTab = document.querySelector('.h-tab[onclick*="bookings"]');
-      showPanel('bookings', bkTab);
-      setTimeout(() => openInvoiceEditor(bookingId), 500);
-    } else if (open === 'advancing' && bookingId) {
-      const bkTab = document.querySelector('.h-tab[onclick*="bookings"]');
-      showPanel('bookings', bkTab);
-      setTimeout(() => openAdvancingEditor(bookingId), 500);
-    }
-  }, 2000);
+  
+  // Load all data in parallel and wait for completion
+  await Promise.all([
+    loadOrgs(),
+    loadContacts(),
+    loadArtists(),
+    loadBookings(),
+    loadContracts(),
+    loadInvoices(),
+    loadAdvancing(),
+    loadExpenses(),
+    loadVenues(),
+    loadTags(),
+    loadTourSlots(),
+    loadPoolLinks(),
+  ]);
+
+  renderDashboard();
+  // Re-apply RBAC after all data is loaded (artists needed for team rendering)
+  if (RBAC.loaded) applyRBACToUI();
+  // Source field cleanup (silent, runs once per session)
+  cleanupSourceField();
+
+  // Handle URL params (data is guaranteed loaded now)
+  const params = new URLSearchParams(window.location.search);
+  const open = params.get('open');
+  const bookingId = params.get('booking');
+  if (open && bookingId) {
+    const bkTab = document.querySelector('.h-tab[onclick*="bookings"]');
+    showPanel('bookings', bkTab);
+    setTimeout(() => {
+      if (open === 'settlement') openSettlement(bookingId);
+      else if (open === 'contract') openContractEditor(bookingId);
+      else if (open === 'invoice') openInvoiceEditor(bookingId);
+      else if (open === 'advancing') openAdvancingEditor(bookingId);
+    }, 100);
+  }
 }
 db.auth.getSession().then(({ data: { session } }) => {
   if (session) startApp();
