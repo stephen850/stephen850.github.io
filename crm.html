@@ -1388,10 +1388,8 @@ tbody td { padding: 10px 14px; vertical-align: middle; }
       <div class="h-tab" onclick="showPanel('advancing', this)">Advancing</div>
       <div class="h-tab" onclick="showPanel('finance', this);renderFinance()">Finance</div>
       <div class="h-tab" onclick="showPanel('calendar', this);renderCalendar()">Calendar</div>
-      <div class="h-tab" onclick="showPanel('reminders', this);renderReminders()">Reminders</div>
       <div class="h-tab" onclick="showPanel('tours', this);renderTours()">Tours</div>
       <div class="h-tab" onclick="showPanel('pipeline', this);renderPipeline()">Pipeline</div>
-      <div class="h-tab" onclick="showPanel('import', this)">Import</div>
       <div class="h-tab" onclick="showPanel('settings', this);loadAgencySettings()">Settings</div>
     </nav>
     <div class="h-right">
@@ -2325,6 +2323,9 @@ tbody td { padding: 10px 14px; vertical-align: middle; }
 
     <!-- ── REMINDERS PANEL ── -->
     <div class="panel" id="panel-reminders">
+      <div style="margin-bottom:16px">
+        <a href="#" onclick="event.preventDefault();showPanel('settings',document.querySelector('.h-tab[onclick*=settings]'));loadAgencySettings()" style="font-family:var(--mono);font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);text-decoration:none">← Back to Settings</a>
+      </div>
 
       <!-- Header -->
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px">
@@ -2732,6 +2733,9 @@ tbody td { padding: 10px 14px; vertical-align: middle; }
 
 
     <div class="panel" id="panel-import">
+      <div style="margin-bottom:16px">
+        <a href="#" onclick="event.preventDefault();showPanel('settings',document.querySelector('.h-tab[onclick*=settings]'));loadAgencySettings()" style="font-family:var(--mono);font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);text-decoration:none">← Back to Settings</a>
+      </div>
       <div class="import-actions">
         <button class="btn primary" onclick="downloadTemplate()">↓ Download Template</button>
         <span style="font-family:var(--mono);font-size:11px;color:var(--muted)">
@@ -2913,6 +2917,18 @@ tbody td { padding: 10px 14px; vertical-align: middle; }
             <button class="btn" onclick="loadAuditLog()">Refresh</button>
           </div>
           <div id="audit-log-list" style="max-height:500px;overflow-y:auto;border:1px solid var(--border)"></div>
+        </div>
+
+        <!-- Quick links to Import & Reminders -->
+        <div style="margin-top:32px;border-top:1px solid var(--border);padding-top:24px">
+          <div style="display:flex;gap:12px">
+            <button class="btn" onclick="showHiddenPanel('import')" style="padding:12px 24px">
+              Import Data
+            </button>
+            <button class="btn" onclick="showHiddenPanel('reminders');renderReminders()" style="padding:12px 24px">
+              Automated Reminders
+            </button>
+          </div>
         </div>
 
       </div>
@@ -5208,7 +5224,7 @@ db.auth.getSession().then(({ data: { session } }) => {
 // ── RBAC ENGINE ──────────────────────────────────────────────
 
 // All CRM panel IDs (must match h-tab onclick and panel-* IDs)
-const ALL_PANELS = ['dashboard','contacts','venues','artists','bookings','contracts','invoices','advancing','finance','calendar','reminders','tours','pipeline','import','settings'];
+const ALL_PANELS = ['dashboard','contacts','venues','artists','bookings','contracts','invoices','advancing','finance','calendar','tours','pipeline','settings','reminders','import'];
 
 // Map panel IDs to their h-tab index (0-based, matching nav order)
 const PANEL_TAB_INDEX = {};
@@ -5792,6 +5808,17 @@ function showPanel(name, el) {
   const panel = document.getElementById('panel-' + name);
   if (panel && RBAC.loaded && !canEdit(name)) {
     panel.classList.add('rbac-no-edit');
+  }
+}
+
+function showHiddenPanel(name) {
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  document.getElementById('panel-' + name).classList.add('active');
+  // Keep Settings tab highlighted
+  const settingsTab = document.querySelector('.h-tab[onclick*="settings"]');
+  if (settingsTab) {
+    document.querySelectorAll('.h-tab').forEach(t => t.classList.remove('active'));
+    settingsTab.classList.add('active');
   }
 }
 
