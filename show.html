@@ -343,6 +343,10 @@ if (new URLSearchParams(window.location.search).get('embedded') === '1') {
         <div class="sd-card-body" id="sd-deal-body">
           <div class="sd-loading">Loading...</div>
         </div>
+        <div style="padding:0 16px 12px">
+          <div style="font-family:var(--mono);font-size:9px;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);margin-bottom:6px">Internal Notes</div>
+          <textarea id="sd-notes" placeholder="Add notes..." style="width:100%;min-height:60px;padding:8px 10px;font-family:var(--sans);font-size:12px;border:1px solid var(--border);background:var(--bg);outline:none;resize:vertical" onblur="saveShowNotes()"></textarea>
+        </div>
         <div class="sd-card-actions">
           <button class="sd-btn" onclick="openCRM('bookings')">Edit Booking</button>
           <button class="sd-btn blue" onclick="openSettlement()">Settlement</button>
@@ -727,6 +731,10 @@ function renderDeal(b) {
       <div class="sd-field-label">${esc(f.label)}</div>
       <div class="sd-field-val ${f.cls||''}">${esc(f.val)}</div>
     </div>`).join('');
+
+  // Populate notes
+  const notesEl = document.getElementById('sd-notes');
+  if (notesEl) notesEl.value = b.internal_notes || '';
 }
 
 // ── CONTRACT ─────────────────────────────────────────────────
@@ -1495,6 +1503,13 @@ async function changeShowStatus(status) {
 
   // Reload full page to update lifecycle bar, open actions, etc.
   setTimeout(() => loadShow(sdBookingId), 300);
+}
+
+async function saveShowNotes() {
+  if (!sdBookingId) return;
+  const notes = document.getElementById('sd-notes')?.value || '';
+  const { error } = await db.from('bookings').update({ internal_notes: notes }).eq('id', sdBookingId);
+  if (error) showToast('Failed to save notes', 'error');
 }
 </script>
 </body>

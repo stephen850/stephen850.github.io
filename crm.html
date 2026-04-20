@@ -1502,7 +1502,7 @@ tbody td { padding: 10px 14px; vertical-align: middle; }
       </div>
     </div>
 
-    <!-- ── ORGANISATIONS PANEL ── -->
+    <!-- ── COMPANIES PANEL ── -->
     <div class="panel" id="panel-contacts">
 
       <!-- View toggle -->
@@ -1633,7 +1633,7 @@ tbody td { padding: 10px 14px; vertical-align: middle; }
       <div class="tbl-wrap">
         <table>
           <thead>
-            <tr><th>Project</th><th>Type</th><th>City</th><th>Country</th><th>Organisation</th><th>Primary Contact</th><th>Email</th><th>Tags</th><th>Actions</th></tr>
+            <tr><th>Project</th><th>Type</th><th>City</th><th>Country</th><th>Company</th><th>Primary Contact</th><th>Email</th><th>Tags</th><th>Actions</th></tr>
           </thead>
           <tbody id="venue-tbody"><tr class="tbl-msg"><td colspan="8">Loading...</td></tr></tbody>
         </table>
@@ -1905,12 +1905,12 @@ tbody td { padding: 10px 14px; vertical-align: middle; }
           <thead>
             <tr>
               <th>Invoice #</th><th>Booking</th><th>Artist</th><th>Promoter</th>
-              <th>Type</th><th>Amount</th><th>VAT</th><th>Total</th>
+              <th>Description</th><th>Type</th><th>Amount</th><th>VAT</th><th>Total</th>
               <th>Due Date</th><th>Status</th><th>Actions</th>
             </tr>
           </thead>
           <tbody id="inv-tbody">
-            <tr class="tbl-msg"><td colspan="11">No invoices yet. Generate one from a booking.</td></tr>
+            <tr class="tbl-msg"><td colspan="12">No invoices yet. Generate one from a booking.</td></tr>
           </tbody>
         </table>
       </div>
@@ -2490,7 +2490,7 @@ tbody td { padding: 10px 14px; vertical-align: middle; }
             <thead>
               <tr>
                 <th style="width:28px;padding:8px 6px;"><input type="checkbox" id="pool-check-all" onchange="poolToggleAll(this.checked)"></th>
-                <th>Organisation</th>
+                <th>Company</th>
                 <th>Type</th>
                 <th>Country</th>
                 <th>City</th>
@@ -2670,7 +2670,7 @@ tbody td { padding: 10px 14px; vertical-align: middle; }
           <thead>
             <tr>
               <th style="width:28px;padding:8px 6px;"><input type="checkbox" id="sb-check-all" onchange="sbToggleAll(this.checked)"></th>
-              <th>Organisation</th>
+              <th>Company</th>
               <th>Type</th>
               <th>Country</th>
               <th>Contact Person</th>
@@ -2719,7 +2719,7 @@ tbody td { padding: 10px 14px; vertical-align: middle; }
         <thead>
           <tr>
             <th style="width:28px;padding:6px;"><input type="checkbox" id="tdp-check-all" onchange="tdpToggleAll(this.checked)"></th>
-            <th>Organisation</th>
+            <th>Company</th>
             <th>Country</th>
             <th>Contact</th>
             <th>Email</th>
@@ -4263,7 +4263,7 @@ tbody td { padding: 10px 14px; vertical-align: middle; }
 
     <div class="form-section">Links</div>
     <div class="form-grid">
-      <div class="fg full"><label>Organisation (billing party)</label>
+      <div class="fg full"><label>Company (billing party)</label>
         <div class="ss-wrap" id="ss-vm-org">
           <input type="text" placeholder="Search company..." autocomplete="off">
           <span class="ss-clear">&times;</span>
@@ -4273,7 +4273,7 @@ tbody td { padding: 10px 14px; vertical-align: middle; }
       </div>
       <div class="fg full"><label>Marketing Contact <span style="font-family:var(--mono);font-size:9px;color:var(--muted)">(receives newsletter · Mailchimp sync)</span></label>
         <div class="ss-wrap" id="ss-vm-contact">
-          <input type="text" placeholder="-- select organisation first --" autocomplete="off" disabled>
+          <input type="text" placeholder="-- select company first --" autocomplete="off" disabled>
           <span class="ss-clear">&times;</span>
           <div class="ss-dd"></div>
         </div>
@@ -4553,7 +4553,7 @@ tbody td { padding: 10px 14px; vertical-align: middle; }
       <div id="tm-artist-section" style="display:none;margin-top:16px">
         <div class="form-section">Assigned Artists</div>
         <p style="font-family:var(--mono);font-size:10px;color:var(--muted);margin-bottom:10px">
-          Agents can only manage bookings, contracts and advancing for their assigned artists.
+          Select which artists this team member can manage.
         </p>
         <div id="tm-artist-chips" style="margin-bottom:8px;min-height:28px"></div>
         <div style="display:flex;gap:6px">
@@ -4561,6 +4561,8 @@ tbody td { padding: 10px 14px; vertical-align: middle; }
             <option value="">Add artist...</option>
           </select>
           <button class="btn" onclick="addArtistChip()">+ Add</button>
+          <button class="btn" onclick="selectAllArtists()" style="font-size:10px">Select All</button>
+          <button class="btn" onclick="deselectAllArtists()" style="font-size:10px">Clear All</button>
         </div>
       </div>
 
@@ -5505,7 +5507,8 @@ function toggleArtistAssignment() {
   const roleId = document.getElementById('tm-role').value;
   const role = RBAC.allRoles.find(r => r.id === roleId);
   const section = document.getElementById('tm-artist-section');
-  section.style.display = (role?.name === 'agent') ? 'block' : 'none';
+  // Show artist assignment for all roles except owner
+  section.style.display = (role && role.name !== 'owner') ? 'block' : 'none';
   // For new members, refresh perm grid defaults when role changes
   if (!editMemberId && role) {
     renderMemberPermGrid(null);
@@ -5523,6 +5526,16 @@ function addArtistChip() {
 
 function removeArtistChip(id) {
   tmArtistIds = tmArtistIds.filter(x => x !== id);
+  renderArtistChips();
+}
+
+function selectAllArtists() {
+  tmArtistIds = allArtists.map(a => a.id);
+  renderArtistChips();
+}
+
+function deselectAllArtists() {
+  tmArtistIds = [];
   renderArtistChips();
 }
 
@@ -6607,7 +6620,7 @@ function exportBookings() {
   showToast(`Exported ${data.length} bookings`, 'success');
 }
 
-// ── ORGANISATIONS ─────────────────────────────────────────────
+// ── COMPANIES ─────────────────────────────────────────────
 async function loadOrgs() {
   const { data, error } = await db.from('organisations')
     .select('*, contacts(id, first_name, last_name, email, phone, role, is_primary, marketing_enabled, is_active)')
@@ -7208,7 +7221,7 @@ function exportOrgs() {
   });
   const ws = XLSX.utils.json_to_sheet(data);
   const wb = XLSX.utils.book_new();
-  XLSX.utils.book_append_sheet(wb, ws, 'Organisations');
+  XLSX.utils.book_append_sheet(wb, ws, 'Companies');
   XLSX.writeFile(wb, `deepbloe_orgs_${new Date().toISOString().slice(0,10)}.xlsx`);
   showToast(`Exported ${data.length} organisations`, 'success');
 }
@@ -7846,7 +7859,7 @@ function renderInvoices() {
   const tbody = document.getElementById('inv-tbody');
   const slice = filtInvoices.slice(invPageN * PG, (invPageN + 1) * PG);
   if (!slice.length) {
-    tbody.innerHTML = '<tr class="tbl-msg"><td colspan="11">No invoices found</td></tr>';
+    tbody.innerHTML = '<tr class="tbl-msg"><td colspan="12">No invoices found</td></tr>';
     document.getElementById('inv-pinfo').textContent = '';
     document.getElementById('inv-prev').disabled = true;
     document.getElementById('inv-next').disabled = true;
@@ -7862,6 +7875,7 @@ function renderInvoices() {
       <td class="td-mono" style="font-size:10px">${esc(i.bookings?.reference||'-')}</td>
       <td class="td-name">${esc(i.bookings?.artists?.name||'-')}</td>
       <td class="td-trunc">${esc(i.bill_to_name||'-')}</td>
+      <td class="td-trunc" style="max-width:160px;font-size:11px">${esc(i.description||'-')}</td>
       <td><span class="genre-pill">${esc((i.type||'').replace('_',' '))}</span></td>
       <td class="td-mono" style="font-size:11px">${sym}${(i.subtotal||0).toLocaleString()}</td>
       <td class="td-mono" style="font-size:11px">${vatPct}</td>
@@ -10995,7 +11009,7 @@ async function openVenueModal(id = null) {
   });
 
   // Reset contact
-  ssDisable('ss-vm-contact', true, '-- select organisation first --');
+  ssDisable('ss-vm-contact', true, '-- select company first --');
 
   // Reset
   selectedVenueTags = new Set();
@@ -11029,7 +11043,7 @@ async function openVenueModal(id = null) {
 function loadVenueContacts(preSelectId = null) {
   const orgId = document.getElementById('vm-org').value;
   if (!orgId) {
-    ssDisable('ss-vm-contact', true, '-- select organisation first --');
+    ssDisable('ss-vm-contact', true, '-- select company first --');
     return;
   }
   const orgCons = allCons.filter(c => c.organisation_id === orgId && c.is_active !== false);
@@ -11989,7 +12003,7 @@ function renderSalesBoard() {
   });
 
   const countBar = document.getElementById('sb-count-bar');
-  if (countBar) countBar.textContent = `${orgs.length} organisation${orgs.length!==1?'s':''}`;
+  if (countBar) countBar.textContent = `${orgs.length} company${orgs.length!==1?'s':''}`;
 
   // Build artist header columns - sort by name for consistent order
   const sortedArtists = [...allArtists].sort((a,b) => a.name.localeCompare(b.name));
