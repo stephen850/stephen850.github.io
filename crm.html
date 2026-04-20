@@ -5812,27 +5812,14 @@ function goToShow(bookingId) {
   const iframe = document.getElementById('show-iframe');
   iframe.src = 'show.html?id=' + bookingId + '&embedded=1';
   overlay.classList.add('open');
-  // Push history state so browser back button closes the overlay
-  history.pushState({ show: bookingId }, '', '?show=' + bookingId);
 }
 
 function closeShowOverlay() {
   const overlay = document.getElementById('show-overlay');
   overlay.classList.remove('open');
   document.getElementById('show-iframe').src = '';
-  // Reload bookings in case status changed in show
   loadBookings();
 }
-
-// Handle browser back button
-window.addEventListener('popstate', (e) => {
-  const overlay = document.getElementById('show-overlay');
-  if (overlay.classList.contains('open')) {
-    overlay.classList.remove('open');
-    document.getElementById('show-iframe').src = '';
-    loadBookings();
-  }
-});
 
 // ── ARTISTS ───────────────────────────────────────────────────
 async function loadArtists() {
