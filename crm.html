@@ -439,6 +439,15 @@ tbody td { padding: 10px 14px; vertical-align: middle; }
   position: fixed; inset: 0; background: var(--bg);
   z-index: 300; display: none; flex-direction: column;
 }
+
+/* Show dashboard overlay */
+#show-overlay {
+  position: fixed; inset: 0; z-index: 200; display: none;
+}
+#show-overlay.open { display: block; }
+#show-overlay iframe {
+  width: 100%; height: 100%; border: none;
+}
 #contract-editor-overlay.open { display: flex; }
 
 .ce-header {
@@ -4562,6 +4571,7 @@ tbody td { padding: 10px 14px; vertical-align: middle; }
   </div>
 </div>
 
+<div id="show-overlay"><iframe id="show-iframe"></iframe></div>
 <div id="toast"></div>
 
 <script data-cfasync="false">
@@ -5798,13 +5808,31 @@ function goToContact(email) {
 }
 
 function goToShow(bookingId) {
-  // Cache booking data in sessionStorage for instant load
-  const b = allBookings.find(x => x.id === bookingId);
-  if (b) {
-    try { sessionStorage.setItem('show_booking', JSON.stringify(b)); } catch(e) {}
-  }
-  window.location.href = 'show.html?id=' + bookingId;
+  const overlay = document.getElementById('show-overlay');
+  const iframe = document.getElementById('show-iframe');
+  iframe.src = 'show.html?id=' + bookingId + '&embedded=1';
+  overlay.classList.add('open');
+  // Push history state so browser back button closes the overlay
+  history.pushState({ show: bookingId }, '', '?show=' + bookingId);
 }
+
+function closeShowOverlay() {
+  const overlay = document.getElementById('show-overlay');
+  overlay.classList.remove('open');
+  document.getElementById('show-iframe').src = '';
+  // Reload bookings in case status changed in show
+  loadBookings();
+}
+
+// Handle browser back button
+window.addEventListener('popstate', (e) => {
+  const overlay = document.getElementById('show-overlay');
+  if (overlay.classList.contains('open')) {
+    overlay.classList.remove('open');
+    document.getElementById('show-iframe').src = '';
+    loadBookings();
+  }
+});
 
 // ── ARTISTS ───────────────────────────────────────────────────
 async function loadArtists() {

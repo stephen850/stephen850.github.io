@@ -256,6 +256,18 @@ body { background: var(--bg); color: var(--text); font-family: var(--sans); font
 #toast.error   { background:var(--red); color:#fff; }
 #toast.info    { background:var(--accent); color:#fff; }
 </style>
+<script data-cfasync="false">
+// Detect embedded mode (inside CRM iframe)
+if (new URLSearchParams(window.location.search).get('embedded') === '1') {
+  document.documentElement.classList.add('embedded');
+}
+</script>
+<style>
+.embedded #login-screen { display: none !important; }
+.embedded .sd-topbar { height: 36px; padding: 0 16px; }
+.embedded .sd-brand { display: none; }
+.embedded .sd-user { display: none; }
+</style>
 </head>
 <body>
 
@@ -281,7 +293,7 @@ body { background: var(--bg); color: var(--text); font-family: var(--sans); font
 
   <!-- Top bar -->
   <div class="sd-topbar">
-    <a href="crm.html" class="sd-back" onclick="event.preventDefault(); if (document.referrer.includes('crm.html')) history.back(); else location.href='crm.html';">← Back to CRM</a>
+    <a href="crm.html" class="sd-back" onclick="event.preventDefault(); if (window.parent !== window) window.parent.closeShowOverlay(); else if (document.referrer.includes('crm.html')) history.back(); else location.href='crm.html';">← Back to CRM</a>
     <div class="sd-brand"><strong>DEEPBLOE</strong> · SHOW DASHBOARD</div>
     <div class="sd-topbar-right">
       <span class="sd-user" id="sd-user"></span>
@@ -1044,25 +1056,45 @@ async function renderActivity(b, contracts, invoices, advancing, settlement) {
 function openSettlement() {
   const params = new URLSearchParams(window.location.search);
   const bookingId = params.get('id');
-  window.location.href = `crm.html?open=settlement&booking=${bookingId}`;
+  if (window.parent !== window) {
+    window.parent.closeShowOverlay();
+    setTimeout(() => window.parent.openSettlement(bookingId), 100);
+  } else {
+    window.location.href = `crm.html?open=settlement&booking=${bookingId}`;
+  }
 }
 
 function openContract() {
   const params = new URLSearchParams(window.location.search);
   const bookingId = params.get('id');
-  window.location.href = `crm.html?open=contract&booking=${bookingId}`;
+  if (window.parent !== window) {
+    window.parent.closeShowOverlay();
+    setTimeout(() => window.parent.openContractEditor(bookingId), 100);
+  } else {
+    window.location.href = `crm.html?open=contract&booking=${bookingId}`;
+  }
 }
 
 function openInvoice() {
   const params = new URLSearchParams(window.location.search);
   const bookingId = params.get('id');
-  window.location.href = `crm.html?open=invoice&booking=${bookingId}`;
+  if (window.parent !== window) {
+    window.parent.closeShowOverlay();
+    setTimeout(() => window.parent.openInvoiceEditor(bookingId), 100);
+  } else {
+    window.location.href = `crm.html?open=invoice&booking=${bookingId}`;
+  }
 }
 
 function openAdvancing() {
   const params = new URLSearchParams(window.location.search);
   const bookingId = params.get('id');
-  window.location.href = `crm.html?open=advancing&booking=${bookingId}`;
+  if (window.parent !== window) {
+    window.parent.closeShowOverlay();
+    setTimeout(() => window.parent.openAdvancingEditor(bookingId), 100);
+  } else {
+    window.location.href = `crm.html?open=advancing&booking=${bookingId}`;
+  }
 }
 
 // ── PRINT SETTLEMENT ──────────────────────────────────────────
