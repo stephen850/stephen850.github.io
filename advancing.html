@@ -174,6 +174,28 @@ textarea.form-input{resize:vertical;min-height:60px;font-family:var(--sans);}
 /* ── LOGIN ── */
 #login-screen{min-height:100vh;display:none;align-items:center;justify-content:center;background:var(--accent);}
 .login-box{background:#fff;padding:40px;width:360px;border-top:3px solid var(--red);}
+
+/* ── SHARE LINK BOX ── */
+.share-box{display:none;align-items:center;gap:8px;padding:8px 14px;background:#111;border:1px solid #333;margin-bottom:12px;}
+.share-box.open{display:flex;}
+.share-url{font-family:var(--mono);font-size:10px;color:rgba(255,255,255,0.7);flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;background:#000;padding:6px 10px;border:1px solid #333;user-select:all;}
+.share-copy{background:var(--green);color:#fff;border:none;padding:6px 14px;font-family:var(--mono);font-size:10px;letter-spacing:0.1em;text-transform:uppercase;cursor:pointer;}
+.share-copy:hover{background:#1a8b4c;}
+.topbar-share{background:none;border:1px solid rgba(255,255,255,0.2);color:rgba(255,255,255,0.6);padding:5px 12px;font-family:var(--mono);font-size:10px;letter-spacing:0.1em;text-transform:uppercase;cursor:pointer;}
+.topbar-share:hover{border-color:rgba(255,255,255,0.5);color:#fff;}
+
+/* ── EXTERNAL MODE ── */
+.external-mode .topbar-save{display:none !important;}
+.external-mode .topbar-share{display:none !important;}
+.external-mode .topbar-user{display:none !important;}
+.external-mode .topbar-brand strong::after{content:' · PROMOTER PORTAL';color:rgba(255,255,255,0.3);}
+.external-mode #sec-tabs .sec-tab[data-sec="travel"],
+.external-mode #sec-tabs .sec-tab[data-sec="visa"],
+.external-mode #sec-tabs .sec-tab[data-sec="checklist"]{display:none !important;}
+.external-banner{background:var(--blue);color:#fff;padding:10px 28px;font-family:var(--mono);font-size:11px;letter-spacing:0.08em;display:none;align-items:center;gap:10px;}
+.external-mode .external-banner{display:flex;}
+.external-save{background:var(--green);color:#fff;border:none;padding:8px 24px;font-family:var(--mono);font-size:11px;letter-spacing:0.1em;text-transform:uppercase;cursor:pointer;margin-left:auto;}
+.external-save:hover{background:#1a8b4c;}
 </style>
 </head>
 <body>
@@ -198,9 +220,24 @@ textarea.form-input{resize:vertical;min-height:60px;font-family:var(--sans);}
     <div class="topbar-brand"><strong>DEEPBLOE</strong> · ADVANCING</div>
     <div class="topbar-right">
       <span class="save-state" id="save-state"></span>
+      <button class="topbar-share" id="share-btn" onclick="toggleShareLink()" style="display:none">🔗 Share</button>
       <button class="topbar-save" onclick="saveAll()">Save</button>
       <span class="topbar-user" id="topbar-user"></span>
     </div>
+  </div>
+
+  <!-- Share link box -->
+  <div class="share-box" id="share-box">
+    <span style="font-family:var(--mono);font-size:9px;color:rgba(255,255,255,0.4);letter-spacing:0.1em;text-transform:uppercase">Promoter Link</span>
+    <span class="share-url" id="share-url">-</span>
+    <button class="share-copy" onclick="copyShareLink()">Copy</button>
+    <button style="background:none;border:1px solid #555;color:#999;padding:4px 8px;font-size:12px;cursor:pointer" onclick="document.getElementById('share-box').classList.remove('open')">✕</button>
+  </div>
+
+  <!-- External mode banner -->
+  <div class="external-banner" id="external-banner">
+    📋 You are viewing this advancing sheet as an external collaborator. Please fill in the relevant fields and save.
+    <button class="external-save" onclick="saveExternal()">Save Changes</button>
   </div>
 
   <!-- Hero -->
@@ -215,11 +252,11 @@ textarea.form-input{resize:vertical;min-height:60px;font-family:var(--sans);}
     </div>
     <!-- Section tabs -->
     <div class="sec-tabs" id="sec-tabs">
-      <div class="sec-tab active" onclick="showSection('production')"><span class="sec-tab-dot none" id="dot-production"></span> Production</div>
-      <div class="sec-tab" onclick="showSection('hospitality')"><span class="sec-tab-dot none" id="dot-hospitality"></span> Hospitality</div>
-      <div class="sec-tab" onclick="showSection('travel')"><span class="sec-tab-dot none" id="dot-travel"></span> Travel</div>
-      <div class="sec-tab" onclick="showSection('visa')"><span class="sec-tab-dot none" id="dot-visa"></span> Visa</div>
-      <div class="sec-tab" onclick="showSection('checklist')"><span class="sec-tab-dot none" id="dot-checklist"></span> Checklist</div>
+      <div class="sec-tab active" data-sec="production" onclick="showSection('production')"><span class="sec-tab-dot none" id="dot-production"></span> Production</div>
+      <div class="sec-tab" data-sec="hospitality" onclick="showSection('hospitality')"><span class="sec-tab-dot none" id="dot-hospitality"></span> Hospitality</div>
+      <div class="sec-tab" data-sec="travel" onclick="showSection('travel')"><span class="sec-tab-dot none" id="dot-travel"></span> Travel</div>
+      <div class="sec-tab" data-sec="visa" onclick="showSection('visa')"><span class="sec-tab-dot none" id="dot-visa"></span> Visa</div>
+      <div class="sec-tab" data-sec="checklist" onclick="showSection('checklist')"><span class="sec-tab-dot none" id="dot-checklist"></span> Checklist</div>
     </div>
   </div>
 
@@ -473,8 +510,16 @@ async function doLogin() {
   startApp();
 }
 db.auth.getSession().then(({ data: { session } }) => {
-  if (session) startApp();
-  else document.getElementById('login-screen').style.display = 'flex';
+  // Check for external token first
+  const params = new URLSearchParams(window.location.search);
+  const token = params.get('token');
+  if (token) {
+    startExternalMode(token);
+  } else if (session) {
+    startApp();
+  } else {
+    document.getElementById('login-screen').style.display = 'flex';
+  }
 });
 
 // ── HELPERS ──
@@ -492,6 +537,7 @@ let advancingId = null;
 let travelItems = [];
 let visaRecords = [];
 let currentUser = null;
+let externalMode = false;
 
 // Standard contacts template
 const CONTACT_ROLES = ['Promoter','Artist Handler','Stage Manager','Production Manager','Technical Director','Audio FOH','Light FOH','Backline','Video','Driver','Marketing / Press'];
@@ -570,6 +616,16 @@ async function startApp() {
   }
   advancingCase = adv;
   advancingId = adv.id;
+
+  // Show share button (internal mode only)
+  document.getElementById('share-btn').style.display = 'inline-block';
+  // Generate token if none exists
+  if (!adv.external_access_token) {
+    const token = generateToken();
+    await db.from('advancing_cases').update({ external_access_token: token }).eq('id', advancingId);
+    adv.external_access_token = token;
+  }
+  updateShareURL();
 
   // Populate form fields from production_data and hospitality_data
   populateFields(adv.production_data || adv.advancing_data || {}, 'p-');
@@ -1217,6 +1273,96 @@ function removeCustomCheck(idx) {
   if (!document.getElementById('check-custom').children.length) document.getElementById('check-custom-wrap').style.display = 'none';
   markDirty();
   updateCheckProgress();
+}
+
+// ══════════════════════════════════════════════════════════════
+// EXTERNAL ACCESS (promoter link)
+// ══════════════════════════════════════════════════════════════
+
+function generateToken() {
+  const arr = new Uint8Array(24);
+  crypto.getRandomValues(arr);
+  return Array.from(arr, b => b.toString(36).padStart(2, '0')).join('').slice(0, 32);
+}
+
+function updateShareURL() {
+  if (!advancingCase?.external_access_token) return;
+  const base = window.location.origin + window.location.pathname;
+  const url = base + '?token=' + advancingCase.external_access_token;
+  document.getElementById('share-url').textContent = url;
+}
+
+function toggleShareLink() {
+  document.getElementById('share-box').classList.toggle('open');
+}
+
+function copyShareLink() {
+  const url = document.getElementById('share-url').textContent;
+  if (!url || url === '-') { showToast('No link available', 'error'); return; }
+  navigator.clipboard.writeText(url);
+  showToast('Promoter link copied ✓', 'success');
+}
+
+async function startExternalMode(token) {
+  externalMode = true;
+  document.getElementById('login-screen').style.display = 'none';
+  document.getElementById('app').style.display = 'block';
+  document.getElementById('app').classList.add('external-mode');
+
+  // Look up advancing case by token
+  const { data: adv, error } = await db.from('advancing_cases')
+    .select('*, bookings:booking_id(id, reference, show_date, venue_name, venue_city, venue_country, status, artists(id,name,home_country))')
+    .eq('external_access_token', token)
+    .maybeSingle();
+
+  if (error || !adv) {
+    document.querySelector('.page-body').innerHTML = '<div class="empty" style="padding:60px"><div class="empty-icon">🔒</div>Invalid or expired link. Please contact the agency for a valid advancing link.</div>';
+    document.getElementById('sec-tabs').style.display = 'none';
+    return;
+  }
+
+  advancingCase = adv;
+  advancingId = adv.id;
+  bookingId = adv.booking_id;
+  booking = adv.bookings || {};
+
+  // Render hero
+  const b = booking;
+  document.getElementById('hero-artist').textContent = b.artists?.name || '-';
+  document.getElementById('hero-venue').innerHTML = `<strong>${esc(b.venue_name||'-')}</strong> · ${esc([b.venue_city,b.venue_country].filter(Boolean).join(', '))}`;
+  document.getElementById('hero-ref').textContent = b.reference || '';
+  document.title = `Advancing · ${b.artists?.name||''} - Promoter Portal`;
+
+  const dateDisplay = b.show_date ? fmtDate(b.show_date) : '—';
+  document.getElementById('hero-meta').innerHTML = [
+    { l:'Date', v:dateDisplay },
+    { l:'Status', v:(b.status||'inquiry').replace(/_/g,' ') },
+  ].map(m => `<div class="hero-meta-item"><div class="hero-meta-label">${m.l}</div><div class="hero-meta-val">${esc(m.v)}</div></div>`).join('');
+
+  // Populate only production + hospitality
+  populateFields(adv.production_data || adv.advancing_data || {}, 'p-');
+  populateFields(adv.hospitality_data || adv.advancing_data || {}, 'h-');
+  renderContacts(adv.production_data?.contacts || []);
+
+  // Show only production tab active
+  showSection('production');
+}
+
+async function saveExternal() {
+  if (!advancingId) return;
+
+  const prodData = collectFields('p-');
+  prodData.contacts = contacts;
+  const hospData = collectFields('h-');
+
+  const { error } = await db.from('advancing_cases').update({
+    production_data: prodData,
+    hospitality_data: hospData,
+    updated_by: 'external',
+  }).eq('id', advancingId);
+
+  if (error) { showToast('Error saving: ' + error.message, 'error'); return; }
+  showToast('Changes saved ✓', 'success');
 }
 
 // ── MODAL CLOSE ON BG ──
