@@ -5911,6 +5911,7 @@ function renderArtists() {
       : '<span style="font-family:var(--mono);font-size:10px;color:var(--muted)">-</span>'}</td>
     <td><div class="row-actions">
       <button class="ra ra-view" onclick="goToArtistTours('${a.id}')" style="border-color:var(--blue);color:var(--blue)">Tours</button>
+      <button class="ra" onclick="window.open('visa.html?artist_id=${a.id}','_blank')" style="border-color:var(--amber);color:var(--amber)">🛂 Visa</button>
       <button class="ra" onclick="openArtistModal('${a.id}')">Edit</button>
       <button class="ra del" onclick="deleteArtistById('${a.id}','${esc(a.name)}')">Del</button>
     </div></td>
