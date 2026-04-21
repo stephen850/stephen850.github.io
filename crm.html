@@ -1392,8 +1392,6 @@ tbody td { padding: 10px 14px; vertical-align: middle; }
       <div class="h-tab" onclick="showPanel('calendar', this);renderCalendar()">Calendar</div>
       <div class="h-tab" onclick="showPanel('tours', this);renderTours()">Tours</div>
       <div class="h-tab" onclick="showPanel('pipeline', this);renderPipeline()">Pipeline</div>
-      <div class="h-tab" onclick="window.open('travel.html','_blank')" title="Travel Desk — opens in new tab">✈ Travel</div>
-      <div class="h-tab" onclick="window.open('visa.html','_blank')" title="Visa Desk — opens in new tab">🛂 Visa</div>
       <div class="h-tab" onclick="showPanel('settings', this);loadAgencySettings()">Settings</div>
     </nav>
     <div class="h-right">
@@ -6087,7 +6085,7 @@ function renderBookingList() {
         <button class="ra ra-view primary" onclick="goToShow('${b.id}')" style="border-color:var(--accent);background:var(--accent);color:#fff">Show</button>
         <button class="ra confirm" onclick="openContractEditor('${b.id}')">Contract</button>
         <button class="ra" style="border-color:var(--amber);color:var(--amber)" onclick="openInvoiceEditor('${b.id}')">Invoice</button>
-        <button class="ra" style="border-color:var(--blue);color:var(--blue)" onclick="openAdvancingEditor('${b.id}')">Advance</button>
+        <button class="ra" style="border-color:var(--blue);color:var(--blue)" onclick="window.open('advancing.html?id='+encodeURIComponent('${b.id}'),'_blank')">Advance</button>
         <button class="ra" style="border-color:var(--green);color:var(--green)" onclick="openSettlement('${b.id}')">Settlement</button>
         <button class="ra" onclick="editBooking('${b.id}')">Edit</button>
         <button class="ra del" onclick="confirmDeleteBooking('${b.id}','${esc(b.reference||'')}')">Del</button>
@@ -8491,7 +8489,7 @@ function renderAdvancing() {
       <td>${progressBar(travPct)}</td>
       <td style="text-align:center">${shared}</td>
       <td><div class="row-actions">
-        <button class="ra" onclick="openAdvancingEditorById('${a.id}')">Open</button>
+        <button class="ra" onclick="window.open('advancing.html?id='+encodeURIComponent('${a.booking_id}'),'_blank')">Open</button>
         <button class="ra del" onclick="deleteAdvancingCase('${a.id}')">Del</button>
       </div></td>
     </tr>`;

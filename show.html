@@ -1257,11 +1257,7 @@ function openInvoice() {
 
 function openAdvancing() {
   const bookingId = new URLSearchParams(window.location.search).get('id');
-  if (window.parent !== window) {
-    window.parent.openAdvancingEditor(bookingId);
-  } else {
-    window.location.href = `crm.html?open=advancing&booking=${bookingId}`;
-  }
+  window.open('advancing.html?id=' + bookingId, '_blank');
 }
 
 function openTravel() {
