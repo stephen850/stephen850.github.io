@@ -376,7 +376,9 @@ function showToast(msg, type='info') {
 
 // ── STATE ──
 let bookingId = null;
+let overviewMode = false;
 let booking = null;
+let allBookings = [];
 let allItems = [];
 let currentTab = 'all';
 let editingId = null;
@@ -390,11 +392,11 @@ async function startApp() {
 
   const params = new URLSearchParams(window.location.search);
   bookingId = params.get('id');
-  const from = params.get('from') || 'show';
+  const from = params.get('from') || 'crm';
 
   // Configure back button
   const backBtn = document.getElementById('back-btn');
-  if (from === 'show') {
+  if (from === 'show' && bookingId) {
     backBtn.textContent = '← Back to Show';
     backBtn.onclick = (e) => {
       e.preventDefault();
@@ -406,7 +408,15 @@ async function startApp() {
     backBtn.onclick = (e) => { e.preventDefault(); window.location.href = 'crm.html'; };
   }
 
-  if (!bookingId) { showToast('No booking ID in URL', 'error'); return; }
+  if (!bookingId) {
+    // Overview mode: show all travel items across all bookings
+    overviewMode = true;
+    document.getElementById('td-artist').textContent = 'All Bookings';
+    document.getElementById('td-venue-line').innerHTML = 'Travel overview across all shows';
+    document.title = 'Travel Desk - Deepbloe CRM';
+    await loadItems();
+    return;
+  }
 
   // Load booking info
   const { data: b } = await db.from('bookings')
@@ -425,10 +435,13 @@ async function startApp() {
 }
 
 async function loadItems() {
-  const { data, error } = await db.from('travel_items')
-    .select('*')
-    .eq('booking_id', bookingId)
+  let query = db.from('travel_items')
+    .select('*, bookings(id, venue_name, venue_city, show_date, artists(name))')
     .order('departure_datetime', { ascending: true, nullsFirst: false });
+
+  if (bookingId) query = query.eq('booking_id', bookingId);
+
+  const { data, error } = await query;
 
   if (error) { showToast('Error loading travel items', 'error'); console.error(error); return; }
   allItems = data || [];
@@ -509,9 +522,13 @@ function renderContent() {
   const icons = { flight: '✈️', hotel: '🏨', ground_transport: '🚗', train: '🚆' };
   const badgeCls = { pending: 'ti-badge-pending', booked: 'ti-badge-booked', confirmed: 'ti-badge-confirmed', cancelled: 'ti-badge-cancelled' };
 
-  const header = `<div class="ti-row ti-row-hdr">
-    <div></div><div>Details</div><div>Date / Time</div><div>Status</div><div>PNR / Ref</div><div>Cost</div><div></div>
-  </div>`;
+  const header = overviewMode
+    ? `<div class="ti-row ti-row-hdr" style="grid-template-columns:32px 1fr 120px 140px 100px 90px 80px 60px">
+        <div></div><div>Details</div><div>Booking</div><div>Date / Time</div><div>Status</div><div>PNR / Ref</div><div>Cost</div><div></div>
+      </div>`
+    : `<div class="ti-row ti-row-hdr">
+        <div></div><div>Details</div><div>Date / Time</div><div>Status</div><div>PNR / Ref</div><div>Cost</div><div></div>
+      </div>`;
 
   const rows = items.map(i => {
     let title = '', sub = '';
@@ -535,12 +552,19 @@ function renderContent() {
 
     const cur = i.currency || 'EUR';
 
-    return `<div class="ti-row" onclick="openEditModal('${i.id}')" style="cursor:pointer">
+    const bookingCol = overviewMode
+      ? `<div style="min-width:0"><div style="font-family:var(--mono);font-size:10px;font-weight:500;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(i.bookings?.artists?.name||'-')}</div><div style="font-family:var(--mono);font-size:9px;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(i.bookings?.venue_name||'-')}</div></div>`
+      : '';
+
+    const gridStyle = overviewMode ? ' style="grid-template-columns:32px 1fr 120px 140px 100px 90px 80px 60px"' : '';
+
+    return `<div class="ti-row"${gridStyle} onclick="openEditModal('${i.id}')" style="cursor:pointer${overviewMode ? ';grid-template-columns:32px 1fr 120px 140px 100px 90px 80px 60px' : ''}">
       <div class="ti-icon">${icons[i.type]||'📦'}</div>
       <div class="ti-main">
         <div class="ti-title">${esc(title)}</div>
         <div class="ti-sub">${esc(sub)}</div>
       </div>
+      ${bookingCol}
       <div class="ti-date">${dateStr}</div>
       <div><span class="ti-badge ${badgeCls[i.status]||'ti-badge-pending'}">${esc(i.status||'pending')}</span></div>
       <div style="font-family:var(--mono);font-size:10px;color:var(--muted)">${esc(i.pnr||i.confirmation_number||'-')}</div>
@@ -612,10 +636,33 @@ function renderTimeline(container) {
 }
 
 // ── MODAL ──
+let allBookingsForSelect = [];
+
+async function ensureBookingsList() {
+  if (allBookingsForSelect.length) return;
+  const { data } = await db.from('bookings')
+    .select('id, venue_name, venue_city, show_date, artists(name)')
+    .in('status', ['confirmed','advancing','hold','offer_sent','negotiating','inquiry'])
+    .order('show_date', { ascending: false });
+  allBookingsForSelect = data || [];
+}
+
 function getFormHTML(type, item) {
   const v = item || {};
   const statusOpts = ['pending','booked','confirmed','cancelled'].map(s =>
     `<option value="${s}" ${v.status===s?'selected':''}>${s.charAt(0).toUpperCase()+s.slice(1)}</option>`).join('');
+
+  // Booking selector for overview mode
+  let bookingSelector = '';
+  if (overviewMode) {
+    const bOpts = allBookingsForSelect.map(b => {
+      const label = `${b.artists?.name||'?'} — ${b.venue_name||'?'} (${b.show_date||'?'})`;
+      return `<option value="${b.id}" ${v.booking_id===b.id?'selected':''}>${esc(label)}</option>`;
+    }).join('');
+    bookingSelector = `<div class="td-field td-form-wide"><label class="td-label">Booking</label>
+      <select class="td-input" id="f-booking_id"><option value="">— Select booking —</option>${bOpts}</select>
+    </div>`;
+  }
 
   let fields = '';
 
@@ -659,6 +706,7 @@ function getFormHTML(type, item) {
   return `
     <input type="hidden" id="f-type" value="${type}">
     <div class="td-form-grid">
+      ${bookingSelector}
       ${fields}
       <div class="td-field"><label class="td-label">Status</label><select class="td-input" id="f-status">${statusOpts}</select></div>
       <div class="td-field"><label class="td-label">PNR / Booking Ref</label><input class="td-input" id="f-pnr" value="${esc(v.pnr||'')}"></div>
@@ -674,15 +722,16 @@ function getFormHTML(type, item) {
   `;
 }
 
-function openAddModal(type) {
+async function openAddModal(type) {
   editingId = null;
+  if (overviewMode) await ensureBookingsList();
   document.getElementById('modal-title').textContent = 'Add ' + type.replace('_',' ').replace(/\b\w/g, c => c.toUpperCase());
   document.getElementById('modal-body').innerHTML = getFormHTML(type, {});
   document.getElementById('modal-delete').style.display = 'none';
   document.getElementById('modal-bg').classList.add('open');
 }
 
-function openEditModal(id) {
+async function openEditModal(id) {
   const item = allItems.find(i => i.id === id);
   if (!item) return;
   editingId = id;
@@ -699,9 +748,22 @@ function closeModal() {
 
 async function saveItem() {
   const type = document.getElementById('f-type').value;
+  const selectedBookingId = overviewMode
+    ? (document.getElementById('f-booking_id')?.value || null)
+    : bookingId;
+
+  if (!selectedBookingId) { showToast('Please select a booking', 'error'); return; }
+
+  // Find artist_id from selected booking
+  let artistId = booking?.artist_id || null;
+  if (overviewMode && selectedBookingId) {
+    const match = allBookingsForSelect.find(b => b.id === selectedBookingId);
+    // artist_id not in select query, so leave null — table FK is optional
+  }
+
   const row = {
-    booking_id: bookingId,
-    artist_id: booking?.artist_id || null,
+    booking_id: selectedBookingId,
+    artist_id: artistId,
     type: type,
     status: document.getElementById('f-status').value,
     pnr: document.getElementById('f-pnr')?.value || null,
