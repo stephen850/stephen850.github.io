@@ -1961,7 +1961,7 @@ tbody td { padding: 10px 14px; vertical-align: middle; }
           <option value="">All artists</option>
         </select>
         <div class="tb-right">
-          <button class="btn primary" onclick="openAdvancingEditor()">+ New Advancing</button>
+          <button class="btn primary" onclick="newAdvancingPrompt()">+ New Advancing</button>
         </div>
       </div>
 
@@ -6054,12 +6054,6 @@ function filterBookings() {
   else renderBookingPipeline();
 }
 
-
-function openStandaloneAdvancing(bookingId) {
-  if (!bookingId) return;
-  window.open('advancing.html?id=' + encodeURIComponent(bookingId), '_blank');
-}
-
 function renderBookingList() {
   const tbody = document.getElementById('bk-tbody');
   const slice = filtBookings.slice(bkPageN * PG, (bkPageN + 1) * PG);
@@ -6091,7 +6085,7 @@ function renderBookingList() {
         <button class="ra ra-view primary" onclick="goToShow('${b.id}')" style="border-color:var(--accent);background:var(--accent);color:#fff">Show</button>
         <button class="ra confirm" onclick="openContractEditor('${b.id}')">Contract</button>
         <button class="ra" style="border-color:var(--amber);color:var(--amber)" onclick="openInvoiceEditor('${b.id}')">Invoice</button>
-        <button class="ra" style="border-color:var(--blue);color:var(--blue)" onclick="openStandaloneAdvancing('${b.id}')">Advance</button>
+        <button class="ra" style="border-color:var(--blue);color:var(--blue)" onclick="window.open('advancing.html?id='+encodeURIComponent('${b.id}'),'_blank')">Advance</button>
         <button class="ra" style="border-color:var(--green);color:var(--green)" onclick="openSettlement('${b.id}')">Settlement</button>
         <button class="ra" onclick="editBooking('${b.id}')">Edit</button>
         <button class="ra del" onclick="confirmDeleteBooking('${b.id}','${esc(b.reference||'')}')">Del</button>
@@ -8495,7 +8489,7 @@ function renderAdvancing() {
       <td>${progressBar(travPct)}</td>
       <td style="text-align:center">${shared}</td>
       <td><div class="row-actions">
-        <button class="ra" onclick="openStandaloneAdvancing('${a.booking_id}')">Open</button>
+        <button class="ra" onclick="window.open('advancing.html?id='+encodeURIComponent('${a.booking_id}'),'_blank')">Open</button>
         <button class="ra del" onclick="deleteAdvancingCase('${a.id}')">Del</button>
       </div></td>
     </tr>`;
@@ -8534,108 +8528,32 @@ async function deleteAdvancingCase(id) {
 
 // ── ADVANCING EDITOR ──────────────────────────────────────────
 function openAdvancingEditor(bookingId = null) {
-  editAdvancingId = null;
-  currentAdvancingBookingId = bookingId;
-  lockedSections = {};
-
-  const sel = document.getElementById('adv-booking-sel');
-  sel.innerHTML = '<option value="">Select booking...</option>' +
-    allBookings.map(b => `<option value="${b.id}" ${b.id===bookingId?'selected':''}>
-      ${esc(b.reference||'')} - ${esc(b.artists?.name||'')} - ${b.show_date||''}
-    </option>`).join('');
-  if (bookingId) sel.value = bookingId;
-
-  resetAdvancingFields();
   if (bookingId) {
-    loadBookingIntoAdvancing();
-    loadAdvCosts(bookingId);
+    window.open('advancing.html?id=' + encodeURIComponent(bookingId), '_blank');
   } else {
-    advCosts = [];
-    renderAdvCosts();
+    showToast('Select a booking first', 'error');
   }
-
-  showAdvancingTab('production');
-  renderChecklist({});
-  document.getElementById('advancing-editor-overlay').classList.add('open');
 }
 
 async function openAdvancingEditorById(advancingId) {
-  const { data: a, error } = await db.from('advancing_cases').select('*').eq('id', advancingId).single();
-  if (error || !a) { showToast('Error loading', 'error'); return; }
+  // Look up the booking_id from the advancing case
+  const { data: a, error } = await db.from('advancing_cases').select('booking_id').eq('id', advancingId).single();
+  if (error || !a) { showToast('Error loading advancing case', 'error'); return; }
+  window.open('advancing.html?id=' + encodeURIComponent(a.booking_id), '_blank');
+}
 
-  editAdvancingId = advancingId;
-  currentAdvancingBookingId = a.booking_id;
-  lockedSections = a.locked_sections || {};
-
-  const sel = document.getElementById('adv-booking-sel');
-  sel.innerHTML = allBookings.map(b => `<option value="${b.id}" ${b.id===a.booking_id?'selected':''}>
-    ${esc(b.reference||'')} - ${esc(b.artists?.name||'')}
-  </option>`).join('');
-  if (a.booking_id) sel.value = a.booking_id;
-
-  const d = a.advancing_data || {};
-  document.getElementById('adv-booking-ref').textContent = a.bookings?.reference || '';
-
-  // Production
-  document.getElementById('adv-venue-contact-name').value  = d.venue_contact_name||'';
-  document.getElementById('adv-venue-contact-phone').value = d.venue_contact_phone||'';
-  document.getElementById('adv-venue-contact-email').value = d.venue_contact_email||'';
-  document.getElementById('adv-load-in-address').value     = d.load_in_address||'';
-  document.getElementById('adv-parking-info').value        = d.parking_info||'';
-  document.getElementById('adv-load-in-time').value        = d.load_in_time||'';
-  document.getElementById('adv-stage-width').value         = d.stage_width||'';
-  document.getElementById('adv-stage-depth').value         = d.stage_depth||'';
-  document.getElementById('adv-pa-system').value           = d.pa_system||'';
-  document.getElementById('adv-power-supply').value        = d.power_supply||'';
-  document.getElementById('adv-backline').value            = d.backline||'';
-  document.getElementById('adv-doors').value               = d.doors||'';
-  document.getElementById('adv-curfew').value              = d.curfew||'';
-  document.getElementById('adv-support').value             = d.support||'';
-  document.getElementById('adv-headliner').value           = d.headliner||'';
-  document.getElementById('adv-set-time').value            = d.set_time||'';
-  document.getElementById('adv-set-length').value          = d.set_length||'';
-  document.getElementById('adv-run-of-show').value         = d.run_of_show||'';
-  // Hospitality
-  document.getElementById('adv-hotel-name').value          = d.hotel_name||'';
-  document.getElementById('adv-hotel-address').value       = d.hotel_address||'';
-  document.getElementById('adv-hotel-checkin').value       = d.hotel_checkin||'';
-  document.getElementById('adv-hotel-checkout').value      = d.hotel_checkout||'';
-  document.getElementById('adv-hotel-confirmation').value  = d.hotel_confirmation||'';
-  document.getElementById('adv-hotel-room').value          = d.hotel_room||'';
-  document.getElementById('adv-dressing-room').value       = d.dressing_room||'';
-  document.getElementById('adv-catering').value            = d.catering||'';
-  document.getElementById('adv-guestlist-spots').value     = d.guestlist_spots||'';
-  document.getElementById('adv-accreditation').value       = d.accreditation||'';
-  document.getElementById('adv-accreditation-notes').value = d.accreditation_notes||'';
-  // Travel
-  document.getElementById('adv-airline-in').value          = d.airline_in||'';
-  document.getElementById('adv-flight-in').value           = d.flight_in||'';
-  document.getElementById('adv-dep-in').value              = d.dep_in||'';
-  document.getElementById('adv-arr-in').value              = d.arr_in||'';
-  document.getElementById('adv-dep-time-in').value         = d.dep_time_in||'';
-  document.getElementById('adv-arr-time-in').value         = d.arr_time_in||'';
-  document.getElementById('adv-seat-in').value             = d.seat_in||'';
-  document.getElementById('adv-flight-ref-in').value       = d.flight_ref_in||'';
-  document.getElementById('adv-airline-out').value         = d.airline_out||'';
-  document.getElementById('adv-flight-out').value          = d.flight_out||'';
-  document.getElementById('adv-dep-out').value             = d.dep_out||'';
-  document.getElementById('adv-arr-out').value             = d.arr_out||'';
-  document.getElementById('adv-dep-time-out').value        = d.dep_time_out||'';
-  document.getElementById('adv-arr-time-out').value        = d.arr_time_out||'';
-  document.getElementById('adv-seat-out').value            = d.seat_out||'';
-  document.getElementById('adv-flight-ref-out').value      = d.flight_ref_out||'';
-  document.getElementById('adv-driver-name').value         = d.driver_name||'';
-  document.getElementById('adv-driver-phone').value        = d.driver_phone||'';
-  document.getElementById('adv-vehicle').value             = d.vehicle||'';
-  document.getElementById('adv-pickup').value              = d.pickup||'';
-  document.getElementById('adv-transport-notes').value     = d.transport_notes||'';
-
-  updateLockUI();
-  renderChecklist(d);
-  updateShowPack();
-  showAdvancingTab('production');
-  loadAdvCosts(a.booking_id);
-  document.getElementById('advancing-editor-overlay').classList.add('open');
+function newAdvancingPrompt() {
+  // Find bookings that don't have an advancing case yet
+  const existing = new Set(allAdvancing.map(a => a.booking_id));
+  const available = allBookings.filter(b => !existing.has(b.id) && !['cancelled','completed'].includes(b.status));
+  if (!available.length) { showToast('All bookings already have an advancing case', 'info'); return; }
+  const options = available.map(b => `${b.reference||'?'} — ${b.artists?.name||'?'} — ${b.venue_name||'?'} (${b.show_date||'?'})`);
+  const choice = prompt('Select booking (type number):\n\n' + options.map((o,i) => `${i+1}. ${o}`).join('\n'));
+  if (!choice) return;
+  const idx = parseInt(choice) - 1;
+  if (idx >= 0 && idx < available.length) {
+    window.open('advancing.html?id=' + encodeURIComponent(available[idx].id), '_blank');
+  }
 }
 
 function loadBookingIntoAdvancing() {
