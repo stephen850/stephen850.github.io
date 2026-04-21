@@ -1660,9 +1660,9 @@ tbody td { padding: 10px 14px; vertical-align: middle; }
       <div class="tbl-wrap">
         <table>
           <thead>
-            <tr><th>Name</th><th>Slug</th><th>Genre</th><th>Home Country</th><th>Actions</th></tr>
+            <tr><th>Name</th><th>Slug</th><th>Genre</th><th>Home Country</th><th>Presskit</th><th>Actions</th></tr>
           </thead>
-          <tbody id="artist-tbody"><tr class="tbl-msg"><td colspan="5">Loading...</td></tr></tbody>
+          <tbody id="artist-tbody"><tr class="tbl-msg"><td colspan="6">Loading...</td></tr></tbody>
         </table>
       </div>
     </div>
@@ -2492,6 +2492,7 @@ tbody td { padding: 10px 14px; vertical-align: middle; }
                 <th style="width:28px;padding:8px 6px;"><input type="checkbox" id="pool-check-all" onchange="poolToggleAll(this.checked)"></th>
                 <th>Company</th>
                 <th>Type</th>
+                <th>Project</th>
                 <th>Country</th>
                 <th>City</th>
                 <th>Contact Person</th>
@@ -2500,7 +2501,7 @@ tbody td { padding: 10px 14px; vertical-align: middle; }
               </tr>
             </thead>
             <tbody id="pool-tbody">
-              <tr class="tbl-msg"><td colspan="8">No contacts found.</td></tr>
+              <tr class="tbl-msg"><td colspan="9">No contacts found.</td></tr>
             </tbody>
           </table>
         </div>
@@ -2613,7 +2614,18 @@ tbody td { padding: 10px 14px; vertical-align: middle; }
           </div>
           <div class="fg">
             <label>Ballpark Fee</label>
-            <input id="edm-fee" placeholder="e.g. 10k EUR">
+            <div style="display:flex;gap:6px">
+              <input id="edm-fee" placeholder="e.g. 10000" style="flex:1">
+              <select id="edm-currency" style="width:80px;font-family:var(--mono);font-size:11px;padding:6px">
+                <option value="EUR">EUR</option>
+                <option value="USD">USD</option>
+                <option value="GBP">GBP</option>
+                <option value="SGD">SGD</option>
+                <option value="THB">THB</option>
+                <option value="IDR">IDR</option>
+                <option value="AED">AED</option>
+              </select>
+            </div>
           </div>
           <div class="fg">
             <label>Assigned To</label>
@@ -3097,6 +3109,10 @@ tbody td { padding: 10px 14px; vertical-align: middle; }
       <div class="fg" style="grid-column:span 2">
         <label>Genre</label>
         <input id="am-genre" placeholder="e.g. House, Deep House">
+      </div>
+      <div class="fg" style="grid-column:span 2">
+        <label>Presskit Link <span style="font-family:var(--mono);font-size:9px;color:var(--muted)">(Google Drive / Dropbox)</span></label>
+        <input id="am-presskit" placeholder="https://drive.google.com/drive/folders/...">
       </div>
     </div>
     <div class="modal-ftr">
@@ -5864,7 +5880,7 @@ function closeShowOverlay() {
 
 // ── ARTISTS ───────────────────────────────────────────────────
 async function loadArtists() {
-  const { data, error } = await db.from('artists').select('id, name, slug, genre, home_country').order('name');
+  const { data, error } = await db.from('artists').select('id, name, slug, genre, home_country, presskit_url').order('name');
   if (error) return;
   allArtists = data || [];
   populateArtistDropdowns();
@@ -5878,7 +5894,7 @@ function renderArtists() {
   document.getElementById('sa-total').textContent = allArtists.length;
   const filtered = allArtists.filter(a => !q || a.name.toLowerCase().includes(q));
   if (!filtered.length) {
-    tbody.innerHTML = '<tr class="tbl-msg"><td colspan="5">No artists found</td></tr>';
+    tbody.innerHTML = '<tr class="tbl-msg"><td colspan="6">No artists found</td></tr>';
     return;
   }
   tbody.innerHTML = filtered.map(a => `<tr>
@@ -5886,11 +5902,27 @@ function renderArtists() {
     <td class="td-mono" style="font-size:11px">${esc(a.slug||'-')}</td>
     <td style="font-size:11px">${esc(Array.isArray(a.genre)?a.genre.join(', '):(a.genre||'-'))}</td>
     <td style="font-size:11px">${esc(a.home_country||'-')}</td>
+    <td>${a.presskit_url
+      ? `<a href="${esc(a.presskit_url)}" target="_blank" style="font-family:var(--mono);font-size:10px;color:var(--blue);text-decoration:none" title="${esc(a.presskit_url)}">Open</a>
+         <span onclick="navigator.clipboard.writeText('${esc(a.presskit_url)}');showToast('Link copied','success')" style="font-family:var(--mono);font-size:10px;color:var(--muted);cursor:pointer;margin-left:6px" title="Copy link">Copy</span>`
+      : '<span style="font-family:var(--mono);font-size:10px;color:var(--muted)">-</span>'}</td>
     <td><div class="row-actions">
+      <button class="ra ra-view" onclick="goToArtistTours('${a.id}')" style="border-color:var(--blue);color:var(--blue)">Tours</button>
       <button class="ra" onclick="openArtistModal('${a.id}')">Edit</button>
       <button class="ra del" onclick="deleteArtistById('${a.id}','${esc(a.name)}')">Del</button>
     </div></td>
   </tr>`).join('');
+}
+
+function goToArtistTours(artistId) {
+  const tab = document.querySelector('.h-tab[onclick*="tours"]');
+  showPanel('tours', tab);
+  renderTours();
+  // Select the artist in the tours filter
+  setTimeout(() => {
+    const sel = document.getElementById('tour-artist-filter');
+    if (sel) { sel.value = artistId; renderTours(); }
+  }, 100);
 }
 
 let editArtistId = null;
@@ -5905,8 +5937,9 @@ function openArtistModal(id=null) {
     document.getElementById('am-slug').value    = a.slug || '';
     document.getElementById('am-country').value = a.home_country || '';
     document.getElementById('am-genre').value   = Array.isArray(a.genre) ? a.genre.join(', ') : (a.genre || '');
+    document.getElementById('am-presskit').value = a.presskit_url || '';
   } else {
-    ['am-id','am-name','am-slug','am-country','am-genre'].forEach(f => {
+    ['am-id','am-name','am-slug','am-country','am-genre','am-presskit'].forEach(f => {
       const el = document.getElementById(f); if (el) el.value = '';
     });
   }
@@ -5924,6 +5957,7 @@ async function saveArtist() {
     name, slug,
     home_country: document.getElementById('am-country').value.trim() || null,
     genre,
+    presskit_url: document.getElementById('am-presskit').value.trim() || null,
   };
   let error;
   if (editArtistId) {
@@ -11707,7 +11741,7 @@ function renderTourTable() {
       <td class="td-mono" style="font-size:11px;">${esc(s.city || '-')}</td>
       <td class="td-mono" style="font-size:11px;">${esc(s.country || '-')}</td>
       <td><span class="badge" style="${stl}font-size:10px;padding:2px 8px;">${s.status}</span></td>
-      <td class="td-mono" style="font-size:11px;">${esc(s.fee_ballpark || '-')}</td>
+      <td class="td-mono" style="font-size:11px;">${s.fee_ballpark ? esc(s.fee_ballpark) + ' ' + esc(s.fee_currency||'EUR') : '-'}</td>
       <td class="td-trunc" style="font-size:11px;color:var(--muted);max-width:200px;">${esc(s.notes || '')}</td>
       <td><button class="ra" onclick="event.stopPropagation();openEditDateModal('${s.id}')">Edit</button></td>
     </tr>`;
@@ -11810,6 +11844,7 @@ function openEditDateModal(id) {
   document.getElementById('edm-country').value       = s.country || '';
   document.getElementById('edm-status').value        = s.status || 'available';
   document.getElementById('edm-fee').value           = s.fee_ballpark || '';
+  document.getElementById('edm-currency').value      = s.fee_currency || 'EUR';
   document.getElementById('edm-assigned').value      = s.assigned_to || '';
   document.getElementById('edm-notes').value         = s.notes || '';
   document.getElementById('edit-date-modal').classList.add('open');
@@ -11824,6 +11859,7 @@ async function saveTourDate() {
     country:      document.getElementById('edm-country').value.trim() || null,
     status:       document.getElementById('edm-status').value,
     fee_ballpark: document.getElementById('edm-fee').value.trim() || null,
+    fee_currency: document.getElementById('edm-currency').value || 'EUR',
     assigned_to:  document.getElementById('edm-assigned').value.trim() || null,
     notes:        document.getElementById('edm-notes').value.trim() || null,
     updated_at:   new Date().toISOString(),
@@ -11929,7 +11965,7 @@ async function renderContactsPool() {
     const msg = poolOrgIds.length === 0
       ? `No contacts in ${artist?.name}'s pool yet - go to Pipeline tab to add contacts.`
       : 'No contacts match the current filter.';
-    tbody.innerHTML = `<tr class="tbl-msg"><td colspan="8">${msg}</td></tr>`;
+    tbody.innerHTML = `<tr class="tbl-msg"><td colspan="9">${msg}</td></tr>`;
     poolUpdateExportBtn(); return;
   }
 
@@ -11938,10 +11974,12 @@ async function renderContactsPool() {
     const primary  = cons[0];
     const conName  = primary ? [primary.first_name, primary.last_name].filter(Boolean).join(' ') : '-';
     const typeCls  = {promoter:'club',festival:'festival',agency:'agency',brand:'brand'}[o.company_type||o.type]||'other';
+    const venue    = allVenues.find(v => v.organisation_id === o.id);
     return `<tr>
       <td style="padding:6px;"><input type="checkbox" class="pool-row-check" data-org-id="${o.id}" onchange="poolUpdateExportBtn()"></td>
       <td class="td-name" style="font-weight:500;">${esc(o.legal_name||o.name||'-')}</td>
       <td><span class="badge b-${typeCls}" style="font-size:10px;">${esc(o.company_type||o.type||'-')}</span></td>
+      <td class="td-trunc" style="font-size:11px;max-width:140px">${esc(venue?.name||'-')}</td>
       <td class="td-mono" style="font-size:11px;">${esc(o.country||'-')}</td>
       <td class="td-mono" style="font-size:11px;">${esc(o.city||'-')}</td>
       <td class="td-trunc" style="max-width:140px;">${esc(conName)}</td>
