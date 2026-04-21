@@ -1019,6 +1019,7 @@ tbody td { padding: 10px 14px; vertical-align: middle; }
 .cal-avail-day.hold      { background:#5b8dee; }
 .cal-avail-day.busy      { background:var(--red); }
 .cal-avail-day.other     { background:var(--border); }
+.cal-avail-day.tour      { background:#c4a8e0; }
 /* ── CALENDAR END ─────────────────────────────────────── */
 
 /* ── SETTLEMENT MODULE ───────────────────────────────── */
@@ -10491,12 +10492,19 @@ function renderAvailStrip(daysInMonth) {
   const rows = allArtists.map(a => {
     const days = Array.from({length: daysInMonth}, (_,i) => {
       const iso = new Date(calYear, calMonth, i+1).toISOString().slice(0,10);
-      const bk  = allBookings.find(b => b.artist_id===a.id && b.show_date===iso && b.status!=='cancelled');
-      if (!bk) return 'free';
-      if (['confirmed','advancing'].includes(bk.status)) return 'confirmed';
-      if (bk.status==='hold') return 'hold';
-      if (bk.status==='completed') return 'other';
-      return 'busy';
+      const bk  = allBookings.find(b => b.artist_id===a.id && b.status!=='cancelled' && (() => {
+        const end = b.show_date_end || b.show_date;
+        return iso >= b.show_date && iso <= end;
+      })());
+      if (bk) {
+        if (['confirmed','advancing'].includes(bk.status)) return 'confirmed';
+        if (bk.status==='hold') return 'hold';
+        if (bk.status==='completed') return 'other';
+        return 'busy';
+      }
+      const ts = allTourSlots.find(s => s.artist_id===a.id && s.date===iso);
+      if (ts) return 'tour';
+      return 'free';
     });
     const freeCount = days.filter(d=>d==='free').length;
     return `<div class="cal-avail-row">
