@@ -5870,7 +5870,7 @@ function goToContact(email) {
 function goToShow(bookingId) {
   const overlay = document.getElementById('show-overlay');
   const iframe = document.getElementById('show-iframe');
-  iframe.src = 'show.html?id=' + bookingId + '&embedded=1';
+  iframe.src = 'show-coupled.html?id=' + bookingId + '&embedded=1';
   overlay.classList.add('open');
 }
 
@@ -6054,6 +6054,12 @@ function filterBookings() {
   else renderBookingPipeline();
 }
 
+
+function openStandaloneAdvancing(bookingId) {
+  if (!bookingId) return;
+  window.open('advancing-coupled.html?id=' + encodeURIComponent(bookingId), '_blank');
+}
+
 function renderBookingList() {
   const tbody = document.getElementById('bk-tbody');
   const slice = filtBookings.slice(bkPageN * PG, (bkPageN + 1) * PG);
@@ -6085,7 +6091,7 @@ function renderBookingList() {
         <button class="ra ra-view primary" onclick="goToShow('${b.id}')" style="border-color:var(--accent);background:var(--accent);color:#fff">Show</button>
         <button class="ra confirm" onclick="openContractEditor('${b.id}')">Contract</button>
         <button class="ra" style="border-color:var(--amber);color:var(--amber)" onclick="openInvoiceEditor('${b.id}')">Invoice</button>
-        <button class="ra" style="border-color:var(--blue);color:var(--blue)" onclick="window.open('advancing.html?id='+encodeURIComponent('${b.id}'),'_blank')">Advance</button>
+        <button class="ra" style="border-color:var(--blue);color:var(--blue)" onclick="openStandaloneAdvancing('${b.id}')">Advance</button>
         <button class="ra" style="border-color:var(--green);color:var(--green)" onclick="openSettlement('${b.id}')">Settlement</button>
         <button class="ra" onclick="editBooking('${b.id}')">Edit</button>
         <button class="ra del" onclick="confirmDeleteBooking('${b.id}','${esc(b.reference||'')}')">Del</button>
@@ -8489,7 +8495,7 @@ function renderAdvancing() {
       <td>${progressBar(travPct)}</td>
       <td style="text-align:center">${shared}</td>
       <td><div class="row-actions">
-        <button class="ra" onclick="window.open('advancing.html?id='+encodeURIComponent('${a.booking_id}'),'_blank')">Open</button>
+        <button class="ra" onclick="openStandaloneAdvancing('${a.booking_id}')">Open</button>
         <button class="ra del" onclick="deleteAdvancingCase('${a.id}')">Del</button>
       </div></td>
     </tr>`;
