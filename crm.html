@@ -5870,7 +5870,7 @@ function goToContact(email) {
 function goToShow(bookingId) {
   const overlay = document.getElementById('show-overlay');
   const iframe = document.getElementById('show-iframe');
-  iframe.src = 'show-coupled.html?id=' + bookingId + '&embedded=1';
+  iframe.src = 'show.html?id=' + bookingId + '&embedded=1';
   overlay.classList.add('open');
 }
 
@@ -6057,7 +6057,7 @@ function filterBookings() {
 
 function openStandaloneAdvancing(bookingId) {
   if (!bookingId) return;
-  window.open('advancing-coupled.html?id=' + encodeURIComponent(bookingId), '_blank');
+  window.open('advancing.html?id=' + encodeURIComponent(bookingId), '_blank');
 }
 
 function renderBookingList() {

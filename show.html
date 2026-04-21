@@ -1257,12 +1257,12 @@ function openInvoice() {
 
 function openAdvancing() {
   const bookingId = new URLSearchParams(window.location.search).get('id');
-  window.open('advancing-coupled.html?id=' + bookingId, '_blank');
+  window.open('advancing.html?id=' + encodeURIComponent(bookingId) + '&from=show', '_blank');
 }
 
 function openTravel() {
   const bookingId = new URLSearchParams(window.location.search).get('id');
-  window.open('travel.html?id=' + bookingId + '&from=show', '_blank');
+  window.open('travel.html?id=' + encodeURIComponent(bookingId) + '&from=show', '_blank');
 }
 
 function openVisa() {
