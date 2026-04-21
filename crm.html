@@ -2447,6 +2447,7 @@ tbody td { padding: 10px 14px; vertical-align: middle; }
               <th style="width:28px;"></th>
               <th>Date</th>
               <th>Day</th>
+              <th>Artist</th>
               <th>Venue / Location</th>
               <th>City</th>
               <th>Country</th>
@@ -2457,7 +2458,7 @@ tbody td { padding: 10px 14px; vertical-align: middle; }
             </tr>
           </thead>
           <tbody id="tour-tbody">
-            <tr class="tbl-msg"><td colspan="10">Select an artist to view or build their tour.</td></tr>
+            <tr class="tbl-msg"><td colspan="11">Select an artist to view or build their tour.</td></tr>
           </tbody>
         </table>
       </div>
@@ -11757,8 +11758,8 @@ function renderTourTable() {
   if (currentTourArtistId) slots = slots.filter(s => s.artist_id === currentTourArtistId);
   if (filterStatus) slots = slots.filter(s => s.status === filterStatus);
   if (!slots.length) {
-    const msg = currentTourArtistId ? 'No dates yet - click "+ Add Dates" to build the tour.' : 'Select an artist to view or build their tour.';
-    tbody.innerHTML = `<tr class="tbl-msg"><td colspan="10">${msg}</td></tr>`;
+    const msg = currentTourArtistId ? 'No dates yet - click "+ Add Dates" to build the tour.' : 'No tour dates found. Select an artist and click "+ Add Dates".';
+    tbody.innerHTML = `<tr class="tbl-msg"><td colspan="11">${msg}</td></tr>`;
     return;
   }
   tbody.innerHTML = slots.map(s => {
@@ -11766,10 +11767,12 @@ function renderTourTable() {
     const day = TOUR_DAYS[(dt.getDay() + 6) % 7];
     const stl = TOUR_STATUS_STYLE[s.status] || '';
     const rowBg = s.status === 'confirmed' ? 'background:#f0fdf4;' : s.status === 'cancelled' ? 'opacity:0.55;' : '';
+    const artistName = s.artists?.name || allArtists.find(a=>a.id===s.artist_id)?.name || '-';
     return `<tr style="${rowBg}cursor:pointer;" onclick="openEditDateModal('${s.id}')">
       <td style="padding:6px 8px;color:var(--muted);font-family:var(--mono);font-size:10px;">${day}</td>
       <td class="td-mono" style="font-size:11px;white-space:nowrap;">${fmtDate(s.date)}</td>
       <td class="td-mono" style="font-size:10px;color:var(--muted);">${day}</td>
+      <td class="td-name" style="font-weight:500;font-size:12px">${esc(artistName)}</td>
       <td class="td-trunc" style="max-width:180px;">${esc(s.venue || '-')}</td>
       <td class="td-mono" style="font-size:11px;">${esc(s.city || '-')}</td>
       <td class="td-mono" style="font-size:11px;">${esc(s.country || '-')}</td>
