@@ -987,6 +987,7 @@ tbody td { padding: 10px 14px; vertical-align: middle; }
 .cal-event.negotiating{ background:#f8eefb; border-color:#a050c0; color:#4a0070; }
 .cal-event.completed  { background:var(--bg); border-color:var(--border-dark); color:var(--muted); }
 .cal-event.cancelled  { background:#fdf0f0; border-color:#e08080; color:var(--red); text-decoration:line-through; }
+.cal-event.tour       { background:#f5f0fa; border-color:#9070b0; color:#4a0070; font-style:italic; border-style:dashed; }
 .cal-more { font-family:var(--mono); font-size:9px; color:var(--muted); padding:2px 4px; cursor:pointer; }
 .cal-more:hover { color:var(--accent); }
 
@@ -10332,6 +10333,16 @@ function renderCalendar() {
     return true;
   });
 
+  // Filter tour slots for this month
+  let tourSlots = allTourSlots.filter(s => {
+    if (!s.date) return false;
+    const d = new Date(s.date);
+    if (d.getFullYear() !== calYear || d.getMonth() !== calMonth) return false;
+    if (artistFilter && s.artist_id !== artistFilter) return false;
+    if (statusFilter) return false; // hide tours when filtering by booking status
+    return true;
+  });
+
   // Build calendar days
   const firstDay = new Date(calYear, calMonth, 1);
   const lastDay  = new Date(calYear, calMonth + 1, 0);
@@ -10350,13 +10361,13 @@ function renderCalendar() {
   // Previous month days
   for (let i = 0; i < startDow; i++) {
     const d = new Date(calYear, calMonth, -startDow + i + 1);
-    const cell = makeCalDay(d, bks, true, today);
+    const cell = makeCalDay(d, bks, tourSlots, true, today);
     grid.appendChild(cell);
   }
   // Current month days
   for (let d = 1; d <= lastDay.getDate(); d++) {
     const date = new Date(calYear, calMonth, d);
-    const cell = makeCalDay(date, bks, false, today);
+    const cell = makeCalDay(date, bks, tourSlots, false, today);
     grid.appendChild(cell);
   }
   // Next month days to fill grid
@@ -10364,7 +10375,7 @@ function renderCalendar() {
   const remaining  = totalCells % 7 === 0 ? 0 : 7 - (totalCells % 7);
   for (let d = 1; d <= remaining; d++) {
     const date = new Date(calYear, calMonth + 1, d);
-    const cell = makeCalDay(date, bks, true, today);
+    const cell = makeCalDay(date, bks, tourSlots, true, today);
     grid.appendChild(cell);
   }
 
@@ -10372,19 +10383,19 @@ function renderCalendar() {
   renderAvailStrip(lastDay.getDate());
 }
 
-function makeCalDay(date, bks, otherMonth, today) {
+function makeCalDay(date, bks, tours, otherMonth, today) {
   const iso = date.toISOString().slice(0,10);
   const dayBks = bks.filter(b => {
     const end = b.show_date_end || b.show_date;
     return iso >= b.show_date && iso <= end;
   });
+  const dayTours = tours.filter(s => s.date === iso);
   const isToday = iso === today;
 
   const cell = document.createElement('div');
   cell.className = 'cal-day' + (otherMonth?' other-month':'') + (isToday?' today':'');
   cell.onclick = () => {
-    if (dayBks.length === 0) {
-      // Open new booking modal with date pre-filled
+    if (dayBks.length === 0 && dayTours.length === 0) {
       openBookingModal();
       setTimeout(() => { document.getElementById('bm-date').value = iso; }, 50);
     }
@@ -10393,17 +10404,31 @@ function makeCalDay(date, bks, otherMonth, today) {
   let html = `<div class="cal-day-num">${date.getDate()}</div>`;
 
   const MAX_SHOW = 3;
-  dayBks.slice(0, MAX_SHOW).forEach(b => {
+  const allEvents = [];
+
+  // Bookings first
+  dayBks.forEach(b => {
     const artist = b.artists?.name || allArtists.find(a=>a.id===b.artist_id)?.name || '?';
     const isExpiring = b.status === 'hold' && b.hold_expires_at &&
       new Date(b.hold_expires_at) < new Date(Date.now() + 48*60*60*1000);
-    html += `<div class="cal-event ${b.status}" onclick="event.stopPropagation();showCalPopup(event,'${b.id}')"
-      title="${esc(artist)} - ${esc(b.venue_name||'')}${isExpiring?' ⚠ Hold expiring!':''}">
-      ${isExpiring?'⚠ ':''}${esc(artist)}${b.venue_city?' · '+esc(b.venue_city):''}
-    </div>`;
+    allEvents.push(`<div class="cal-event ${b.status}" onclick="event.stopPropagation();showCalPopup(event,'${b.id}')"
+      title="${esc(artist)} - ${esc(b.venue_name||'')}${isExpiring?' Hold expiring!':''}">
+      ${isExpiring?'! ':''}${esc(artist)}${b.venue_city?' · '+esc(b.venue_city):''}
+    </div>`);
   });
-  if (dayBks.length > MAX_SHOW) {
-    html += `<div class="cal-more" onclick="event.stopPropagation()">+${dayBks.length - MAX_SHOW} more</div>`;
+
+  // Tour slots
+  dayTours.forEach(s => {
+    const artist = s.artists?.name || allArtists.find(a=>a.id===s.artist_id)?.name || '?';
+    allEvents.push(`<div class="cal-event tour" onclick="event.stopPropagation()"
+      title="${esc(artist)} - ${esc(s.venue||'')} (Tour lead)">
+      ${esc(artist)}${s.city?' · '+esc(s.city):''}${s.venue?' · '+esc(s.venue):''}
+    </div>`);
+  });
+
+  allEvents.slice(0, MAX_SHOW).forEach(e => html += e);
+  if (allEvents.length > MAX_SHOW) {
+    html += `<div class="cal-more" onclick="event.stopPropagation()">+${allEvents.length - MAX_SHOW} more</div>`;
   }
 
   cell.innerHTML = html;
