@@ -1,0 +1,613 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Visa Desk - Deepbloe CRM</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@300;400;500&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<script data-cfasync="false" src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+:root {
+  --bg: #f7f5f0; --surface: #ffffff; --border: #e2ddd6; --border-dark: #c8c2b8;
+  --accent: #1a1a1a; --red: #c0392b; --green: #1a6b3c; --blue: #1a3a6b;
+  --amber: #8b5e00; --text: #1a1a1a; --muted: #8a8278;
+  --mono: 'DM Mono', monospace; --sans: 'DM Sans', sans-serif;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { background: var(--bg); color: var(--text); font-family: var(--sans); font-size: 13px; }
+
+/* ── HEADER ── */
+.vs-topbar {
+  background: var(--accent); padding: 0 28px; display: flex; align-items: center;
+  height: 48px; gap: 20px; position: sticky; top: 0; z-index: 50;
+}
+.vs-back {
+  background: none; border: 1px solid rgba(255,255,255,0.2); color: rgba(255,255,255,0.6);
+  padding: 5px 12px; font-family: var(--mono); font-size: 10px; letter-spacing: 0.1em;
+  text-transform: uppercase; cursor: pointer; text-decoration: none; display: flex; align-items: center; gap: 6px;
+}
+.vs-back:hover { border-color: rgba(255,255,255,0.5); color: #fff; }
+.vs-brand { font-family: var(--mono); font-size: 10px; letter-spacing: 0.3em; text-transform: uppercase; color: rgba(255,255,255,0.3); }
+.vs-brand strong { color: #fff; }
+.vs-topbar-right { margin-left: auto; display: flex; gap: 8px; align-items: center; }
+.vs-user { font-family: var(--mono); font-size: 10px; color: rgba(255,255,255,0.3); }
+
+/* ── HERO ── */
+.vs-hero {
+  background: var(--accent); padding: 20px 28px; border-bottom: 1px solid #333;
+}
+.vs-hero-top { display: flex; align-items: center; justify-content: space-between; gap: 20px; }
+.vs-title { font-size: 22px; font-weight: 300; color: #fff; }
+.vs-subtitle { font-family: var(--mono); font-size: 11px; color: rgba(255,255,255,0.5); margin-top: 4px; }
+.vs-hero-stats { display: flex; gap: 16px; }
+.vs-stat { text-align: center; }
+.vs-stat-num { font-family: var(--mono); font-size: 20px; color: #fff; }
+.vs-stat-label { font-family: var(--mono); font-size: 9px; letter-spacing: 0.1em; text-transform: uppercase; color: rgba(255,255,255,0.3); }
+
+/* ── BODY ── */
+.vs-body { padding: 24px 28px; max-width: 1400px; }
+
+/* ── SUMMARY CARDS ── */
+.vs-summary-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 12px; margin-bottom: 20px; }
+.vs-summary-card { background: var(--surface); border: 1px solid var(--border); padding: 14px 16px; }
+.vs-summary-label { font-family: var(--mono); font-size: 9px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); margin-bottom: 6px; }
+.vs-summary-val { font-family: var(--mono); font-size: 18px; color: var(--accent); }
+.vs-summary-val.green { color: var(--green); }
+.vs-summary-val.amber { color: var(--amber); }
+.vs-summary-val.red   { color: var(--red); }
+
+/* ── FILTER BAR ── */
+.vs-filters {
+  display: flex; gap: 10px; align-items: center; margin-bottom: 16px; flex-wrap: wrap;
+}
+.vs-filter-input {
+  border: 1px solid var(--border-dark); padding: 6px 10px; font-family: var(--sans);
+  font-size: 12px; outline: none; background: var(--bg); min-width: 160px;
+}
+.vs-filter-input:focus { border-color: var(--accent); }
+select.vs-filter-input { cursor: pointer; }
+
+/* ── TABLE ── */
+.vs-table { width: 100%; background: var(--surface); border: 1px solid var(--border); border-collapse: collapse; }
+.vs-table th {
+  background: var(--accent); color: rgba(255,255,255,0.6); font-family: var(--mono);
+  font-size: 9px; letter-spacing: 0.1em; text-transform: uppercase; padding: 10px 12px;
+  text-align: left; font-weight: 400;
+}
+.vs-table td {
+  padding: 10px 12px; border-bottom: 1px solid var(--border); font-size: 12px; vertical-align: middle;
+}
+.vs-table tr:hover td { background: #faf8f4; }
+.vs-table tr.expired td { opacity: 0.5; }
+
+/* ── BADGES ── */
+.vs-badge {
+  font-family: var(--mono); font-size: 9px; padding: 2px 8px; border: 1px solid;
+  text-transform: uppercase; letter-spacing: 0.06em; white-space: nowrap; display: inline-block;
+}
+.vs-badge-not_required { color: var(--muted); border-color: var(--border-dark); }
+.vs-badge-required     { color: var(--red); border-color: var(--red); }
+.vs-badge-applied      { color: var(--amber); border-color: var(--amber); }
+.vs-badge-approved     { color: var(--green); border-color: var(--green); }
+.vs-badge-denied       { color: var(--red); border-color: var(--red); background: #fff5f5; }
+.vs-badge-expired      { color: var(--muted); border-color: var(--border-dark); text-decoration: line-through; }
+
+/* ── BUTTONS ── */
+.vs-btn {
+  padding: 5px 10px; font-family: var(--mono); font-size: 9px; letter-spacing: 0.08em;
+  text-transform: uppercase; border: 1px solid var(--border-dark); background: none;
+  color: var(--muted); cursor: pointer; transition: all 0.1s; white-space: nowrap;
+}
+.vs-btn:hover { border-color: var(--accent); color: var(--accent); }
+.vs-btn.primary { border-color: var(--accent); background: var(--accent); color: #fff; }
+.vs-btn.primary:hover { background: #333; }
+.vs-btn.green { border-color: var(--green); color: var(--green); }
+.vs-btn.red   { border-color: var(--red); color: var(--red); }
+
+/* ── MODAL ── */
+.vs-modal-bg {
+  position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 100;
+  display: none; align-items: flex-start; justify-content: center; padding-top: 60px;
+  overflow-y: auto;
+}
+.vs-modal-bg.open { display: flex; }
+.vs-modal {
+  background: #fff; width: 560px; max-width: 96vw; border-top: 3px solid var(--accent);
+  margin-bottom: 60px;
+}
+.vs-modal-hdr {
+  background: var(--accent); padding: 12px 20px;
+  display: flex; justify-content: space-between; align-items: center;
+}
+.vs-modal-title {
+  font-family: var(--mono); font-size: 10px; letter-spacing: 0.15em;
+  text-transform: uppercase; color: rgba(255,255,255,0.6);
+}
+.vs-modal-close {
+  background: none; border: 1px solid rgba(255,255,255,0.2); color: rgba(255,255,255,0.5);
+  padding: 3px 10px; font-size: 14px; cursor: pointer;
+}
+.vs-modal-close:hover { border-color: rgba(255,255,255,0.5); color: #fff; }
+.vs-modal-body { padding: 20px; }
+.vs-modal-foot {
+  padding: 14px 20px; border-top: 1px solid var(--border);
+  display: flex; gap: 8px; justify-content: flex-end;
+}
+
+/* ── FORM ── */
+.vs-form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.vs-form-wide { grid-column: 1 / -1; }
+.vs-field { display: flex; flex-direction: column; gap: 4px; }
+.vs-label { font-family: var(--mono); font-size: 9px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); }
+.vs-input {
+  border: 1px solid var(--border-dark); padding: 8px 10px; font-family: var(--sans);
+  font-size: 12px; outline: none; background: var(--bg);
+}
+.vs-input:focus { border-color: var(--accent); }
+select.vs-input { cursor: pointer; }
+textarea.vs-input { resize: vertical; min-height: 50px; }
+
+/* ── EMPTY STATE ── */
+.vs-empty {
+  text-align: center; padding: 40px; font-family: var(--mono); font-size: 11px; color: var(--muted);
+}
+.vs-empty-icon { font-size: 32px; margin-bottom: 12px; }
+
+/* ── ARTIST GROUP ── */
+.vs-artist-group { margin-bottom: 24px; }
+.vs-artist-header {
+  display: flex; align-items: center; justify-content: space-between; padding: 10px 14px;
+  background: var(--accent); cursor: pointer;
+}
+.vs-artist-name { font-family: var(--mono); font-size: 11px; color: #fff; letter-spacing: 0.1em; text-transform: uppercase; }
+.vs-artist-count { font-family: var(--mono); font-size: 9px; color: rgba(255,255,255,0.4); }
+
+/* Toast */
+#toast { position:fixed; bottom:24px; right:24px; padding:10px 18px; font-family:var(--mono); font-size:11px;
+         display:none; z-index:999; }
+#toast.success { background:var(--green); color:#fff; }
+#toast.error   { background:var(--red); color:#fff; }
+#toast.info    { background:var(--accent); color:#fff; }
+
+/* ── EMBEDDED ── */
+.embedded #login-screen { display: none !important; }
+.embedded .vs-topbar { height: 36px; padding: 0 16px; }
+.embedded .vs-brand { display: none; }
+.embedded .vs-user { display: none; }
+
+/* ── EXPIRY WARNING ── */
+.vs-expiry-warn {
+  display: flex; align-items: center; gap: 8px; padding: 8px 12px;
+  background: #fff9f0; border: 1px solid var(--amber); border-left: 3px solid var(--amber);
+  font-family: var(--mono); font-size: 10px; color: var(--amber); margin-bottom: 12px;
+}
+.vs-expiry-danger {
+  background: #fff5f5; border-color: var(--red); border-left-color: var(--red); color: var(--red);
+}
+</style>
+<script data-cfasync="false">
+if (new URLSearchParams(window.location.search).get('embedded') === '1') {
+  document.documentElement.classList.add('embedded');
+}
+</script>
+</head>
+<body>
+
+<!-- LOGIN SCREEN -->
+<div id="login-screen" style="min-height:100vh;display:none;align-items:center;justify-content:center;background:var(--accent)">
+  <div style="background:#fff;padding:40px;width:360px;border-top:3px solid var(--red)">
+    <div style="font-family:var(--mono);font-size:10px;letter-spacing:0.3em;color:var(--muted);text-transform:uppercase;margin-bottom:24px"><strong style="color:var(--accent)">DEEPBLOE</strong> · VISA</div>
+    <div style="display:flex;flex-direction:column;gap:5px;margin-bottom:14px">
+      <label style="font-family:var(--mono);font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted)">Email</label>
+      <input type="email" id="l-email" placeholder="your email" style="border:1px solid var(--border-dark);padding:10px 12px;font-family:var(--sans);font-size:13px;outline:none;background:var(--bg)">
+    </div>
+    <div style="display:flex;flex-direction:column;gap:5px;margin-bottom:14px">
+      <label style="font-family:var(--mono);font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted)">Password</label>
+      <input type="password" id="l-pass" style="border:1px solid var(--border-dark);padding:10px 12px;font-family:var(--sans);font-size:13px;outline:none;background:var(--bg)">
+    </div>
+    <button id="login-btn" style="width:100%;background:var(--accent);color:#fff;border:none;padding:12px;font-family:var(--mono);font-size:11px;letter-spacing:0.15em;text-transform:uppercase;cursor:pointer">Sign In</button>
+    <div id="login-err" style="color:var(--red);font-size:11px;margin-top:10px;display:none;font-family:var(--mono)"></div>
+  </div>
+</div>
+
+<!-- APP -->
+<div id="app" style="display:none">
+
+  <!-- Top bar -->
+  <div class="vs-topbar">
+    <a href="crm.html" class="vs-back" id="back-btn" onclick="event.preventDefault(); if (document.referrer.includes('crm.html')) history.back(); else location.href='crm.html';">← Back to CRM</a>
+    <div class="vs-brand"><strong>DEEPBLOE</strong> · VISA DESK</div>
+    <div class="vs-topbar-right">
+      <span class="vs-user" id="vs-user"></span>
+    </div>
+  </div>
+
+  <!-- Hero -->
+  <div class="vs-hero">
+    <div class="vs-hero-top">
+      <div>
+        <div class="vs-title" id="vs-title">Visa Overview</div>
+        <div class="vs-subtitle" id="vs-subtitle">Manage visa requirements across all artists</div>
+      </div>
+      <div class="vs-hero-stats" id="vs-stats"></div>
+    </div>
+  </div>
+
+  <!-- Body -->
+  <div class="vs-body">
+
+    <!-- Expiry warnings -->
+    <div id="vs-warnings"></div>
+
+    <!-- Summary cards -->
+    <div class="vs-summary-grid" id="vs-summary"></div>
+
+    <!-- Filter bar -->
+    <div class="vs-filters">
+      <input type="text" class="vs-filter-input" id="f-search" placeholder="Search artist or country..." oninput="renderTable()">
+      <select class="vs-filter-input" id="f-status-filter" onchange="renderTable()">
+        <option value="">All Statuses</option>
+        <option value="required">Required</option>
+        <option value="applied">Applied</option>
+        <option value="approved">Approved</option>
+        <option value="denied">Denied</option>
+        <option value="expired">Expired</option>
+        <option value="not_required">Not Required</option>
+      </select>
+      <select class="vs-filter-input" id="f-artist-filter" onchange="renderTable()">
+        <option value="">All Artists</option>
+      </select>
+      <div style="margin-left:auto;display:flex;gap:6px">
+        <button class="vs-btn primary" onclick="openAddModal()">+ Add Visa Record</button>
+      </div>
+    </div>
+
+    <!-- Table -->
+    <div id="vs-content">
+      <div class="vs-empty"><div class="vs-empty-icon">🛂</div>Loading visa records...</div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ADD/EDIT MODAL -->
+<div class="vs-modal-bg" id="modal-bg">
+  <div class="vs-modal">
+    <div class="vs-modal-hdr">
+      <div class="vs-modal-title" id="modal-title">Add Visa Record</div>
+      <button class="vs-modal-close" onclick="closeModal()">✕</button>
+    </div>
+    <div class="vs-modal-body" id="modal-body"></div>
+    <div class="vs-modal-foot">
+      <button class="vs-btn red" id="modal-delete" style="display:none;margin-right:auto" onclick="deleteRecord()">Delete</button>
+      <button class="vs-btn" onclick="closeModal()">Cancel</button>
+      <button class="vs-btn primary" id="modal-save" onclick="saveRecord()">Save</button>
+    </div>
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<script data-cfasync="false">
+const SUPABASE_URL = 'https://ksnxgidklhonpsneerbu.supabase.co';
+const SUPABASE_KEY = 'sb_publishable_JsOkmXlOxBWKXcraBE7gGg_qErTkqX9';
+const { createClient } = supabase;
+const db = createClient(SUPABASE_URL, SUPABASE_KEY);
+
+// ── AUTH ──
+document.getElementById('login-btn').addEventListener('click', doLogin);
+document.getElementById('l-pass').addEventListener('keydown', e => { if (e.key === 'Enter') doLogin(); });
+
+async function doLogin() {
+  const email = document.getElementById('l-email').value.trim();
+  const pass  = document.getElementById('l-pass').value;
+  const err   = document.getElementById('login-err');
+  err.style.display = 'none';
+  const { error } = await db.auth.signInWithPassword({ email, password: pass });
+  if (error) { err.textContent = error.message; err.style.display = 'block'; return; }
+  startApp();
+}
+
+db.auth.getSession().then(({ data: { session } }) => {
+  if (session) startApp();
+  else document.getElementById('login-screen').style.display = 'flex';
+});
+
+// ── HELPERS ──
+function esc(s) { return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+function fmtDate(d) {
+  if (!d) return '-';
+  return new Date(d + 'T00:00:00').toLocaleDateString('en-GB', { day:'2-digit', month:'short', year:'numeric' });
+}
+function showToast(msg, type='info') {
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.className = type; t.style.display = 'block';
+  setTimeout(() => t.style.display = 'none', 3500);
+}
+
+// ── STATE ──
+let allRecords = [];
+let allArtists = [];
+let artistId = null; // if opened per-artist
+let editingId = null;
+
+// ── INIT ──
+async function startApp() {
+  const { data: { user } } = await db.auth.getUser();
+  document.getElementById('login-screen').style.display = 'none';
+  document.getElementById('app').style.display = 'block';
+  document.getElementById('vs-user').textContent = user?.email || '';
+
+  const params = new URLSearchParams(window.location.search);
+  artistId = params.get('artist_id');
+
+  // Load artists
+  const { data: artists } = await db.from('artists').select('id, name').order('name');
+  allArtists = artists || [];
+
+  // Populate artist filter
+  const artistFilter = document.getElementById('f-artist-filter');
+  allArtists.forEach(a => {
+    const opt = document.createElement('option');
+    opt.value = a.id; opt.textContent = a.name;
+    if (artistId && a.id === artistId) opt.selected = true;
+    artistFilter.appendChild(opt);
+  });
+
+  // If artist-specific, update hero
+  if (artistId) {
+    const artist = allArtists.find(a => a.id === artistId);
+    if (artist) {
+      document.getElementById('vs-title').textContent = artist.name;
+      document.getElementById('vs-subtitle').textContent = 'Visa records for ' + artist.name;
+      document.title = `Visa · ${artist.name} - Deepbloe`;
+    }
+  }
+
+  await loadRecords();
+}
+
+async function loadRecords() {
+  let query = db.from('visa_records').select('*, artists(name)').order('country');
+  if (artistId) query = query.eq('artist_id', artistId);
+
+  const { data, error } = await query;
+  if (error) { showToast('Error loading visa records', 'error'); console.error(error); return; }
+  allRecords = data || [];
+  renderSummary();
+  renderWarnings();
+  renderTable();
+  renderStats();
+}
+
+// ── SUMMARY ──
+function renderSummary() {
+  const required  = allRecords.filter(r => r.status === 'required').length;
+  const applied   = allRecords.filter(r => r.status === 'applied').length;
+  const approved  = allRecords.filter(r => r.status === 'approved').length;
+  const denied    = allRecords.filter(r => r.status === 'denied').length;
+  const total     = allRecords.length;
+
+  document.getElementById('vs-summary').innerHTML = `
+    <div class="vs-summary-card"><div class="vs-summary-label">Total Records</div><div class="vs-summary-val">${total}</div></div>
+    <div class="vs-summary-card"><div class="vs-summary-label">Required</div><div class="vs-summary-val ${required>0?'red':''}">${required}</div></div>
+    <div class="vs-summary-card"><div class="vs-summary-label">Applied</div><div class="vs-summary-val ${applied>0?'amber':''}">${applied}</div></div>
+    <div class="vs-summary-card"><div class="vs-summary-label">Approved</div><div class="vs-summary-val green">${approved}</div></div>
+    <div class="vs-summary-card"><div class="vs-summary-label">Denied</div><div class="vs-summary-val ${denied>0?'red':''}">${denied}</div></div>
+  `;
+}
+
+function renderStats() {
+  const approved = allRecords.filter(r => r.status === 'approved').length;
+  const pending  = allRecords.filter(r => ['required','applied'].includes(r.status)).length;
+  const countries = [...new Set(allRecords.map(r => r.country))].length;
+
+  document.getElementById('vs-stats').innerHTML = `
+    <div class="vs-stat"><div class="vs-stat-num">${approved}</div><div class="vs-stat-label">Approved</div></div>
+    <div class="vs-stat"><div class="vs-stat-num">${pending}</div><div class="vs-stat-label">Pending</div></div>
+    <div class="vs-stat"><div class="vs-stat-num">${countries}</div><div class="vs-stat-label">Countries</div></div>
+  `;
+}
+
+// ── WARNINGS ──
+function renderWarnings() {
+  const today = new Date();
+  const in30 = new Date(); in30.setDate(in30.getDate() + 30);
+  const warnings = [];
+
+  allRecords.forEach(r => {
+    if (r.status === 'approved' && r.expiry_date) {
+      const exp = new Date(r.expiry_date + 'T00:00:00');
+      const artist = r.artists?.name || 'Unknown';
+      if (exp < today) {
+        warnings.push({ type: 'danger', text: `${artist} — ${r.country} visa expired on ${fmtDate(r.expiry_date)}` });
+      } else if (exp < in30) {
+        const days = Math.ceil((exp - today) / (1000*60*60*24));
+        warnings.push({ type: 'warn', text: `${artist} — ${r.country} visa expires in ${days} days (${fmtDate(r.expiry_date)})` });
+      }
+    }
+    if (r.status === 'required') {
+      const artist = r.artists?.name || 'Unknown';
+      warnings.push({ type: 'warn', text: `${artist} — ${r.country} visa required but not yet applied` });
+    }
+  });
+
+  const el = document.getElementById('vs-warnings');
+  if (!warnings.length) { el.innerHTML = ''; return; }
+
+  el.innerHTML = warnings.map(w =>
+    `<div class="vs-expiry-warn ${w.type === 'danger' ? 'vs-expiry-danger' : ''}">⚠ ${esc(w.text)}</div>`
+  ).join('');
+}
+
+// ── TABLE ──
+function renderTable() {
+  const container = document.getElementById('vs-content');
+  const search = (document.getElementById('f-search')?.value || '').toLowerCase();
+  const statusFilter = document.getElementById('f-status-filter')?.value || '';
+  const artistFilter = document.getElementById('f-artist-filter')?.value || '';
+
+  let filtered = allRecords.filter(r => {
+    if (statusFilter && r.status !== statusFilter) return false;
+    if (artistFilter && r.artist_id !== artistFilter) return false;
+    if (search) {
+      const hay = [r.artists?.name, r.country, r.visa_type, r.passport_nationality, r.embassy, r.notes].filter(Boolean).join(' ').toLowerCase();
+      if (!hay.includes(search)) return false;
+    }
+    return true;
+  });
+
+  if (!filtered.length) {
+    container.innerHTML = `<div class="vs-empty"><div class="vs-empty-icon">🛂</div>No visa records found</div>`;
+    return;
+  }
+
+  const badgeCls = {
+    not_required: 'vs-badge-not_required', required: 'vs-badge-required',
+    applied: 'vs-badge-applied', approved: 'vs-badge-approved',
+    denied: 'vs-badge-denied', expired: 'vs-badge-expired'
+  };
+  const statusLabel = {
+    not_required: 'Not Required', required: 'Required',
+    applied: 'Applied', approved: 'Approved', denied: 'Denied', expired: 'Expired'
+  };
+
+  // Check for expiry
+  const today = new Date().toISOString().slice(0,10);
+  filtered.forEach(r => {
+    if (r.status === 'approved' && r.expiry_date && r.expiry_date < today) {
+      r._effectiveStatus = 'expired';
+    } else {
+      r._effectiveStatus = r.status;
+    }
+  });
+
+  const rows = filtered.map(r => {
+    const s = r._effectiveStatus || r.status;
+    return `<tr class="${s === 'expired' ? 'expired' : ''}" onclick="openEditModal('${r.id}')" style="cursor:pointer">
+      <td style="font-weight:500">${esc(r.artists?.name || '-')}</td>
+      <td>${esc(r.country || '-')}</td>
+      <td style="font-family:var(--mono);font-size:10px">${esc(r.visa_type || '-')}</td>
+      <td><span class="vs-badge ${badgeCls[s]||'vs-badge-not_required'}">${statusLabel[s]||s}</span></td>
+      <td style="font-family:var(--mono);font-size:10px">${esc(r.passport_nationality || '-')}</td>
+      <td style="font-family:var(--mono);font-size:10px">${r.application_date ? fmtDate(r.application_date) : '-'}</td>
+      <td style="font-family:var(--mono);font-size:10px">${r.expiry_date ? fmtDate(r.expiry_date) : '-'}</td>
+      <td style="font-family:var(--mono);font-size:10px;color:var(--muted)">${esc(r.visa_number || '-')}</td>
+    </tr>`;
+  }).join('');
+
+  container.innerHTML = `<table class="vs-table">
+    <thead><tr>
+      <th>Artist</th><th>Country</th><th>Visa Type</th><th>Status</th>
+      <th>Nationality</th><th>Applied</th><th>Expires</th><th>Visa #</th>
+    </tr></thead>
+    <tbody>${rows}</tbody>
+  </table>`;
+}
+
+// ── MODAL ──
+function getFormHTML(record) {
+  const v = record || {};
+  const statusOpts = ['not_required','required','applied','approved','denied','expired'].map(s =>
+    `<option value="${s}" ${v.status===s?'selected':''}>${s.replace('_',' ').replace(/\b\w/g,c=>c.toUpperCase())}</option>`).join('');
+  const visaTypeOpts = ['','tourist','work','business','waiver','schengen','transit','other'].map(t =>
+    `<option value="${t}" ${(v.visa_type||'')===t?'selected':''}>${t ? t.charAt(0).toUpperCase()+t.slice(1) : '— Select —'}</option>`).join('');
+
+  const artistOpts = allArtists.map(a =>
+    `<option value="${a.id}" ${v.artist_id===a.id?'selected':''}>${esc(a.name)}</option>`).join('');
+
+  return `
+    <div class="vs-form-grid">
+      <div class="vs-field vs-form-wide">
+        <label class="vs-label">Artist</label>
+        <select class="vs-input" id="f-artist_id"><option value="">— Select artist —</option>${artistOpts}</select>
+      </div>
+      <div class="vs-field"><label class="vs-label">Country</label><input class="vs-input" id="f-country" value="${esc(v.country||'')}" placeholder="e.g. United States"></div>
+      <div class="vs-field"><label class="vs-label">Visa Type</label><select class="vs-input" id="f-visa_type">${visaTypeOpts}</select></div>
+      <div class="vs-field"><label class="vs-label">Status</label><select class="vs-input" id="f-status">${statusOpts}</select></div>
+      <div class="vs-field"><label class="vs-label">Passport Nationality</label><input class="vs-input" id="f-passport_nationality" value="${esc(v.passport_nationality||'')}" placeholder="e.g. Brazilian"></div>
+      <div class="vs-field"><label class="vs-label">Application Date</label><input type="date" class="vs-input" id="f-application_date" value="${v.application_date||''}"></div>
+      <div class="vs-field"><label class="vs-label">Approval Date</label><input type="date" class="vs-input" id="f-approval_date" value="${v.approval_date||''}"></div>
+      <div class="vs-field"><label class="vs-label">Expiry Date</label><input type="date" class="vs-input" id="f-expiry_date" value="${v.expiry_date||''}"></div>
+      <div class="vs-field"><label class="vs-label">Visa Number</label><input class="vs-input" id="f-visa_number" value="${esc(v.visa_number||'')}"></div>
+      <div class="vs-field"><label class="vs-label">Embassy / Consulate</label><input class="vs-input" id="f-embassy" value="${esc(v.embassy||'')}"></div>
+      <div class="vs-field vs-form-wide"><label class="vs-label">Notes</label><textarea class="vs-input" id="f-notes">${esc(v.notes||'')}</textarea></div>
+    </div>
+  `;
+}
+
+function openAddModal() {
+  editingId = null;
+  document.getElementById('modal-title').textContent = 'Add Visa Record';
+  const defaultRecord = artistId ? { artist_id: artistId } : {};
+  document.getElementById('modal-body').innerHTML = getFormHTML(defaultRecord);
+  document.getElementById('modal-delete').style.display = 'none';
+  document.getElementById('modal-bg').classList.add('open');
+}
+
+function openEditModal(id) {
+  const record = allRecords.find(r => r.id === id);
+  if (!record) return;
+  editingId = id;
+  document.getElementById('modal-title').textContent = 'Edit Visa Record';
+  document.getElementById('modal-body').innerHTML = getFormHTML(record);
+  document.getElementById('modal-delete').style.display = 'block';
+  document.getElementById('modal-bg').classList.add('open');
+}
+
+function closeModal() {
+  document.getElementById('modal-bg').classList.remove('open');
+  editingId = null;
+}
+
+async function saveRecord() {
+  const artist = document.getElementById('f-artist_id')?.value;
+  if (!artist) { showToast('Please select an artist', 'error'); return; }
+
+  const country = document.getElementById('f-country')?.value?.trim();
+  if (!country) { showToast('Please enter a country', 'error'); return; }
+
+  const row = {
+    artist_id: artist,
+    country: country,
+    visa_type: document.getElementById('f-visa_type')?.value || null,
+    status: document.getElementById('f-status')?.value || 'not_required',
+    passport_nationality: document.getElementById('f-passport_nationality')?.value || null,
+    application_date: document.getElementById('f-application_date')?.value || null,
+    approval_date: document.getElementById('f-approval_date')?.value || null,
+    expiry_date: document.getElementById('f-expiry_date')?.value || null,
+    visa_number: document.getElementById('f-visa_number')?.value || null,
+    embassy: document.getElementById('f-embassy')?.value || null,
+    notes: document.getElementById('f-notes')?.value || null,
+  };
+
+  let error;
+  if (editingId) {
+    ({ error } = await db.from('visa_records').update(row).eq('id', editingId));
+  } else {
+    ({ error } = await db.from('visa_records').insert(row));
+  }
+
+  if (error) { showToast('Error: ' + error.message, 'error'); return; }
+  showToast(editingId ? 'Visa record updated' : 'Visa record added', 'success');
+  closeModal();
+  await loadRecords();
+}
+
+async function deleteRecord() {
+  if (!editingId) return;
+  if (!confirm('Delete this visa record?')) return;
+  const { error } = await db.from('visa_records').delete().eq('id', editingId);
+  if (error) { showToast('Error: ' + error.message, 'error'); return; }
+  showToast('Visa record deleted', 'success');
+  closeModal();
+  await loadRecords();
+}
+
+// Close modal on bg click
+document.getElementById('modal-bg').addEventListener('click', (e) => {
+  if (e.target === document.getElementById('modal-bg')) closeModal();
+});
+</script>
+</body>
+</html>
