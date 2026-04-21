@@ -174,18 +174,9 @@ textarea.form-input{resize:vertical;min-height:60px;font-family:var(--sans);}
 /* ── LOGIN ── */
 #login-screen{min-height:100vh;display:none;align-items:center;justify-content:center;background:var(--accent);}
 .login-box{background:#fff;padding:40px;width:360px;border-top:3px solid var(--red);}
-
-.embedded #login-screen{display:none !important;}
-.embedded .topbar{height:36px;padding:0 16px;}
-.embedded .topbar-user{display:none;}
 </style>
 </head>
 <body>
-<script data-cfasync="false">
-if (new URLSearchParams(window.location.search).get('embedded') === '1') {
-  document.documentElement.classList.add('embedded');
-}
-</script>
 
 <!-- LOGIN -->
 <div id="login-screen">
@@ -471,9 +462,6 @@ const { createClient } = supabase;
 const db = createClient(SUPABASE_URL, SUPABASE_KEY);
 
 // ── AUTH ──
-const ADV_PARAMS = new URLSearchParams(window.location.search);
-const ADV_EMBEDDED = ADV_PARAMS.get('embedded') === '1';
-
 document.getElementById('l-pass').addEventListener('keydown', e => { if (e.key === 'Enter') doLogin(); });
 async function doLogin() {
   const email = document.getElementById('l-email').value.trim();
@@ -484,33 +472,10 @@ async function doLogin() {
   if (error) { err.textContent = error.message; err.style.display = 'block'; return; }
   startApp();
 }
-
-function showEmbeddedAuthMessage() {
-  document.getElementById('login-screen').style.display = 'flex';
-  const box = document.querySelector('.login-box');
-  if (!box) return;
-  box.innerHTML = `
-    <div style="font-family:var(--mono);font-size:10px;letter-spacing:0.3em;color:var(--muted);text-transform:uppercase;margin-bottom:24px"><strong style="color:var(--accent)">DEEPBLOE</strong> · ADVANCING</div>
-    <div style="font-size:15px;font-weight:400;color:var(--accent);margin-bottom:8px">Session required</div>
-    <div style="font-size:12px;color:var(--muted);line-height:1.6;margin-bottom:18px">Open this page from the CRM on the deployed domain, so it can reuse the same Supabase session.</div>
-    <button onclick="window.location.href=getBackUrl()" style="width:100%;background:var(--accent);color:#fff;border:none;padding:12px;font-family:var(--mono);font-size:11px;letter-spacing:0.15em;text-transform:uppercase;cursor:pointer">Back</button>
-  `;
-}
-
-async function bootstrapAuth() {
-  const { data: { session } } = await db.auth.getSession();
-  if (session) {
-    startApp();
-    return;
-  }
-  if (ADV_EMBEDDED) {
-    showEmbeddedAuthMessage();
-  } else {
-    document.getElementById('login-screen').style.display = 'flex';
-  }
-}
-
-bootstrapAuth();
+db.auth.getSession().then(({ data: { session } }) => {
+  if (session) startApp();
+  else document.getElementById('login-screen').style.display = 'flex';
+});
 
 // ── HELPERS ──
 function esc(s) { return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
@@ -518,7 +483,6 @@ function fmtDate(d) { if (!d) return '-'; return new Date(d+'T00:00:00').toLocal
 function fmtDateTime(d) { if (!d) return '-'; const dt=new Date(d); return dt.toLocaleDateString('en-GB',{day:'2-digit',month:'short'})+' '+dt.toLocaleTimeString('nl-NL',{hour:'2-digit',minute:'2-digit'}); }
 function fmtMoney(a,c='EUR') { const s={EUR:'€',USD:'$',GBP:'£',SGD:'S$',AED:'AED ',IDR:'Rp',THB:'฿'}[c]||c+' '; return s+(a||0).toLocaleString('nl-NL',{minimumFractionDigits:2}); }
 function showToast(msg,type='info') { const t=document.getElementById('toast'); t.textContent=msg; t.className=type; t.style.display='block'; setTimeout(()=>t.style.display='none',3500); }
-function getBackUrl() { const from = ADV_PARAMS.get('from'); const id = ADV_PARAMS.get('id'); if (from === 'show' && id) return 'show.html?id=' + encodeURIComponent(id); return 'crm.html'; }
 
 // ── STATE ──
 let bookingId = null;
@@ -558,12 +522,15 @@ async function startApp() {
   document.getElementById('login-screen').style.display = 'none';
   document.getElementById('app').style.display = 'block';
   document.getElementById('topbar-user').textContent = user?.email || '';
-  const backBtn = document.getElementById('back-btn');
-  if (backBtn) backBtn.href = getBackUrl();
 
-  bookingId = ADV_PARAMS.get('id');
+  const params = new URLSearchParams(window.location.search);
+  bookingId = params.get('id');
 
-  if (!bookingId) { showToast('No booking ID in URL', 'error'); return; }
+  if (!bookingId) {
+    // Overview mode — show all advancing cases
+    await renderOverview();
+    return;
+  }
 
   // Load booking
   const { data: b } = await db.from('bookings')
@@ -1259,6 +1226,76 @@ function removeCustomCheck(idx) {
 
 // ── WARN ON LEAVE ──
 window.addEventListener('beforeunload', e => { if (dirty) { e.preventDefault(); e.returnValue = ''; }});
+
+// ══════════════════════════════════════════════════════════════
+// OVERVIEW MODE (no booking ID)
+// ══════════════════════════════════════════════════════════════
+
+async function renderOverview() {
+  // Hide booking-specific UI, show overview
+  document.getElementById('hero-artist').textContent = 'Advancing Overview';
+  document.getElementById('hero-venue').innerHTML = 'All advancing cases across bookings';
+  document.getElementById('hero-ref').textContent = '';
+  document.getElementById('hero-meta').innerHTML = '';
+  document.title = 'Advancing - Deepbloe CRM';
+
+  // Hide section tabs and page body, replace with overview table
+  document.getElementById('sec-tabs').style.display = 'none';
+  document.querySelector('.topbar-save').style.display = 'none';
+  document.getElementById('save-state').textContent = '';
+
+  const { data: cases, error } = await db.from('advancing_cases')
+    .select('*, bookings(id, reference, show_date, venue_name, venue_city, venue_country, status, artists(name))')
+    .order('created_at', { ascending: false });
+
+  if (error) { showToast('Error loading: ' + error.message, 'error'); return; }
+
+  const body = document.querySelector('.page-body');
+
+  if (!cases || !cases.length) {
+    body.innerHTML = '<div class="empty"><div class="empty-icon">📋</div>No advancing cases yet. Open a booking and click Advance to get started.</div>';
+    return;
+  }
+
+  // Stats
+  const total = cases.length;
+  const inProgress = cases.filter(c => c.status === 'in_progress').length;
+  const completed = cases.filter(c => c.status === 'completed').length;
+  const notStarted = cases.filter(c => c.status === 'not_started').length;
+
+  const statusBadge = (s) => {
+    const colors = { not_started:'var(--muted)', in_progress:'var(--amber)', completed:'var(--green)' };
+    return `<span style="font-family:var(--mono);font-size:9px;padding:2px 8px;border:1px solid ${colors[s]||'var(--muted)'};color:${colors[s]||'var(--muted)'};text-transform:uppercase;letter-spacing:0.06em">${(s||'not started').replace(/_/g,' ')}</span>`;
+  };
+
+  body.innerHTML = `
+    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:20px">
+      <div class="travel-stat"><div class="travel-stat-label">Total</div><div class="travel-stat-val">${total}</div></div>
+      <div class="travel-stat"><div class="travel-stat-label">Not Started</div><div class="travel-stat-val">${notStarted}</div></div>
+      <div class="travel-stat"><div class="travel-stat-label">In Progress</div><div class="travel-stat-val amber">${inProgress}</div></div>
+      <div class="travel-stat"><div class="travel-stat-label">Completed</div><div class="travel-stat-val green">${completed}</div></div>
+    </div>
+
+    <table class="visa-table">
+      <thead><tr>
+        <th>Reference</th><th>Artist</th><th>Date</th><th>Venue</th><th>Status</th><th>Updated</th><th></th>
+      </tr></thead>
+      <tbody>${cases.map(c => {
+        const bk = c.bookings;
+        const updatedAt = c.updated_at ? fmtDate(c.updated_at.slice(0,10)) : '-';
+        return `<tr style="cursor:pointer" onclick="window.location.href='advancing.html?id=${bk?.id||c.booking_id}'">
+          <td style="font-family:var(--mono);font-size:10px">${esc(bk?.reference||'-')}</td>
+          <td style="font-weight:500">${esc(bk?.artists?.name||'-')}</td>
+          <td style="font-family:var(--mono);font-size:10px">${bk?.show_date?fmtDate(bk.show_date):'-'}</td>
+          <td>${esc([bk?.venue_name,bk?.venue_city].filter(Boolean).join(', ')||'-')}</td>
+          <td>${statusBadge(c.status)}</td>
+          <td style="font-family:var(--mono);font-size:10px;color:var(--muted)">${updatedAt}</td>
+          <td><button class="btn btn-primary" style="font-size:8px" onclick="event.stopPropagation();window.location.href='advancing.html?id=${bk?.id||c.booking_id}'">Open</button></td>
+        </tr>`;
+      }).join('')}</tbody>
+    </table>
+  `;
+}
 </script>
 </body>
 </html>
