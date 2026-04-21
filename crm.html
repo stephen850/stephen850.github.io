@@ -2747,7 +2747,8 @@ tbody td { padding: 10px 14px; vertical-align: middle; }
            ondragover="e=>e.preventDefault()" ondrop="handleDrop(event)">
         <div class="import-icon">📂</div>
         <div class="import-lbl">Drop Excel file here or click to browse</div>
-        <div class="import-sub">Accepts .xlsx - columns: type, name, country, city, genre, first_name, email, phone</div>
+        <div class="import-sub">Accepts .xlsx - creates Companies + Contacts + Projects with tags</div>
+        <div class="import-sub" style="margin-top:2px">Columns: type, name, country, city, genre, first_name, last_name, email, phone, venue_type, marketing</div>
       </div>
       <input type="file" id="file-input" accept=".xlsx,.xls" style="display:none" onchange="handleFile(this.files[0])">
 
@@ -7172,10 +7173,14 @@ async function handleFile(file) {
 async function runImport() {
   const btn = document.getElementById('import-btn');
   btn.disabled = true; btn.textContent = 'Importing...';
-  let orgsCreated = 0, contactsDone = 0, errors = 0;
+  let orgsCreated = 0, contactsDone = 0, venuesCreated = 0, errors = 0;
+
   for (const r of importRows) {
     try {
       let orgId = null;
+      let contactId = null;
+
+      // 1. Create/update Company
       if (r.name) {
         const genres = r.genre ? r.genre.split(',').map(g => g.trim()).filter(Boolean) : null;
         const { data: orgData, error: orgErr } = await db.from('organisations').upsert({
@@ -7183,26 +7188,95 @@ async function runImport() {
         }, { onConflict: 'name,city,country' }).select('id');
         if (!orgErr) { orgId = orgData?.[0]?.id||null; orgsCreated++; }
       }
+
+      // 2. Create/update Contact
       if (r._email) {
-        const { error: conErr } = await db.from('contacts').upsert({
-          email: r._email, first_name: r.first_name||null, last_name: r.last_name||null,
-          phone: r.phone||null, organisation_id: orgId, source: 'Import',
-        }, { onConflict: 'email' });
-        if (!conErr) contactsDone++;
+        const marketing = r.marketing ? String(r.marketing).toLowerCase().trim() : 'yes';
+        const marketingEnabled = !['no','false','0','nee'].includes(marketing);
+        const { data: conData, error: conErr } = await db.from('contacts').upsert({
+          email: r._email,
+          first_name: r.first_name||null,
+          last_name: r.last_name||null,
+          phone: r.phone||null,
+          organisation_id: orgId,
+          marketing_enabled: marketingEnabled,
+          source: 'Import',
+        }, { onConflict: 'email' }).select('id');
+        if (!conErr) { contactId = conData?.[0]?.id||null; contactsDone++; }
         else errors++;
+      }
+
+      // 3. Create Project/Venue (linked to company + contact)
+      if (r.name && orgId) {
+        const venueType = r.venue_type || r.type || 'club';
+        // Check if venue already exists for this org
+        const { data: existingVenue } = await db.from('venues')
+          .select('id').eq('name', r.name).eq('organisation_id', orgId).maybeSingle();
+
+        let venueId = existingVenue?.id;
+        if (!venueId) {
+          const { data: vData } = await db.from('venues').insert({
+            name: r.name,
+            venue_type: venueType,
+            city: r.city||null,
+            country: r.country||null,
+            organisation_id: orgId,
+            primary_contact_id: contactId,
+            is_active: true,
+          }).select('id').single();
+          venueId = vData?.id;
+          if (venueId) venuesCreated++;
+        }
+
+        // 4. Add country tag to project
+        if (venueId && r.country) {
+          const countryTag = allTags.find(t => t.tag_type === 'country' && t.name.toLowerCase() === r.country.toLowerCase().trim());
+          if (countryTag) {
+            await db.from('venue_tags').upsert({
+              venue_id: venueId, tag_id: countryTag.id
+            }, { onConflict: 'venue_id,tag_id' }).select();
+          }
+        }
+
+        // 5. Add genre tags to project
+        if (venueId && r.genre) {
+          const genres = r.genre.split(',').map(g => g.trim()).filter(Boolean);
+          for (const g of genres) {
+            const genreTag = allTags.find(t => t.tag_type === 'genre' && t.name.toLowerCase() === g.toLowerCase());
+            if (genreTag) {
+              await db.from('venue_tags').upsert({
+                venue_id: venueId, tag_id: genreTag.id
+              }, { onConflict: 'venue_id,tag_id' }).select();
+            }
+          }
+        }
+
+        // 6. Add category tag (type) to project
+        if (venueId && r.type) {
+          const catTag = allTags.find(t => t.tag_type === 'category' && t.name.toLowerCase() === r.type.toLowerCase().trim());
+          if (catTag) {
+            await db.from('venue_tags').upsert({
+              venue_id: venueId, tag_id: catTag.id
+            }, { onConflict: 'venue_id,tag_id' }).select();
+          }
+        }
       }
     } catch(e) { errors++; }
   }
+
   btn.disabled = false; btn.textContent = 'Import All';
-  showToast(`Imported ${contactsDone} contacts, ${orgsCreated} organisations${errors ? `, ${errors} errors` : ''}`, errors ? 'error' : 'success');
-  loadOrgs(); loadContacts();
+  showToast(`Imported: ${orgsCreated} companies, ${contactsDone} contacts, ${venuesCreated} projects${errors ? `, ${errors} errors` : ''}`, errors ? 'error' : 'success');
+  loadOrgs(); loadContacts(); loadVenues();
 }
 
 function downloadTemplate() {
   const ws = XLSX.utils.aoa_to_sheet([
-    ['type','name','country','city','genre','first_name','email','phone'],
-    ['Club','Example Club','Thailand','Bangkok','Afro House, Tech House','John','john@example.com','+66 1234567'],
+    ['type','name','country','city','genre','first_name','last_name','email','phone','venue_type','marketing'],
+    ['Club','Example Club','Thailand','Bangkok','Afro House, Tech House','John','Doe','john@example.com','+66 1234567','club','yes'],
+    ['Festival','Summer Fest','Indonesia','Bali','Deep House, Melodic House','Sarah','Wilson','sarah@fest.com','+62 1234567','festival','yes'],
+    ['Promoter','ACME Events','Netherlands','Amsterdam','','James','Brown','james@acme.com','+31 612345678','promoter','no'],
   ]);
+  ws['!cols'] = [{wch:12},{wch:20},{wch:14},{wch:14},{wch:24},{wch:12},{wch:12},{wch:24},{wch:16},{wch:12},{wch:10}];
   const wb = XLSX.utils.book_new();
   XLSX.utils.book_append_sheet(wb, ws, 'Import');
   XLSX.writeFile(wb, 'deepbloe_import_template.xlsx');
