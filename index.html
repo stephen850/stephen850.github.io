@@ -2,17 +2,16 @@
 <html lang="en">
 <head>
 <meta charset="utf-8"/>
-<meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
 
 <!-- ═══════════════════════════════════════════════
      PRIMARY SEO
 ════════════════════════════════════════════════ -->
-<title>Deepbloe | Global Electronic Music Platform</title>
-<meta name="description" content="Deepbloe is a global electronic music platform. Talent representation, festival programming, industry showcases and strategic partnerships — connecting artists, promoters and brands worldwide. Est. 2018."/>
+<title>Deepbloe | Global Electronic Music Platform & Booking Agency</title>
+<meta name="description" content="Deepbloe is a global electronic music platform representing artists, buying talent and programming festivals, clubs and brand experiences worldwide. Est. 2018."/>
 <meta name="keywords" content="electronic music booking agency, dj booking agency, artist representation, festival programming, talent buying, house music booking, techno booking agency, global dj agency, electronic music talent agency, festival talent buying, electronic music platform, club programming, brand partnerships music, ADE booking, WMC Miami booking, Tomorrowland artists, Jax Jones booking, Goldfish booking, Liu booking"/>
 <meta name="author" content="Deepbloe Agency B.V."/>
 <meta name="robots" content="index, follow"/>
-<link rel="sitemap" type="application/xml" href="/sitemap.xml"/>
 <link rel="canonical" href="https://www.deepbloe.com/"/>
 <link rel="alternate" hreflang="en" href="https://www.deepbloe.com/"/>
 <link rel="alternate" hreflang="x-default" href="https://www.deepbloe.com/"/>
@@ -22,7 +21,7 @@
 ════════════════════════════════════════════════ -->
 <meta property="og:type" content="website"/>
 <meta property="og:url" content="https://www.deepbloe.com/"/>
-<meta property="og:title" content="Deepbloe | Global Electronic Music Platform"/>
+<meta property="og:title" content="Deepbloe | Global Electronic Music Platform & Booking Agency"/>
 <meta property="og:description" content="Connecting artists, promoters, festivals, clubs and brands worldwide. Full-service talent representation, talent buying, industry showcases and strategic partnerships."/>
 <meta property="og:image" content="https://www.deepbloe.com/assets/images/og-image.jpg"/>
 <meta property="og:image:width" content="1200"/>
@@ -123,826 +122,87 @@
 <link href="https://fonts.googleapis.com" rel="preconnect"/>
 <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300&family=DM+Mono:wght@300;400&display=swap" rel="stylesheet"/>
+<link href="styles/main.css" rel="stylesheet"/>
+
 <style>
-/* ── RESET & BASE ─────────────────────────────────────────────────────────── */
-*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
-:root {
-  --void:      #080808;
-  --obsidian:  #0D0D10;
-  --midnight:  #0A0E1A;
-  --ink:       #111318;
-  --graphite:  #1C1E24;
-  --steel:     #2A2D36;
-  --iron:      #5A5F70;
-  --silver:    #C4C8D4;
-  --chrome:    #E2E4EA;
-  --ivory:     #FFFFFF;
-  --electric:  #29ABE2;
-  --electric2: #1A6E95;
-  --font-display: 'Bebas Neue', sans-serif;
-  --font-body:    'DM Sans', sans-serif;
-  --font-mono:    'DM Mono', monospace;
-}
-
-html { scroll-behavior: smooth; }
-
-body {
-  background: #080808;
-  color: var(--ivory);
-  font-family: var(--font-body);
-  font-size: 16px;
-  line-height: 1.7;
-  overflow-x: hidden;
-  
-}
-
-/* ── CUSTOM CURSOR ────────────────────────────────────────────────────────── */
-
-
-.cursor-ring {
-  width: 36px; height: 36px; border: 1px solid rgba(238,240,244,0.4);
-  border-radius: 50%; transform: translate(-50%,-50%);
-  transition: width 0.3s ease, height 0.3s ease, transform 0.15s ease;
-  margin-top: -22px; margin-left: -4px;
-}
-body:has(a:hover) .cursor-ring,
-body:has(button:hover) .cursor-ring { width: 56px; height: 56px; }
-
-/* ── GRAIN OVERLAY ────────────────────────────────────────────────────────── */
-body::before {
-  content: ''; position: fixed; inset: 0; z-index: 1000; pointer-events: none;
-  opacity: 0.035;
-  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
-  background-size: 200px 200px;
-}
-
-/* ── SCROLLBAR ────────────────────────────────────────────────────────────── */
-::-webkit-scrollbar { width: 3px; }
-::-webkit-scrollbar-track { background: #080808; }
-::-webkit-scrollbar-thumb { background: var(--steel); border-radius: 2px; }
-
-/* ── TYPOGRAPHY ───────────────────────────────────────────────────────────── */
-h1, h2, h3, h4 { font-family: var(--font-display); letter-spacing: 0.02em; line-height: 0.92; }
-.mono { font-family: var(--font-mono); }
-
-/* ── LAYOUT ───────────────────────────────────────────────────────────────── */
-.container { max-width: 1440px; margin: 0 auto; padding: 0 80px; }
-@media (max-width: 1024px) { .container { padding: 0 40px; } }
-@media (max-width: 640px)  { .container { padding: 0 24px; } }
-
-/* ── NAVIGATION ───────────────────────────────────────────────────────────── */
-nav {
-  position: fixed; top: 0; left: 0; right: 0; z-index: 100;
-  padding: 0 80px;
-  display: flex; align-items: center; justify-content: space-between;
-  height: 72px;
-  background: linear-gradient(180deg, rgba(8,8,8,0.95) 0%, rgba(8,8,8,0.7) 100%);
-  border-bottom: 1px solid var(--steel);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  transition: border-color 0.4s, background 0.4s;
-}
-nav.scrolled {
-  background: rgba(8,8,8,0.97);
-  border-bottom-color: var(--steel);
-}
-nav::before {
-  content: ''; position: absolute; top: 0; left: 0; right: 0;
-  height: 1px; background: linear-gradient(90deg, transparent, var(--electric), transparent);
-  opacity: 0.6;
-}
-.nav-logo {
-  display: flex; align-items: center; gap: 12px;
-  text-decoration: none; color: var(--ivory);
-}
-.nav-logo img { width: 36px; height: 36px; object-fit: contain; }
-.nav-logo-text {
-  font-family: var(--font-display); font-size: 18px; letter-spacing: 0.1em;
-  color: var(--ivory);
-}
-.nav-links {
-  display: flex; gap: 40px; list-style: none;
-}
-.nav-links a {
-  font-size: 11px; font-weight: 500; letter-spacing: 0.12em;
-  text-transform: uppercase; text-decoration: none;
-  color: var(--ivory); transition: color 0.2s;
-  position: relative;
-}
-.nav-links a::after {
-  content: ''; position: absolute; bottom: -4px; left: 0;
-  width: 0; height: 1px; background: var(--electric);
-  transition: width 0.3s ease;
-}
-.nav-links a:hover { color: var(--ivory); }
-.nav-links a:hover::after { width: 100%; }
-.nav-cta {
-  font-size: 11px; font-weight: 500; letter-spacing: 0.12em; text-transform: uppercase;
-  text-decoration: none; color: var(--ivory); padding: 10px 24px;
-  border: 1px solid rgba(238,240,244,0.25); transition: border-color 0.2s, color 0.2s, background 0.2s;
-}
-.nav-cta:hover { border-color: var(--electric); color: var(--electric); }
-
-/* ── HERO ─────────────────────────────────────────────────────────────────── */
-.hero {
-  position: relative; min-height: 100vh;
-  display: flex; flex-direction: column; justify-content: center;
-  padding-bottom: 80px; padding-top: 72px; overflow: hidden;
-}
-.hero-bg {
-  position: absolute; inset: 0; overflow: hidden;
-}
-.hero-bg img {
-  position: absolute; inset: 0; width: 100%; height: 100%;
-  object-fit: cover; object-position: center 25%;
-  filter: brightness(0.8) saturate(0.95);
-}
-.hero-bg::after {
-  content: '';
-  position: absolute; inset: 0;
-  background:
-    linear-gradient(180deg, rgba(8,8,8,0.0) 0%, rgba(8,8,8,0.1) 50%, #080808 100%);
-}
-/* Simulated light beams */
-.hero-beams {
-  position: absolute; inset: 0; pointer-events: none; overflow: hidden;
-}
-.beam {
-  position: absolute; bottom: 0;
-  width: 1px; height: 65%;
-  background: linear-gradient(0deg, transparent, rgba(41,171,226,0.08), transparent);
-  transform-origin: bottom center;
-  animation: beam-sway 8s ease-in-out infinite;
-}
-.beam:nth-child(1) { left: 25%; transform: rotate(-12deg); animation-delay: 0s; }
-.beam:nth-child(2) { left: 40%; transform: rotate(-6deg); animation-delay: 1.5s; width: 2px; background: linear-gradient(0deg, transparent, rgba(41,171,226,0.05), transparent); }
-.beam:nth-child(3) { left: 55%; transform: rotate(4deg); animation-delay: 0.8s; }
-.beam:nth-child(4) { left: 68%; transform: rotate(10deg); animation-delay: 2.2s; }
-.beam:nth-child(5) { left: 78%; transform: rotate(16deg); animation-delay: 0.4s; width: 2px; background: linear-gradient(0deg, transparent, rgba(41,171,226,0.04), transparent); }
-@keyframes beam-sway {
-  0%, 100% { opacity: 0.6; }
-  50% { opacity: 1; }
-}
-
-.hero-counter {
-  font-family: var(--font-mono); font-size: 11px; color: var(--electric);
-  letter-spacing: 0.15em; margin-bottom: 32px;
-  opacity: 0; animation: fade-up 0.8s 0.3s ease forwards;
-}
-.hero-headline {
-  font-size: clamp(72px, 10vw, 160px); line-height: 0.88;
-  margin-bottom: 48px; position: relative;
-  opacity: 0; animation: fade-up 1s 0.5s ease forwards;
-}
-.hero-headline .line-2 { color: var(--chrome); opacity: 0.45; display: block; }
-.hero-headline .accent { color: var(--electric); }
-
-.hero-bottom {
-  display: flex; align-items: flex-end; justify-content: space-between;
-  opacity: 0; animation: fade-up 0.8s 0.9s ease forwards;
-}
-.hero-tagline {
-  font-size: 15px; color: var(--chrome); max-width: 360px; line-height: 1.7;
-  border-left: 1px solid var(--electric); padding-left: 20px;
-}
-.hero-scroll {
-  display: flex; flex-direction: column; align-items: center; gap: 12px;
-  font-family: var(--font-mono); font-size: 9px; letter-spacing: 0.2em;
-  color: var(--silver); text-transform: uppercase;
-}
-.hero-scroll-line {
-  width: 1px; height: 48px;
-  background: linear-gradient(180deg, var(--electric) 0%, transparent 100%);
-  animation: scroll-pulse 2s ease-in-out infinite;
-}
-@keyframes scroll-pulse { 0%,100%{opacity:0.4} 50%{opacity:1} }
-
-@keyframes fade-up {
-  from { opacity: 0; transform: translateY(24px); }
-  to   { opacity: 1; transform: translateY(0); }
-}
-
-/* ── MARQUEE ──────────────────────────────────────────────────────────────── */
-.marquee-section {
-  border-top: 1px solid var(--steel); border-bottom: 1px solid var(--steel);
-  padding: 20px 0; overflow: hidden; background: var(--obsidian);
-}
-.marquee-track {
-  display: flex; gap: 64px; white-space: nowrap;
-  animation: marquee 30s linear infinite;
-}
-.marquee-track:hover { animation-play-state: paused; }
-.marquee-item {
-  display: flex; align-items: center; gap: 20px;
-  font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.15em;
-  color: var(--silver); text-transform: uppercase;
-  flex-shrink: 0;
-}
-.marquee-item span { color: var(--electric); }
-@keyframes marquee { 0%{transform:translateX(0)} 100%{transform:translateX(-50%)} }
-
-/* ── SECTION BASE ─────────────────────────────────────────────────────────── */
-section { position: relative; }
-.section-label {
-  font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.18em;
-  color: var(--electric); text-transform: uppercase; display: flex;
-  align-items: center; gap: 12px; margin-bottom: 48px;
-}
-.section-label::before {
-  content: ''; width: 24px; height: 1px; background: var(--electric);
-}
-
-/* ── ABOUT ────────────────────────────────────────────────────────────────── */
-.about { padding: 80px 0; background: #0C0C13; }
-.about-grid {
-  display: grid; grid-template-columns: 1fr 1fr; gap: 80px; align-items: start;
-}
-.about-headline {
-  font-size: clamp(48px, 5.5vw, 80px);
-  margin-bottom: 0;
-}
-.about-headline em { font-style: normal; color: var(--chrome); opacity: 0.45; }
-.about-subtitle {
-  font-size: 16px; color: var(--silver); line-height: 1.7;
-  margin-top: 28px; padding-top: 28px;
-  border-top: 1px solid var(--steel);
-  max-width: 340px;
-}
-.about-body { padding-top: 20px; }
-.about-body p { font-size: 16px; color: var(--chrome); line-height: 1.9; margin-bottom: 24px; }
-.about-body p strong { color: var(--ivory); font-weight: 500; }
-.about-stats {
-  display: grid; grid-template-columns: 1fr 1fr; gap: 1px;
-  background: var(--steel); margin-top: 48px; border: 1px solid var(--steel);
-}
-.stat {
-  background: #080808; padding: 28px 24px;
-}
-.stat-number {
-  font-family: var(--font-display); font-size: 52px; color: var(--ivory);
-  line-height: 1; margin-bottom: 6px;
-}
-.stat-number span { color: var(--electric); }
-.stat-label { font-size: 11px; color: var(--chrome); letter-spacing: 0.1em; text-transform: uppercase; }
-
-/* ── SERVICES ─────────────────────────────────────────────────────────────── */
-.services { padding: 0 0 140px; background: #080808; }
-.services-header {
-  display: flex; justify-content: space-between; align-items: flex-end;
-  margin-bottom: 2px;
-}
-.services-headline { font-size: clamp(40px, 5vw, 72px); color: var(--ivory); }
-.services-list { display: flex; flex-direction: column; }
-.service-item {
-  border-top: 1px solid var(--steel);
-  display: grid; grid-template-columns: 80px 1fr 1fr auto;
-  gap: 40px; align-items: center; padding: 32px 0;
-  cursor: pointer; transition: padding-left 0.3s ease;
-  position: relative; overflow: hidden;
-}
-.service-item::before {
-  content: ''; position: absolute; left: 0; top: 0; bottom: 0;
-  width: 0; background: #080808;
-  transition: width 0.4s cubic-bezier(0.16,1,0.3,1);
-  z-index: -1;
-}
-.service-item:hover::before { width: 100%; }
-.service-item:hover { padding-left: 24px; }
-.service-item:last-child { border-bottom: 1px solid var(--steel); }
-.service-num { font-family: var(--font-mono); font-size: 11px; color: var(--silver); letter-spacing: 0.1em; }
-.service-name { font-family: var(--font-display); font-size: 32px; letter-spacing: 0.05em; }
-.service-desc { font-size: 14px; color: var(--chrome); line-height: 1.7; max-width: 400px; }
-.service-arrow {
-  width: 40px; height: 40px; border: 1px solid var(--steel);
-  display: flex; align-items: center; justify-content: center;
-  color: var(--silver); font-size: 18px; transition: all 0.3s;
-  flex-shrink: 0;
-}
-.service-item:hover .service-arrow { border-color: var(--electric); color: var(--electric); transform: rotate(45deg); }
-
-/* ── ARTISTS ──────────────────────────────────────────────────────────────── */
-.artists { padding: 80px 0 0; background: #080808; width: 100%; overflow: hidden; }
-.artists-header { margin-bottom: 64px; }
-.artists-headline { font-size: clamp(40px, 5vw, 72px); margin-bottom: 16px; }
-.artists-sub { font-size: 15px; color: var(--chrome); }
-.artists-grid {
-  display: flex;
-  flex-direction: row;
-  flex-wrap: nowrap;
-  gap: 2px;
-  width: 100%;
-}
-.artists-grid > * {
-  flex: 0 0 calc(20% - 2px);
-  width: calc(20% - 2px);
-  height: 420px;
-  min-width: 0;
-}
-
-.artist-card {
-  position: relative; overflow: hidden;
-  background: #080808; cursor: pointer; display: block;
-  height: 420px;
-}
-.artist-card-bg {
-  position: absolute; inset: 0; overflow: hidden;
-  transition: transform 0.6s cubic-bezier(0.16,1,0.3,1);
-}
-.artist-card:hover .artist-card-bg { transform: scale(1.06); }
-
-.artist-card-overlay {
-  position: absolute; inset: 0;
-  background: linear-gradient(0deg, rgba(8,8,8,0.9) 0%, rgba(8,8,8,0.2) 50%, transparent 100%);
-  transition: background 0.4s;
-}
-.artist-card:hover .artist-card-overlay {
-  background: linear-gradient(0deg, rgba(8,8,8,0.95) 0%, rgba(8,8,8,0.4) 60%, rgba(41,171,226,0.05) 100%);
-}
-.artist-card-content {
-  position: absolute; bottom: 0; left: 0; right: 0; padding: 24px 20px;
-}
-.artist-card-num {
-  font-family: var(--font-mono); font-size: 10px; color: var(--iron);
-  letter-spacing: 0.15em; margin-bottom: 8px;
-}
-.artist-card-name {
-  font-family: var(--font-display); font-size: 20px; letter-spacing: 0.05em;
-  color: var(--ivory); margin-bottom: 4px;
-}
-.artist-card-insta {
-  display: inline-block; margin-top: 8px;
-  font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.1em;
-  color: var(--electric); text-decoration: none;
-  border: 1px solid rgba(41,171,226,0.3); padding: 4px 10px;
-  transition: background 0.2s, border-color 0.2s;
-}
-.artist-card-insta:hover { background: rgba(41,171,226,0.15); border-color: var(--electric); }
-.artist-card-role { font-size: 12px; color: var(--chrome); letter-spacing: 0.08em; }
-.artist-card-tag {
-  position: absolute; top: 16px; right: 16px;
-  font-family: var(--font-mono); font-size: 9px; letter-spacing: 0.1em;
-  color: var(--electric); background: rgba(8,8,8,0.8); padding: 4px 8px;
-  border: 1px solid var(--steel); opacity: 0;
-  transform: translateY(-8px); transition: opacity 0.3s, transform 0.3s;
-}
-.artist-card:hover .artist-card-tag { opacity: 1; transform: translateY(0); }
-.artist-card-tag.management { color: var(--chrome); border-color: var(--iron); }
-.artists-cta { text-align: center; margin-top: 48px; }
-
-/* ── PLATFORM SECTION ─────────────────────────────────────────────────────── */
-.platform { position: relative; padding: 0; background: #111318; overflow: hidden; }
-.platform-photo-wrap {
-  position: absolute; inset: 0; z-index: 0;
-}
-.platform-photo-overlay {
-  position: absolute; inset: 0;
-  background:
-    linear-gradient(90deg, rgba(8,8,8,0.92) 0%, rgba(8,8,8,0.75) 50%, rgba(8,8,8,0.5) 100%),
-    linear-gradient(180deg, rgba(8,8,8,0.3) 0%, rgba(8,8,8,0.3) 100%);
-}
-.platform-photo-content { position: relative; z-index: 1; padding: 80px 0; }
-.platform-inner {
-  display: grid; grid-template-columns: 1fr 1fr; gap: 120px; align-items: center;
-}
-.platform-headline { font-size: clamp(48px, 5.5vw, 80px); margin-bottom: 32px; }
-.platform-headline em { font-style: normal; display: block; color: var(--chrome); opacity: 0.45; }
-.platform-body { font-size: 16px; color: var(--chrome); line-height: 1.9; margin-bottom: 40px; }
-.platform-features { display: flex; flex-direction: column; gap: 0; }
-.platform-feature {
-  padding: 20px 0; border-bottom: 1px solid var(--steel);
-  display: flex; gap: 20px; align-items: flex-start;
-}
-.platform-feature:first-child { border-top: 1px solid var(--steel); }
-.platform-feature-num {
-  font-family: var(--font-mono); font-size: 10px; color: var(--electric);
-  width: 32px; flex-shrink: 0; padding-top: 2px;
-}
-.platform-feature-text h4 {
-  font-family: var(--font-body); font-size: 15px; font-weight: 600;
-  color: var(--ivory); margin-bottom: 6px; letter-spacing: 0;
-}
-.platform-feature-text p { font-size: 14px; color: var(--chrome); line-height: 1.7; }
-.platform-quote {
-  text-align: center; padding: 48px;
-  border: 1px solid var(--steel); background: rgba(8,8,8,0.25);
-  backdrop-filter: blur(8px);
-}
-.platform-quote-mark {
-  font-family: var(--font-display); font-size: 80px; color: var(--electric);
-  line-height: 0.8; margin-bottom: 16px;
-}
-.platform-quote p {
-  font-family: var(--font-display); font-size: 32px; color: var(--ivory);
-  line-height: 1.1; margin-bottom: 20px;
-}
-.platform-quote span {
-  font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.15em;
-  color: var(--silver); text-transform: uppercase;
-}
-
-/* ── SHOWCASES ────────────────────────────────────────────────────────────── */
-.showcases { padding: 80px 0; background: #0A0A10; }
-.showcases-header {
-  display: grid; grid-template-columns: 1fr 1fr;
-  gap: 80px; margin-bottom: 64px; align-items: end;
-}
-.showcases-headline { font-size: clamp(40px, 5vw, 72px); }
-.showcases-body { font-size: 15px; color: var(--chrome); line-height: 1.9; }
-.showcases-grid {
-  display: grid; grid-template-columns: 2fr 1fr 1fr; grid-template-rows: auto auto;
-  gap: 2px;
-}
-.showcase-card {
-  position: relative; overflow: hidden; cursor: pointer;
-  background: #080808;
-}
-.showcase-card:nth-child(1) { grid-row: span 2; min-height: 480px; }
-.showcase-card:nth-child(n+2) { min-height: 240px; }
-.showcase-card-bg {
-  position: absolute; inset: 0; overflow: hidden;
-  transition: transform 0.7s cubic-bezier(0.16,1,0.3,1);
-}
-.showcase-card:hover .showcase-card-bg { transform: scale(1.04); }
-.showcase-overlay {
-  position: absolute; inset: 0;
-  background: linear-gradient(0deg, rgba(8,8,8,0.9) 0%, rgba(8,8,8,0.1) 60%);
-}
-.showcase-content { position: absolute; bottom: 0; left: 0; right: 0; padding: 28px 24px; }
-.showcase-location {
-  font-family: var(--font-mono); font-size: 9px; color: var(--electric);
-  letter-spacing: 0.15em; text-transform: uppercase; margin-bottom: 8px;
-}
-.showcase-name {
-  font-family: var(--font-display); font-size: 28px; letter-spacing: 0.05em; margin-bottom: 6px;
-}
-.showcase-card:nth-child(1) .showcase-name { font-size: 48px; }
-.showcase-meta { font-size: 12px; color: var(--chrome); }
-.showcase-num {
-  position: absolute; top: 16px; right: 20px;
-  font-family: var(--font-display); font-size: 56px; color: rgba(238,240,244,0.06);
-  line-height: 1;
-}
-.showcase-card:nth-child(1) .showcase-num { font-size: 120px; top: 24px; }
-
-/* ── BRANDS SECTION ───────────────────────────────────────────────────────── */
-.brands { padding: 100px 0; background: #0D0D14; }
-.brands-headline { font-size: clamp(32px, 4vw, 56px); margin-bottom: 16px; color: var(--ivory); }
-.brands-sub { font-size: 15px; color: var(--chrome); margin-bottom: 56px; }
-.brands-logos {
-  display: grid; grid-template-columns: repeat(6, 1fr); gap: 1px;
-  background: var(--steel);
-  border: 1px solid var(--steel);
-}
-.brand-logo-cell {
-  background: #080808; padding: 32px 24px;
-  display: flex; align-items: center; justify-content: center;
-  font-family: var(--font-display); font-size: 18px; letter-spacing: 0.1em;
-  color: var(--silver); transition: color 0.3s, background 0.3s;
+.nav-hamburger {
+  display: none;
+  flex-direction: column;
+  gap: 5px;
   cursor: pointer;
+  padding: 8px;
+  background: none;
+  border: none;
 }
-.brand-logo-cell:hover { background: var(--ink); color: var(--ivory); }
+.nav-hamburger span {
+  display: block;
+  width: 24px;
+  height: 2px;
+  background: #fff;
+  transition: all 0.3s;
+}
+.nav-hamburger.open span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+.nav-hamburger.open span:nth-child(2) { opacity: 0; }
+.nav-hamburger.open span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
 
-/* ── CTA BANNER ───────────────────────────────────────────────────────────── */
-.cta-banner {
-  padding: 80px 0; background: #111318;
-  text-align: center; position: relative; overflow: hidden;
+.mobile-menu {
+  display: none;
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(8,8,8,0.98);
+  z-index: 150;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 32px;
 }
-.cta-banner::before {
-  content: ''; position: absolute; inset: 0;
-  background: radial-gradient(ellipse 60% 80% at 50% 50%, rgba(41,171,226,0.08) 0%, transparent 70%);
-}
-.cta-headline { font-size: clamp(48px, 7vw, 110px); margin-bottom: 24px; position: relative; }
-.cta-headline em { font-style: normal; color: var(--electric); }
-.cta-sub { font-size: 16px; color: var(--chrome); margin-bottom: 48px; max-width: 500px; margin-left: auto; margin-right: auto; }
-.btn-primary {
-  display: inline-flex; align-items: center; gap: 12px;
-  font-size: 12px; font-weight: 500; letter-spacing: 0.14em; text-transform: uppercase;
-  text-decoration: none; color: var(--void); background: var(--ivory);
-  padding: 16px 40px; transition: background 0.2s, color 0.2s;
-}
-.btn-primary:hover { background: var(--electric); }
-.btn-secondary {
-  display: inline-flex; align-items: center; gap: 12px; margin-left: 16px;
-  font-size: 12px; font-weight: 500; letter-spacing: 0.14em; text-transform: uppercase;
-  text-decoration: none; color: var(--ivory); padding: 16px 40px;
-  border: 1px solid var(--steel); transition: border-color 0.2s;
-}
-.btn-secondary:hover { border-color: var(--electric); color: var(--electric); }
-
-/* ── FOOTER ───────────────────────────────────────────────────────────────── */
-footer {
-  background: #080808; border-top: 1px solid var(--steel);
-  padding: 64px 0 40px;
-}
-.footer-top {
-  display: grid; grid-template-columns: 1.5fr 1fr 1fr 1fr;
-  gap: 60px; padding-bottom: 48px; border-bottom: 1px solid var(--steel);
-  margin-bottom: 32px;
-}
-.footer-brand { }
-.footer-logo { display: flex; align-items: center; gap: 12px; margin-bottom: 20px; }
-.footer-logo img { width: 40px; height: 40px; }
-.footer-logo-name { font-family: var(--font-display); font-size: 20px; letter-spacing: 0.1em; }
-.footer-tagline { font-size: 14px; color: var(--chrome); line-height: 1.7; max-width: 280px; }
-.footer-col h5 {
-  font-family: var(--font-mono); font-size: 9px; letter-spacing: 0.18em;
-  color: var(--electric); text-transform: uppercase; margin-bottom: 20px;
-}
-.footer-col ul { list-style: none; display: flex; flex-direction: column; gap: 12px; }
-.footer-col li a {
-  font-size: 14px; color: var(--chrome); text-decoration: none;
-  transition: color 0.2s;
-}
-.footer-col li a:hover { color: var(--ivory); }
-.footer-bottom {
-  display: flex; justify-content: space-between; align-items: center;
-}
-.footer-copy { font-size: 11px; color: var(--silver); }
-.footer-legal {
-  border-top: 1px solid var(--steel);
-  padding: 32px 0; margin-bottom: 24px;
-}
-.footer-legal-grid {
-  display: grid; grid-template-columns: repeat(4, 1fr); gap: 32px;
-}
-.footer-legal-block {
-  display: flex; flex-direction: column; gap: 8px;
-}
-.footer-legal-label {
-  font-family: var(--font-mono); font-size: 9px; letter-spacing: 0.18em;
-  color: var(--electric); text-transform: uppercase;
-}
-.footer-legal-block span {
-  font-size: 13px; color: var(--silver); line-height: 1.7;
-}
-@media (max-width: 1024px) { .footer-legal-grid { grid-template-columns: repeat(2,1fr); } }
-@media (max-width: 640px)  { .footer-legal-grid { grid-template-columns: 1fr; } }
-.footer-socials { display: flex; gap: 24px; }
-.footer-socials a {
-  font-family: var(--font-mono); font-size: 9px; letter-spacing: 0.12em;
-  color: var(--silver); text-decoration: none; text-transform: uppercase;
-  transition: color 0.2s;
-}
-.footer-socials a:hover { color: var(--electric); }
-
-/* ── ARTIST MORE LIST ─────────────────────────────────────────────────────── */
-.artists-more { border-top: 1px solid var(--steel); padding-top: 40px; }
-.artists-more-header { margin-bottom: 32px; }
-.artists-more-grid {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 2px;
-  background: var(--steel);
-  border: 1px solid var(--steel);
-}
-.artist-row {
-  background: #080808;
-  display: flex; align-items: center; gap: 12px;
-  padding: 18px 20px;
+#menu-toggle:checked ~ .mobile-menu { display: flex !important; }
+#menu-toggle:checked ~ nav .nav-hamburger span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+#menu-toggle:checked ~ nav .nav-hamburger span:nth-child(2) { opacity: 0; }
+#menu-toggle:checked ~ nav .nav-hamburger span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+.mobile-menu a {
+  font-family: "Bebas Neue", sans-serif;
+  font-size: 40px;
+  color: #fff;
   text-decoration: none;
-  transition: background 0.2s;
-  position: relative;
-  overflow: hidden;
+  letter-spacing: 0.06em;
 }
-.artist-row::before {
-  content: ''; position: absolute; left: 0; top: 0; bottom: 0;
-  width: 0; background: #080808;
-  transition: width 0.3s cubic-bezier(0.16,1,0.3,1);
-}
-.artist-row:hover::before { width: 100%; }
-.artist-row:hover { background: #080808; }
-.artist-row-name {
-  font-family: var(--font-display); font-size: 17px; letter-spacing: 0.05em;
-  color: var(--ivory); flex: 1; position: relative; z-index: 1;
-  transition: color 0.2s;
-}
-.artist-row-handle {
-  font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.08em;
-  color: var(--iron); position: relative; z-index: 1;
-  transition: color 0.2s;
-}
-.artist-row:hover .artist-row-handle { color: var(--electric); }
-.artist-row-arrow {
-  font-size: 14px; color: var(--steel); position: relative; z-index: 1;
-  transition: color 0.2s, transform 0.2s;
-}
-.artist-row:hover .artist-row-arrow { color: var(--electric); transform: translate(2px, -2px); }
-
-@media (max-width: 1024px) { .artists-more-grid { grid-template-columns: repeat(2, 1fr); } }
-@media (max-width: 640px)  { .artists-more-grid { grid-template-columns: 1fr; } }
-
-/* ── TEAM ──────────────────────────────────────────────────────────────────── */
-.team-grid { display: flex; flex-direction: column; }
-.team-row {
-  display: grid; grid-template-columns: 1.4fr 1.4fr 1.6fr 120px;
-  align-items: center; gap: 24px; padding: 20px;
-  border-bottom: 1px solid var(--steel); background: #080808;
-  transition: background 0.2s;
-}
-.team-row:hover { background: #080808; }
-.team-name { font-family: var(--font-display); font-size: 20px; letter-spacing: 0.04em; color: var(--ivory); }
-.team-role { font-size: 14px; color: var(--chrome); }
-.team-email { font-size: 13px; color: var(--silver); text-decoration: none; font-family: var(--font-mono); transition: color 0.2s; }
-.team-email:hover { color: var(--electric); }
-.team-li { font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.1em; color: var(--electric); text-decoration: none; text-align: right; transition: color 0.2s; }
-.team-li:hover { color: var(--ivory); }
-@media (max-width: 768px) { .team-row { grid-template-columns: 1fr 1fr; } .team-email,.team-li { display:none; } }
-
-/* ── FADE-IN ON SCROLL ────────────────────────────────────────────────────── */
-.reveal {
-  opacity: 1; transform: none;
-  transition: opacity 0.8s cubic-bezier(0.16,1,0.3,1), transform 0.8s cubic-bezier(0.16,1,0.3,1);
-}
-.reveal.animate-hidden { opacity: 0; transform: translateY(32px); }
-.reveal.visible { opacity: 1; transform: none; }
-.reveal-delay-1 { transition-delay: 0.1s; }
-.reveal-delay-2 { transition-delay: 0.2s; }
-.reveal-delay-3 { transition-delay: 0.3s; }
-
-/* ── MOBILE ───────────────────────────────────────────────────────────────── */
-@media (max-width: 1024px) {
-  nav { padding: 0 40px; }
-  .nav-links { gap: 24px; }
-  .about-grid, .platform-inner, .showcases-header { grid-template-columns: 1fr; gap: 48px; }
-    .showcases-grid { grid-template-columns: 1fr 1fr; }
-  .showcase-card:nth-child(1) { grid-column: span 2; }
-  .brands-logos { grid-template-columns: repeat(3, 1fr); }
-  .footer-top { grid-template-columns: 1fr 1fr; }
-  .service-item { grid-template-columns: 48px 1fr auto; }
-  .service-desc { display: none; }
-}
-@media (max-width: 640px) {
-  nav { padding: 0 24px; }
-  .nav-links { display: none; }
-  .hero { padding-bottom: 60px; }
-    .showcases-grid { grid-template-columns: 1fr; }
-  .showcase-card:nth-child(1) { grid-column: span 1; }
-  .brands-logos { grid-template-columns: repeat(2, 1fr); }
-  .footer-top { grid-template-columns: 1fr; }
-  .cta-banner { padding: 80px 0; }
-  .btn-secondary { display: none; }
-}
-
-
+.mobile-menu a:hover { color: #29ABE2; }
 
 @media (max-width: 768px) {
   nav { padding: 0 20px !important; }
-  .nav-links, .nav-cta { display: none !important; }
-  .container { padding: 0 24px !important; }
-  #contact > div > div { grid-template-columns: 1fr !important; gap: 48px !important; }
-  #contact > div { padding: 0 24px !important; }
-  #team .team-row { grid-template-columns: 1fr 1fr !important; }
-  .team-email, .team-li { display: none !important; }
-  .showcases-header { grid-template-columns: 1fr !important; }
-  .showcases-grid { grid-template-columns: 1fr !important; }
-  .about-grid { grid-template-columns: 1fr !important; }
-  .footer-grid { grid-template-columns: 1fr 1fr !important; }
-  .footer-legal-grid { grid-template-columns: 1fr 1fr !important; }
-  .artists-grid > * { flex: 0 0 calc(50% - 2px) !important; width: calc(50% - 2px) !important; }
-  #platform > div > div { grid-template-columns: 1fr !important; }
-  nav::after { content: ''; }
-}
-@media (max-width: 480px) {
-  .artists-grid > * { flex: 0 0 calc(100% - 2px) !important; width: calc(100% - 2px) !important; }
-  .footer-grid { grid-template-columns: 1fr !important; }
-  #contact > div { padding: 0 16px !important; }
-  #contact form > div:first-child { grid-template-columns: 1fr !important; }
-}
-
-
-
-@keyframes mapPulse {
-  0%   { r: 8; opacity: 0.3; }
-  50%  { r: 14; opacity: 0.08; }
-  100% { r: 8; opacity: 0.3; }
-}
-.map-dot circle.pulse {
-  animation: mapPulse 2.5s ease-in-out infinite;
-}
-.map-dot:nth-child(2n) circle.pulse { animation-delay: 0.4s; }
-.map-dot:nth-child(3n) circle.pulse { animation-delay: 0.8s; }
-.map-dot:nth-child(4n) circle.pulse { animation-delay: 1.2s; }
-.map-dot:nth-child(5n) circle.pulse { animation-delay: 1.6s; }
-
-
-
-#offer-overlay{display:none;position:fixed;inset:0;z-index:9999;background:#080808;overflow-y:auto;}
-#offer-overlay.active{display:block;}
-.offer-close-bar{position:sticky;top:0;z-index:10;background:rgba(8,8,8,0.97);border-bottom:1px solid #1C1E24;padding:0 60px;height:72px;display:flex;align-items:center;justify-content:space-between;backdrop-filter:blur(12px);}
-.offer-close-bar::before{content:"";position:absolute;top:0;left:0;right:0;height:2px;background:#29ABE2;}
-.offer-close-logo{font-family:"Bebas Neue",sans-serif;font-size:22px;letter-spacing:0.1em;color:#fff;}
-.offer-close-btn{font-family:"DM Mono",monospace;font-size:11px;letter-spacing:0.12em;text-transform:uppercase;color:#8A8F9E;background:none;border:none;cursor:pointer;transition:color 0.2s;}
-.offer-close-btn:hover{color:#fff;}
-
-/* ═══════════════════════════════════════════════
-   MOBILE — COMPREHENSIVE OVERRIDE
-═══════════════════════════════════════════════ */
-@media (max-width: 768px) {
-  html, body { overflow-x: hidden !important; }
-  body * { box-sizing: border-box !important; }
-
-  /* NAV */
   .nav-links { display: none !important; }
   .nav-cta { display: none !important; }
-  .hamburger { display: flex !important; }
-  nav { padding: 0 20px !important; }
+  .nav-hamburger { display: flex !important; }
 
-  /* HERO */
-  .hero-headline { font-size: clamp(44px, 12vw, 72px) !important; line-height: 0.9 !important; }
-  .hero-bottom { flex-direction: column !important; gap: 20px !important; align-items: flex-start !important; }
-  .hero-tagline { max-width: 100% !important; border-left: none !important; padding-left: 0 !important; border-top: 1px solid var(--electric) !important; padding-top: 16px !important; }
-  .hero-scroll { display: none !important; }
-  .hero { padding-bottom: 60px !important; }
-  .container { padding: 0 20px !important; }
-
-  /* ARTIST CARDS */
-  #artists { overflow: hidden !important; }
-  #artists > div:nth-child(2) {
-    display: grid !important;
-    grid-template-columns: 1fr 1fr !important;
-    gap: 3px !important;
+  #artists-grid {
+    flex-direction: column !important;
     padding: 0 !important;
-    width: 100% !important;
-    overflow: hidden !important;
   }
-  #artists > div:nth-child(2) > a {
-    flex: unset !important;
+  #artists-grid > a {
     width: 100% !important;
-    min-width: 0 !important;
-    height: 200px !important;
+    min-width: 100% !important;
+    flex: none !important;
+    height: 300px !important;
   }
-  #artists > div:nth-child(2) > a img { height: 200px !important; }
-  #artists > div:first-child { padding: 36px 20px 20px !important; }
-  #artists > div:last-child { padding: 0 20px 48px !important; }
 
-  /* GRIDS → SINGLE COLUMN */
-  .about-grid { grid-template-columns: 1fr !important; gap: 32px !important; }
-  .about-subtitle { max-width: 100% !important; }
-  .about-stats { grid-template-columns: 1fr 1fr !important; }
-  .platform-inner { grid-template-columns: 1fr !important; gap: 40px !important; }
-  #platform > div > div { grid-template-columns: 1fr !important; gap: 40px !important; }
-  .showcases-header { grid-template-columns: 1fr !important; gap: 24px !important; margin-bottom: 32px !important; }
-  .showcases-grid { grid-template-columns: 1fr !important; }
-  .showcase-card:nth-child(1) { grid-column: span 1 !important; min-height: 260px !important; }
-  .showcase-card:nth-child(n+2) { min-height: 180px !important; }
-
-  /* SERVICES */
-  .service-item { grid-template-columns: 40px 1fr auto !important; gap: 12px !important; }
-  .service-desc { display: none !important; }
-  .services-headline { font-size: 40px !important; }
-
-  /* BRANDS */
-  .brands-logos { grid-template-columns: repeat(2, 1fr) !important; }
-  .brand-logo-cell { padding: 20px 12px !important; font-size: 12px !important; }
-
-  /* ALL INLINE GRID SECTIONS */
-  div[style*="grid-template-columns:1fr 1fr;gap:100px"],
-  div[style*="grid-template-columns:1fr 1fr;gap:80px"],
-  div[style*="grid-template-columns: 1fr 1fr"] {
+  div[style*="grid-template-columns:1fr 1fr;gap:100px"] {
     grid-template-columns: 1fr !important;
     gap: 40px !important;
   }
-  div[style*="padding:0 80px"],
-  div[style*="padding: 0 80px"] {
-    padding: 0 20px !important;
+  div[style*="padding:0 80px"] {
+    padding-left: 20px !important;
+    padding-right: 20px !important;
   }
-  div[style*="padding:80px 40px"],
-  div[style*="padding:120px 80px"],
-  div[style*="padding:56px 80px"],
-  div[style*="padding:60px 60px"] {
-    padding: 40px 20px !important;
-  }
-
-  /* CONTACT */
-  #contact { padding-top: 60px !important; padding-bottom: 60px !important; }
-  #contact > div { padding: 0 20px !important; }
-  #contact > div > div { grid-template-columns: 1fr !important; gap: 40px !important; }
-  #contact form > div:first-child { grid-template-columns: 1fr !important; }
-
-  /* TEAM */
-  .team-row { grid-template-columns: 1fr 1fr !important; padding: 14px !important; }
-  .team-email, .team-li { display: none !important; }
-  .team-name { font-size: 16px !important; }
-
-  /* FOOTER */
-  footer .container { padding: 0 20px !important; }
-  .footer-top { grid-template-columns: 1fr !important; gap: 28px !important; }
-  .footer-legal-grid { grid-template-columns: 1fr 1fr !important; }
-  .footer-bottom { flex-direction: column !important; gap: 12px !important; }
-  .footer-top[style*="grid-template-columns:1.5fr 1fr 1fr 1fr 1fr"] {
-    grid-template-columns: 1fr !important;
-  }
+  div[style*="padding:120px 80px"] { padding: 60px 20px 40px !important; }
+  div[style*="padding:60px 80px"] { padding: 40px 20px 60px !important; }
+  section[style*="padding:80px 0"] { padding: 60px 0 !important; }
+  div[style*="grid-template-columns:1fr 1fr;gap:16px"] { grid-template-columns: 1fr !important; }
+  div[style*="grid-template-columns:1fr 1fr;gap:20px 28px"] { grid-template-columns: 1fr !important; }
+  footer { flex-direction: column !important; gap: 24px !important; padding: 32px 20px !important; text-align: center !important; }
+  .footer-links { flex-wrap: wrap !important; justify-content: center !important; gap: 16px !important; }
 }
-
-@media (max-width: 480px) {
-  .hero-headline { font-size: clamp(38px, 11vw, 56px) !important; }
-  .stat-number { font-size: 36px !important; }
-  .footer-legal-grid { grid-template-columns: 1fr !important; }
-}
-
 </style>
-
 </head>
 <body>
 <!-- CURSOR -->
@@ -961,54 +221,40 @@ footer {
   ╚══════════════════════════════════════════════════════╝
 -->
 <!-- NAVIGATION -->
-<!-- NAV -->
-<nav style="position:fixed;top:0;left:0;right:0;z-index:1000;height:72px;display:flex;align-items:center;justify-content:space-between;padding:0 32px;background:rgba(8,8,8,0.97);border-bottom:1px solid #2A2D36;backdrop-filter:blur(16px);">
-  <!-- Logo -->
-  <a href="/" style="display:flex;align-items:center;text-decoration:none;z-index:1001;">
-    <img src="assets/images/image_01.png" alt="Deepbloe" style="height:40px;width:auto;"/>
-  </a>
 
-  <!-- Desktop links -->
-  <ul id="desktopNav" style="display:flex;gap:36px;list-style:none;margin:0;padding:0;">
-    <li><a href="#about" style="font-family:'DM Sans',sans-serif;font-size:11px;font-weight:500;letter-spacing:0.12em;text-transform:uppercase;color:#fff;text-decoration:none;">About</a></li>
-    <li><a href="#services" style="font-family:'DM Sans',sans-serif;font-size:11px;font-weight:500;letter-spacing:0.12em;text-transform:uppercase;color:#fff;text-decoration:none;">Services</a></li>
-    <li><a href="artists.html" style="font-family:'DM Sans',sans-serif;font-size:11px;font-weight:500;letter-spacing:0.12em;text-transform:uppercase;color:#fff;text-decoration:none;">Artists</a></li>
-    <li><a href="#showcases" style="font-family:'DM Sans',sans-serif;font-size:11px;font-weight:500;letter-spacing:0.12em;text-transform:uppercase;color:#fff;text-decoration:none;">Showcases</a></li>
-    <li><a href="team.html" style="font-family:'DM Sans',sans-serif;font-size:11px;font-weight:500;letter-spacing:0.12em;text-transform:uppercase;color:#fff;text-decoration:none;">Team</a></li>
-    <li><a href="/jobs.html" style="font-family:'DM Sans',sans-serif;font-size:11px;font-weight:500;letter-spacing:0.12em;text-transform:uppercase;color:#fff;text-decoration:none;">Jobs</a></li>
-    <li><a href="/artist-portal.html" style="font-family:'DM Sans',sans-serif;font-size:11px;font-weight:500;letter-spacing:0.12em;text-transform:uppercase;color:#29ABE2;text-decoration:none;border:1px solid rgba(41,171,226,0.3);padding:6px 14px;">Artist Portal</a></li>
-  </ul>
-
-  <!-- Desktop CTA -->
-  <a id="desktopCta" href="#contact" style="font-family:'DM Sans',sans-serif;font-size:11px;font-weight:500;letter-spacing:0.12em;text-transform:uppercase;color:#fff;text-decoration:none;padding:10px 24px;border:1px solid rgba(255,255,255,0.25);">Get in Touch</a>
-
-  <!-- Hamburger button -->
-  <button id="hamburgerBtn" onclick="toggleMobileMenu()" aria-label="Menu" style="display:none;flex-direction:column;gap:5px;background:none;border:none;cursor:pointer;padding:8px;z-index:1001;margin-left:auto;">
-    <span id="hLine1" style="display:block;width:24px;height:2px;background:#fff;transition:all 0.3s;"></span>
-    <span id="hLine2" style="display:block;width:24px;height:2px;background:#fff;transition:all 0.3s;"></span>
-    <span id="hLine3" style="display:block;width:24px;height:2px;background:#fff;transition:all 0.3s;"></span>
-  </button>
-</nav>
-
-<!-- MOBILE MENU OVERLAY -->
-<div id="mobileMenuOverlay" style="display:none;position:fixed;top:72px;left:0;right:0;bottom:0;background:rgba(8,8,8,0.99);z-index:999;flex-direction:column;padding:32px 24px;overflow-y:auto;">
-  <a href="#about" onclick="closeMobileMenu()" style="font-family:'Bebas Neue',sans-serif;font-size:40px;letter-spacing:0.05em;color:#fff;text-decoration:none;padding:16px 0;border-bottom:1px solid #1C1E24;display:block;">About</a>
-  <a href="#services" onclick="closeMobileMenu()" style="font-family:'Bebas Neue',sans-serif;font-size:40px;letter-spacing:0.05em;color:#fff;text-decoration:none;padding:16px 0;border-bottom:1px solid #1C1E24;display:block;">Services</a>
-  <a href="artists.html" onclick="closeMobileMenu()" style="font-family:'Bebas Neue',sans-serif;font-size:40px;letter-spacing:0.05em;color:#fff;text-decoration:none;padding:16px 0;border-bottom:1px solid #1C1E24;display:block;">Artists</a>
-  <a href="#showcases" onclick="closeMobileMenu()" style="font-family:'Bebas Neue',sans-serif;font-size:40px;letter-spacing:0.05em;color:#fff;text-decoration:none;padding:16px 0;border-bottom:1px solid #1C1E24;display:block;">Showcases</a>
-  <a href="team.html" onclick="closeMobileMenu()" style="font-family:'Bebas Neue',sans-serif;font-size:40px;letter-spacing:0.05em;color:#fff;text-decoration:none;padding:16px 0;border-bottom:1px solid #1C1E24;display:block;">Team</a>
-<a href="/jobs.html" onclick="closeMobileMenu()" style="font-family:'Bebas Neue',sans-serif;font-size:40px;color:#fff;text-decoration:none;padding:16px 0;border-bottom:1px solid #1C1E24;display:block;">Jobs</a>
-  <a href="/artist-portal.html" onclick="closeMobileMenu()" style="font-family:'Bebas Neue',sans-serif;font-size:40px;color:#29ABE2;text-decoration:none;padding:16px 0;border-bottom:1px solid #1C1E24;display:block;">Artist Portal</a>
-  <a href="#contact" onclick="closeMobileMenu()" style="display:block;text-align:center;margin-top:28px;background:#fff;color:#080808;font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:0.1em;padding:18px 32px;text-decoration:none;">Get in Touch</a>
+<div class="mobile-menu" id="mobileMenu">
+  <label for="menu-toggle" style="position:absolute;top:24px;right:24px;cursor:pointer;font-size:32px;color:#fff;line-height:1;">✕</label>
+  <a href="#about">About</a>
+  <a href="#services">Services</a>
+  <a href="#artists">Artists</a>
+  <a href="#showcases">Showcases</a>
+  <a href="#team">Team</a>
+  <a href="#contact" style="color:#29ABE2;">Get in Touch</a>
 </div>
+<nav id="mainNav">
+<a class="nav-logo" href="/">
+<img alt="Deepbloe Agency" src="assets/images/image_01.png" style="height:48px;width:auto;"/>
+</a>
+<ul class="nav-links">
+<li><a href="#about">About</a></li>
+<li><a href="#services">Services</a></li>
+<li><a href="#artists">Artists</a></li>
+<li><a href="#platform">Platform</a></li>
+<li><a href="#showcases">Showcases</a></li>
+<li><a href="#team">Team</a></li>
+<li><a href="https://www.deepbloe.com/private-access" style="color:var(--electric) !important;" target="_blank">Private Access</a></li>
+</ul>
+<a class="nav-cta" href="#contact">Get in Touch</a>
+<button class="nav-hamburger" aria-label="Menu">
+  <span></span><span></span><span></span>
+</button>
+</nav>
 
 <!-- HERO -->
 <section class="hero">
 <div class="hero-bg">
-<img alt="Hero" src="hero.jpg" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center 25%;"/>
+<img alt="Hero" src="assets/images/image_02.jpg" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center 30%;"/>
 </div>
-<!-- Shader canvas — blended over photo -->
-<canvas id="deepbloe-hero-canvas" style="position:absolute;inset:0;width:100%;height:100%;display:block;mix-blend-mode:screen;opacity:0.52;touch-action:none;z-index:1;pointer-events:none;"></canvas>
 <div class="hero-beams">
 <div class="beam"></div><div class="beam"></div><div class="beam"></div>
 <div class="beam"></div><div class="beam"></div>
@@ -1018,11 +264,12 @@ footer {
 <h1 class="hero-headline">
       GLOBAL<br/>
       ELECTRO<span class="accent">NIC</span><br/>
-<span style="color:#FFFFFF;display:block;">PLATFORM</span>
+<span class="line-2">PLATFORM</span>
 </h1>
 <div class="hero-bottom">
 <p class="hero-tagline">
-        One platform. Built for the artists, brands and partners shaping electronic music worldwide.
+        Connecting artists, promoters, festivals, clubs and brands worldwide.
+        We represent talent. We build culture. We drive the industry forward.
       </p>
 <div class="hero-scroll">
 <div class="hero-scroll-line"></div>
@@ -1031,94 +278,34 @@ footer {
 </div>
 </div>
 </section>
-<script data-cfasync="false">
-(function(){
-  var canvas=document.getElementById('deepbloe-hero-canvas');
-  if(!canvas)return;
-  var gl=canvas.getContext('webgl2');
-  if(!gl)return;
-  var vSrc='#version 300 es\nprecision highp float;\nin vec4 position;\nvoid main(){gl_Position=position;}';
-  var fSrc=[
-    '#version 300 es','precision highp float;','out vec4 O;',
-    'uniform vec2 resolution;','uniform float time;',
-    '#define FC gl_FragCoord.xy','#define T time','#define R resolution','#define MN min(R.x,R.y)',
-    'float rnd(vec2 p){p=fract(p*vec2(12.9898,78.233));p+=dot(p,p+34.56);return fract(p.x*p.y);}',
-    'float noise(in vec2 p){vec2 i=floor(p),f=fract(p),u=f*f*(3.-2.*f);float a=rnd(i),b=rnd(i+vec2(1,0)),c=rnd(i+vec2(0,1)),d=rnd(i+1.);return mix(mix(a,b,u.x),mix(c,d,u.x),u.y);}',
-    'float fbm(vec2 p){float t=.0,a=1.;mat2 m=mat2(1.,-.5,.2,1.2);for(int i=0;i<5;i++){t+=a*noise(p);p*=2.*m;a*=.5;}return t;}',
-    'float clouds(vec2 p){float d=1.,t=.0;for(float i=.0;i<3.;i++){float a=d*fbm(i*10.+p.x*.2+.2*(1.+i)*p.y+d+i*i+p);t=mix(t,d,a);d=a;p*=2./(i+1.);}return t;}',
-    'void main(void){',
-    '  vec2 uv=(FC-.5*R)/MN,st=uv*vec2(2.,1.);',
-    '  vec3 electric=vec3(0.161,0.671,0.886);vec3 midnight=vec3(0.039,0.055,0.102);',
-    '  vec3 cyan=vec3(0.04,0.82,0.96);vec3 marine=vec3(0.008,0.220,0.420);',
-    '  float bg=clouds(vec2(st.x+T*.35,-st.y));',
-    '  uv*=1.-.25*(sin(T*.18)*.5+.5);',
-    '  vec3 col=vec3(0.0);',
-    '  for(float i=1.;i<12.;i++){',
-    '    uv+=.09*cos(i*vec2(.08+.008*i,.75)+i*i+T*.42+.08*uv.x);',
-    '    vec2 p=uv;float d=length(p);',
-    '    float hue=fract(i*.13+T*.04);',
-    '    vec3 fil=mix(mix(electric,cyan,hue),mix(marine,midnight,hue),smoothstep(.0,.8,d));',
-    '    col+=.0015/d*fil;',
-    '    float b=noise(i+p+bg*1.731);',
-    '    col+=.0025*b/length(max(p,vec2(b*p.x*.02,p.y)))*electric;',
-    '    col=mix(col,midnight*bg*.5+marine*bg*.12,d*.3);',
-    '  }',
-    '  float centre=1.0-smoothstep(.0,.5,length(uv));',
-    '  col+=centre*electric*.05;',
-    '  O=vec4(col,1.0);}'].join('\n');
-  function mkS(t,s){var sh=gl.createShader(t);gl.shaderSource(sh,s);gl.compileShader(sh);return sh;}
-  var vs=mkS(gl.VERTEX_SHADER,vSrc),fs=mkS(gl.FRAGMENT_SHADER,fSrc);
-  var prog=gl.createProgram();gl.attachShader(prog,vs);gl.attachShader(prog,fs);gl.linkProgram(prog);
-  var buf=gl.createBuffer();gl.bindBuffer(gl.ARRAY_BUFFER,buf);
-  gl.bufferData(gl.ARRAY_BUFFER,new Float32Array([-1,1,-1,-1,1,1,1,-1]),gl.STATIC_DRAW);
-  var pos=gl.getAttribLocation(prog,'position');gl.enableVertexAttribArray(pos);gl.vertexAttribPointer(pos,2,gl.FLOAT,false,0,0);
-  var uR=gl.getUniformLocation(prog,'resolution'),uT=gl.getUniformLocation(prog,'time');
-  function resize(){var dpr=Math.max(1,0.5*window.devicePixelRatio);canvas.width=window.innerWidth*dpr;canvas.height=window.innerHeight*dpr;gl.viewport(0,0,canvas.width,canvas.height);}
-  function loop(now){
-    gl.useProgram(prog);gl.uniform2f(uR,canvas.width,canvas.height);gl.uniform1f(uT,now*1e-3);
-    gl.clearColor(0,0,0,0);gl.clear(gl.COLOR_BUFFER_BIT);
-    gl.bindBuffer(gl.ARRAY_BUFFER,buf);gl.drawArrays(gl.TRIANGLE_STRIP,0,4);
-    requestAnimationFrame(loop);
-  }
-  resize();window.addEventListener('resize',resize);loop(0);
-})();
-</script>
 <!-- MARQUEE -->
 <div class="marquee-section">
 <div class="marquee-track" id="marqueeTrack">
 <div class="marquee-item"><span>Tomorrowland</span> Belgium</div>
-<div class="marquee-item"><span>Ushuaïa</span> Ibiza</div>
+<div class="marquee-item"><span>S2O</span> Thailand</div>
 <div class="marquee-item"><span>Bootshaus</span> Germany</div>
 <div class="marquee-item"><span>Marquee</span> Singapore</div>
-<div class="marquee-item"><span>Ministry of Sound</span> London</div>
-<div class="marquee-item"><span>Wave</span> Taipei</div>
-<div class="marquee-item"><span>S2O</span> Thailand</div>
+<div class="marquee-item"><span>Space Plus</span> Bangkok</div>
 <div class="marquee-item"><span>Fabric</span> London</div>
-<div class="marquee-item"><span>Hï</span> Ibiza</div>
-<div class="marquee-item"><span>Onyx</span> Bangkok</div>
-<div class="marquee-item"><span>Dance Valley</span> Netherlands</div>
-<div class="marquee-item"><span>Boomerang</span> Hong Kong</div>
+<div class="marquee-item"><span>Club der Visionaere</span> Berlin</div>
 <div class="marquee-item"><span>ADE</span> Amsterdam</div>
 <div class="marquee-item"><span>WMC</span> Miami</div>
+<div class="marquee-item"><span>Hï</span> Ibiza</div>
 <!-- Duplicate for infinite loop -->
 <div class="marquee-item"><span>Tomorrowland</span> Belgium</div>
-<div class="marquee-item"><span>Ushuaïa</span> Ibiza</div>
+<div class="marquee-item"><span>S2O</span> Thailand</div>
 <div class="marquee-item"><span>Bootshaus</span> Germany</div>
 <div class="marquee-item"><span>Marquee</span> Singapore</div>
-<div class="marquee-item"><span>Ministry of Sound</span> London</div>
-<div class="marquee-item"><span>Wave</span> Taipei</div>
-<div class="marquee-item"><span>S2O</span> Thailand</div>
+<div class="marquee-item"><span>Space Plus</span> Bangkok</div>
 <div class="marquee-item"><span>Fabric</span> London</div>
-<div class="marquee-item"><span>Hï</span> Ibiza</div>
-<div class="marquee-item"><span>Onyx</span> Bangkok</div>
-<div class="marquee-item"><span>Dance Valley</span> Netherlands</div>
-<div class="marquee-item"><span>Boomerang</span> Hong Kong</div>
+<div class="marquee-item"><span>Club der Visionaere</span> Berlin</div>
 <div class="marquee-item"><span>ADE</span> Amsterdam</div>
 <div class="marquee-item"><span>WMC</span> Miami</div>
+<div class="marquee-item"><span>Hï</span> Ibiza</div>
 </div>
 </div>
 <!-- ABOUT -->
-<section class="about" id="about" style="background:#0D0D12;">
+<section class="about" id="about">
 <div class="container">
 <div class="about-grid">
 <div>
@@ -1127,43 +314,39 @@ footer {
           WHERE<br/>MUSIC<br/><em>MEETS BUSINESS.</em>
 </h2>
 <p class="about-subtitle reveal reveal-delay-2">
-          A global electronic music talent, programming<br/>and industry platform. Connecting artists, promoters,<br/>festivals, clubs and brands worldwide.
+          A global electronic music talent, programming<br/>and industry platform. Connecting artists, promoters,<br/>festivals, clubs and brands, worldwide.
         </p>
 </div>
 <div class="about-body reveal">
 <p>
-<strong>Deepbloe is a global electronic music platform.</strong> We represent artists,
-          buy and programme talent for festivals and clubs, build industry showcases and
-          create strategic brand partnerships — all under one roof, worldwide.
+<strong>Deepbloe is a full-service electronic music platform</strong>, we represent artists,
+          buy and program talent for festivals and clubs, build industry showcases and
+          create strategic brand partnerships. All under one roof, worldwide.
         </p>
 <p>
-          We are not a traditional booking agency. We are a boutique partner built for
-          the long game — with deep industry expertise, a global network, and the kind
-          of direct attention that serious careers actually require.
+          We're not a traditional booking agency. We are a boutique partner built for
+          the long game, with deep industry expertise, a global network and the
+          personal attention that serious careers demand.
         </p>
 <p>
-          From Tomorrowland to S2O Thailand, from Berlin club residencies to landmark
-          festival stages — we place our artists, clients and partners exactly where
-          they need to be.
-        </p>
-<p style="font-family:var(--font-mono);font-size:11px;letter-spacing:0.12em;color:var(--electric);text-transform:uppercase;margin-top:8px;margin-bottom:0;">
-          Operating across Europe · Middle East · Asia · and beyond
+          From Tomorrowland to S2O Thailand, from intimate club residencies to landmark
+          festival stages, we position our artists, clients and partners where they belong.
         </p>
 <div class="about-stats reveal reveal-delay-2">
 <div class="stat">
-<div class="stat-number"><span>200+</span></div>
+<div class="stat-number" data-suffix="+" data-target="200"><span class="count">0</span><span>+</span></div>
 <div class="stat-label">Bookings annually</div>
 </div>
 <div class="stat">
-<div class="stat-number"><span>40+</span></div>
+<div class="stat-number" data-suffix="+" data-target="40"><span class="count">0</span><span>+</span></div>
 <div class="stat-label">Countries reached</div>
 </div>
 <div class="stat">
-<div class="stat-number"><span>500+</span></div>
-<div class="stat-label">Industry connections</div>
+<div class="stat-number" data-suffix="+" data-target="15"><span class="count">0</span><span>+</span></div>
+<div class="stat-label">Artists represented</div>
 </div>
 <div class="stat">
-<div class="stat-number"><span>8</span></div>
+<div class="stat-number" data-target="8"><span class="count">0</span></div>
 <div class="stat-label">Years operating</div>
 </div>
 </div>
@@ -1182,38 +365,155 @@ footer {
 <div class="service-item reveal">
 <span class="service-num mono">01</span>
 <span class="service-name">TALENT REPRESENTATION</span>
-<span class="service-desc">Your career, our obsession. We handle bookings, negotiations, routing and career strategy — so artists can focus on the music. Every artist we represent is a partnership, not a transaction.</span>
+<span class="service-desc">Full-service artist representation built on long-term vision. We handle bookings, negotiations, routing and career strategy — so artists can focus on the music. Every artist we represent is a partnership, not a transaction.</span>
 <div class="service-arrow">↗</div>
 </div>
 <div class="service-item reveal reveal-delay-1">
 <span class="service-num mono">02</span>
 <span class="service-name">STRATEGIC PARTNERSHIPS</span>
-<span class="service-desc">The right brand partnership changes everything. We find the fit, structure the deal and own the delivery — from initial concept to final execution.</span>
+<span class="service-desc">We connect brands to music culture in ways that feel genuine. Drawing on years of experience on both sides of the table, we identify the right fit, structure the deal and manage the relationship — from initial concept to final delivery.</span>
 <div class="service-arrow">↗</div>
 </div>
 <div class="service-item reveal reveal-delay-2">
 <span class="service-num mono">03</span>
 <span class="service-name">INDUSTRY SHOWCASES</span>
-<span class="service-desc">Visibility is earned, not bought. Our showcases at ADE, WMC and key industry moments put artists in the room where decisions are made — and keep them there.</span>
+<span class="service-desc">We create and produce our own showcase events at ADE, WMC and other key industry moments. These are not just shows — they are strategic platforms that generate visibility, press and business opportunities for the artists and partners involved.</span>
 <div class="service-arrow">↗</div>
 </div>
 <div class="service-item reveal reveal-delay-3">
 <span class="service-num mono">04</span>
 <span class="service-name">TALENT BUYING &amp; PROGRAMMING</span>
-<span class="service-desc">From Tomorrowland mainstages to Bangkok clubs — we know what works, for whom, and why. Full line-up curation, individual placement and direct market knowledge across Europe, Asia, the Middle East and beyond.</span>
+<span class="service-desc">We programme stages, festivals, club nights, beach clubs, luxury venues and brand experiences — globally. From full festival line-up curation to individual artist placement, we advise on what works, for whom, and why. Our programming work is built on direct market knowledge and long-term promoter relationships across Europe, Latin America and MENA.</span>
 <div class="service-arrow">↗</div>
 </div>
 <div class="service-item reveal">
 <span class="service-num mono">05</span>
 <span class="service-name">MANAGEMENT &amp; CONSULTANCY</span>
-<span class="service-desc">When the strategy isn't working, we tell you the truth. Then we fix it. Our consultancy draws on direct experience across talent, touring, brand partnerships and market development.</span>
+<span class="service-desc">Beyond bookings, we advise artists and brands on strategy, positioning and growth. Our consultancy work draws on direct experience across talent, touring, brand partnerships and market development. Whether you need a sounding board or a full strategic overhaul, we bring honest, informed perspective — with no agenda other than your success.</span>
 <div class="service-arrow">↗</div>
 </div>
 </div>
 </div>
 </section>
-<!-- PLATFORM -->
+<!-- ARTISTS -->
+<section id="artists" style="padding:0;background:#080808;">
+<div style="padding:60px 60px 32px;">
+<div style="font-family:monospace;font-size:10px;letter-spacing:0.15em;color:#29ABE2;text-transform:uppercase;margin-bottom:12px;">Artists</div>
+<h2 style="font-family:'Bebas Neue',sans-serif;font-size:clamp(36px,4vw,60px);color:#fff;margin-bottom:8px;">ARTISTS</h2>
+<p style="font-size:14px;color:#C4C8D4;margin-bottom:32px;">A curated selection of global electronic music artists.</p>
+<a class="btn-primary" href="#" onclick="openOffer();return false;" style="display:inline-flex;align-items:center;gap:10px;background:#fff;color:#080808;font-family:'DM Sans',sans-serif;font-size:12px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;text-decoration:none;padding:14px 28px;transition:background 0.2s;">BOOK AN ARTIST <span style="font-size:14px;">↗</span></a>
+</div>
+<div style="display:flex;flex-direction:row;flex-wrap:nowrap;gap:3px;padding:0 3px;" id="artists-grid">
+<a href="liu.html" style="display:block;text-decoration:none;flex:1;min-width:0;position:relative;overflow:hidden;height:360px;">
+<img src="assets/images/image_03.jpg" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center 15%;filter:brightness(0.65) saturate(0.65);transition:filter 0.3s,transform 0.3s;" onmouseover="this.style.filter='brightness(0.8) saturate(0.8)';this.style.transform='scale(1.03)'" onmouseout="this.style.filter='brightness(0.65) saturate(0.65)';this.style.transform='scale(1)'"/>
+<div style="position:absolute;inset:0;background:linear-gradient(180deg,transparent 40%,rgba(0,0,0,0.85) 100%);"></div>
+<div style="position:absolute;top:12px;right:12px;font-family:monospace;font-size:9px;letter-spacing:0.1em;color:#29ABE2;background:rgba(8,8,8,0.8);padding:3px 8px;border:1px solid #29ABE2;">Available for booking</div>
+<div style="position:absolute;top:12px;left:12px;font-family:monospace;font-size:9px;letter-spacing:0.1em;color:#fff;background:rgba(41,171,226,0.85);padding:3px 8px;">DJ Mag #79</div>
+<div style="position:absolute;bottom:0;left:0;right:0;padding:16px;">
+<div style="font-family:'Bebas Neue',sans-serif;font-size:22px;color:#fff;letter-spacing:0.05em;margin-bottom:6px;">LIU</div>
+<div style="font-size:11px;color:#C4C8D4;margin-bottom:10px;">Electronic / House · Brazil</div>
+<div style="font-family:monospace;font-size:9px;color:#080808;background:#fff;display:inline-block;padding:5px 12px;letter-spacing:0.1em;">VIEW PROFILE →</div>
+</div>
+</a><a href="https://instagram.com/goldfishlive" style="display:block;text-decoration:none;flex:1;min-width:0;position:relative;overflow:hidden;height:360px;" target="_blank">
+<img src="assets/images/image_04.jpg" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center 15%;filter:brightness(0.65) saturate(0.65);"/>
+<div style="position:absolute;inset:0;background:linear-gradient(180deg,transparent 40%,rgba(0,0,0,0.85) 100%);"></div>
+<div style="position:absolute;top:12px;right:12px;font-family:monospace;font-size:9px;letter-spacing:0.1em;color:#29ABE2;background:rgba(8,8,8,0.8);padding:3px 8px;border:1px solid #29ABE2;">Available for booking</div>
+<div style="position:absolute;bottom:0;left:0;right:0;padding:16px;">
+<div style="font-family:'Bebas Neue',sans-serif;font-size:22px;color:#fff;letter-spacing:0.05em;margin-bottom:6px;">GOLDFISH</div>
+<div style="font-family:monospace;font-size:9px;color:#29ABE2;border:1px solid rgba(41,171,226,0.4);display:inline-block;padding:3px 8px;margin-bottom:6px;">@goldfishlive ↗</div>
+<div style="font-size:11px;color:#C4C8D4;">Live Act / Electronic</div>
+</div>
+</a><a href="https://instagram.com/jaxjones" style="display:block;text-decoration:none;flex:1;min-width:0;position:relative;overflow:hidden;height:360px;" target="_blank">
+<img src="assets/images/image_05.jpg" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center 15%;filter:brightness(0.65) saturate(0.65);"/>
+<div style="position:absolute;inset:0;background:linear-gradient(180deg,transparent 40%,rgba(0,0,0,0.85) 100%);"></div>
+<div style="position:absolute;top:12px;right:12px;font-family:monospace;font-size:9px;letter-spacing:0.1em;color:#29ABE2;background:rgba(8,8,8,0.8);padding:3px 8px;border:1px solid #29ABE2;">Available for booking</div>
+<div style="position:absolute;bottom:0;left:0;right:0;padding:16px;">
+<div style="font-family:'Bebas Neue',sans-serif;font-size:22px;color:#fff;letter-spacing:0.05em;margin-bottom:6px;">JAX JONES</div>
+<div style="font-family:monospace;font-size:9px;color:#29ABE2;border:1px solid rgba(41,171,226,0.4);display:inline-block;padding:3px 8px;margin-bottom:6px;">@jaxjones ↗</div>
+<div style="font-size:11px;color:#C4C8D4;">House / Pop Electronic</div>
+</div>
+</a><a href="https://www.instagram.com/ave_music/" style="display:block;text-decoration:none;flex:1;min-width:0;position:relative;overflow:hidden;height:360px;" target="_blank">
+<img src="assets/images/artist_ave.jpg" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center 15%;filter:brightness(0.65) saturate(0.65);"/>
+<div style="position:absolute;inset:0;background:linear-gradient(180deg,transparent 40%,rgba(0,0,0,0.85) 100%);"></div>
+<div style="position:absolute;top:12px;right:12px;font-family:monospace;font-size:9px;letter-spacing:0.1em;color:#29ABE2;background:rgba(8,8,8,0.8);padding:3px 8px;border:1px solid #29ABE2;">Available</div>
+<div style="position:absolute;bottom:0;left:0;right:0;padding:16px;">
+<div style="font-family:'Bebas Neue',sans-serif;font-size:22px;color:#fff;letter-spacing:0.05em;margin-bottom:6px;">AVE</div>
+<div style="font-family:monospace;font-size:9px;color:#29ABE2;border:1px solid rgba(41,171,226,0.4);display:inline-block;padding:3px 8px;margin-bottom:6px;">@ave_music ↗</div>
+<div style="font-size:11px;color:#C4C8D4;">Electronic / House</div>
+</div>
+</a><a href="https://instagram.com/giugiugiugiugiugiu_" style="display:block;text-decoration:none;flex:1;min-width:0;position:relative;overflow:hidden;height:360px;" target="_blank">
+<img src="assets/images/image_07.jpg" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center 15%;filter:brightness(0.65) saturate(0.65);"/>
+<div style="position:absolute;inset:0;background:linear-gradient(180deg,transparent 40%,rgba(0,0,0,0.85) 100%);"></div>
+<div style="position:absolute;top:12px;right:12px;font-family:monospace;font-size:9px;letter-spacing:0.1em;color:#29ABE2;background:rgba(8,8,8,0.8);padding:3px 8px;border:1px solid #29ABE2;">Available for booking</div>
+<div style="position:absolute;bottom:0;left:0;right:0;padding:16px;">
+<div style="font-family:'Bebas Neue',sans-serif;font-size:22px;color:#fff;letter-spacing:0.05em;margin-bottom:6px;">GIU</div>
+<div style="font-family:monospace;font-size:9px;color:#29ABE2;border:1px solid rgba(41,171,226,0.4);display:inline-block;padding:3px 8px;margin-bottom:6px;">@giugiugiugiugiugiu_ ↗</div>
+<div style="font-size:11px;color:#C4C8D4;">Tech House</div>
+</div>
+</a>
+</div>
+<div style="padding:0 60px 80px;">
+<div class="artists-more reveal" style="margin-top: 56px;">
+<div class="artists-more-header">
+<span class="section-label" style="margin-bottom:0;">More Artists</span>
+</div>
+<div class="artists-more-grid">
+<a class="artist-row" href="https://instagram.com/dontblinkmusic" target="_blank">
+<span class="artist-row-name">DON'T BLINK</span>
+<span class="artist-row-handle">@dontblinkmusic</span>
+<span class="artist-row-arrow">↗</span>
+</a>
+<a class="artist-row" href="https://instagram.com/catdealers" target="_blank">
+<span class="artist-row-name">CAT DEALERS</span>
+<span class="artist-row-handle">@catdealers</span>
+<span class="artist-row-arrow">↗</span>
+</a>
+<a class="artist-row" href="https://instagram.com/angemimusic" target="_blank">
+<span class="artist-row-name">ANGEMI</span>
+<span class="artist-row-handle">@angemimusic</span>
+<span class="artist-row-arrow">↗</span>
+</a>
+<a class="artist-row" href="https://instagram.com/djrscl" target="_blank">
+<span class="artist-row-name">RSCL</span>
+<span class="artist-row-handle">@djrscl</span>
+<span class="artist-row-arrow">↗</span>
+</a>
+<a class="artist-row" href="https://instagram.com/etta.music" target="_blank">
+<span class="artist-row-name">ETTA</span>
+<span class="artist-row-handle">@etta.music</span>
+<span class="artist-row-arrow">↗</span>
+</a>
+<a class="artist-row" href="https://instagram.com/watermatmusic" target="_blank">
+<span class="artist-row-name">WATERMÄT</span>
+<span class="artist-row-handle">@watermatmusic</span>
+<span class="artist-row-arrow">↗</span>
+</a>
+<a class="artist-row" href="https://instagram.com/_sevek" target="_blank">
+<span class="artist-row-name">SEVEK</span>
+<span class="artist-row-handle">@_sevek</span>
+<span class="artist-row-arrow">↗</span>
+</a>
+<a class="artist-row" href="https://instagram.com/vinneofficial" target="_blank">
+<span class="artist-row-name">VINNE</span>
+<span class="artist-row-handle">@vinneofficial</span>
+<span class="artist-row-arrow">↗</span>
+</a>
+<a class="artist-row" href="https://instagram.com/wedamnz" target="_blank">
+<span class="artist-row-name">WEDAMNZ</span>
+<span class="artist-row-handle">@wedamnz</span>
+<span class="artist-row-arrow">↗</span>
+</a>
+<a class="artist-row" href="https://instagram.com/suarkmusic" target="_blank">
+<span class="artist-row-name">SUARK</span>
+<span class="artist-row-handle">@suarkmusic</span>
+<span class="artist-row-arrow">↗</span>
+</a>
+</div>
+</div>
+</div>
+</section>
 
+<!-- PLATFORM -->
 <section id="platform" style="position:relative;overflow:hidden;background:#080808;">
 <div class="container" style="position:relative;z-index:1;padding-top:80px;padding-bottom:80px;">
 <div style="display:grid;grid-template-columns:1fr 1fr;gap:100px;align-items:center;">
@@ -1221,8 +521,8 @@ footer {
 <div>
 <div class="section-label reveal">Network</div>
 <h2 class="reveal" style="font-family:var(--font-display);font-size:clamp(48px,5.5vw,80px);line-height:0.92;color:var(--ivory);margin-bottom:28px;">
-          BUILT ON REAL<br/>
-<span style="color:var(--chrome);opacity:0.45;">RELATIONSHIPS.</span>
+          THE PEOPLE<br/>
+<span style="color:var(--chrome);opacity:0.45;">BEHIND THE MUSIC.</span>
 </h2>
 <p class="reveal" style="font-size:15px;color:var(--chrome);line-height:1.9;margin-bottom:40px;max-width:480px;">
           Deepbloe is built on real relationships, with artists, promoters,
@@ -1254,10 +554,10 @@ footer {
 </div>
 <!-- Right: quote -->
 <div class="reveal" style="display:flex;align-items:center;justify-content:center;">
-<div style="text-align:center;padding:48px;border:1px solid var(--steel);background:rgba(8,8,8,0.25);backdrop-filter:blur(12px);">
+<div style="text-align:center;padding:48px;border:1px solid var(--steel);background:rgba(8,8,8,0.55);backdrop-filter:blur(12px);">
 <div style="font-family:var(--font-display);font-size:72px;color:var(--electric);line-height:0.8;margin-bottom:20px;">"</div>
 <p style="font-family:var(--font-display);font-size:30px;color:var(--ivory);line-height:1.1;margin-bottom:20px;">We don't just<br/>book shows.<br/>We build careers.</p>
-<span style="font-family:var(--font-mono);font-size:10px;letter-spacing:0.15em;color:var(--silver);text-transform:uppercase;">Deepbloe — Est. 2018</span>
+<span style="font-family:var(--font-mono);font-size:10px;letter-spacing:0.15em;color:var(--silver);text-transform:uppercase;">, Deepbloe Agency</span>
 </div>
 </div>
 </div>
@@ -1265,7 +565,7 @@ footer {
 </section>
 
 <!-- SHOWCASES -->
-<section class="showcases" id="showcases" style="background:#0A0A0F;">
+<section class="showcases" id="showcases">
 <div class="container">
 <div class="showcases-header">
 <div>
@@ -1273,8 +573,9 @@ footer {
 <h2 class="showcases-headline reveal">SHOWCASES</h2>
 </div>
 <p class="showcases-body reveal">
-        From club residencies to Tomorrowland mainstages, Deepbloe creates and
-        programmes showcases that open doors — for artists, partners and the platform.
+        From intimate club environments to major festival stages, Deepbloe
+        creates and programs showcases that position artists at the centre
+        of global electronic music culture.
       </p>
 </div>
 <div class="showcases-grid reveal">
@@ -1295,7 +596,7 @@ footer {
 <div class="showcase-content">
 <div class="showcase-location mono">Thailand, Festival</div>
 <div class="showcase-name">S2O SONGKRAN</div>
-<div class="showcase-meta">Full stage programming</div>
+<div class="showcase-meta">Curated programming</div>
 </div>
 </div>
 <div class="showcase-card">
@@ -1305,7 +606,7 @@ footer {
 <div class="showcase-content">
 <div class="showcase-location mono">Germany, Club</div>
 <div class="showcase-name">BOOTSHAUS</div>
-<div class="showcase-meta">Club residencies · Deepbloe nights</div>
+<div class="showcase-meta">Residencies &amp; events</div>
 </div>
 </div>
 <div class="showcase-card">
@@ -1315,7 +616,7 @@ footer {
 <div class="showcase-content">
 <div class="showcase-location mono">Singapore, Club</div>
 <div class="showcase-name">MARQUEE</div>
-<div class="showcase-meta">Southeast Asia programming</div>
+<div class="showcase-meta">Asia market access</div>
 </div>
 </div>
 <div class="showcase-card">
@@ -1325,7 +626,7 @@ footer {
 <div class="showcase-content">
 <div class="showcase-location mono">Netherlands, Industry</div>
 <div class="showcase-name">ADE SHOWCASE</div>
-<div class="showcase-meta">Deepbloe ADE showcase</div>
+<div class="showcase-meta">Annual industry platform</div>
 </div>
 </div>
 </div>
@@ -1338,15 +639,13 @@ footer {
 <div style="display:grid;grid-template-columns:1fr 1fr;gap:100px;align-items:center;">
 <div>
 <div style="font-family:monospace;font-size:10px;letter-spacing:0.15em;color:#29ABE2;text-transform:uppercase;margin-bottom:16px;">Deepbloe Platform</div>
-<h2 style="font-family:'Bebas Neue',sans-serif;font-size:clamp(48px,5vw,80px);color:#fff;line-height:0.92;margin-bottom:16px;">MEET ME<br/>AT THE HOTEL.</h2>
-<p style="font-family:'DM Sans',sans-serif;font-size:13px;letter-spacing:0.08em;color:#5A5F70;text-transform:uppercase;margin-bottom:24px;">A Deepbloe industry gathering format.</p>
+<h2 style="font-family:'Bebas Neue',sans-serif;font-size:clamp(48px,5vw,80px);color:#fff;line-height:0.92;margin-bottom:24px;">MEET ME<br/>AT THE HOTEL.</h2>
 <p style="font-size:16px;color:#E0E2E8;line-height:1.8;margin-bottom:24px;">An exclusive industry gathering format created by Deepbloe. Designed to bring together artists, managers, promoters and tastemakers in an intimate, high-level setting — away from the noise of the main floor.</p>
 <p style="font-size:15px;color:#8A8F9E;line-height:1.8;margin-bottom:40px;">Not a conference. Not a showcase. A room where real conversations happen and real deals get made.</p>
-<div style="font-family:monospace;font-size:9px;color:#5A5F70;letter-spacing:0.15em;text-transform:uppercase;margin-bottom:12px;">Editions</div>
 <div style="display:flex;gap:16px;flex-wrap:wrap;">
-<div style="padding:12px 24px;border:1px solid #29ABE2;font-family:monospace;font-size:10px;color:#29ABE2;letter-spacing:0.12em;">ADE AMSTERDAM</div>
-<div style="padding:12px 24px;border:1px solid #29ABE2;font-family:monospace;font-size:10px;color:#29ABE2;letter-spacing:0.12em;">WMC MIAMI</div>
-<div style="padding:12px 24px;border:1px solid #29ABE2;font-family:monospace;font-size:10px;color:#29ABE2;letter-spacing:0.12em;">SÃO PAULO</div>
+<div style="padding:12px 24px;border:1px solid #2A2D36;font-family:monospace;font-size:10px;color:#8A8F9E;letter-spacing:0.12em;">ADE AMSTERDAM</div>
+<div style="padding:12px 24px;border:1px solid #2A2D36;font-family:monospace;font-size:10px;color:#8A8F9E;letter-spacing:0.12em;">WMC MIAMI</div>
+<div style="padding:12px 24px;border:1px solid #2A2D36;font-family:monospace;font-size:10px;color:#8A8F9E;letter-spacing:0.12em;">SAO PAULO</div>
 </div>
 </div>
 <div style="border:1px solid #1C1E24;padding:48px;display:flex;flex-direction:column;gap:32px;">
@@ -1364,7 +663,7 @@ footer {
 <div style="font-family:monospace;font-size:9px;color:#29ABE2;letter-spacing:0.15em;text-transform:uppercase;margin-bottom:8px;">Partner opportunities</div>
 <p style="font-size:14px;color:#E0E2E8;line-height:1.7;">Sponsorship, co-hosting and brand integration available for selected partners.</p>
 </div>
-<a href="#contact" onclick="document.getElementById('enquiry-type').value='mmah';return true;" style="display:block;background:transparent;color:#fff;font-family:'Bebas Neue',sans-serif;font-size:14px;letter-spacing:0.12em;padding:14px 32px;border:1px solid #fff;text-decoration:none;text-align:center;">REQUEST INVITE</a>
+<a href="/cdn-cgi/l/email-protection#b5dcdbd3daf5d1d0d0c5d7d9dad09bd6dad8" style="display:inline-block;background:transparent;color:#fff;font-family:'Bebas Neue',sans-serif;font-size:14px;letter-spacing:0.12em;padding:14px 32px;border:1px solid #fff;text-decoration:none;text-align:center;">REQUEST INVITE</a>
 </div>
 </div>
 </div>
@@ -1373,41 +672,118 @@ footer {
 <!-- BRANDS -->
 <section class="brands">
 <div class="container">
-<div class="section-label reveal">Our Network</div>
-<h2 class="brands-headline reveal">WHERE WE WORK</h2>
-<p class="brands-sub reveal">Festivals, clubs and brands we programme, partner and collaborate with globally.</p>
+<div class="section-label reveal">Partners</div>
+<h2 class="brands-headline reveal">TRUSTED BY</h2>
+<p class="brands-sub reveal">Festivals, clubs and brands we work with globally.</p>
 <div class="brands-logos reveal">
 <div class="brand-logo-cell">TOMORROWLAND</div>
-<div class="brand-logo-cell">USHUAÏA IBIZA</div>
 <div class="brand-logo-cell">BOOTSHAUS</div>
-<div class="brand-logo-cell">HÏ IBIZA</div>
 <div class="brand-logo-cell">MARQUEE SG</div>
-<div class="brand-logo-cell">MINISTRY OF SOUND</div>
-<div class="brand-logo-cell">FABRIC LDN</div>
-<div class="brand-logo-cell">WAVE TAIPEI</div>
 <div class="brand-logo-cell">S2O FESTIVAL</div>
-<div class="brand-logo-cell">DANCE VALLEY</div>
-<div class="brand-logo-cell">ONYX BANGKOK</div>
-<div class="brand-logo-cell">DREAMFIELDS</div>
-<div class="brand-logo-cell">BOOMERANG HK</div>
-<div class="brand-logo-cell">MUIN BANGKOK</div>
-<div class="brand-logo-cell">ADE</div>
-<div class="brand-logo-cell">WMC MIAMI</div>
 <div class="brand-logo-cell">SPACE PLUS</div>
 <div class="brand-logo-cell">1001TL</div>
+<div class="brand-logo-cell">ADE</div>
+<div class="brand-logo-cell">WMC MIAMI</div>
+<div class="brand-logo-cell">MEET ME AT</div>
+<div class="brand-logo-cell">INS LAND</div>
+<div class="brand-logo-cell">FABRIC LDN</div>
+<div class="brand-logo-cell">HÏ IBIZA</div>
+</div>
+</div>
+</section>
+
+<!-- TEAM -->
+<section id="team" style="padding:60px 0;background:#080808;">
+<div class="container">
+<div class="section-label reveal">Who we are</div>
+<h2 class="reveal" style="font-family:var(--font-display);font-size:clamp(40px,5vw,72px);color:var(--ivory);line-height:0.92;margin-bottom:64px;">TEAM</h2>
+<div class="reveal" style="margin-bottom:2px;">
+<div style="font-family:var(--font-mono);font-size:9px;letter-spacing:0.18em;color:var(--electric);text-transform:uppercase;padding:14px 20px;border-top:1px solid var(--steel);border-bottom:1px solid var(--steel);background:var(--graphite);">Leadership</div>
+</div>
+<div class="team-grid reveal">
+<div class="team-row">
+<span class="team-name">Stephen Texidor</span>
+<span class="team-role">Founder &amp; CEO</span>
+<a class="team-email" href="/cdn-cgi/l/email-protection#7e0d0a1b0e161b103e1a1b1b0e1c12111b501d1113"><span class="__cf_email__" data-cfemail="5a292e3f2a323f341a3e3f3f2a3836353f74393537">[email&#160;protected]</span></a>
+<a class="team-li" href="https://www.linkedin.com/in/stephentexidor/" target="_blank">LinkedIn ↗</a>
+</div>
+<div class="team-row" style="border-bottom:none;">
+<span class="team-name">Marvin Kater</span>
+<span class="team-role">Partner</span>
+<a class="team-email" href="/cdn-cgi/l/email-protection#4924283b3f2027092d2c2c392b25262c672a2624"><span class="__cf_email__" data-cfemail="e885899a9e8186a88c8d8d988a84878dc68b8785">[email&#160;protected]</span></a>
+<a class="team-li" href="https://www.linkedin.com/in/marvin-kater-8a6b75147/" target="_blank">LinkedIn ↗</a>
+</div>
+</div>
+<div style="margin-top:32px;">
+<div class="reveal" style="margin-bottom:2px;">
+<div style="font-family:var(--font-mono);font-size:9px;letter-spacing:0.18em;color:var(--electric);text-transform:uppercase;padding:14px 20px;border-top:1px solid var(--steel);border-bottom:1px solid var(--steel);background:var(--graphite);">Talent &amp; Booking</div>
+</div>
+</div>
+<div class="team-grid reveal">
+<div class="team-row">
+<span class="team-name">Stephen Texidor</span>
+<span class="team-role">Head Agent</span>
+<a class="team-email" href="/cdn-cgi/l/email-protection#9be8effeebf3fef5dbfffefeebf9f7f4feb5f8f4f6"><span class="__cf_email__" data-cfemail="73000716031b161d3317161603111f1c165d101c1e">[email&#160;protected]</span></a>
+<a class="team-li" href="https://www.linkedin.com/in/stephentexidor/" target="_blank">LinkedIn ↗</a>
+</div>
+<div class="team-row" style="border-bottom:none;">
+<span class="team-name">Henry Johnson</span>
+<span class="team-role">Senior Agent</span>
+<a class="team-email" href="/cdn-cgi/l/email-protection#4a222f2438330a2e2f2f3a2826252f64292527"><span class="__cf_email__" data-cfemail="8ce4e9e2fef5cce8e9e9fceee0e3e9a2efe3e1">[email&#160;protected]</span></a>
+<a class="team-li" href="https://www.linkedin.com/in/henry-johnson-8113241a5/" target="_blank">LinkedIn ↗</a>
+</div>
+</div>
+<div style="margin-top:32px;">
+<div class="reveal" style="margin-bottom:2px;">
+<div style="font-family:var(--font-mono);font-size:9px;letter-spacing:0.18em;color:var(--electric);text-transform:uppercase;padding:14px 20px;border-top:1px solid var(--steel);border-bottom:1px solid var(--steel);background:var(--graphite);">Partnerships &amp; Business Development</div>
+</div>
+</div>
+<div class="team-grid reveal">
+<div class="team-row" style="border-bottom:none;">
+<span class="team-name">Bjoern Wilbrink</span>
+<span class="team-role">Head of Partnerships</span>
+<a class="team-email" href="/cdn-cgi/l/email-protection#16747c797364785672737366747a79733875797b"><span class="__cf_email__" data-cfemail="f290989d97809cb296979782909e9d97dc919d9f">[email&#160;protected]</span></a>
+<a class="team-li" href="https://www.linkedin.com/in/bj%C3%B6rn-wilbrink-8aa5891aa/" target="_blank">LinkedIn ↗</a>
+</div>
+</div>
+<div style="margin-top:32px;">
+<div class="reveal" style="margin-bottom:2px;">
+<div style="font-family:var(--font-mono);font-size:9px;letter-spacing:0.18em;color:var(--electric);text-transform:uppercase;padding:14px 20px;border-top:1px solid var(--steel);border-bottom:1px solid var(--steel);background:var(--graphite);">Operations</div>
+</div>
+</div>
+<div class="team-grid reveal">
+<div class="team-row" style="border-bottom:none;">
+<span class="team-name">Vhanie Mae P.</span>
+<span class="team-role">Advancing &amp; Logistics</span>
+<a class="team-email" href="/cdn-cgi/l/email-protection#bdcbd5dcd3d4d8fdd9d8d8cddfd1d2d893ded2d0"><span class="__cf_email__" data-cfemail="1a6c727b74737f5a7e7f7f6a7876757f34797577">[email&#160;protected]</span></a>
+<a class="team-li" href="https://www.linkedin.com/in/vhaniemaepilarca/" target="_blank">LinkedIn ↗</a>
+</div>
+</div>
+<div style="margin-top:32px;">
+<div class="reveal" style="margin-bottom:2px;">
+<div style="font-family:var(--font-mono);font-size:9px;letter-spacing:0.18em;color:var(--electric);text-transform:uppercase;padding:14px 20px;border-top:1px solid var(--steel);border-bottom:1px solid var(--steel);background:var(--graphite);">Finance</div>
+</div>
+</div>
+<div class="team-grid reveal" style="border-bottom:1px solid var(--steel);">
+<div class="team-row" style="border-bottom:none;">
+<span class="team-name">Cristina Mallari</span>
+<span class="team-role">Finance Controller</span>
+<a class="team-email" href="/cdn-cgi/l/email-protection#b6d5c4dfc5c2dfd8d7f6d2d3d3c6d4dad9d398d5d9db"><span class="__cf_email__" data-cfemail="3d5e4f544e4954535c7d5958584d5f515258135e5250">[email&#160;protected]</span></a>
+<span style="color:var(--iron);">—</span>
+</div>
 </div>
 </div>
 </section>
 
 <!-- CONTACT -->
-<section id="contact" style="background:#0A0A0F;" style="padding:120px 0;background:#080808;border-top:1px solid #1C1E24;">
+<section id="contact" style="padding:120px 0;background:#080808;border-top:1px solid #1C1E24;">
 <div style="max-width:1400px;margin:0 auto;padding:0 80px;">
 <div style="display:grid;grid-template-columns:1fr 1fr;gap:100px;align-items:start;">
 <!-- Left: text -->
 <div>
 <div style="font-family:monospace;font-size:10px;letter-spacing:0.15em;color:#29ABE2;text-transform:uppercase;margin-bottom:16px;">Contact</div>
-<h2 style="font-family:'Bebas Neue',sans-serif;font-size:clamp(48px,6vw,88px);color:#fff;line-height:0.92;margin-bottom:32px;">LET'S TALK<br/><span style="color:#5A5F70;">BUSINESS.</span></h2>
-<p style="font-size:16px;color:#E0E2E8;line-height:1.8;margin-bottom:40px;">Artist, promoter, festival, club or brand — if you're serious about electronic music, this is where the conversation starts.</p>
+<h2 style="font-family:'Bebas Neue',sans-serif;font-size:clamp(48px,6vw,88px);color:#fff;line-height:0.92;margin-bottom:32px;">WORK WITH<br/><span style="color:#5A5F70;">DEEPBLOE.</span></h2>
+<p style="font-size:16px;color:#E0E2E8;line-height:1.8;margin-bottom:40px;">Whether you're an artist looking for representation, a promoter seeking talent, or a brand looking to connect with music culture. Let's talk.</p>
 <div style="display:flex;flex-direction:column;gap:16px;">
 <div style="display:flex;align-items:center;gap:16px;">
 <span style="font-family:monospace;font-size:10px;color:#29ABE2;letter-spacing:0.1em;">EMAIL</span>
@@ -1426,7 +802,10 @@ footer {
 <!-- Right: form -->
 <div>
 <form id="contact-form" onsubmit="handleSubmit(event)" style="display:flex;flex-direction:column;gap:16px;">
-
+  <input type="hidden" name="access_key" value="cb3fcb04-20e3-423c-8ee7-d6019ab20c29">
+  <input type="hidden" name="subject" value="New Deepbloe Contact Form Submission">
+  <input type="hidden" name="from_name" value="Deepbloe Website">
+  <input type="checkbox" name="botcheck" style="display:none;">
 <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
 <div style="display:flex;flex-direction:column;gap:6px;">
 <label style="font-family:monospace;font-size:9px;letter-spacing:0.15em;color:#29ABE2;text-transform:uppercase;">Name</label>
@@ -1439,14 +818,14 @@ footer {
 </div>
 <div style="display:flex;flex-direction:column;gap:6px;">
 <label style="font-family:monospace;font-size:9px;letter-spacing:0.15em;color:#29ABE2;text-transform:uppercase;">I am a</label>
-<select id="enquiry-type" name="type" onblur="this.style.borderColor='#2A2D36'" onfocus="this.style.borderColor='#29ABE2'" style="background:#111;border:1px solid #2A2D36;color:#fff;padding:14px 16px;font-size:14px;font-family:inherit;outline:none;appearance:none;cursor:pointer;">
+<select name="type" onblur="this.style.borderColor='#2A2D36'" onfocus="this.style.borderColor='#29ABE2'" style="background:#111;border:1px solid #2A2D36;color:#fff;padding:14px 16px;font-size:14px;font-family:inherit;outline:none;appearance:none;cursor:pointer;">
 <option value="">Select...</option>
 <option value="artist">Artist or Manager — representation</option>
 <option value="promoter">Promoter or Festival — talent buying</option>
 <option value="programming">Club or Venue — programming</option>
 <option value="brand">Brand — partnership or sponsorship</option>
-<option value="mmah">Meet Me at the Hotel — invite or partnership</option>
-<option value="demo">New talent — submit demo</option>
+<option value="mmah">MeetMeAtTheHotel — invite or partnership</option>
+<option value="other">Other</option>
 </select>
 </div>
 <div style="display:flex;flex-direction:column;gap:6px;">
@@ -1460,6 +839,9 @@ footer {
 <button style="background:#fff;color:#080808;font-family:'Bebas Neue',sans-serif;font-size:16px;letter-spacing:0.12em;padding:16px 40px;border:none;cursor:pointer;transition:background 0.2s;margin-top:8px;text-transform:uppercase;" type="submit">
             Send Message
           </button>
+<div id="form-success" style="display:none;padding:16px;background:rgba(41,171,226,0.1);border:1px solid #29ABE2;color:#29ABE2;font-family:monospace;font-size:12px;letter-spacing:0.1em;text-align:center;">
+            MESSAGE SENT. WE'LL BE IN TOUCH SOON.
+          </div>
 </form>
 </div>
 </div>
@@ -1469,14 +851,15 @@ footer {
 <!-- FOOTER -->
 <footer>
 <div class="container">
-<div class="footer-top" style="grid-template-columns:1.5fr 1fr 1fr 1fr 1fr;">
+<div class="footer-top">
 <div class="footer-brand">
 <div class="footer-logo">
 <img alt="Deepbloe" onerror="this.style.display='none'" src="assets/images/image_01.png"/>
 <span class="footer-logo-name">DEEPBLOE</span>
 </div>
 <p class="footer-tagline">
-          Global electronic music platform. Talent representation, programming and industry connections — built for the long game. Est. 2018.
+          Global electronic music platform. Connecting artists, promoters,
+          festivals, clubs and brands worldwide.
         </p>
 </div>
 <div class="footer-col">
@@ -1492,37 +875,20 @@ footer {
 <div class="footer-col">
 <h5>Platform</h5>
 <ul>
-<li><a href="christian-liu-booking.html">Liu</a></li>
-<li><a href="goldfish-booking.html">Goldfish</a></li>
-<li><a href="jax-jones-booking.html">Jax Jones</a></li>
-<li><a href="artists.html">Full Roster</a></li>
-</ul>
-</div>
-<div class="footer-col">
-<h5>Platform</h5>
-<ul>
+<li><a href="#artists">Artists</a></li>
 <li><a href="#platform">Promoters</a></li>
-<li><a href="/jobs.html" style="font-family:'DM Sans',sans-serif;font-size:11px;font-weight:500;letter-spacing:0.12em;text-transform:uppercase;color:#fff;text-decoration:none;">Jobs</a></li>
-</ul>
-</div>
-<div class="footer-col">
-<h5>Explore</h5>
-<ul>
-<li><a href="book-dj.html">Book a DJ</a></li>
-<li><a href="book-dj-europe.html">Book a DJ in Europe</a></li>
-<li><a href="hire-dj-for-festival.html">Festival Booking</a></li>
-<li><a href="house-dj-booking.html">House DJ Booking</a></li>
-<li><a href="techno-dj-booking.html">Techno DJ Booking</a></li>
-<li><a href="dj-booking-agency.html">DJ Booking Agency</a></li>
-<li><a href="dj-agent-europe.html">DJ Agent Europe</a></li>
-<li><a href="how-to-get-bookings-as-dj.html">Get Bookings as DJ</a></li>
+<li><a href="https://www.deepbloe.com/private-access" target="_blank">Private Access</a></li>
+<li><a href="#">Industry Reports</a></li>
+<li><a href="#">Jobs</a></li>
 </ul>
 </div>
 <div class="footer-col">
 <h5>Contact</h5>
 <ul>
-<li><a href="/cdn-cgi/l/email-protection#01686f676e4165646471636d6e642f626e6c"><span class="__cf_email__" data-cfemail="2f464149406f4b4a4a5f4d43404a014c4042">[email&#160;protected]</span></a></li>
+<li><a href="/cdn-cgi/l/email-protection#026b6c646d4266676772606e6d672c616d6f"><span class="__cf_email__" data-cfemail="5831363e37183c3d3d283a34373d763b3735">[email&#160;protected]</span></a></li>
 <li><a href="#contact">Get in Touch</a></li>
+<li><a href="#">Newsletter</a></li>
+<li><a href="#">Press</a></li>
 </ul>
 </div>
 </div>
@@ -1556,226 +922,257 @@ footer {
 </div>
 </div>
 </footer>
-<!-- TIQQO PARTNER -->
-<div class="tiqqo-partner" style="background:#080808;border-top:1px solid rgba(255,255,255,0.06);padding:14px 20px;text-align:center;font-family:'DM Sans',Arial,sans-serif;font-size:11px;letter-spacing:0.14em;text-transform:uppercase;color:#6B6F7A;">
-  Official partner&nbsp;&nbsp;·&nbsp;&nbsp;<a href="https://tiqqo.com/" target="_blank" rel="noopener" title="Tiqqo — official ticketing partner of Deepbloe" style="color:#E8E9EC;text-decoration:none;font-weight:600;letter-spacing:0.08em;">Tiqqo.com</a>
-</div>
-
 
 <!-- OFFER OVERLAY -->
 <div id="offer-overlay">
 <div style="min-height:100vh;background:#080808;">
-
-<!-- TOP BAR -->
 <div class="offer-close-bar">
-  <span class="offer-close-logo">DEEPBLOE</span>
-  <button class="offer-close-btn" onclick="closeOffer()">← Back</button>
+<span class="offer-close-logo">DEEPBLOE</span>
+<button class="offer-close-btn" onclick="closeOffer()">← Back to Artists</button>
 </div>
-
-<!-- HEADER -->
-<div style="padding:100px 80px 48px;max-width:900px;margin:0 auto;border-bottom:1px solid #1C1E24;">
-  <div style="font-family:'DM Mono',monospace;font-size:10px;letter-spacing:0.18em;color:#29ABE2;text-transform:uppercase;margin-bottom:20px;display:flex;align-items:center;gap:10px;">
-    <span style="display:block;width:32px;height:1px;background:#29ABE2;"></span>Booking
-  </div>
-  <h1 style="font-family:'Bebas Neue',sans-serif;font-size:clamp(48px,7vw,88px);color:#fff;line-height:0.9;margin-bottom:16px;">BOOK AN<br/><span style="color:#5A5F70;">ARTIST</span></h1>
-  <p style="font-size:14px;color:#8A8F9E;line-height:1.8;">Submit your booking request and we'll get back to you within 48 hours.</p>
+<!-- OFFER PAGE HEADER -->
+<div style="padding:120px 80px 60px;max-width:1400px;margin:0 auto;border-bottom:1px solid #1C1E24;">
+<div style="font-family:'DM Mono',monospace;font-size:10px;letter-spacing:0.18em;color:#29ABE2;text-transform:uppercase;margin-bottom:20px;display:flex;align-items:center;gap:10px;">
+<span style="display:block;width:32px;height:1px;background:#29ABE2;"></span>Booking
 </div>
-
-<!-- FORM -->
-<div style="max-width:900px;margin:0 auto;padding:56px 80px 120px;">
-  <form id="offer-form" onsubmit="submitOffer(event)" style="display:flex;flex-direction:column;gap:20px;">
-
-    <!-- Artist -->
-    <div style="display:flex;flex-direction:column;gap:7px;">
-      <label style="font-family:'DM Mono',monospace;font-size:9px;letter-spacing:0.16em;color:#29ABE2;text-transform:uppercase;">Artist *</label>
-      <input name="artist" required placeholder="e.g. Liu, Jax Jones" type="text"
-        style="background:#0D0D10;border:1px solid #2A2D36;color:#fff;padding:14px 16px;font-size:14px;font-family:'DM Sans',sans-serif;outline:none;transition:border-color 0.2s;"
-        onfocus="this.style.borderColor='#29ABE2'" onblur="this.style.borderColor='#2A2D36'"/>
-    </div>
-
-    <!-- Name -->
-    <div style="display:flex;flex-direction:column;gap:7px;">
-      <label style="font-family:'DM Mono',monospace;font-size:9px;letter-spacing:0.16em;color:#29ABE2;text-transform:uppercase;">Your Name *</label>
-      <input name="name" required placeholder="First & Last name" type="text"
-        style="background:#0D0D10;border:1px solid #2A2D36;color:#fff;padding:14px 16px;font-size:14px;font-family:'DM Sans',sans-serif;outline:none;transition:border-color 0.2s;"
-        onfocus="this.style.borderColor='#29ABE2'" onblur="this.style.borderColor='#2A2D36'"/>
-    </div>
-
-    <!-- Phone + Email side by side -->
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;">
-      <div style="display:flex;flex-direction:column;gap:7px;">
-        <label style="font-family:'DM Mono',monospace;font-size:9px;letter-spacing:0.16em;color:#29ABE2;text-transform:uppercase;">Phone *</label>
-        <input name="phone" required placeholder="+31 6 00 000000" type="tel"
-          style="background:#0D0D10;border:1px solid #2A2D36;color:#fff;padding:14px 16px;font-size:14px;font-family:'DM Sans',sans-serif;outline:none;transition:border-color 0.2s;"
-          onfocus="this.style.borderColor='#29ABE2'" onblur="this.style.borderColor='#2A2D36'"/>
+<h1 style="font-family:'Bebas Neue',sans-serif;font-size:clamp(56px,8vw,96px);color:#fff;line-height:0.9;margin-bottom:20px;">BOOKING<br/><span style="color:#5A5F70;">OFFER FORM</span></h1>
+<p style="font-size:15px;color:#8A8F9E;max-width:540px;line-height:1.8;">Complete this form to submit a booking offer for one of our artists. Our team will respond within 48 hours.</p>
+</div>
+<!-- OFFER FORM -->
+<div style="max-width:1400px;margin:0 auto;padding:60px 80px 120px;">
+<form id="offer-form" onsubmit="submitOffer(event)" style="display:flex;flex-direction:column;gap:0;">
+  <input type="hidden" name="access_key" value="cb3fcb04-20e3-423c-8ee7-d6019ab20c29">
+  <input type="hidden" name="subject" value="Deepbloe Booking Request">
+  <input type="hidden" name="from_name" value="Deepbloe Booking Form">
+  <input type="checkbox" name="botcheck" style="display:none;">
+<!-- SEC 01 -->
+<div style="padding-bottom:48px;margin-bottom:48px;border-bottom:1px solid #1C1E24;">
+<div style="font-family:'DM Mono',monospace;font-size:9px;letter-spacing:0.2em;color:#29ABE2;text-transform:uppercase;margin-bottom:28px;display:flex;align-items:center;gap:12px;">01 — Offer Details<span style="flex:1;height:1px;background:#1C1E24;display:block;"></span></div>
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:20px 28px;">
+<div style="grid-column:1/-1;display:flex;flex-direction:column;gap:7px;">
+<label style="font-family:'DM Mono',monospace;font-size:9px;letter-spacing:0.16em;color:#8A8F9E;text-transform:uppercase;">Requested Date(s) *</label>
+<input name="dates" onblur="this.style.borderColor='#2A2D36'" onfocus="this.style.borderColor='#29ABE2'" placeholder="e.g. 15 June 2025" required="" style="background:#0D0D10;border:1px solid #2A2D36;color:#fff;padding:13px 16px;font-size:14px;font-family:'DM Sans',sans-serif;outline:none;" type="text"/>
+</div>
+<div style="grid-column:1/-1;display:flex;flex-direction:column;gap:7px;">
+<label style="font-family:'DM Mono',monospace;font-size:9px;letter-spacing:0.16em;color:#8A8F9E;text-transform:uppercase;">Artist(s) *</label>
+<input name="artists" onblur="this.style.borderColor='#2A2D36'" onfocus="this.style.borderColor='#29ABE2'" placeholder="e.g. Liu, Jax Jones" required="" style="background:#0D0D10;border:1px solid #2A2D36;color:#fff;padding:13px 16px;font-size:14px;font-family:'DM Sans',sans-serif;outline:none;" type="text"/>
+</div>
+<div style="display:flex;flex-direction:column;gap:7px;">
+<label style="font-family:'DM Mono',monospace;font-size:9px;letter-spacing:0.16em;color:#8A8F9E;text-transform:uppercase;">Offer / Fee (EUR) *</label>
+<input name="fee" onblur="this.style.borderColor='#2A2D36'" onfocus="this.style.borderColor='#29ABE2'" placeholder="e.g. €5,000" required="" style="background:#0D0D10;border:1px solid #2A2D36;color:#fff;padding:13px 16px;font-size:14px;font-family:'DM Sans',sans-serif;outline:none;" type="text"/>
+</div>
+<div style="display:flex;flex-direction:column;gap:7px;">
+<label style="font-family:'DM Mono',monospace;font-size:9px;letter-spacing:0.16em;color:#8A8F9E;text-transform:uppercase;">Additional Terms</label>
+<input name="additional_terms" onblur="this.style.borderColor='#2A2D36'" onfocus="this.style.borderColor='#29ABE2'" placeholder="e.g. backend, merch split" style="background:#0D0D10;border:1px solid #2A2D36;color:#fff;padding:13px 16px;font-size:14px;font-family:'DM Sans',sans-serif;outline:none;" type="text"/>
+</div>
+<div style="display:flex;flex-direction:column;gap:7px;">
+<label style="font-family:'DM Mono',monospace;font-size:9px;letter-spacing:0.16em;color:#8A8F9E;text-transform:uppercase;">Flights</label>
+<div style="display:flex;gap:8px;">
+<input name="flights" onblur="this.style.borderColor='#2A2D36'" onfocus="this.style.borderColor='#29ABE2'" placeholder="Nr of flights or details" style="flex:1;background:#0D0D10;border:1px solid #2A2D36;color:#fff;padding:13px 16px;font-size:14px;font-family:'DM Sans',sans-serif;outline:none;" type="text"/>
+<select name="flights_type" onblur="this.style.borderColor='#2A2D36'" onfocus="this.style.borderColor='#29ABE2'" style="background:#0D0D10;border:1px solid #2A2D36;color:#fff;padding:13px 16px;font-size:13px;font-family:'DM Mono',sans-serif;outline:none;cursor:pointer;">
+<option value="plus">+ Plus</option><option value="inclusive">Inclusive</option>
+</select>
+</div>
+</div>
+<div style="display:flex;flex-direction:column;gap:7px;">
+<label style="font-family:'DM Mono',monospace;font-size:9px;letter-spacing:0.16em;color:#8A8F9E;text-transform:uppercase;">Hotel Room(s)</label>
+<div style="display:flex;gap:8px;">
+<input name="hotel" onblur="this.style.borderColor='#2A2D36'" onfocus="this.style.borderColor='#29ABE2'" placeholder="Nr of rooms or details" style="flex:1;background:#0D0D10;border:1px solid #2A2D36;color:#fff;padding:13px 16px;font-size:14px;font-family:'DM Sans',sans-serif;outline:none;" type="text"/>
+<select name="hotel_type" onblur="this.style.borderColor='#2A2D36'" onfocus="this.style.borderColor='#29ABE2'" style="background:#0D0D10;border:1px solid #2A2D36;color:#fff;padding:13px 16px;font-size:13px;font-family:'DM Mono',sans-serif;outline:none;cursor:pointer;">
+<option value="plus">+ Plus</option><option value="inclusive">Inclusive</option>
+</select>
+</div>
+</div>
+<div style="grid-column:1/-1;background:#0D0D10;border:1px solid #1C1E24;border-left:3px solid #29ABE2;padding:16px 20px;font-size:13px;color:#8A8F9E;line-height:1.7;font-style:italic;">
+        Artist's require purchaser to provide: Professional Ground Transportation, Equipment &amp; Hospitality Rider, Foreign Work Permits — unless otherwise outlined in advance.
       </div>
-      <div style="display:flex;flex-direction:column;gap:7px;">
-        <label style="font-family:'DM Mono',monospace;font-size:9px;letter-spacing:0.16em;color:#29ABE2;text-transform:uppercase;">Email *</label>
-        <input name="email" required placeholder="you@company.com" type="email"
-          style="background:#0D0D10;border:1px solid #2A2D36;color:#fff;padding:14px 16px;font-size:14px;font-family:'DM Sans',sans-serif;outline:none;transition:border-color 0.2s;"
-          onfocus="this.style.borderColor='#29ABE2'" onblur="this.style.borderColor='#2A2D36'"/>
-      </div>
-    </div>
-
-    <!-- Date -->
-    <div style="display:flex;flex-direction:column;gap:7px;">
-      <label style="font-family:'DM Mono',monospace;font-size:9px;letter-spacing:0.16em;color:#29ABE2;text-transform:uppercase;">Date *</label>
-      <input name="date" required placeholder="e.g. 15 June 2025" type="text"
-        style="background:#0D0D10;border:1px solid #2A2D36;color:#fff;padding:14px 16px;font-size:14px;font-family:'DM Sans',sans-serif;outline:none;transition:border-color 0.2s;"
-        onfocus="this.style.borderColor='#29ABE2'" onblur="this.style.borderColor='#2A2D36'"/>
-    </div>
-
-    <!-- Event -->
-    <div style="display:flex;flex-direction:column;gap:7px;">
-      <label style="font-family:'DM Mono',monospace;font-size:9px;letter-spacing:0.16em;color:#29ABE2;text-transform:uppercase;">Event / Venue *</label>
-      <input name="event" required placeholder="Event name & venue" type="text"
-        style="background:#0D0D10;border:1px solid #2A2D36;color:#fff;padding:14px 16px;font-size:14px;font-family:'DM Sans',sans-serif;outline:none;transition:border-color 0.2s;"
-        onfocus="this.style.borderColor='#29ABE2'" onblur="this.style.borderColor='#2A2D36'"/>
-    </div>
-
-    <!-- Other -->
-    <div style="display:flex;flex-direction:column;gap:7px;">
-      <label style="font-family:'DM Mono',monospace;font-size:9px;letter-spacing:0.16em;color:#29ABE2;text-transform:uppercase;">Other</label>
-      <textarea name="other" rows="4" placeholder="Anything else we should know — budget, line-up, special requirements..."
-        style="background:#0D0D10;border:1px solid #2A2D36;color:#fff;padding:14px 16px;font-size:14px;font-family:'DM Sans',sans-serif;outline:none;resize:vertical;transition:border-color 0.2s;"
-        onfocus="this.style.borderColor='#29ABE2'" onblur="this.style.borderColor='#2A2D36'"></textarea>
-    </div>
-
-    <!-- Submit -->
-    <button type="submit"
-      style="background:#fff;color:#080808;font-family:'Bebas Neue',sans-serif;font-size:16px;letter-spacing:0.14em;padding:18px 48px;border:none;cursor:pointer;transition:background 0.2s;margin-top:8px;text-transform:uppercase;align-self:flex-start;">
-      Submit Request
-    </button>
-
-  </form>
-</div>
-
 </div>
 </div>
-<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
-function openOffer(){document.getElementById("offer-overlay").classList.add("active");document.body.style.overflow="hidden";document.getElementById("offer-overlay").scrollTop=0;}
-function closeOffer(){document.getElementById("offer-overlay").classList.remove("active");document.body.style.overflow="";}
+<!-- SEC 02 -->
+<div style="padding-bottom:48px;margin-bottom:48px;border-bottom:1px solid #1C1E24;">
+<div style="font-family:'DM Mono',monospace;font-size:9px;letter-spacing:0.2em;color:#29ABE2;text-transform:uppercase;margin-bottom:28px;display:flex;align-items:center;gap:12px;">02 — Your Details<span style="flex:1;height:1px;background:#1C1E24;display:block;"></span></div>
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:20px 28px;">
+<div style="grid-column:1/-1;display:flex;flex-direction:column;gap:7px;">
+<label style="font-family:'DM Mono',monospace;font-size:9px;letter-spacing:0.16em;color:#8A8F9E;text-transform:uppercase;">Full Name *</label>
+<input name="contact_name" onblur="this.style.borderColor='#2A2D36'" onfocus="this.style.borderColor='#29ABE2'" placeholder="First &amp; Last Name" required="" style="background:#0D0D10;border:1px solid #2A2D36;color:#fff;padding:13px 16px;font-size:14px;font-family:'DM Sans',sans-serif;outline:none;" type="text"/>
+</div>
+<div style="display:flex;flex-direction:column;gap:7px;">
+<label style="font-family:'DM Mono',monospace;font-size:9px;letter-spacing:0.16em;color:#8A8F9E;text-transform:uppercase;">Title</label>
+<input name="contact_title" onblur="this.style.borderColor='#2A2D36'" onfocus="this.style.borderColor='#29ABE2'" placeholder="e.g. Booking Manager" style="background:#0D0D10;border:1px solid #2A2D36;color:#fff;padding:13px 16px;font-size:14px;font-family:'DM Sans',sans-serif;outline:none;" type="text"/>
+</div>
+<div style="display:flex;flex-direction:column;gap:7px;">
+<label style="font-family:'DM Mono',monospace;font-size:9px;letter-spacing:0.16em;color:#8A8F9E;text-transform:uppercase;">Office Phone</label>
+<input name="contact_office" onblur="this.style.borderColor='#2A2D36'" onfocus="this.style.borderColor='#29ABE2'" placeholder="+31 20 000 0000" style="background:#0D0D10;border:1px solid #2A2D36;color:#fff;padding:13px 16px;font-size:14px;font-family:'DM Sans',sans-serif;outline:none;" type="tel"/>
+</div>
+<div style="display:flex;flex-direction:column;gap:7px;">
+<label style="font-family:'DM Mono',monospace;font-size:9px;letter-spacing:0.16em;color:#8A8F9E;text-transform:uppercase;">Mobile *</label>
+<input name="contact_mobile" onblur="this.style.borderColor='#2A2D36'" onfocus="this.style.borderColor='#29ABE2'" placeholder="+31 6 000 00000" required="" style="background:#0D0D10;border:1px solid #2A2D36;color:#fff;padding:13px 16px;font-size:14px;font-family:'DM Sans',sans-serif;outline:none;" type="tel"/>
+</div>
+<div style="grid-column:1/-1;display:flex;flex-direction:column;gap:7px;">
+<label style="font-family:'DM Mono',monospace;font-size:9px;letter-spacing:0.16em;color:#8A8F9E;text-transform:uppercase;">Email *</label>
+<input name="contact_email" onblur="this.style.borderColor='#2A2D36'" onfocus="this.style.borderColor='#29ABE2'" placeholder="you@company.com" required="" style="background:#0D0D10;border:1px solid #2A2D36;color:#fff;padding:13px 16px;font-size:14px;font-family:'DM Sans',sans-serif;outline:none;" type="email"/>
+</div>
+</div>
+</div>
+<!-- SEC 03 -->
+<div style="padding-bottom:48px;margin-bottom:48px;border-bottom:1px solid #1C1E24;">
+<div style="font-family:'DM Mono',monospace;font-size:9px;letter-spacing:0.2em;color:#29ABE2;text-transform:uppercase;margin-bottom:28px;display:flex;align-items:center;gap:12px;">03 — Purchaser / Company<span style="flex:1;height:1px;background:#1C1E24;display:block;"></span></div>
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:20px 28px;">
+<div style="grid-column:1/-1;display:flex;flex-direction:column;gap:7px;">
+<label style="font-family:'DM Mono',monospace;font-size:9px;letter-spacing:0.16em;color:#8A8F9E;text-transform:uppercase;">Company Name *</label>
+<input name="company_name" onblur="this.style.borderColor='#2A2D36'" onfocus="this.style.borderColor='#29ABE2'" placeholder="Company or Promoter name" required="" style="background:#0D0D10;border:1px solid #2A2D36;color:#fff;padding:13px 16px;font-size:14px;font-family:'DM Sans',sans-serif;outline:none;" type="text"/>
+</div>
+<div style="grid-column:1/-1;display:flex;flex-direction:column;gap:7px;">
+<label style="font-family:'DM Mono',monospace;font-size:9px;letter-spacing:0.16em;color:#8A8F9E;text-transform:uppercase;">Address (No PO Boxes)</label>
+<input name="company_address" onblur="this.style.borderColor='#2A2D36'" onfocus="this.style.borderColor='#29ABE2'" placeholder="Street address" style="background:#0D0D10;border:1px solid #2A2D36;color:#fff;padding:13px 16px;font-size:14px;font-family:'DM Sans',sans-serif;outline:none;" type="text"/>
+</div>
+<div style="display:flex;flex-direction:column;gap:7px;">
+<label style="font-family:'DM Mono',monospace;font-size:9px;letter-spacing:0.16em;color:#8A8F9E;text-transform:uppercase;">City</label>
+<input name="company_city" onblur="this.style.borderColor='#2A2D36'" onfocus="this.style.borderColor='#29ABE2'" placeholder="City" style="background:#0D0D10;border:1px solid #2A2D36;color:#fff;padding:13px 16px;font-size:14px;font-family:'DM Sans',sans-serif;outline:none;" type="text"/>
+</div>
+<div style="display:flex;flex-direction:column;gap:7px;">
+<label style="font-family:'DM Mono',monospace;font-size:9px;letter-spacing:0.16em;color:#8A8F9E;text-transform:uppercase;">State / Province / Postal Code</label>
+<input name="company_postal" onblur="this.style.borderColor='#2A2D36'" onfocus="this.style.borderColor='#29ABE2'" placeholder="State / Province, Postal Code" style="background:#0D0D10;border:1px solid #2A2D36;color:#fff;padding:13px 16px;font-size:14px;font-family:'DM Sans',sans-serif;outline:none;" type="text"/>
+</div>
+<div style="display:flex;flex-direction:column;gap:7px;">
+<label style="font-family:'DM Mono',monospace;font-size:9px;letter-spacing:0.16em;color:#8A8F9E;text-transform:uppercase;">Office Phone</label>
+<input name="company_phone" onblur="this.style.borderColor='#2A2D36'" onfocus="this.style.borderColor='#29ABE2'" placeholder="+31 20 000 0000" style="background:#0D0D10;border:1px solid #2A2D36;color:#fff;padding:13px 16px;font-size:14px;font-family:'DM Sans',sans-serif;outline:none;" type="tel"/>
+</div>
+<div style="display:flex;flex-direction:column;gap:7px;">
+<label style="font-family:'DM Mono',monospace;font-size:9px;letter-spacing:0.16em;color:#8A8F9E;text-transform:uppercase;">Signatory Name &amp; Title</label>
+<input name="signatory" onblur="this.style.borderColor='#2A2D36'" onfocus="this.style.borderColor='#29ABE2'" placeholder="Name, Title" style="background:#0D0D10;border:1px solid #2A2D36;color:#fff;padding:13px 16px;font-size:14px;font-family:'DM Sans',sans-serif;outline:none;" type="text"/>
+</div>
+<div style="display:flex;flex-direction:column;gap:7px;">
+<label style="font-family:'DM Mono',monospace;font-size:9px;letter-spacing:0.16em;color:#8A8F9E;text-transform:uppercase;">Signatory Mobile</label>
+<input name="signatory_mobile" onblur="this.style.borderColor='#2A2D36'" onfocus="this.style.borderColor='#29ABE2'" placeholder="+31 6 000 00000" style="background:#0D0D10;border:1px solid #2A2D36;color:#fff;padding:13px 16px;font-size:14px;font-family:'DM Sans',sans-serif;outline:none;" type="tel"/>
+</div>
+<div style="grid-column:1/-1;display:flex;flex-direction:column;gap:7px;">
+<label style="font-family:'DM Mono',monospace;font-size:9px;letter-spacing:0.16em;color:#8A8F9E;text-transform:uppercase;">Signatory Email</label>
+<input name="signatory_email" onblur="this.style.borderColor='#2A2D36'" onfocus="this.style.borderColor='#29ABE2'" placeholder="signatory@company.com" style="background:#0D0D10;border:1px solid #2A2D36;color:#fff;padding:13px 16px;font-size:14px;font-family:'DM Sans',sans-serif;outline:none;" type="email"/>
+</div>
+</div>
+</div>
+<!-- SEC 04 -->
+<div style="padding-bottom:48px;margin-bottom:48px;border-bottom:1px solid #1C1E24;">
+<div style="font-family:'DM Mono',monospace;font-size:9px;letter-spacing:0.2em;color:#29ABE2;text-transform:uppercase;margin-bottom:28px;display:flex;align-items:center;gap:12px;">04 — Venue &amp; Event Details<span style="flex:1;height:1px;background:#1C1E24;display:block;"></span></div>
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:20px 28px;">
+<div style="display:flex;flex-direction:column;gap:7px;">
+<label style="font-family:'DM Mono',monospace;font-size:9px;letter-spacing:0.16em;color:#8A8F9E;text-transform:uppercase;">Event Name *</label>
+<input name="event_name" onblur="this.style.borderColor='#2A2D36'" onfocus="this.style.borderColor='#29ABE2'" placeholder="Event name" required="" style="background:#0D0D10;border:1px solid #2A2D36;color:#fff;padding:13px 16px;font-size:14px;font-family:'DM Sans',sans-serif;outline:none;" type="text"/>
+</div>
+<div style="display:flex;flex-direction:column;gap:7px;">
+<label style="font-family:'DM Mono',monospace;font-size:9px;letter-spacing:0.16em;color:#8A8F9E;text-transform:uppercase;">Venue Name *</label>
+<input name="venue_name" onblur="this.style.borderColor='#2A2D36'" onfocus="this.style.borderColor='#29ABE2'" placeholder="Venue name" required="" style="background:#0D0D10;border:1px solid #2A2D36;color:#fff;padding:13px 16px;font-size:14px;font-family:'DM Sans',sans-serif;outline:none;" type="text"/>
+</div>
+<div style="grid-column:1/-1;display:flex;flex-direction:column;gap:7px;">
+<label style="font-family:'DM Mono',monospace;font-size:9px;letter-spacing:0.16em;color:#8A8F9E;text-transform:uppercase;">Venue Address</label>
+<input name="venue_address" onblur="this.style.borderColor='#2A2D36'" onfocus="this.style.borderColor='#29ABE2'" placeholder="Street address" style="background:#0D0D10;border:1px solid #2A2D36;color:#fff;padding:13px 16px;font-size:14px;font-family:'DM Sans',sans-serif;outline:none;" type="text"/>
+</div>
+<div style="display:flex;flex-direction:column;gap:7px;">
+<label style="font-family:'DM Mono',monospace;font-size:9px;letter-spacing:0.16em;color:#8A8F9E;text-transform:uppercase;">City / State / Postal Code</label>
+<input name="venue_city" onblur="this.style.borderColor='#2A2D36'" onfocus="this.style.borderColor='#29ABE2'" placeholder="City, State, Postal Code" style="background:#0D0D10;border:1px solid #2A2D36;color:#fff;padding:13px 16px;font-size:14px;font-family:'DM Sans',sans-serif;outline:none;" type="text"/>
+</div>
+<div style="display:flex;flex-direction:column;gap:7px;">
+<label style="font-family:'DM Mono',monospace;font-size:9px;letter-spacing:0.16em;color:#8A8F9E;text-transform:uppercase;">Venue Phone</label>
+<input name="venue_phone" onblur="this.style.borderColor='#2A2D36'" onfocus="this.style.borderColor='#29ABE2'" placeholder="+31 20 000 0000" style="background:#0D0D10;border:1px solid #2A2D36;color:#fff;padding:13px 16px;font-size:14px;font-family:'DM Sans',sans-serif;outline:none;" type="tel"/>
+</div>
+<div style="display:flex;flex-direction:column;gap:7px;">
+<label style="font-family:'DM Mono',monospace;font-size:9px;letter-spacing:0.16em;color:#8A8F9E;text-transform:uppercase;">Venue Website</label>
+<input name="venue_website" onblur="this.style.borderColor='#2A2D36'" onfocus="this.style.borderColor='#29ABE2'" placeholder="https://venue.com" style="background:#0D0D10;border:1px solid #2A2D36;color:#fff;padding:13px 16px;font-size:14px;font-family:'DM Sans',sans-serif;outline:none;" type="url"/>
+</div>
+<div style="display:flex;flex-direction:column;gap:7px;">
+<label style="font-family:'DM Mono',monospace;font-size:9px;letter-spacing:0.16em;color:#8A8F9E;text-transform:uppercase;">Event Capacity</label>
+<input name="capacity" onblur="this.style.borderColor='#2A2D36'" onfocus="this.style.borderColor='#29ABE2'" placeholder="e.g. 2,000" style="background:#0D0D10;border:1px solid #2A2D36;color:#fff;padding:13px 16px;font-size:14px;font-family:'DM Sans',sans-serif;outline:none;" type="text"/>
+</div>
+<div style="display:flex;flex-direction:column;gap:7px;">
+<label style="font-family:'DM Mono',monospace;font-size:9px;letter-spacing:0.16em;color:#8A8F9E;text-transform:uppercase;">Age Restrictions</label>
+<input name="age" onblur="this.style.borderColor='#2A2D36'" onfocus="this.style.borderColor='#29ABE2'" placeholder="e.g. 18+, All ages" style="background:#0D0D10;border:1px solid #2A2D36;color:#fff;padding:13px 16px;font-size:14px;font-family:'DM Sans',sans-serif;outline:none;" type="text"/>
+</div>
+<div style="grid-column:1/-1;display:flex;flex-direction:column;gap:7px;">
+<label style="font-family:'DM Mono',monospace;font-size:9px;letter-spacing:0.16em;color:#8A8F9E;text-transform:uppercase;">Ticket Price (all tiers)</label>
+<input name="tickets" onblur="this.style.borderColor='#2A2D36'" onfocus="this.style.borderColor='#29ABE2'" placeholder="e.g. Early bird €20, General €30, VIP €75" style="background:#0D0D10;border:1px solid #2A2D36;color:#fff;padding:13px 16px;font-size:14px;font-family:'DM Sans',sans-serif;outline:none;" type="text"/>
+</div>
+<div style="display:flex;flex-direction:column;gap:7px;">
+<label style="font-family:'DM Mono',monospace;font-size:9px;letter-spacing:0.16em;color:#8A8F9E;text-transform:uppercase;">Door / Show Time</label>
+<input name="door_time" onblur="this.style.borderColor='#2A2D36'" onfocus="this.style.borderColor='#29ABE2'" placeholder="Doors 22:00 / Show 23:00" style="background:#0D0D10;border:1px solid #2A2D36;color:#fff;padding:13px 16px;font-size:14px;font-family:'DM Sans',sans-serif;outline:none;" type="text"/>
+</div>
+<div style="display:flex;flex-direction:column;gap:7px;">
+<label style="font-family:'DM Mono',monospace;font-size:9px;letter-spacing:0.16em;color:#8A8F9E;text-transform:uppercase;">Event Curfew</label>
+<input name="curfew" onblur="this.style.borderColor='#2A2D36'" onfocus="this.style.borderColor='#29ABE2'" placeholder="e.g. 04:00" style="background:#0D0D10;border:1px solid #2A2D36;color:#fff;padding:13px 16px;font-size:14px;font-family:'DM Sans',sans-serif;outline:none;" type="text"/>
+</div>
+<div style="display:flex;flex-direction:column;gap:7px;">
+<label style="font-family:'DM Mono',monospace;font-size:9px;letter-spacing:0.16em;color:#8A8F9E;text-transform:uppercase;">Type of Venue</label>
+<select name="venue_type" onblur="this.style.borderColor='#2A2D36'" onfocus="this.style.borderColor='#29ABE2'" style="background:#0D0D10;border:1px solid #2A2D36;color:#fff;padding:13px 16px;font-size:14px;font-family:'DM Sans',sans-serif;outline:none;cursor:pointer;">
+<option value="">Select...</option>
+<option>Club / Nightclub</option><option>Festival</option><option>Beach Club</option>
+<option>Outdoor / Open Air</option><option>Arena / Theatre</option>
+<option>Brand Event</option><option>Private Event</option><option>Other</option>
+</select>
+</div>
+<div style="display:flex;flex-direction:column;gap:7px;">
+<label style="font-family:'DM Mono',monospace;font-size:9px;letter-spacing:0.16em;color:#8A8F9E;text-transform:uppercase;">Proposed Set Time</label>
+<input name="set_time" onblur="this.style.borderColor='#2A2D36'" onfocus="this.style.borderColor='#29ABE2'" placeholder="e.g. 01:00 – 03:00" style="background:#0D0D10;border:1px solid #2A2D36;color:#fff;padding:13px 16px;font-size:14px;font-family:'DM Sans',sans-serif;outline:none;" type="text"/>
+</div>
+<div style="display:flex;flex-direction:column;gap:7px;">
+<label style="font-family:'DM Mono',monospace;font-size:9px;letter-spacing:0.16em;color:#8A8F9E;text-transform:uppercase;">Proposed Stage</label>
+<input name="stage" onblur="this.style.borderColor='#2A2D36'" onfocus="this.style.borderColor='#29ABE2'" placeholder="e.g. Main Stage" style="background:#0D0D10;border:1px solid #2A2D36;color:#fff;padding:13px 16px;font-size:14px;font-family:'DM Sans',sans-serif;outline:none;" type="text"/>
+</div>
+<div style="grid-column:1/-1;display:flex;flex-direction:column;gap:7px;">
+<label style="font-family:'DM Mono',monospace;font-size:9px;letter-spacing:0.16em;color:#8A8F9E;text-transform:uppercase;">Other Artists Performing</label>
+<textarea name="other_artists" onblur="this.style.borderColor='#2A2D36'" onfocus="this.style.borderColor='#29ABE2'" placeholder="List other confirmed or proposed artists..." style="background:#0D0D10;border:1px solid #2A2D36;color:#fff;padding:13px 16px;font-size:14px;font-family:'DM Sans',sans-serif;outline:none;resize:vertical;min-height:80px;"></textarea>
+</div>
+<div style="display:flex;flex-direction:column;gap:7px;">
+<label style="font-family:'DM Mono',monospace;font-size:9px;letter-spacing:0.16em;color:#8A8F9E;text-transform:uppercase;">Other Artists Set Times</label>
+<input name="other_set_times" onblur="this.style.borderColor='#2A2D36'" onfocus="this.style.borderColor='#29ABE2'" placeholder="e.g. Artist A: 23:00, Artist B: 01:00" style="background:#0D0D10;border:1px solid #2A2D36;color:#fff;padding:13px 16px;font-size:14px;font-family:'DM Sans',sans-serif;outline:none;" type="text"/>
+</div>
+<div style="display:flex;flex-direction:column;gap:7px;">
+<label style="font-family:'DM Mono',monospace;font-size:9px;letter-spacing:0.16em;color:#8A8F9E;text-transform:uppercase;">Is this part of a series?</label>
+<input name="series" onblur="this.style.borderColor='#2A2D36'" onfocus="this.style.borderColor='#29ABE2'" placeholder="e.g. Monthly club night" style="background:#0D0D10;border:1px solid #2A2D36;color:#fff;padding:13px 16px;font-size:14px;font-family:'DM Sans',sans-serif;outline:none;" type="text"/>
+</div>
+</div>
+</div>
+<!-- SEC 05 -->
+<div style="padding-bottom:48px;margin-bottom:48px;border-bottom:1px solid #1C1E24;">
+<div style="font-family:'DM Mono',monospace;font-size:9px;letter-spacing:0.2em;color:#29ABE2;text-transform:uppercase;margin-bottom:28px;display:flex;align-items:center;gap:12px;">05 — History<span style="flex:1;height:1px;background:#1C1E24;display:block;"></span></div>
+<div style="display:grid;grid-template-columns:1fr;gap:20px;">
+<div style="display:flex;flex-direction:column;gap:7px;">
+<label style="font-family:'DM Mono',monospace;font-size:9px;letter-spacing:0.16em;color:#8A8F9E;text-transform:uppercase;">What other artists have performed at this venue?</label>
+<textarea name="venue_history" onblur="this.style.borderColor='#2A2D36'" onfocus="this.style.borderColor='#29ABE2'" placeholder="List notable past artists..." style="background:#0D0D10;border:1px solid #2A2D36;color:#fff;padding:13px 16px;font-size:14px;font-family:'DM Sans',sans-serif;outline:none;resize:vertical;min-height:80px;"></textarea>
+</div>
+<div style="display:flex;flex-direction:column;gap:7px;">
+<label style="font-family:'DM Mono',monospace;font-size:9px;letter-spacing:0.16em;color:#8A8F9E;text-transform:uppercase;">What other agencies have you contracted with? (Specify artists &amp; agent)</label>
+<textarea name="agency_history" onblur="this.style.borderColor='#2A2D36'" onfocus="this.style.borderColor='#29ABE2'" placeholder="e.g. WME – Artist X, CAA – Artist Y..." style="background:#0D0D10;border:1px solid #2A2D36;color:#fff;padding:13px 16px;font-size:14px;font-family:'DM Sans',sans-serif;outline:none;resize:vertical;min-height:80px;"></textarea>
+</div>
+<div style="display:flex;flex-direction:column;gap:7px;">
+<label style="font-family:'DM Mono',monospace;font-size:9px;letter-spacing:0.16em;color:#8A8F9E;text-transform:uppercase;">Additional Comments</label>
+<textarea name="comments" onblur="this.style.borderColor='#2A2D36'" onfocus="this.style.borderColor='#29ABE2'" placeholder="Anything else we should know..." style="background:#0D0D10;border:1px solid #2A2D36;color:#fff;padding:13px 16px;font-size:14px;font-family:'DM Sans',sans-serif;outline:none;resize:vertical;min-height:100px;"></textarea>
+</div>
+<div style="display:flex;align-item<script>
+document.addEventListener("DOMContentLoaded", function() {
+  var hamburger = document.querySelector(".nav-hamburger");
+  var menu = document.getElementById("mobileMenu");
+  if (!hamburger || !menu) return;
 
-function submitOffer(e){
-  e.preventDefault();
-  var form=document.getElementById("offer-form");
-  var btn=form.querySelector("button[type=submit]");
-  btn.disabled=true;
-  btn.textContent="Sending...";
-  fetch("https://formspree.io/f/xjgpkbaz",{
-    method:"POST",
-    body:new FormData(form),
-    headers:{Accept:"application/json"}
-  }).then(function(r){
-    if(r.ok){window.location.href="thank-you.html";}
-    else{btn.disabled=false;btn.textContent="Submit Request";alert("Something went wrong. Please try again.");}
-  }).catch(function(){
-    btn.disabled=false;btn.textContent="Submit Request";alert("Something went wrong. Please try again.");
+  hamburger.addEventListener("click", function() {
+    menu.classList.toggle("open");
+    hamburger.classList.toggle("open");
+    document.body.style.overflow = menu.classList.contains("open") ? "hidden" : "";
   });
-}
 
-function handleSubmit(e){
-  e.preventDefault();
-  var form=document.getElementById("contact-form");
-  var btn=form.querySelector("button[type=submit]");
-  btn.disabled=true;
-  btn.textContent="Sending...";
-  fetch("https://formspree.io/f/xjgpkbaz",{
-    method:"POST",
-    body:new FormData(form),
-    headers:{Accept:"application/json"}
-  }).then(function(r){
-    if(r.ok){window.location.href="thank-you.html";}
-    else{btn.disabled=false;btn.textContent="Send Message";alert("Something went wrong. Please try again.");}
-  }).catch(function(){
-    btn.disabled=false;btn.textContent="Send Message";alert("Something went wrong. Please try again.");
-  });
-}
-
-function acceptCookies(){try{localStorage.setItem("cookies","accepted");}catch(e){}document.getElementById("cookie-banner").style.display="none";}
-function rejectCookies(){try{localStorage.setItem("cookies","rejected");}catch(e){}document.getElementById("cookie-banner").style.display="none";}
-function showPrivacy(){document.getElementById("privacy-modal").style.display="block";}
-try{if(localStorage.getItem("cookies"))document.getElementById("cookie-banner").style.display="none";}catch(e){}
-
-// Nav scroll
-window.addEventListener("scroll",function(){
-  var nav=document.querySelector("nav");
-  if(nav) nav.classList.toggle("scrolled",window.scrollY>50);
-});
-
-// Reveal on scroll
-(function(){
-  var revealEls=document.querySelectorAll(".reveal");
-  revealEls.forEach(function(el){el.classList.add("animate-hidden");});
-  var ro=new IntersectionObserver(function(entries){
-    entries.forEach(function(entry){
-      if(entry.isIntersecting){entry.target.classList.remove("animate-hidden");entry.target.classList.add("visible");ro.unobserve(entry.target);}
+  menu.querySelectorAll("a").forEach(function(link) {
+    link.addEventListener("click", function(e) {
+      var href = this.getAttribute("href");
+      menu.classList.remove("open");
+      hamburger.classList.remove("open");
+      document.body.style.overflow = "";
+      if (href && href.startsWith("#")) {
+        e.preventDefault();
+        setTimeout(function() {
+          var target = document.querySelector(href);
+          if (target) target.scrollIntoView({ behavior: "smooth" });
+        }, 50);
+      }
     });
-  },{threshold:0.1,rootMargin:"0px 0px -40px 0px"});
-  revealEls.forEach(function(el){ro.observe(el);});
-})();
-
-// Accordion
-document.querySelectorAll(".service-row").forEach(function(row){
-  row.addEventListener("click",function(){
-    var isOpen=row.classList.contains("open");
-    document.querySelectorAll(".service-row").forEach(function(r){r.classList.remove("open");});
-    if(!isOpen)row.classList.add("open");
   });
 });
-
-// Mobile menu
-var mobileMenuOpen = false;
-function toggleMobileMenu() {
-  mobileMenuOpen = !mobileMenuOpen;
-  var overlay = document.getElementById('mobileMenuOverlay');
-  var btn = document.getElementById('hamburgerBtn');
-  var l1 = document.getElementById('hLine1');
-  var l2 = document.getElementById('hLine2');
-  var l3 = document.getElementById('hLine3');
-  if (mobileMenuOpen) {
-    overlay.style.display = 'flex';
-    document.body.style.overflow = 'hidden';
-    l1.style.transform = 'rotate(45deg) translate(5px,5px)';
-    l2.style.opacity = '0';
-    l3.style.transform = 'rotate(-45deg) translate(5px,-5px)';
-  } else {
-    closeMobileMenu();
-  }
-}
-function closeMobileMenu() {
-  mobileMenuOpen = false;
-  var overlay = document.getElementById('mobileMenuOverlay');
-  if (overlay) overlay.style.display = 'none';
-  document.body.style.overflow = '';
-  var l1 = document.getElementById('hLine1');
-  var l2 = document.getElementById('hLine2');
-  var l3 = document.getElementById('hLine3');
-  if (l1) { l1.style.transform='none'; l2.style.opacity='1'; l3.style.transform='none'; }
-}
-
-
-// Responsive nav show/hide
-function handleNavResize() {
-  var w = window.innerWidth;
-  var desktop = document.getElementById('desktopNav');
-  var cta = document.getElementById('desktopCta');
-  var ham = document.getElementById('hamburgerBtn');
-  if (!desktop || !ham) return;
-  if (w <= 768) {
-    desktop.style.display = 'none';
-    cta.style.display = 'none';
-    ham.style.display = 'flex';
-  } else {
-    desktop.style.display = 'flex';
-    cta.style.display = 'block';
-    ham.style.display = 'none';
-    closeMobileMenu();
-  }
-}
-handleNavResize();
-window.addEventListener('resize', handleNavResize);
-
 </script>
-</body>
-</html>
